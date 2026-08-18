@@ -1,0 +1,25 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Contact: bglbasculas@gmail.com
+Preferred-Languages: es
+Canonical: https://bglbasculas.com.mx
+Policy: https://bglbasculas.com.mx/legal/politicas-de-seguridad
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJPBAEBCAA5FiEE7lMDSWOOIBAOR+HlovKBqgCFwxwFAmphsJ4bFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMiwxAAoJEKLygaoAhcMcuHUP/j8aKfrmrQNsNjxGrRxM
+B5fToBMqbHe/o2bbKOnRLi7SyT74RNzD4cCCkbE71wtG8S7oBm+w3TP+o8fQt+5v
+lr/T3jNPpZEhMdyjwIac5oDy+IAiHERSqH0G+sAG5/JnfzVSWi95neSmo76VRHth
+ZRVUG0rZOpJUdS7F0McaUgL1NQ/3Or/NJMwzrae6LiIyliwqCMnuzg6XJHcuSh8D
+OSlhGmSuLaJQ22PWuJPplr/3eb3SZjQz91PIZ2TKl6YoYm4EdYDMJzrV45Xs7xbf
+uHDy30W1438agz98gTWyHCrmDZtZ8j2/MRbZ8hAQUfoy38a+1LgBlSDvX8+27ne5
+BstMgEWRo4nGdkTt4saCo9NzuJhs6U23YZUKO/Z9+FWTyaAZpRCsC4Aoced6VS2c
+B3ot2tmuMJzEwmkC2Hr67lOCY6kDqWakqMEUtzERdCbPzKQpbDIFcfSS16ECHLUC
+eXpky/kJWrDOSeC6J/QafRW/jyiakgx27dOCKPXxiwNSCIHHq48RvWpQ5kjRhpjf
+5BHEryKjyDWaZtvNfS6r+vaKRwUYmX95hRSPDiS3KDQItncRm71inwdfVNQJ6EH8
+1SMma4A9LF66sFd3XGm6gCe/A0cXM/iLnoPF772hD8yV4btBKBWRoc0J1enCQHhU
+0gBML3N+AJuJlNSyEVC2/guO
+=2xFS
+-----END PGP SIGNATURE-----

@@ -1,0 +1,50 @@
+# CODEOWNERS — define who reviews changes to specific parts of the codebase.
+
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback — the maintainer reviews everything by default
+
+-                              @JesusOmarDev1
+
+# CMS block system (components + types)
+
+/src/components/blocks/ @JesusOmarDev1
+/src/@types/blocks/ @JesusOmarDev1
+
+# Directus services and data layer
+
+/src/services/ @JesusOmarDev1
+/src/lib/directus.ts @JesusOmarDev1
+
+# API routes and webhooks
+
+/src/pages/api/ @JesusOmarDev1
+
+# Core utilities and caching
+
+/src/lib/ @JesusOmarDev1
+
+# Layouts, middleware, and providers
+
+/src/layouts/ @JesusOmarDev1
+/src/middleware.ts @JesusOmarDev1
+
+# Styles and theming
+
+/src/styles/ @JesusOmarDev1
+
+# CI / GitHub configuration
+
+/.github/ @JesusOmarDev1
+
+# Docker and deployment
+
+/Dockerfile @JesusOmarDev1
+/docker-compose.yml @JesusOmarDev1
+
+# Root config files
+
+/package.json @JesusOmarDev1
+/astro.config.mjs @JesusOmarDev1
+/tailwind.config.mjs @JesusOmarDev1
+/tsconfig.json @JesusOmarDev1

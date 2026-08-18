@@ -1,0 +1,1 @@
+export const placeholder2xl = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2560' height='1440' viewBox='0 0 2560 1440'%3E%3Crect width='2560' height='1440' fill='%231a1a1a'/%3E%3C/svg%3E`;

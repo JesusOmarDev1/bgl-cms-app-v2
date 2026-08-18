@@ -1,0 +1,19 @@
+<Files ".env">
+   Require all denied
+</Files>
+
+<FilesMatch "^\..*env">
+   Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(env|gitignore|gga)$">
+   Require all denied
+</FilesMatch>
+
+# Habilitar el motor de reescritura
+RewriteEngine On
+
+ErrorDocument 403 "Acceso denegado"
+ErrorDocument 404 "No encontrado"
+ErrorDocument 500 "Error interno"
+ErrorDocument 503 "Mantenimiento"

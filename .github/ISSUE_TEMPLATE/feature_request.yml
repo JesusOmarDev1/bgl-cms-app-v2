@@ -1,0 +1,57 @@
+name: 🚀 Solicitud de Feature
+description: Sugerí una nueva funcionalidad o mejora
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por sugerir una funcionalidad! Describí tu idea claramente para que podamos entenderla y discutirla.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema / Motivación
+      description: ¿Qué problema resuelve esta funcionalidad? ¿Cuál es la limitación o dolor actual?
+      placeholder: "Siempre me frustra cuando..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Describí la funcionalidad que te gustaría ver. ¿Cómo debería funcionar?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: ¿Consideraste alguna solución alternativa o workaround?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      description: ¿A qué parte del proyecto se relaciona?
+      options:
+        - Páginas / Rutas
+        - Bloques CMS
+        - API / Servicios
+        - SEO / Rendimiento
+        - UI / Componentes
+        - Infraestructura / Docker
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Contexto Adicional
+      description: Cualquier otro contexto, mockups o ejemplos que ayuden a ilustrar la funcionalidad.
+    validations:
+      required: false
