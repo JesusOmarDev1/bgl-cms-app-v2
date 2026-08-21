@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 
 import { cn } from "@/lib/utils"
 
@@ -31,17 +32,19 @@ function AvatarImage({ className, ...props }: React.ComponentProps<"img">) {
     props.src ? "loading" : "error"
   )
   return (
-    <img
-      data-slot="avatar-image"
+    <Image
+      src={props.src as string}
       alt={props.alt || ""}
+      className={cn(
+        "aspect-square size-full rounded-full object-cover",
+        className
+      )}
       data-state={state}
       onLoad={() => setState("loaded")}
       onError={() => setState("error")}
-      className={cn(
-        "peer aspect-square size-full rounded-full object-cover data-[state=error]:hidden",
-        className
-      )}
-      {...props}
+      loading="lazy"
+      decoding="async"
+      fetchPriority="high"
     />
   )
 }

@@ -1,6 +1,10 @@
 packages: []
 
+minimumReleaseAge: 1280
+
 allowBuilds:
   sharp: true
   unrs-resolver: true
   msw: false
+  '@parcel/watcher': set this to true or false
+  '@swc/core': set this to true or false
