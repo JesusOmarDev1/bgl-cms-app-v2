@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const FacebookIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 666.667 666.667" {...props}>
@@ -28,6 +28,6 @@ const FacebookIcon = (props: SVGProps<SVGSVGElement>) => (
       />
     </g>
   </svg>
-);
+)
 
-export { FacebookIcon };
+export { FacebookIcon }

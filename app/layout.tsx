@@ -1,9 +1,11 @@
+import "./globals.css"
 import { Geist, Geist_Mono } from "next/font/google"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { NextIntlClientProvider } from "next-intl"
-
-import "./globals.css"
 import { ThemeProvider } from "@/providers/ThemeProvider"
+import { QueryProvider } from "@/providers/QueryProvider"
+import { Toaster } from "@/components/ui/sonner"
+
 import { cn } from "@/lib/utils"
 
 const geist = Geist({
@@ -33,16 +35,29 @@ export default function RootLayout({
     >
       <body>
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-          <GoogleAnalytics
-            gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID! as string}
-          />
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+              forcedTheme="dark"
+              storageKey="bgl-theme"
+              enableSystem={false}
+            >
+              {children}
+              <Toaster
+                richColors
+                closeButton
+                expand
+                theme="dark"
+                duration={2000}
+                position="top-center"
+              />
+            </ThemeProvider>
+            <GoogleAnalytics
+              gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID! as string}
+            />
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

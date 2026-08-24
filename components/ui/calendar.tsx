@@ -150,14 +150,14 @@ function CalendarInner({
           slot="previous"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
-          <ChevronLeftIcon className="rtl:rotate-180 size-4" />
+          <ChevronLeftIcon className="size-4 rtl:rotate-180" />
         </Button>
         <Button
           variant={buttonVariant}
           slot="next"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
-          <ChevronRightIcon className="rtl:rotate-180 size-4" />
+          <ChevronRightIcon className="size-4 rtl:rotate-180" />
         </Button>
       </header>
       {Array.from({ length: numberOfMonths }, (_, i) => (

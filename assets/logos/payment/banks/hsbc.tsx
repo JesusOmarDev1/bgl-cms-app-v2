@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const HsbcIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 177 38" {...props}>
@@ -12,6 +12,6 @@ const HsbcIcon = (props: SVGProps<SVGSVGElement>) => (
       className="fill-[#db0011]"
     />
   </svg>
-);
+)
 
-export { HsbcIcon };
+export { HsbcIcon }

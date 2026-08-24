@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const LinkedInIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg {...props} preserveAspectRatio="xMidYMid" viewBox="0 0 256 256">
@@ -7,6 +7,6 @@ const LinkedInIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#0A66C2"
     />
   </svg>
-);
+)
 
-export { LinkedInIcon };
+export { LinkedInIcon }

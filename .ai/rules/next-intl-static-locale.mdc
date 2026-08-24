@@ -1,0 +1,26 @@
+---
+description: next-intl single-locale es — static catalogs under messages
+globs: i18n/**/*.ts,i18n/**/*.json,app/layout.tsx
+alwaysApply: false
+---
+
+# next-intl static locale
+
+This app is single-locale. `getRequestConfig` uses `locale: "es"` with no cookie.
+
+Catalogs live at `i18n/<namespace>/es.json` and already wrap the namespace key. Merge with spread into `messages` (do not wrap again):
+
+```ts
+messages: {
+  ...(await import(`./email-validator/${locale}.json`)).default,
+  ...(await import(`./ofetch/${locale}.json`)).default,
+  ...(await import(`./search/${locale}.json`)).default,
+  ...(await import(`./visual-editing/${locale}.json`)).default,
+}
+```
+
+`useTranslations("email-validator")` reads `messages["email-validator"]`.
+
+Keep `<html lang="es-MX">`. Document language (`es-MX`) and next-intl locale (`es`) may differ.
+
+`NextIntlClientProvider` with no props is fine once `getRequestConfig` is static.

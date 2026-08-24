@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const InstagramIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -43,6 +43,6 @@ const InstagramIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#fff"
     />
   </svg>
-);
+)
 
-export { InstagramIcon };
+export { InstagramIcon }

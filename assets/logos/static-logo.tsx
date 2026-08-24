@@ -34,5 +34,5 @@ export const StaticLogo = (props: React.SVGProps<SVGSVGElement>) => {
         />
       </g>
     </svg>
-  );
-};
+  )
+}

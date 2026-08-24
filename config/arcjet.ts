@@ -8,7 +8,14 @@ export const aj = arcjet({
     }),
     detectBot({
       mode: process.env.ARCJET_MODE! as ArcjetMode,
-      allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:GOOGLE"],
+      allow: [
+        "CATEGORY:SEARCH_ENGINE",
+        "CATEGORY:GOOGLE",
+        "YAHOO_CRAWLER",
+        "BING_CRAWLER",
+        "GOOGLE_CRAWLER",
+        "CATEGORY:APPLE",
+      ],
     }),
     filter({
       // This will deny any traffic using a VPN, Tor, that matches the curl

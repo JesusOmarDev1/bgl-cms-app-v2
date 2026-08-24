@@ -1,7 +1,7 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 interface WhatsAppIconProps extends SVGProps<SVGSVGElement> {
-  fill?: string;
+  fill?: string
 }
 
 const WhatsAppIcon = ({ fill, ...props }: WhatsAppIconProps) => (
@@ -13,6 +13,6 @@ const WhatsAppIcon = ({ fill, ...props }: WhatsAppIconProps) => (
       clipRule="evenodd"
     />
   </svg>
-);
+)
 
-export { WhatsAppIcon };
+export { WhatsAppIcon }

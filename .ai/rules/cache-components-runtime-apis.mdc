@@ -1,0 +1,36 @@
+---
+description: Cache Components — no runtime APIs in the root shell
+globs: app/**/layout.tsx,app/**/page.tsx,i18n/**/*.ts
+alwaysApply: true
+---
+
+# Cache Components runtime APIs
+
+`cacheComponents: true` is on. Keep it on.
+
+Never call `cookies()`, `headers()`, or `connection()` in:
+
+- `getRequestConfig` (`i18n/request.ts`)
+- the root layout shell (`<html>` / `<body>`)
+
+Those reads must live in a child wrapped in `<Suspense fallback={...}>`.
+
+Never wrap `cookies()` / `headers()` / `connection()` in `"use cache"`.
+
+```ts
+// BAD — blocks prerender of every route
+export default getRequestConfig(async () => {
+  const store = await cookies()
+  return { locale: store.get("locale")?.value || "es" }
+})
+
+// GOOD — static locale (this app is es-only)
+export default getRequestConfig(async () => ({
+  locale: "es",
+  messages: { ...(await import("./email-validator/es.json")).default },
+}))
+```
+
+Dynamic `params` / `searchParams`: keep the page/layout sync; await the promise inside a Suspense child.
+
+Do not use `export const instant = false` unless the user explicitly asks.

@@ -1,13 +1,27 @@
 import { createDirectus, rest, staticToken } from "@directus/sdk"
 import { ofetch } from "ofetch"
+import { useTranslations } from "next-intl"
 
 type Schema = {}
+
+const t = useTranslations("ofetch")
 
 const ofetchInstance = ofetch.create({
   retry: 2,
   retryDelay: 200,
   timeout: 30000,
-  retryStatusCodes: [408, 429, 500, 502, 503, 504, 509],
+  retryStatusCodes: [408, 429, 500, 502, 503, 504, 409, 425],
+  credentials: "include" as RequestCredentials,
+  onRequestError: (error: unknown) => {
+    console.error(
+      error instanceof Error ? error.message : (t("request_error") as string)
+    )
+  },
+  onResponseError: (error: unknown) => {
+    console.error(
+      error instanceof Error ? error.message : (t("response_error") as string)
+    )
+  },
 })
 
 const directus = createDirectus<Schema>(
@@ -22,7 +36,7 @@ const directus = createDirectus<Schema>(
       credentials: "include",
       onRequest: (options) => ({
         ...options,
-        cache: "no-store",
+        cache: "no-store" as RequestCache,
       }),
     })
   )

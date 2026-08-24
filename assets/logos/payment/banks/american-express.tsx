@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const AmericanExpressIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -28,6 +28,6 @@ const AmericanExpressIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#016fd0"
     />
   </svg>
-);
+)
 
-export { AmericanExpressIcon };
+export { AmericanExpressIcon }

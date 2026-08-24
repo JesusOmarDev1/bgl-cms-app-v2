@@ -1,0 +1,8 @@
+{
+  "share": {
+    "share": "Compartir",
+    "sharing": "Compartiendo...",
+    "share_error": "Error al compartir. Intentalo mas tarde.",
+    "share_success": "Compartido correctamente"
+  }
+}

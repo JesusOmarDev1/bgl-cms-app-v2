@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const YouTubeIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg {...props} preserveAspectRatio="xMidYMid" viewBox="0 0 256 180">
@@ -8,6 +8,6 @@ const YouTubeIcon = (props: SVGProps<SVGSVGElement>) => (
     />
     <path fill="#FFF" d="m102.421 128.06 66.328-38.418-66.328-38.418z" />
   </svg>
-);
+)
 
-export { YouTubeIcon };
+export { YouTubeIcon }

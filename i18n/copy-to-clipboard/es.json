@@ -1,0 +1,9 @@
+{
+  "copy_to_clipboard": {
+    "copying": "Copiando...",
+    "copy_error": "Error al copiar. Intentalo mas tarde.",
+    "copy_success": "Copiado correctamente",
+    "browser_not_supported": "useCopyToClipboard solo se puede utilizar en el entorno del navegador",
+    "copy_fallback_error": "No se pudo copiar el texto usando el método de respaldo"
+  }
+}

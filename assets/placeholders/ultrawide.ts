@@ -1,1 +1,1 @@
-export const placeholderUltrawide = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2560' height='1080' viewBox='0 0 2560 1080'%3E%3Crect width='2560' height='1080' fill='%231a1a1a'/%3E%3C/svg%3E`;
+export const placeholderUltrawide = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2560' height='1080' viewBox='0 0 2560 1080'%3E%3Crect width='2560' height='1080' fill='%231a1a1a'/%3E%3C/svg%3E`

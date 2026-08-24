@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 export function ExcelIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -63,5 +63,5 @@ export function ExcelIcon(props: SVGProps<SVGSVGElement>) {
       />
       <path fill="#107c41" d="M19.581 16H30v6.5H19.581Z" />
     </svg>
-  );
+  )
 }

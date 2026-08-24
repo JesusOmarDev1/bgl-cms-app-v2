@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const BbvaIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 179.8" {...props}>
@@ -7,6 +7,6 @@ const BbvaIcon = (props: SVGProps<SVGSVGElement>) => (
       className="fill-[#004481]"
     />
   </svg>
-);
+)
 
-export { BbvaIcon };
+export { BbvaIcon }

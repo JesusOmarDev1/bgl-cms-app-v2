@@ -1,13 +1,16 @@
-import { cookies } from "next/headers"
 import { getRequestConfig } from "next-intl/server"
 
 export default getRequestConfig(async () => {
-  const store = await cookies()
-  const locale = store.get("locale")?.value || "es"
+  const locale = "es" as const
 
   return {
     locale,
-    "email-validator": (await import(`./email-validator/${locale}.json`))
-      .default,
+    messages: {
+      ...(await import(`./email-validator/${locale}.json`)).default,
+      ...(await import(`./ofetch/${locale}.json`)).default,
+      ...(await import(`./search/${locale}.json`)).default,
+      ...(await import(`./visual-editing/${locale}.json`)).default,
+      ...(await import(`./share/${locale}.json`)).default,
+    },
   }
 })

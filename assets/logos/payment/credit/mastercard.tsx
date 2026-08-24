@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const MastercardIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -28,6 +28,6 @@ const MastercardIcon = (props: SVGProps<SVGSVGElement>) => (
       className="fill-foreground"
     />
   </svg>
-);
+)
 
-export { MastercardIcon };
+export { MastercardIcon }

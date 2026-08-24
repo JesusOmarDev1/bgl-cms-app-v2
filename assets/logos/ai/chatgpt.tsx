@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const ChatGPTIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -33,6 +33,6 @@ const ChatGPTIcon = (props: SVGProps<SVGSVGElement>) => (
       </clipPath>
     </defs>
   </svg>
-);
+)
 
-export { ChatGPTIcon };
+export { ChatGPTIcon }

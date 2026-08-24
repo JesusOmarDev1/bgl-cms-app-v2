@@ -1,0 +1,7 @@
+{
+  "search": {
+    "unknown_error": "Error al realizar la búsqueda",
+    "no_results": "No se encontraron resultados",
+    "no_query": "No se ha proporcionado una consulta"
+  }
+}

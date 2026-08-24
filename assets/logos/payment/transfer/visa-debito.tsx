@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const VisaDebitoIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -49,6 +49,6 @@ const VisaDebitoIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#686867"
     />
   </svg>
-);
+)
 
-export { VisaDebitoIcon };
+export { VisaDebitoIcon }

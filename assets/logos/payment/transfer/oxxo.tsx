@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const OxxoIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -27,6 +27,6 @@ const OxxoIcon = (props: SVGProps<SVGSVGElement>) => (
       />
     </g>
   </svg>
-);
+)
 
-export { OxxoIcon };
+export { OxxoIcon }

@@ -1,1 +1,1 @@
-export const placeholderSm = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='812' viewBox='0 0 375 812'%3E%3Crect width='375' height='812' fill='%231a1a1a'/%3E%3C/svg%3E`;
+export const placeholderSm = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='812' viewBox='0 0 375 812'%3E%3Crect width='375' height='812' fill='%231a1a1a'/%3E%3C/svg%3E`

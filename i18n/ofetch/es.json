@@ -1,0 +1,9 @@
+{
+  "ofetch": {
+    "request_error": "Error al realizar la solicitud",
+    "response_error": "Error al recibir la respuesta",
+    "timeout_error": "Tiempo de espera agotado",
+    "max_retries_error": "Se han agotado los intentos de reintento",
+    "unknown_error": "Error desconocido"
+  }
+}

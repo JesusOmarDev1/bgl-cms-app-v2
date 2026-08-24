@@ -1,0 +1,20 @@
+---
+description: pnpm verify loop after Cache Components / i18n work
+alwaysApply: true
+---
+
+# Verify with pnpm only
+
+After Cache Components, next-intl, or layout/provider changes, run in order:
+
+1. `pnpm typecheck`
+2. `pnpm lint`
+3. `pnpm typegen`
+4. `pnpm format`
+5. `pnpm build`
+
+If `pnpm build` reports `blocking-prerender-dynamic`, use `pnpm exec next build --debug-prerender` for file:line. Apply the bundled recipe in `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`.
+
+Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.
+
+Session memory: Engram (`mem_save`), not extra `.md` dumps. Persist long-term hardening in `.ai/rules`.

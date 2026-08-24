@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const SantanderIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -14,6 +14,6 @@ const SantanderIcon = (props: SVGProps<SVGSVGElement>) => (
       transform="translate(0 -.4)"
     />
   </svg>
-);
+)
 
-export { SantanderIcon };
+export { SantanderIcon }

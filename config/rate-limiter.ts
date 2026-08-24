@@ -6,7 +6,7 @@ const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(10, "10 s"),
   analytics: false,
   timeout: 30000,
-  prefix: "@bglcmsapp/ratelimit",
+  prefix: "@bglbasculas/ratelimit",
 })
 
 export default ratelimit

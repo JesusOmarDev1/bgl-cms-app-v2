@@ -1,0 +1,9 @@
+{
+  "visual-editing": {
+    "unknown_error": "Error al inicializar la edición visual",
+    "enable_visual_editing": "Habilitar edición visual",
+    "disable_visual_editing": "Deshabilitar edición visual",
+    "visual_editing_enabled": "Edición visual habilitada",
+    "visual_editing_disabled": "Edición visual deshabilitada"
+  }
+}

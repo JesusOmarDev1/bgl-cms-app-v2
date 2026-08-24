@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const GoogleAIIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg fill="none" {...props} viewBox="0 0 296 298">
@@ -166,6 +166,6 @@ const GoogleAIIcon = (props: SVGProps<SVGSVGElement>) => (
       </filter>
     </defs>
   </svg>
-);
+)
 
-export { GoogleAIIcon };
+export { GoogleAIIcon }

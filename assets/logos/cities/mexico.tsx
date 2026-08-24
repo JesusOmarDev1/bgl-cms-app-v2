@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from "react"
 
 const MexicoCityIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 513 342" {...props}>
@@ -12,6 +12,6 @@ const MexicoCityIcon = (props: SVGProps<SVGSVGElement>) => (
     ></path>
     <ellipse fill="#C59262" cx="256.5" cy="159.1" rx="24.3" ry="36.4"></ellipse>
   </svg>
-);
+)
 
-export { MexicoCityIcon };
+export { MexicoCityIcon }

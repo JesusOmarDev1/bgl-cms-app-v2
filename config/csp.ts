@@ -1,0 +1,16 @@
+export const CSP_DIRECTIVES = [
+  `default-src 'self'`,
+  `connect-src 'self' https://bglbasculas.app https://bglbasculas.tech https://challenges.cloudflare.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net`,
+  `script-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com 'unsafe-inline' 'unsafe-eval'`,
+  `style-src 'self' 'unsafe-inline'`,
+  `img-src 'self' blob: data: https://bglbasculas.app https://www.google-analytics.com`,
+  `media-src 'self' https://bglbasculas.app`,
+  `font-src 'self' https://fontsource.org`,
+  `frame-src https://challenges.cloudflare.com https://www.google.com/maps/embed`,
+  `frame-ancestors 'self' https://bglbasculas.app https://challenges.cloudflare.com https://www.google.com/maps/embed`,
+  `form-action 'self'`,
+  `base-uri 'self'`,
+  `worker-src 'self' blob:`,
+  `manifest-src 'self'`,
+  `upgrade-insecure-requests`,
+] as const
