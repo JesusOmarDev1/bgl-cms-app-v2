@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react"
 import useShare from "@/hooks/useShare"
-import useToast from "@/hooks/useToast"
+import showToast from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 import { MaterialIcon } from "@/components/shared/MaterialIcon"
 import { cn } from "@/lib/utils"
@@ -36,26 +35,19 @@ export default function Share({
   size = "default",
   variant = "default",
 }: ShareProps) {
-  const [resolvedUrl, setResolvedUrl] = useState("")
   const t = useTranslations("share")
-
-  useEffect(() => {
-    setResolvedUrl(urlProp ?? window.location.href)
-  }, [urlProp])
-
-  const url = urlProp ?? resolvedUrl
   const share = useShare({
     onSuccess: () =>
-      useToast({
+      showToast({
         title: successMessage || t("share_success"),
         message: successMessage || t("share_success"),
         variant: "success",
         icon: <MaterialIcon name="share" className="text-success" />,
       }),
     onError: (error) =>
-      useToast({
+      showToast({
         title: errorMessage || t("share_error"),
-        message: Error instanceof Error ? error.message : t("share_error"),
+        message: error instanceof Error ? error.message : t("share_error"),
         variant: "error",
         icon: <MaterialIcon name="share" className="text-error" />,
       }),
@@ -64,7 +56,11 @@ export default function Share({
 
   const handleShare = async () => {
     if (!disabled) {
-      await share.share({ title, text, url })
+      await share.share({
+        title,
+        text,
+        url: urlProp ?? window.location.href,
+      })
     }
   }
 

@@ -1,5 +1,5 @@
 import Fuse, { type FuseOptionKey } from "fuse.js"
-import { useTranslations } from "next-intl"
+import searchMessages from "@/i18n/search/es.json"
 
 export interface FuseSearchOptions<T> {
   keys: FuseOptionKey<T>[]
@@ -14,8 +14,6 @@ export function fuzzySearch<T>(
   query: string,
   options: FuseSearchOptions<T>
 ) {
-  const t = useTranslations("search")
-
   if (!query.trim()) return items
 
   const fuse = new Fuse(items, {
@@ -31,7 +29,11 @@ export function fuzzySearch<T>(
   try {
     return fuse.search(query).map((result) => result.item as T)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("unknown_error"))
+    console.error(
+      error instanceof Error
+        ? error.message
+        : searchMessages.search.unknown_error
+    )
     return items
   }
 }

@@ -1,0 +1,25 @@
+---
+description: pnpm allowBuilds must be booleans, never stub strings
+alwaysApply: true
+---
+
+# pnpm allowBuilds
+
+Never leave the placeholder string `set this to true or false` in `allowBuilds`. pnpm 10+ treats that as ignored lifecycle scripts and fails install with `ERR_PNPM_IGNORED_BUILDS`.
+
+For this Next.js app, native binaries must be allowed:
+
+```yaml
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+  msw: false
+  "@parcel/watcher": true
+  "@swc/core": true
+```
+
+- `@swc/core` — Next compile (dev + build)
+- `@parcel/watcher` — `next dev` file watching
+- `sharp` and `unrs-resolver` stay `true`; `msw` stays `false`
+- Edit `pnpm-workspace.yaml`, then `pnpm i`. Do not use the interactive TUI `pnpm approve-builds`.
+- Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.

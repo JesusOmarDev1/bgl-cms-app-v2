@@ -13,7 +13,7 @@ interface ToastOptions {
   duration?: number
 }
 
-export default function useToast(options: ToastOptions): void {
+export default function showToast(options: ToastOptions): void {
   const { title, message, variant, action, icon, duration = 3000 } = options
 
   switch (variant) {

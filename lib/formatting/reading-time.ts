@@ -7,7 +7,7 @@ export type ReadingTimeResult = {
   label: string
 }
 
-function extractTextFromBlocks(blocks: any[]): string {
+function extractTextFromBlocks(blocks: unknown[]): string {
   const htmlParts: string[] = []
 
   function walk(v: unknown) {
@@ -22,12 +22,12 @@ function extractTextFromBlocks(blocks: any[]): string {
   return htmlParts.join(" ")
 }
 
-export function getBlocksPlainText(blocks?: any[] | null): string {
+export function getBlocksPlainText(blocks?: unknown[] | null): string {
   if (!blocks?.length) return ""
   return htmlToText(extractTextFromBlocks(blocks))
 }
 
-export function getReadingTime(blocks?: any[] | null): ReadingTimeResult {
+export function getReadingTime(blocks?: unknown[] | null): ReadingTimeResult {
   const text = getBlocksPlainText(blocks)
   if (!text) return { minutes: 0, seconds: 0, label: "" }
 

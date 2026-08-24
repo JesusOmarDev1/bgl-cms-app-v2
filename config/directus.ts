@@ -1,10 +1,11 @@
 import { createDirectus, rest, staticToken } from "@directus/sdk"
 import { ofetch } from "ofetch"
-import { useTranslations } from "next-intl"
+import ofetchMessages from "@/i18n/ofetch/es.json"
+import { PagesTypes } from "@/types/collections/pages"
 
-type Schema = {}
-
-const t = useTranslations("ofetch")
+type Schema = {
+  pages: PagesTypes[]
+}
 
 const ofetchInstance = ofetch.create({
   retry: 2,
@@ -14,12 +15,16 @@ const ofetchInstance = ofetch.create({
   credentials: "include" as RequestCredentials,
   onRequestError: (error: unknown) => {
     console.error(
-      error instanceof Error ? error.message : (t("request_error") as string)
+      error instanceof Error
+        ? error.message
+        : ofetchMessages.ofetch.request_error
     )
   },
   onResponseError: (error: unknown) => {
     console.error(
-      error instanceof Error ? error.message : (t("response_error") as string)
+      error instanceof Error
+        ? error.message
+        : ofetchMessages.ofetch.response_error
     )
   },
 })

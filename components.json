@@ -21,5 +21,7 @@
   },
   "menuColor": "default-translucent",
   "menuAccent": "subtle",
-  "registries": {}
+  "registries": {
+    "@jalco": "https://ui.justinlevine.me/r/{name}.json"
+  }
 }

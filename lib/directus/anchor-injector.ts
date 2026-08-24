@@ -41,7 +41,7 @@ export function injectHeadingIds(
     const text = htmlToText(inner)
     if (!text) return match
 
-    let baseSlug = slugify(text)
+    const baseSlug = slugify(text)
 
     // Handle collision with numeric suffix
     let slug = baseSlug

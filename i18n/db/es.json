@@ -1,0 +1,8 @@
+{
+  "db": {
+    "pages": {
+      "failed_to_fetch": "Error al obtener las páginas.",
+      "not_found": "No se encontraron páginas."
+    }
+  }
+}

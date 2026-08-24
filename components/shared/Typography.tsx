@@ -1,6 +1,6 @@
 import { TypographyType } from "@/types/enums/typography"
 
-interface TypographyProps {
+export interface TypographyProps {
   children: React.ReactNode
   type: TypographyType
   className?: string
