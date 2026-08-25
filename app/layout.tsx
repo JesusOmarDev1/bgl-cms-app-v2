@@ -1,4 +1,5 @@
 import "./globals.css"
+import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { NextIntlClientProvider } from "next-intl"
@@ -7,6 +8,13 @@ import { QueryProvider } from "@/providers/QueryProvider"
 import { Toaster } from "@/components/ui/sonner"
 
 import { cn } from "@/lib/utils"
+
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+
+export const metadata: Metadata = {
+  title: "BGL CMS",
+  description: "Aplicación CMS de BGL",
+}
 
 const geist = Geist({
   subsets: ["latin"],
@@ -54,9 +62,9 @@ export default function RootLayout({
                 position="top-center"
               />
             </ThemeProvider>
-            <GoogleAnalytics
-              gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID! as string}
-            />
+            {gaMeasurementId ? (
+              <GoogleAnalytics gaId={gaMeasurementId} />
+            ) : null}
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

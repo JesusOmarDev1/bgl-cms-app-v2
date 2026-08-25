@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { Check, ChevronDown, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -14,6 +16,7 @@ import { PerplexityAIIcon } from "@/assets/logos/ai/perplexity"
 import { GoogleAIIcon } from "@/assets/logos/ai/googleai"
 import { GrokIcon } from "@/assets/logos/ai/grok"
 import { ClaudeIcon } from "@/assets/logos/ai/claude"
+import { useTranslations } from "next-intl"
 
 // Targets
 
@@ -39,53 +42,13 @@ interface AiTarget {
   getUrl?: (value: string) => string
 }
 
-const builtInTargets: Record<BuiltInTarget, AiTarget> = {
-  chatgpt: {
-    id: "chatgpt",
-    label: "Resumir en ChatGPT",
-    icon: <ChatGPTIcon />,
-    brandColorClass: "text-[#fff]",
-    action: "url",
-    getUrl: (value) => `https://chatgpt.com/?q=${encodeURIComponent(value)}`,
-  },
-  perplexity: {
-    id: "perplexity",
-    label: "Resumir en Perplexity",
-    icon: <PerplexityAIIcon />,
-    brandColorClass: "text-[#fff]",
-    action: "url",
-    getUrl: (value) =>
-      `https://www.perplexity.ai/search/?q=${encodeURIComponent(value)}`,
-  },
-  googleai: {
-    id: "googleai",
-    label: "Resumir en Google AI",
-    icon: <GoogleAIIcon />,
-    brandColorClass: "text-[#fff]",
-    action: "url",
-    getUrl: (value) =>
-      `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(value)}`,
-  },
-  grok: {
-    id: "grok",
-    label: "Resumir en Grok",
-    icon: <GrokIcon />,
-    brandColorClass: "text-[#fff]",
-    action: "url",
-    getUrl: (value) => `https://x.com/i/grok?text=${encodeURIComponent(value)}`,
-  },
-  claude: {
-    id: "claude",
-    label: "Resumir en Claude",
-    icon: <ClaudeIcon />,
-    brandColorClass: "text-[#fff]",
-    action: "url",
-    getUrl: (value) => `https://claude.ai/new?q=${encodeURIComponent(value)}`,
-  },
-}
-
-function resolveTargets(targets: (BuiltInTarget | AiTarget)[]): AiTarget[] {
-  return targets.map((t) => (typeof t === "string" ? builtInTargets[t] : t))
+function resolveTargets(
+  targets: (BuiltInTarget | AiTarget)[],
+  builtIn: Record<BuiltInTarget, AiTarget>
+): AiTarget[] {
+  return targets.map((target) =>
+    typeof target === "string" ? builtIn[target] : target
+  )
 }
 
 const defaultTargets: (BuiltInTarget | AiTarget)[] = [
@@ -95,27 +58,6 @@ const defaultTargets: (BuiltInTarget | AiTarget)[] = [
   "grok",
   "claude",
 ]
-
-const AI_CONTEXT_PROMPT = `Contexto: Actúa como un experto de alto nivel en la materia del texto que se te proporcionará a continuación. Tu objetivo es procesar la información de forma rigurosa, analítica y perfectamente estructurada.
-
-Tarea:
-1. Resumen Ejecutivo: Extrae las ideas centrales, conclusiones o el valor principal del contenido de forma clara y directa.
-2. Guías / Tutoriales (Si aplica): Si el texto describe un proceso, desglósalo en un paso a paso secuencial, lógico y fácil de seguir, sin omitir ninguna instrucción.
-3. Datos Técnicos y Código (Si aplica): Transcribe con absoluta precisión cualquier fragmento de código, comandos de terminal, configuraciones, fórmulas o datos técnicos. No los simplifiques ni los resumas.
-
-Restricciones Críticas:
-- Cero Alucinaciones: Limítate estrictamente a la información provista. No asumas, extrapoles ni inventes datos que no estén explícitamente en el texto.
-- Enfoque Local: No utilices fuentes externas ni busques en internet a menos que se te solicite explícitamente.
-- Preservación de Detalles: Si el contenido es extenso, condensa la prosa redundante pero mantén intactos todos los detalles técnicos, datos clave y pasos del proceso.
-- Atribución: Si el texto original cita fuentes, autores o referencias, inclúyelas claramente en el resultado.
-
-Formato y Entregable:
-- Devuelve un documento limpio, usando Markdown (negritas, listas, bloques de código) para facilitar la lectura.
-- El resultado debe ser autosuficiente: cualquier persona que no haya leído el texto original debe ser capaz de entender el tema o replicar el tutorial a la perfección.
-
-Contenido:
-
-`
 
 // Component
 
@@ -161,8 +103,62 @@ function AiCopyButton({
   className,
   ...props
 }: AiCopyButtonProps) {
+  const t = useTranslations("ai")
+  const c = useTranslations("copy_to_clipboard")
   const [copied, setCopied] = React.useState(false)
-  const resolved = resolveTargets(targets)
+
+  const builtInTargets = React.useMemo((): Record<BuiltInTarget, AiTarget> => {
+    return {
+      chatgpt: {
+        id: "chatgpt",
+        label: t("chatgpt") as string,
+        icon: <ChatGPTIcon />,
+        brandColorClass: "text-[#fff]",
+        action: "url",
+        getUrl: (value) =>
+          `https://chatgpt.com/?q=${encodeURIComponent(value)}`,
+      },
+      perplexity: {
+        id: "perplexity",
+        label: t("perplexity") as string,
+        icon: <PerplexityAIIcon />,
+        brandColorClass: "text-[#fff]",
+        action: "url",
+        getUrl: (value) =>
+          `https://www.perplexity.ai/search/?q=${encodeURIComponent(value)}`,
+      },
+      googleai: {
+        id: "googleai",
+        label: t("googleai") as string,
+        icon: <GoogleAIIcon />,
+        brandColorClass: "text-[#fff]",
+        action: "url",
+        getUrl: (value) =>
+          `https://www.google.com/search?udm=50&aep=11&q=${encodeURIComponent(value)}`,
+      },
+      grok: {
+        id: "grok",
+        label: t("grok") as string,
+        icon: <GrokIcon />,
+        brandColorClass: "text-[#fff]",
+        action: "url",
+        getUrl: (value) =>
+          `https://x.com/i/grok?text=${encodeURIComponent(value)}`,
+      },
+      claude: {
+        id: "claude",
+        label: t("claude") as string,
+        icon: <ClaudeIcon />,
+        brandColorClass: "text-[#fff]",
+        action: "url",
+        getUrl: (value) =>
+          `https://claude.ai/new?q=${encodeURIComponent(value)}`,
+      },
+    }
+  }, [t])
+
+  const aiContextPrompt = t("default_prompt") as string
+  const resolved = resolveTargets(targets, builtInTargets)
 
   async function handleCopy() {
     try {
@@ -177,7 +173,7 @@ function AiCopyButton({
 
   function handleTarget(target: AiTarget) {
     // Los targets de IA reciben el prompt, el copy usa value crudo
-    const aiValue = AI_CONTEXT_PROMPT + value
+    const aiValue = aiContextPrompt + value
 
     if (target.action === "url" && target.getUrl) {
       window.open(target.getUrl(aiValue), "_blank", "noopener,noreferrer")
@@ -196,10 +192,14 @@ function AiCopyButton({
       <Button
         variant={mappedVariant}
         onClick={handleCopy}
-        aria-label={copied ? "Copiado" : `${label} al portapapeles`}
+        aria-label={
+          copied
+            ? (c("copied") as string)
+            : `${label} ${c("clipboard") as string}`
+        }
       >
         {copied ? <Check className="text-emerald-500" /> : <Copy />}
-        {copied ? "Copiado" : label}
+        {copied ? (c("copied") as string) : label}
       </Button>
 
       <ButtonGroupSeparator />
@@ -238,8 +238,6 @@ function AiCopyButton({
 
 export {
   AiCopyButton,
-  AI_CONTEXT_PROMPT,
-  builtInTargets,
   type AiCopyButtonProps,
   type AiTarget,
   type BuiltInTarget,

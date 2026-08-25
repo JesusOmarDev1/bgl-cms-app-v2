@@ -1,7 +1,9 @@
+"use client"
+
 import { useState, useEffect, useCallback } from "react"
 import { apply, setAttr } from "@directus/visual-editing"
 import { useTranslations } from "next-intl"
-import { isEnvFlagEnabled } from "@/lib/env"
+import { isEnvFlagEnabled } from "@/lib/browser/env"
 
 const VISUAL_EDITING_PARAM = "visual-editing"
 const VISUAL_EDITING_KEY = "directus-visual-editing"

@@ -23,7 +23,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { MaterialIcon } from "@/components/shared/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import React from "react"
 import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"

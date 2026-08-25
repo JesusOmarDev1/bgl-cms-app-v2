@@ -13,10 +13,10 @@ function getQueryClient() {
 }
 
 function QueryProvider({ children }: { children: React.ReactNode }) {
+  const [queryClient] = React.useState(() => getQueryClient())
+
   return (
-    <QueryClientProvider client={getQueryClient()}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 

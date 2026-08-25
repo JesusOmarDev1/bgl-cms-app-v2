@@ -16,6 +16,7 @@ messages: {
   ...(await import(`./ofetch/${locale}.json`)).default,
   ...(await import(`./search/${locale}.json`)).default,
   ...(await import(`./visual-editing/${locale}.json`)).default,
+  ...(await import(`./theme/${locale}.json`)).default,
 }
 ```
 

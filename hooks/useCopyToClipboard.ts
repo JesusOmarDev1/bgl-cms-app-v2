@@ -1,5 +1,7 @@
+"use client"
+
 import { useState } from "react"
-import { isBrowser } from "@/lib/env"
+import { isBrowser } from "@/lib/browser/env"
 import { useTranslations } from "next-intl"
 
 interface UseCopyToClipboardOptions {

@@ -29,6 +29,7 @@ export default function showToast(options: ToastOptions): void {
         icon: icon,
         duration: duration,
       })
+      break
     case "success":
       toast.success(title, {
         description: message,
@@ -41,6 +42,7 @@ export default function showToast(options: ToastOptions): void {
         icon: icon,
         duration: duration,
       })
+      break
     case "warning":
       toast.warning(title, {
         description: message,
@@ -53,6 +55,7 @@ export default function showToast(options: ToastOptions): void {
         icon: icon,
         duration: duration,
       })
+      break
     case "info":
       toast.info(title, {
         description: message,
@@ -65,5 +68,6 @@ export default function showToast(options: ToastOptions): void {
         icon: icon,
         duration: duration,
       })
+      break
   }
 }

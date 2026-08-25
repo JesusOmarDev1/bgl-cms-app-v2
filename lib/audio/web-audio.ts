@@ -1,4 +1,4 @@
-import { isBrowser, hasDocument } from "@/lib/env"
+import { isBrowser, hasDocument } from "@/lib/browser/env"
 
 declare global {
   interface Window {

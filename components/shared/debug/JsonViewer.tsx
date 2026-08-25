@@ -16,7 +16,7 @@ import {
   jsonThemes,
   type JsonColorTheme,
   type ShikiThemeName,
-} from "@/lib/themes"
+} from "@/lib/debug/themes"
 
 type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }

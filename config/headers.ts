@@ -1,5 +1,5 @@
 import { CSP_DIRECTIVES } from "./csp"
-import { isEnvFlagEnabled } from "@/lib/env"
+import { isEnvFlagEnabled } from "@/lib/browser/env"
 
 const isVisualEditingEnabled = isEnvFlagEnabled(
   process.env.NEXT_PUBLIC_ENABLE_VISUAL_EDITING

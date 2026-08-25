@@ -1,5 +1,8 @@
 {
   "copy_to_clipboard": {
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "clipboard": "al portapapeles",
     "copying": "Copiando...",
     "copy_error": "Error al copiar. Intentalo mas tarde.",
     "copy_success": "Copiado correctamente",

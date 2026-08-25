@@ -12,6 +12,9 @@ export default getRequestConfig(async () => {
       ...(await import(`./visual-editing/${locale}.json`)).default,
       ...(await import(`./share/${locale}.json`)).default,
       ...(await import(`./db/${locale}.json`)).default,
+      ...(await import(`./ai/${locale}.json`)).default,
+      ...(await import(`./copy-to-clipboard/${locale}.json`)).default,
+      ...(await import(`./theme/${locale}.json`)).default,
     },
   }
 })

@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { persist, subscribeWithSelector } from "zustand/middleware"
 import { $htmlAudio, type Track } from "@/lib/audio/html-audio"
-import { isBrowser, hasDocument } from "@/lib/env"
+import { isBrowser, hasDocument } from "@/lib/browser/env"
 
 type RepeatMode = "none" | "one" | "all"
 type InsertMode = "first" | "last" | "after"

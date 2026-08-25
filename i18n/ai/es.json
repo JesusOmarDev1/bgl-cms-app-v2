@@ -1,0 +1,10 @@
+{
+  "ai": {
+    "chatgpt": "Resumir en ChatGPT",
+    "perplexity": "Resumir en Perplexity",
+    "googleai": "Resumir en Google AI",
+    "grok": "Resumir en Grok",
+    "claude": "Resumir en Claude",
+    "default_prompt": "Contexto: Actúa como un experto de alto nivel en la materia del texto que se te proporcionará a continuación. Tu objetivo es procesar la información de forma rigurosa, analítica y perfectamente estructurada. \n\nTarea: Extrae las ideas centrales, conclusiones o el valor principal del contenido de forma clara y directa. \n\nRestricciones Críticas: Limítate estrictamente a la información provista. No asumas, extrapoles ni inventes datos que no estén explícitamente en el texto. \n\nFormato y Entregable: Devuelve un documento limpio, usando Markdown (negritas, listas, bloques de código) para facilitar la lectura. El resultado debe ser autosuficiente: cualquier persona que no haya leído el texto original debe ser capaz de entender el tema o replicar el tutorial a la perfección. \n\nContenido: \n\n"
+  }
+}

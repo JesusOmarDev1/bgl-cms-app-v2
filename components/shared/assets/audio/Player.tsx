@@ -1,12 +1,14 @@
+"use client"
+
 import { cva, type VariantProps } from "class-variance-authority"
 import React from "react"
 import { useAudio } from "@/hooks/useAudio"
 import { useAudioStore, type InsertMode } from "@/lib/audio/audio-store"
-import { MaterialIcon } from "@/components/shared/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { formatDuration, type Track } from "@/lib/audio/html-audio"
 import { cn } from "@/lib/utils"
-import { Fader } from "@/components/shared/audio/Fader"
-import { Transport } from "@/components/shared/audio/Transport"
+import { Fader } from "@/components/shared/assets/audio/Fader"
+import { Transport } from "@/components/shared/assets/audio/Transport"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -47,7 +49,7 @@ import {
   SortableDragHandle,
   SortableItem,
   SortableList,
-} from "@/components/shared/audio/SortableList"
+} from "@/components/shared/assets/audio/SortableList"
 import { Spinner } from "@/components/ui/spinner"
 import { Toggle } from "@/components/ui/toggle"
 import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip"
@@ -489,7 +491,7 @@ const AudioPlayerPlay = React.memo(
         className={cn(className)}
         data-slot="audio-play-button"
         isDisabled={showSpinner || !currentTrack}
-        onClick={() => handleClick}
+        onClick={handleClick}
         size={size}
         tooltipLabel={isPlaying ? "Pausar" : "Reproducir"}
         variant={variant}
@@ -649,7 +651,7 @@ const AudioPlayerSkipForward = React.memo(
         className={cn(className)}
         data-slot="audio-skip-forward-button"
         isDisabled={disableNext}
-        onClick={() => handleClick}
+        onClick={handleClick}
         size={size}
         tooltipLabel="Next"
         variant={variant}
@@ -691,7 +693,7 @@ const AudioPlayerSkipBack = React.memo(
         className={cn(className)}
         data-slot="audio-skip-back-button"
         isDisabled={disablePrevious}
-        onClick={() => handleClick}
+        onClick={handleClick}
         size={size}
         tooltipLabel="Previous"
         variant={variant}
