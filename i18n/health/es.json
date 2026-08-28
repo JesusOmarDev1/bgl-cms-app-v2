@@ -1,0 +1,14 @@
+{
+  "health": {
+    "title": "Estado del sistema",
+    "description": "Monitoriza el estado del sistema para garantizar que el sistema funciona correctamente.",
+    "status": {
+      "ok": "Ok",
+      "warn": "Advertencia",
+      "error": "Error",
+      "unreachable": "Inalcanzable"
+    },
+    "responseTime": "{ms} ms",
+    "ping": "Ping"
+  }
+}

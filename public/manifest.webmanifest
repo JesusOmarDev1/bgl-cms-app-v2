@@ -5,11 +5,11 @@
   "description": "Sitio web de la empresa BGL BASCULAS INDUSTRIALES",
   "start_url": "/inicio",
   "scope": "/",
-  "lang": "es-NX",
+  "lang": "es-MX",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "minimal-ui"],
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "categories": [
     "ecommerce",
     "shopping",
@@ -20,7 +20,8 @@
     "enterprise",
     "scale",
     "productivity",
-    "provider"
+    "provider",
+    "web"
   ],
   "icons": [
     {
@@ -34,19 +35,44 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-image.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "form_factor": "square",
+      "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "/website-template-OG.png",
+      "src": "/opengraph.png",
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
-      "src": "/website-template-OG.webp",
+      "src": "/opengraph.webp",
       "sizes": "1200x630",
       "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/opengraph.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpg",
       "form_factor": "wide"
     }
   ]

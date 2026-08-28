@@ -10,7 +10,7 @@ export async function getPagesRepository({
   limit = 10,
   offset = 0,
 }: PagesQuery): Promise<PagesTypes[]> {
-  return getPagesQuery({ status, limit, offset })
+  return await getPagesQuery({ status, limit, offset })
 }
 
 export async function getPageBySlugRepository({
@@ -19,5 +19,5 @@ export async function getPageBySlugRepository({
   offset = 0,
   slug,
 }: PagesQuery & { slug: string }): Promise<PagesTypes[]> {
-  return getPagesBySlugQuery({ status, limit, offset }, slug)
+  return await getPagesBySlugQuery({ status, limit, offset }, slug)
 }

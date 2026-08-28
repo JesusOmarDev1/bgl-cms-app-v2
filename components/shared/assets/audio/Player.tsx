@@ -108,7 +108,7 @@ function AudioPlayer({
   variant,
   ...props
 }: AudioPlayerProps) {
-  const errorMessage = useAudioStore((state) => state.errorMessage)
+  const errorMessage = useAudioStore((state: any) => state.errorMessage)
 
   const content = (
     <div
@@ -478,7 +478,7 @@ const AudioPlayerPlay = React.memo(
     const showSpinner = isLoading || isBuffering
 
     const handleClick = React.useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
+      (e: Parameters<NonNullable<typeof onClick>>[0]) => {
         onClick?.(e)
         togglePlay()
       },
@@ -638,7 +638,7 @@ const AudioPlayerSkipForward = React.memo(
       !currentTrack ||
       (currentQueueIndex === queueLength - 1 && repeatMode !== "all")
     const handleClick = React.useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
+      (e: Parameters<NonNullable<typeof onClick>>[0]) => {
         onClick?.(e)
         next()
       },
@@ -680,7 +680,7 @@ const AudioPlayerSkipBack = React.memo(
     const disablePrevious =
       !currentTrack || (currentQueueIndex === 0 && repeatMode !== "all")
     const handleClick = React.useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
+      (e: Parameters<NonNullable<typeof onClick>>[0]) => {
         onClick?.(e)
         previous()
       },
@@ -1533,6 +1533,13 @@ function AudioPlaybackSpeed({
     </DropdownMenu>
   )
 }
+
+AudioPlayerPlay.displayName = "AudioPlayerPlay"
+AudioPlayerRewind.displayName = "AudioPlayerRewind"
+AudioPlayerFastForward.displayName = "AudioPlayerFastForward"
+AudioPlayerSkipForward.displayName = "AudioPlayerSkipForward"
+AudioPlayerSkipBack.displayName = "AudioPlayerSkipBack"
+AudioQueue.displayName = "AudioQueue"
 
 export {
   audioPlayerVariants,

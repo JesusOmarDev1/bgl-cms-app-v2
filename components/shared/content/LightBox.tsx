@@ -1,55 +1,56 @@
-"use client";
+"use client"
 
 /* eslint-disable @next/next/no-img-element -- pan/zoom uses CSS translate+scale on an intrinsic img; next/image fill/sized wrappers break drag-to-pan */
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 export type LightboxItem = {
-  src: string;
-  alt?: string;
-  caption?: string;
-  thumbnail?: string;
-};
+  src: string
+  alt?: string
+  caption?: string
+  thumbnail?: string
+}
 
 type LightboxContextValue = {
-  items: LightboxItem[];
-  index: number;
-  loop: boolean;
-  zoomed: boolean;
-  setZoomed: (zoomed: boolean) => void;
-  goTo: (index: number) => void;
-  next: () => void;
-  prev: () => void;
-  canPrev: boolean;
-  canNext: boolean;
-};
+  items: LightboxItem[]
+  index: number
+  loop: boolean
+  zoomed: boolean
+  setZoomed: (zoomed: boolean) => void
+  goTo: (index: number) => void
+  next: () => void
+  prev: () => void
+  canPrev: boolean
+  canNext: boolean
+}
 
-const LightboxContext = React.createContext<LightboxContextValue | null>(null);
+const LightboxContext = React.createContext<LightboxContextValue | null>(null)
 
 function useLightbox() {
-  const ctx = React.useContext(LightboxContext);
+  const ctx = React.useContext(LightboxContext)
   if (!ctx) {
     throw new Error(
-      "Lightbox compound components must be used inside <Lightbox>",
-    );
+      "Lightbox compound components must be used inside <Lightbox>"
+    )
   }
-  return ctx;
+  return ctx
 }
 
 export type LightboxProps = {
-  items: LightboxItem[];
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  index?: number;
-  defaultIndex?: number;
-  onIndexChange?: (index: number) => void;
-  loop?: boolean;
-  children?: React.ReactNode;
-};
+  items: LightboxItem[]
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  index?: number
+  defaultIndex?: number
+  onIndexChange?: (index: number) => void
+  loop?: boolean
+  children?: React.ReactNode
+}
 
 function Lightbox({
   items,
@@ -62,58 +63,58 @@ function Lightbox({
   loop = true,
   children,
 }: LightboxProps) {
-  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
-  const open = openProp ?? internalOpen;
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen)
+  const open = openProp ?? internalOpen
   const setOpen = React.useCallback(
     (next: boolean) => {
-      if (openProp === undefined) setInternalOpen(next);
-      onOpenChange?.(next);
+      if (openProp === undefined) setInternalOpen(next)
+      onOpenChange?.(next)
     },
-    [openProp, onOpenChange],
-  );
+    [openProp, onOpenChange]
+  )
 
-  const [internalIndex, setInternalIndex] = React.useState(defaultIndex);
-  const index = indexProp ?? internalIndex;
+  const [internalIndex, setInternalIndex] = React.useState(defaultIndex)
+  const index = indexProp ?? internalIndex
   const setIndex = React.useCallback(
     (next: number) => {
-      if (indexProp === undefined) setInternalIndex(next);
-      onIndexChange?.(next);
+      if (indexProp === undefined) setInternalIndex(next)
+      onIndexChange?.(next)
     },
-    [indexProp, onIndexChange],
-  );
+    [indexProp, onIndexChange]
+  )
 
-  const [zoomed, setZoomed] = React.useState(false);
+  const [zoomed, setZoomed] = React.useState(false)
 
-  const count = items.length;
+  const count = items.length
 
   const goTo = React.useCallback(
     (i: number) => {
-      if (count === 0) return;
+      if (count === 0) return
       const next = loop
         ? ((i % count) + count) % count
-        : Math.min(Math.max(i, 0), count - 1);
-      setIndex(next);
-      setZoomed(false);
+        : Math.min(Math.max(i, 0), count - 1)
+      setIndex(next)
+      setZoomed(false)
     },
-    [count, loop, setIndex],
-  );
+    [count, loop, setIndex]
+  )
 
-  const next = React.useCallback(() => goTo(index + 1), [goTo, index]);
-  const prev = React.useCallback(() => goTo(index - 1), [goTo, index]);
+  const next = React.useCallback(() => goTo(index + 1), [goTo, index])
+  const prev = React.useCallback(() => goTo(index - 1), [goTo, index])
 
-  const canPrev = loop ? count > 1 : index > 0;
-  const canNext = loop ? count > 1 : index < count - 1;
+  const canPrev = loop ? count > 1 : index > 0
+  const canNext = loop ? count > 1 : index < count - 1
 
   React.useEffect(() => {
-    if (!open || count === 0) return;
+    if (!open || count === 0) return
     for (const i of [index - 1, index + 1]) {
-      const item = items[loop ? ((i % count) + count) % count : i];
+      const item = items[loop ? ((i % count) + count) % count : i]
       if (item) {
-        const img = new window.Image();
-        img.src = item.src;
+        const img = new window.Image()
+        img.src = item.src
       }
     }
-  }, [open, index, items, count, loop]);
+  }, [open, index, items, count, loop])
 
   const value = React.useMemo<LightboxContextValue>(
     () => ({
@@ -128,8 +129,8 @@ function Lightbox({
       canPrev,
       canNext,
     }),
-    [items, index, loop, zoomed, goTo, next, prev, canPrev, canNext],
-  );
+    [items, index, loop, zoomed, goTo, next, prev, canPrev, canNext]
+  )
 
   return (
     <LightboxContext.Provider value={value}>
@@ -141,43 +142,43 @@ function Lightbox({
         {children}
       </DialogPrimitive.Root>
     </LightboxContext.Provider>
-  );
+  )
 }
 
 type LightboxTriggerProps = React.ComponentProps<
   typeof DialogPrimitive.Trigger
 > & {
-  index?: number;
-};
+  index?: number
+}
 
 function LightboxTrigger({
   index = 0,
   onClick,
   ...props
 }: LightboxTriggerProps) {
-  const { goTo } = useLightbox();
+  const { goTo } = useLightbox()
   return (
     <DialogPrimitive.Trigger
       data-slot="lightbox-trigger"
       onClick={(event) => {
-        goTo(index);
-        onClick?.(event);
+        goTo(index)
+        onClick?.(event)
       }}
       {...props}
     />
-  );
+  )
 }
 
 function LightboxClose(
-  props: React.ComponentProps<typeof DialogPrimitive.Close>,
+  props: React.ComponentProps<typeof DialogPrimitive.Close>
 ) {
-  return <DialogPrimitive.Close data-slot="lightbox-close" {...props} />;
+  return <DialogPrimitive.Close data-slot="lightbox-close" {...props} />
 }
 
 function LightboxPortal(
-  props: React.ComponentProps<typeof DialogPrimitive.Portal>,
+  props: React.ComponentProps<typeof DialogPrimitive.Portal>
 ) {
-  return <DialogPrimitive.Portal data-slot="lightbox-portal" {...props} />;
+  return <DialogPrimitive.Portal data-slot="lightbox-portal" {...props} />
 }
 
 function LightboxOverlay({
@@ -189,17 +190,17 @@ function LightboxOverlay({
       data-slot="lightbox-overlay"
       className={cn(
         "fixed inset-0 z-50 bg-black/90 backdrop-blur-sm",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
         "duration-200 ease-out motion-reduce:animate-none",
-        className,
+        className
       )}
       {...props}
     />
-  );
+  )
 }
 
 const chromeButtonClass =
-  "inline-flex items-center justify-center rounded-md bg-black/50 p-2 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none";
+  "inline-flex items-center justify-center rounded-md bg-black/50 p-2 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
 
 function LightboxContent({
   className,
@@ -217,62 +218,65 @@ function LightboxContent({
     prev,
     canPrev,
     canNext,
-  } = useLightbox();
-  const item = items[index];
+  } = useLightbox()
+  const item = items[index]
 
-  const [pan, setPan] = React.useState({ x: 0, y: 0 });
-  const [dragging, setDragging] = React.useState(false);
+  const [pan, setPan] = React.useState({ x: 0, y: 0 })
+  const [dragging, setDragging] = React.useState(false)
   const dragRef = React.useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    panX: number;
-    panY: number;
-    moved: boolean;
-  } | null>(null);
+    pointerId: number
+    startX: number
+    startY: number
+    panX: number
+    panY: number
+    moved: boolean
+  } | null>(null)
 
   React.useEffect(() => {
-    setPan({ x: 0, y: 0 });
-  }, [index, zoomed]);
+    const frame = requestAnimationFrame(() => {
+      setPan({ x: 0, y: 0 })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [index, zoomed])
 
   function isRtl(el: HTMLElement) {
-    return getComputedStyle(el).direction === "rtl";
+    return getComputedStyle(el).direction === "rtl"
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    const rtl = isRtl(event.currentTarget);
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+    const rtl = isRtl(event.currentTarget)
     switch (event.key) {
       case "ArrowRight":
-        event.preventDefault();
-        if (rtl) prev();
-        else next();
-        break;
+        event.preventDefault()
+        if (rtl) prev()
+        else next()
+        break
       case "ArrowLeft":
-        event.preventDefault();
-        if (rtl) next();
-        else prev();
-        break;
+        event.preventDefault()
+        if (rtl) next()
+        else prev()
+        break
       case "Home":
-        event.preventDefault();
-        goTo(0);
-        break;
+        event.preventDefault()
+        goTo(0)
+        break
       case "End":
-        event.preventDefault();
-        goTo(items.length - 1);
-        break;
+        event.preventDefault()
+        goTo(items.length - 1)
+        break
       case "z":
       case "Z":
-        event.preventDefault();
-        setZoomed(!zoomed);
-        break;
+        event.preventDefault()
+        setZoomed(!zoomed)
+        break
     }
   }
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (event.pointerType === "mouse" && event.button !== 0) return
+    event.currentTarget.setPointerCapture(event.pointerId)
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -280,48 +284,48 @@ function LightboxContent({
       panX: pan.x,
       panY: pan.y,
       moved: false,
-    };
-    setDragging(true);
+    }
+    setDragging(true)
   }
 
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) drag.moved = true;
-    if (zoomed) setPan({ x: drag.panX + dx, y: drag.panY + dy });
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    const dx = event.clientX - drag.startX
+    const dy = event.clientY - drag.startY
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) drag.moved = true
+    if (zoomed) setPan({ x: drag.panX + dx, y: drag.panY + dy })
   }
 
   function handlePointerUp(event: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    dragRef.current = null;
-    setDragging(false);
-    const dx = event.clientX - drag.startX;
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    dragRef.current = null
+    setDragging(false)
+    const dx = event.clientX - drag.startX
     if (!zoomed && Math.abs(dx) > 64) {
-      const rtl = isRtl(event.currentTarget);
+      const rtl = isRtl(event.currentTarget)
       if (dx < 0) {
-        if (rtl) prev();
-        else next();
+        if (rtl) prev()
+        else next()
       } else {
-        if (rtl) next();
-        else prev();
+        if (rtl) next()
+        else prev()
       }
-      return;
+      return
     }
-    const target = event.target as HTMLElement;
+    const target = event.target as HTMLElement
     if (!drag.moved && target.closest("[data-slot=lightbox-image]")) {
-      setZoomed(!zoomed);
+      setZoomed(!zoomed)
     }
   }
 
   function handlePointerCancel(event: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    dragRef.current = null;
-    setDragging(false);
-    if (zoomed) setPan({ x: drag.panX, y: drag.panY });
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    dragRef.current = null
+    setDragging(false)
+    if (zoomed) setPan({ x: drag.panX, y: drag.panY })
   }
 
   return (
@@ -333,9 +337,9 @@ function LightboxContent({
         onKeyDown={handleKeyDown}
         className={cn(
           "fixed inset-0 z-50 flex flex-col outline-none",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95",
+          "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           "duration-200 ease-out motion-reduce:animate-none",
-          className,
+          className
         )}
         {...props}
       >
@@ -344,7 +348,7 @@ function LightboxContent({
         </DialogPrimitive.Title>
         <div
           data-slot="lightbox-viewport"
-          className="flex min-h-0 w-full flex-1 touch-none select-none items-center justify-center overflow-hidden px-14 py-14"
+          className="flex min-h-0 w-full flex-1 touch-none items-center justify-center overflow-hidden px-14 py-14 select-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -352,7 +356,7 @@ function LightboxContent({
         >
           {item ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               data-slot="lightbox-image"
               src={item.src}
               alt={item.alt ?? ""}
@@ -360,7 +364,7 @@ function LightboxContent({
               className={cn(
                 "max-h-full max-w-full object-contain transition-transform duration-200 motion-reduce:transition-none",
                 zoomed ? "cursor-grab" : "cursor-zoom-in",
-                dragging && zoomed && "cursor-grabbing transition-none",
+                dragging && zoomed && "cursor-grabbing transition-none"
               )}
               style={{
                 transform: zoomed
@@ -381,7 +385,7 @@ function LightboxContent({
         {children}
         <span
           data-slot="lightbox-counter"
-          className="absolute start-3 top-3 rounded-full bg-black/50 px-2.5 py-1 font-mono text-xs tabular-nums text-white backdrop-blur-sm"
+          className="absolute start-3 top-3 rounded-full bg-black/50 px-2.5 py-1 font-mono text-xs text-white tabular-nums backdrop-blur-sm"
         >
           {index + 1} / {items.length}
         </span>
@@ -416,7 +420,7 @@ function LightboxContent({
             onClick={prev}
             className={cn(
               chromeButtonClass,
-              "absolute start-3 top-1/2 -translate-y-1/2",
+              "absolute start-3 top-1/2 -translate-y-1/2"
             )}
           >
             <ChevronLeft className="size-5 rtl:rotate-180" />
@@ -430,7 +434,7 @@ function LightboxContent({
             onClick={next}
             className={cn(
               chromeButtonClass,
-              "absolute end-3 top-1/2 -translate-y-1/2",
+              "absolute end-3 top-1/2 -translate-y-1/2"
             )}
           >
             <ChevronRight className="size-5 rtl:rotate-180" />
@@ -438,33 +442,31 @@ function LightboxContent({
         ) : null}
       </DialogPrimitive.Content>
     </LightboxPortal>
-  );
+  )
 }
 
 function LightboxThumbnails({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { items, index, goTo } = useLightbox();
-  const refs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const { items, index, goTo } = useLightbox()
+  const refs = React.useRef<(HTMLButtonElement | null)[]>([])
 
   React.useEffect(() => {
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     refs.current[index]?.scrollIntoView({
       block: "nearest",
       inline: "nearest",
       behavior: reduce ? "auto" : "smooth",
-    });
-  }, [index]);
+    })
+  }, [index])
 
   return (
     <div
       data-slot="lightbox-thumbnails"
       className={cn(
         "mx-auto mb-3 flex max-w-full gap-2 overflow-x-auto p-1",
-        className,
+        className
       )}
       {...props}
     >
@@ -473,7 +475,7 @@ function LightboxThumbnails({
           key={`${item.src}-${i}`}
           type="button"
           ref={(el) => {
-            refs.current[i] = el;
+            refs.current[i] = el
           }}
           data-slot="lightbox-thumbnail"
           data-active={i === index || undefined}
@@ -481,8 +483,8 @@ function LightboxThumbnails({
           aria-current={i === index ? "true" : undefined}
           onClick={() => goTo(i)}
           className={cn(
-            "size-14 shrink-0 overflow-hidden rounded-md opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
-            i === index && "opacity-100 ring-2 ring-ring",
+            "size-14 shrink-0 overflow-hidden rounded-md opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none",
+            i === index && "opacity-100 ring-2 ring-ring"
           )}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -495,7 +497,7 @@ function LightboxThumbnails({
         </button>
       ))}
     </div>
-  );
+  )
 }
 
 export {
@@ -506,4 +508,4 @@ export {
   LightboxOverlay,
   LightboxContent,
   LightboxThumbnails,
-};
+}

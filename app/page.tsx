@@ -1,4 +1,7 @@
+import { Suspense } from "react"
 import { Button } from "@/components/ui/button"
+import { HealthStatus } from "@/components/health/HealthStatus"
+import { HealthStatusSkeleton } from "@/components/health/HealthStatusSkeleton"
 
 export default function Page() {
   return (
@@ -8,11 +11,18 @@ export default function Page() {
           <h1 className="font-medium">Project ready!</h1>
           <p>You may now add components and start building.</p>
           <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+          <Button variant={"red"} className="mt-2">
+            Button
+          </Button>
         </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
+        <Suspense
+          defer
+          name="health-status"
+          key="health-status"
+          fallback={<HealthStatusSkeleton />}
+        >
+          <HealthStatus />
+        </Suspense>
       </div>
     </div>
   )

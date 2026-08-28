@@ -11,7 +11,10 @@ type Status =
   | "incident"
   | "unknown"
 
-const STATUS_CONFIG: Record<Status, { label: string; dot: string; text: string }> = {
+const STATUS_CONFIG: Record<
+  Status,
+  { label: string; dot: string; text: string }
+> = {
   operational: {
     label: "Operational",
     dot: "bg-emerald-500",
@@ -66,7 +69,8 @@ const statusIndicatorVariants = cva(
 )
 
 interface StatusIndicatorProps
-  extends Omit<React.ComponentProps<"span">, "children">,
+  extends
+    Omit<React.ComponentProps<"span">, "children">,
     VariantProps<typeof statusIndicatorVariants> {
   /** Current operational status. */
   status: Status
@@ -97,13 +101,16 @@ function StatusIndicator({
       )}
       {...props}
     >
-     <span
-       data-slot="status-dot"
+      <span
+        data-slot="status-dot"
         className={cn("relative shrink-0 rounded-full", config.dot)}
         aria-hidden="true"
       >
         <span
-          className={cn("absolute inset-0 rounded-full animate-ping opacity-40", config.dot)}
+          className={cn(
+            "absolute inset-0 animate-ping rounded-full opacity-40",
+            config.dot
+          )}
         />
       </span>
       <span className={cn("whitespace-nowrap", config.text)}>

@@ -53,11 +53,11 @@ const SortableList = <TItem extends SortableBaseItem>({
   className,
 }: SortableListProps<TItem>) => {
   const [active, setActive] = React.useState<Active | null>(null)
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
 
   const [activeItem, activeIndex] = React.useMemo(() => {
     if (active === null) {

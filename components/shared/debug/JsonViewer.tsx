@@ -553,21 +553,16 @@ function JsonViewer({
   }, [data])
 
   const toggleSearch = React.useCallback(() => {
-    setSearchOpen((prev) => {
-      if (!prev) {
-        requestAnimationFrame(() => searchRef.current?.focus())
-      } else {
-        setSearchQuery("")
-      }
-      return !prev
-    })
-  }, [])
+    const nextSearchOpen = !searchOpen
+    setSearchOpen(nextSearchOpen)
 
-  React.useEffect(() => {
-    if (searchQuery) {
-      setCollapsedPaths(new Set())
+    if (nextSearchOpen) {
+      requestAnimationFrame(() => searchRef.current?.focus())
+      return
     }
-  }, [searchQuery])
+
+    setSearchQuery("")
+  }, [searchOpen])
 
   const isExpandable = data !== null && typeof data === "object"
   const type = typeOf(data)
@@ -645,7 +640,13 @@ function JsonViewer({
               ref={searchRef}
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const nextQuery = e.target.value
+                setSearchQuery(nextQuery)
+                if (nextQuery) {
+                  setCollapsedPaths(new Set())
+                }
+              }}
               placeholder="Filter keys and values…"
               className="min-w-0 flex-1 bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
             />

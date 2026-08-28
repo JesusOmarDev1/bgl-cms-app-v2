@@ -1,0 +1,28 @@
+---
+description: Enforce next-intl APIs; forbid direct i18n JSON imports outside i18n bootstrap
+alwaysApply: false
+---
+
+# next-intl is mandatory for translations
+
+Never import translation catalogs directly from `@/i18n/**/*.json` in app, components, hooks, services, repositories, queries, actions, route handlers, or utilities.
+
+Use next-intl APIs instead:
+
+- Client components (`"use client"`): `useTranslations("<namespace>")`
+- Server contexts (`"use server"`, async RSC, server actions, route handlers, metadata): `await getTranslations("<namespace>")` or `await getTranslations({locale, namespace})`
+
+This includes logs and fallback messages. Do not read messages from raw JSON in runtime code.
+
+Exception (allowed): i18n bootstrap/config files that assemble catalogs (e.g. `i18n/request.ts`).
+
+```ts
+// BAD
+import dbMessages from "@/i18n/db/es.json"
+console.error(dbMessages.db.pages.failed_to_fetch)
+
+// GOOD (server)
+import { getTranslations } from "next-intl/server"
+const t = await getTranslations("db")
+console.error(t("pages.failed_to_fetch"))
+```

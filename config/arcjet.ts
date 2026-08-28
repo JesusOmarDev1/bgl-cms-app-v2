@@ -11,10 +11,13 @@ export const aj = arcjet({
       allow: [
         "CATEGORY:SEARCH_ENGINE",
         "CATEGORY:GOOGLE",
-        "YAHOO_CRAWLER",
-        "BING_CRAWLER",
-        "GOOGLE_CRAWLER",
         "CATEGORY:APPLE",
+        "CATEGORY:AI",
+        "CATEGORY:ACADEMIC",
+        "CATEGORY:YAHOO",
+        "CATEGORY:VERCEL",
+        "CATEGORY:META",
+        "CATEGORY:MICROSOFT",
       ],
     }),
     filter({

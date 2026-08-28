@@ -62,19 +62,11 @@ export function useScrollSpy(
   const offset = parseTopOffset(rootMargin)
 
   React.useEffect(() => {
-    if (ids.length === 0) {
-      setActiveId(undefined)
-      return
-    }
-
     let frame = 0
 
     const update = () => {
       const nextActiveId = getActiveIdFromScrollPosition(ids, root, offset)
-
-      if (nextActiveId) {
-        setActiveId(nextActiveId)
-      }
+      setActiveId((prev) => (prev === nextActiveId ? prev : nextActiveId))
     }
 
     const scheduleUpdate = () => {
@@ -83,6 +75,12 @@ export function useScrollSpy(
     }
 
     update()
+
+    if (ids.length === 0) {
+      return () => {
+        cancelAnimationFrame(frame)
+      }
+    }
 
     const scrollTarget = root ?? window
     scrollTarget.addEventListener("scroll", scheduleUpdate, { passive: true })

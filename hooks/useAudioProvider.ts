@@ -238,10 +238,10 @@ export function useAudioProvider({ tracks = [] }: { tracks?: Track[] } = {}) {
       forceTimeUpdate()
       requestAnimationFrame(() => {
         forceTimeUpdate()
+        requestAnimationFrame(() => {
+          forceTimeUpdate()
+        })
       })
-      setTimeout(() => {
-        forceTimeUpdate()
-      }, 50)
       preloadNextTrack()
     }
 

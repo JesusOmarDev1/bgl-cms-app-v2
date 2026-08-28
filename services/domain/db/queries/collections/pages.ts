@@ -13,8 +13,7 @@ export interface PagesQuery {
 
 export async function getPagesQuery(query: PagesQuery): Promise<PagesTypes[]> {
   const { status = "published", limit = 10, offset = 0 } = query
-  const t = await getTranslations("db")
-
+  const t = await getTranslations("db.pages")
   try {
     const pages = await directus.request<PagesTypes[]>(
       readItems("pages", {
@@ -27,9 +26,7 @@ export async function getPagesQuery(query: PagesQuery): Promise<PagesTypes[]> {
     )
     return pages
   } catch (error) {
-    console.error(
-      error instanceof Error ? error.message : t("pages.failed_to_fetch")
-    )
+    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
     return []
   }
 }
@@ -39,8 +36,7 @@ export async function getPagesBySlugQuery(
   slug: string
 ): Promise<PagesTypes[]> {
   const { status = "published", limit = 1, offset = 0 } = query
-  const t = await getTranslations("db")
-
+  const t = await getTranslations("db.pages")
   try {
     const page = await directus.request<PagesTypes[]>(
       readItems("pages", {
@@ -53,9 +49,7 @@ export async function getPagesBySlugQuery(
     )
     return page
   } catch (error) {
-    console.error(
-      error instanceof Error ? error.message : t("pages.failed_to_fetch")
-    )
+    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
     return []
   }
 }

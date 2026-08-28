@@ -4,5 +4,5 @@
 @import "tailwind-animations";
 @import "./theme.css";
 @import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
+@import "@material-symbols/font-400/rounded.css";
+@import "./animations.css";

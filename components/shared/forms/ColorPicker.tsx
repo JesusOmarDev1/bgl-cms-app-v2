@@ -225,18 +225,21 @@ function ColorPicker({
     const rgb = hexToRgb(value)
     if (!rgb) return
     const parsed = rgbToHsv(rgb)
-    setHsv((prev) => {
-      const next = {
-        h: parsed.s === 0 || parsed.v === 0 ? prev.h : parsed.h,
-        s: parsed.v === 0 ? prev.s : parsed.s,
-        v: parsed.v,
-      }
-      return Math.abs(prev.h - next.h) < 0.5 &&
-        Math.abs(prev.s - next.s) < 0.5 &&
-        Math.abs(prev.v - next.v) < 0.5
-        ? prev
-        : next
+    const frame = requestAnimationFrame(() => {
+      setHsv((prev) => {
+        const next = {
+          h: parsed.s === 0 || parsed.v === 0 ? prev.h : parsed.h,
+          s: parsed.v === 0 ? prev.s : parsed.s,
+          v: parsed.v,
+        }
+        return Math.abs(prev.h - next.h) < 0.5 &&
+          Math.abs(prev.s - next.s) < 0.5 &&
+          Math.abs(prev.v - next.v) < 0.5
+          ? prev
+          : next
+      })
     })
+    return () => cancelAnimationFrame(frame)
   }, [value])
 
   const setValue = React.useCallback(
@@ -411,6 +414,9 @@ function ColorPickerArea({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="color-picker-area"
       role="slider"
       aria-label="Saturation and brightness"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(ctx.hsv.s)}
       aria-valuetext={`saturation ${Math.round(ctx.hsv.s)}%, brightness ${Math.round(ctx.hsv.v)}%`}
       tabIndex={0}
       onPointerDown={(e) => {
@@ -709,11 +715,11 @@ function ColorPickerEyedropper({
   ...props
 }: Omit<React.ComponentProps<"button">, "onClick" | "children">) {
   const ctx = useColorPicker()
-  const [supported, setSupported] = React.useState(false)
-
-  React.useEffect(() => {
-    setSupported(typeof window !== "undefined" && "EyeDropper" in window)
-  }, [])
+  const supported = React.useSyncExternalStore(
+    () => () => {},
+    () => typeof window !== "undefined" && "EyeDropper" in window,
+    () => false
+  )
 
   if (!supported) return null
 

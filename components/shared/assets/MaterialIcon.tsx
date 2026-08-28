@@ -1,16 +1,19 @@
+import type * as React from "react"
+
 import { cn } from "@/lib/utils"
 
-interface MaterialIconProps {
+type MaterialIconProps = Omit<
+  React.ComponentPropsWithoutRef<"span">,
+  "children"
+> & {
   /** Icon name in snake_case (e.g., "phone", "arrow_outward") */
   name: string
-  /** Icon size in pixels (default: 18) */
+  /** Icon size in pixels (default: 20) */
   size?: number
   /** Fill axis (0 = outline, 1 = filled) */
   fill?: 0 | 1
   /** Symbol weight axis (100-700) */
   weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700
-  /** Additional CSS classes */
-  className?: string
 }
 
 /**
@@ -29,6 +32,8 @@ export const MaterialIcon = ({
   fill = 0,
   weight = 300,
   className,
+  style,
+  ...rest
 }: MaterialIconProps) => {
   if (!name) return null
 
@@ -40,11 +45,13 @@ export const MaterialIcon = ({
         className
       )}
       style={{
+        ...style,
         fontSize: size,
         width: size,
         height: size,
         fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 0, 'opsz' 48`,
       }}
+      {...rest}
       aria-hidden="true"
     >
       {name}
