@@ -1,11 +1,15 @@
 import { createDirectus, rest, staticToken } from "@directus/sdk"
 import { ofetch } from "ofetch"
-import ofetchMessages from "@/i18n/ofetch/es.json"
+import { getTranslations } from "next-intl/server"
 import { PagesTypes } from "@/types/collections/pages"
+import { SiteSettingsType } from "@/types/singletons/site-settings"
 
 type Schema = {
   pages: PagesTypes[]
+  site_settings: SiteSettingsType
 }
+
+const t = await getTranslations("ofetch")
 
 const ofetchInstance = ofetch.create({
   retry: 2,
@@ -13,19 +17,11 @@ const ofetchInstance = ofetch.create({
   timeout: 30000,
   retryStatusCodes: [408, 429, 500, 502, 503, 504, 409, 425],
   credentials: "include" as RequestCredentials,
-  onRequestError: (error: unknown) => {
-    console.error(
-      error instanceof Error
-        ? error.message
-        : ofetchMessages.ofetch.request_error
-    )
+  onRequestError: (error) => {
+    throw new Error(t("request_error"), { cause: error })
   },
-  onResponseError: (error: unknown) => {
-    console.error(
-      error instanceof Error
-        ? error.message
-        : ofetchMessages.ofetch.response_error
-    )
+  onResponseError: (response) => {
+    throw new Error(t("response_error"), { cause: response })
   },
 })
 

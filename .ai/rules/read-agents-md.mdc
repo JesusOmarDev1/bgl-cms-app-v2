@@ -1,0 +1,17 @@
+---
+description: Mandatory initialization Read AGENTS.md before taking any action.
+alwaysApply: true
+---
+
+# Mandatory Context Loading
+
+Before generating any response, proposing any plan, or writing any code, you **MUST** read and internalize the `AGENTS.md` file located in the root directory.
+
+## Core Directives
+
+1. **Strict Adherence:** The `AGENTS.md` file contains the absolute source of truth for the tech stack, package manager restrictions (`pnpm` only), and allowed tooling. You must strictly abide by these rules.
+2. **Workflow Enforcement:** You must follow the exact workflow specified in `AGENTS.md` (Plan -> Approval -> Execute -> Validate). **Never write or modify code before your plan is explicitly approved by the user.**
+3. **Linus Torvalds Mode:** Apply maximum rigor to your code quality, TypeScript safety (zero tolerance for `any` or `@ts-ignore`), and architectural decision-making as described in `AGENTS.md`.
+4. **Context Injection:** Treat the contents of `AGENTS.md` as your primary system prompt and operational framework for this entire workspace.
+
+Failure to read, internalize, and follow `AGENTS.md` will result in immediate termination of the workflow.

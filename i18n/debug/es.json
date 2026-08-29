@@ -1,0 +1,17 @@
+{
+  "debug": {
+    "title": "Inspector CMS",
+    "kindLabel": "Tipo",
+    "kindPlaceholder": "Tipo",
+    "kind": {
+      "singleton": "singleton",
+      "collections": "collections"
+    },
+    "resourceLabel": "Recurso",
+    "resourcePlaceholder": "Filtrar recurso",
+    "resourceEmpty": "Sin coincidencias",
+    "extract": "Extraer",
+    "emptyTitle": "Ningun recurso seleccionado",
+    "emptyDescription": "Elige un tipo y un recurso, luego pulsa Extraer."
+  }
+}

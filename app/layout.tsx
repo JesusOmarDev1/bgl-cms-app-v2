@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { NextIntlClientProvider } from "next-intl"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import { QueryProvider } from "@/providers/QueryProvider"
 import { Toaster } from "@/components/ui/sonner"
@@ -52,7 +53,7 @@ export default function RootLayout({
               storageKey="bgl-theme"
               enableSystem={false}
             >
-              {children}
+              <NuqsAdapter>{children}</NuqsAdapter>
               <Toaster
                 richColors
                 closeButton

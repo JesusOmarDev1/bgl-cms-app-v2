@@ -8,6 +8,21 @@
       "error": "Error",
       "unreachable": "Inalcanzable"
     },
+    "indicator": {
+      "operational": "Operativo",
+      "degraded": "Degradado",
+      "partial-outage": "Interrupcion parcial",
+      "major-outage": "Caida mayor",
+      "maintenance": "Mantenimiento",
+      "incident": "Incidente",
+      "unknown": "Desconocido"
+    },
+    "hint": {
+      "maintenance": "Mantenimiento en progreso.",
+      "degraded-latency": "Conexion degradada a partir de {ms} ms.",
+      "critical-latency": "Conexion muy degradada por encima de {ms} ms."
+    },
+    "statusLabel": "Estado API:",
     "responseTime": "{ms} ms",
     "ping": "Ping"
   }

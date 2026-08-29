@@ -6,6 +6,9 @@
     },
     "health": {
       "failed_to_fetch": "Error al obtener el estado de la salud."
+    },
+    "site_settings": {
+      "failed_to_fetch": "Error al obtener la configuracion global del sitio."
     }
   }
 }
