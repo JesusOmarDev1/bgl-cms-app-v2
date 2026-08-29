@@ -448,7 +448,6 @@ function TableOfContentsItem({
 
   return (
     <a
-      role="listitem"
       href={`#${item.id}`}
       onClick={handleClick}
       data-toc-id={item.id}

@@ -52,6 +52,10 @@ export type LightboxProps = {
   children?: React.ReactNode
 }
 
+function getLightboxItemKey(item: LightboxItem): string {
+  return `${item.src}::${item.thumbnail ?? ""}::${item.alt ?? ""}::${item.caption ?? ""}`
+}
+
 function Lightbox({
   items,
   open: openProp,
@@ -472,7 +476,7 @@ function LightboxThumbnails({
     >
       {items.map((item, i) => (
         <button
-          key={`${item.src}-${i}`}
+          key={getLightboxItemKey(item)}
           type="button"
           ref={(el) => {
             refs.current[i] = el
@@ -483,16 +487,17 @@ function LightboxThumbnails({
           aria-current={i === index ? "true" : undefined}
           onClick={() => goTo(i)}
           className={cn(
-            "size-14 shrink-0 overflow-hidden rounded-md opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none",
+            "relative size-14 shrink-0 overflow-hidden rounded-md opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none",
             i === index && "opacity-100 ring-2 ring-ring"
           )}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={item.thumbnail ?? item.src}
             alt=""
+            fill
+            sizes="56px"
             draggable={false}
-            className="size-full object-cover"
+            className="object-cover"
           />
         </button>
       ))}

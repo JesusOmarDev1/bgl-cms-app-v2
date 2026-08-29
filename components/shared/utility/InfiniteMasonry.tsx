@@ -154,30 +154,57 @@ function MasonryItemReveal({
   )
 }
 
-export function InfiniteMasonry<T>({
+type MasonryVirtualizerBoundaryProps<T> = {
+  items: readonly T[]
+  getItemKey: (item: T, index: number) => InfiniteMasonryKey
+  renderItem: (item: T, index: number) => ReactNode
+  onLoadMore: () => void | Promise<void>
+  hasMore: boolean
+  loading: boolean
+  hasError: boolean
+  error?: ReactNode
+  onRetry?: () => void
+  estimateSize: (item: T, index: number) => number
+  renderLoadingItem: (index: number) => ReactNode
+  endState?: ReactNode
+  minColumnWidth: number
+  maxColumns: number
+  gap: number
+  overscan: number
+  prefetch: number
+  animateItems: boolean
+  ariaLabel: string
+  className?: string
+  contentClassName?: string
+  itemClassName?: string
+}
+
+function MasonryVirtualizerBoundary<T>({
   items,
   getItemKey,
   renderItem,
   onLoadMore,
   hasMore,
-  loading = false,
+  loading,
+  hasError,
   error,
   onRetry,
-  estimateSize = () => 240,
-  renderLoadingItem = (index) => <DefaultLoadingItem index={index} />,
-  emptyState = <DefaultEmptyState />,
+  estimateSize,
+  renderLoadingItem,
   endState,
-  minColumnWidth = 208,
-  maxColumns = 4,
-  gap = 12,
-  overscan = 4,
-  prefetch = 3,
-  animateItems = true,
-  ariaLabel = "Infinite masonry feed",
+  minColumnWidth,
+  maxColumns,
+  gap,
+  overscan,
+  prefetch,
+  animateItems,
+  ariaLabel,
   className,
   contentClassName,
   itemClassName,
-}: InfiniteMasonryProps<T>) {
+}: MasonryVirtualizerBoundaryProps<T>) {
+  "use no memo"
+
   const reduceMotion = useReducedMotion()
   const scrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -200,7 +227,6 @@ export function InfiniteMasonry<T>({
     if (!loading) loadPendingRef.current = false
   }, [loading])
 
-  const hasError = error !== undefined && error !== null
   const tailCount = hasError ? 1 : loading ? columns : 0
   const virtualizer = useVirtualizer({
     count: items.length + tailCount,
@@ -243,20 +269,6 @@ export function InfiniteMasonry<T>({
       loadPendingRef.current = false
     })
   }, [hasError, hasMore, items.length, lastVisibleIndex, loading, prefetch])
-
-  if (items.length === 0 && !hasMore && !loading && !hasError) {
-    return (
-      <section
-        aria-label={ariaLabel}
-        className={cn(
-          "w-full overflow-hidden rounded-3xl border border-border bg-background",
-          className
-        )}
-      >
-        {emptyState}
-      </section>
-    )
-  }
 
   const columnWidth =
     columns > 0 ? Math.max(0, (width - gap * (columns - 1)) / columns) : 0
@@ -347,5 +359,73 @@ export function InfiniteMasonry<T>({
         {loading ? "Loading more items" : null}
       </span>
     </section>
+  )
+}
+
+export function InfiniteMasonry<T>({
+  items,
+  getItemKey,
+  renderItem,
+  onLoadMore,
+  hasMore,
+  loading = false,
+  error,
+  onRetry,
+  estimateSize = () => 240,
+  renderLoadingItem = (index) => <DefaultLoadingItem index={index} />,
+  emptyState = <DefaultEmptyState />,
+  endState,
+  minColumnWidth = 208,
+  maxColumns = 4,
+  gap = 12,
+  overscan = 4,
+  prefetch = 3,
+  animateItems = true,
+  ariaLabel = "Infinite masonry feed",
+  className,
+  contentClassName,
+  itemClassName,
+}: InfiniteMasonryProps<T>) {
+  const hasError = error !== undefined && error !== null
+
+  if (items.length === 0 && !hasMore && !loading && !hasError) {
+    return (
+      <section
+        aria-label={ariaLabel}
+        className={cn(
+          "w-full overflow-hidden rounded-3xl border border-border bg-background",
+          className
+        )}
+      >
+        {emptyState}
+      </section>
+    )
+  }
+
+  return (
+    <MasonryVirtualizerBoundary
+      items={items}
+      getItemKey={getItemKey}
+      renderItem={renderItem}
+      onLoadMore={onLoadMore}
+      hasMore={hasMore}
+      loading={loading}
+      hasError={hasError}
+      error={error}
+      onRetry={onRetry}
+      estimateSize={estimateSize}
+      renderLoadingItem={renderLoadingItem}
+      endState={endState}
+      minColumnWidth={minColumnWidth}
+      maxColumns={maxColumns}
+      gap={gap}
+      overscan={overscan}
+      prefetch={prefetch}
+      animateItems={animateItems}
+      ariaLabel={ariaLabel}
+      className={className}
+      contentClassName={contentClassName}
+      itemClassName={itemClassName}
+    />
   )
 }

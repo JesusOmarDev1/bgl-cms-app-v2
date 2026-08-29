@@ -12,7 +12,7 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "reset": "clean --lockfile",
-    "doctor": "react-doctor --verbose --scope full"
+    "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm format && pnpm build"
   },
   "dependencies": {
     "@arcjet/inspect": "^1.10.0",

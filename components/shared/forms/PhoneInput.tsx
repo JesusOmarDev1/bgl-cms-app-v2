@@ -101,7 +101,9 @@ const CountrySelect = ({
       isNonModal={false}
       onOpenChange={(open) => {
         setIsOpen(open)
-        open && setSearchValue("")
+        if (open) {
+          setSearchValue("")
+        }
       }}
     >
       <PopoverTrigger>

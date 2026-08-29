@@ -601,6 +601,7 @@ function ColorPickerFormatInputs({
 
   const [hexDraft, setHexDraft] = React.useState(ctx.hex.toUpperCase())
   const [hexFocused, setHexFocused] = React.useState(false)
+  const hexIsComposingRef = React.useRef(false)
   const hexDisplay = hexFocused ? hexDraft : ctx.hex.toUpperCase()
 
   const parseHex = (raw: string) => {
@@ -641,10 +642,19 @@ function ColorPickerFormatInputs({
           }}
           onBlur={() => {
             setHexFocused(false)
+            hexIsComposingRef.current = false
             commitHexDraft()
           }}
+          onCompositionStart={() => {
+            hexIsComposingRef.current = true
+          }}
+          onCompositionEnd={() => {
+            hexIsComposingRef.current = false
+          }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") commitHexDraft()
+            if (e.key !== "Enter") return
+            if (e.nativeEvent.isComposing || hexIsComposingRef.current) return
+            commitHexDraft()
           }}
           aria-label="Hex color"
           className="h-8 font-mono text-xs uppercase tabular-nums"

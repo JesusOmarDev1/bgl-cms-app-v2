@@ -14,6 +14,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   useCallback,
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
 } from "react"
@@ -230,7 +231,6 @@ export function PullToRefresh({
   const rootRef = useRef<HTMLElement>(null)
   const gestureRef = useRef<Gesture>({ ...EMPTY_GESTURE })
   const animationRef = useRef<{ stop: () => void } | null>(null)
-  const statusRef = useRef<PullToRefreshStatus>("idle")
   const disabledRef = useRef(disabled)
   const externalRefreshingRef = useRef(refreshing)
   const refreshingRef = useRef(refreshing)
@@ -259,9 +259,7 @@ export function PullToRefresh({
   }, [isRefreshing])
 
   const setStatus = useCallback((next: PullToRefreshStatus) => {
-    if (statusRef.current === next) return
-    statusRef.current = next
-    setStatusState(next)
+    setStatusState((current) => (current === next ? current : next))
   }, [])
 
   const settle = useCallback(
@@ -294,7 +292,6 @@ export function PullToRefresh({
     if (disabledRef.current || refreshingRef.current) return
 
     setInternalRefreshing(true)
-    setStatus("refreshing")
     settle(restingDistance)
 
     try {
@@ -305,11 +302,10 @@ export function PullToRefresh({
       // A synchronous refresh can resolve before React commits the temporary
       // internal state, so release here instead of relying only on the effect.
       if (!externalRefreshingRef.current) {
-        setStatus("idle")
         settle(0)
       }
     }
-  }, [onRefresh, restingDistance, setStatus, settle])
+  }, [onRefresh, restingDistance, settle])
 
   const finishPull = useCallback(() => {
     const shouldRefresh =
@@ -318,6 +314,7 @@ export function PullToRefresh({
     gestureRef.current = { ...EMPTY_GESTURE }
 
     if (shouldRefresh) {
+      setStatus("idle")
       void runRefresh()
       return
     }
@@ -328,62 +325,68 @@ export function PullToRefresh({
 
   useEffect(() => {
     if (isRefreshing) {
-      setStatus("refreshing")
       settle(restingDistance)
       return
     }
 
-    if (statusRef.current === "refreshing") {
-      setStatus("idle")
+    if (status === "idle") {
       settle(0)
     }
-  }, [isRefreshing, restingDistance, setStatus, settle])
+  }, [isRefreshing, restingDistance, settle, status])
+
+  const onTouchStartEvent = useEffectEvent((event: TouchEvent) => {
+    const root = rootRef.current
+    if (
+      !root ||
+      event.touches.length !== 1 ||
+      root.scrollTop > 0 ||
+      disabledRef.current ||
+      refreshingRef.current
+    ) {
+      return
+    }
+
+    const touch = event.touches[0]
+    gestureRef.current = {
+      active: true,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      pointerId: null,
+    }
+  })
+
+  const onTouchMoveEvent = useEffectEvent((event: TouchEvent) => {
+    const root = rootRef.current
+    const gesture = gestureRef.current
+    const touch = event.touches[0]
+
+    if (!root || !gesture.active || !touch) return
+
+    const deltaX = touch.clientX - gesture.startX
+    const deltaY = touch.clientY - gesture.startY
+
+    if (root.scrollTop > 0 || deltaY < 0) {
+      gestureRef.current = { ...EMPTY_GESTURE }
+      return
+    }
+
+    if (Math.abs(deltaX) > deltaY) return
+
+    event.preventDefault()
+    updatePull(deltaY)
+  })
+
+  const onTouchEndEvent = useEffectEvent(() => {
+    if (gestureRef.current.active) finishPull()
+  })
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
 
-    const onTouchStart = (event: TouchEvent) => {
-      if (
-        event.touches.length !== 1 ||
-        root.scrollTop > 0 ||
-        disabledRef.current ||
-        refreshingRef.current
-      ) {
-        return
-      }
-
-      const touch = event.touches[0]
-      gestureRef.current = {
-        active: true,
-        startX: touch.clientX,
-        startY: touch.clientY,
-        pointerId: null,
-      }
-    }
-
-    const onTouchMove = (event: TouchEvent) => {
-      const gesture = gestureRef.current
-      const touch = event.touches[0]
-      if (!gesture.active || !touch) return
-
-      const deltaX = touch.clientX - gesture.startX
-      const deltaY = touch.clientY - gesture.startY
-
-      if (root.scrollTop > 0 || deltaY < 0) {
-        gestureRef.current = { ...EMPTY_GESTURE }
-        return
-      }
-
-      if (Math.abs(deltaX) > deltaY) return
-
-      event.preventDefault()
-      updatePull(deltaY)
-    }
-
-    const onTouchEnd = () => {
-      if (gestureRef.current.active) finishPull()
-    }
+    const onTouchStart = (event: TouchEvent) => onTouchStartEvent(event)
+    const onTouchMove = (event: TouchEvent) => onTouchMoveEvent(event)
+    const onTouchEnd = () => onTouchEndEvent()
 
     root.addEventListener("touchstart", onTouchStart, { passive: true })
     root.addEventListener("touchmove", onTouchMove, { passive: false })
@@ -396,7 +399,7 @@ export function PullToRefresh({
       root.removeEventListener("touchend", onTouchEnd)
       root.removeEventListener("touchcancel", onTouchEnd)
     }
-  }, [finishPull, updatePull])
+  }, [])
 
   useEffect(() => {
     return () => animationRef.current?.stop()
@@ -437,10 +440,14 @@ export function PullToRefresh({
     updatePull(deltaY)
   }
 
+  const displayStatus: PullToRefreshStatus = isRefreshing
+    ? "refreshing"
+    : status
+
   const label =
-    status === "refreshing"
+    displayStatus === "refreshing"
       ? refreshingLabel
-      : status === "ready"
+      : displayStatus === "ready"
         ? releaseLabel
         : pullingLabel
 
@@ -449,7 +456,7 @@ export function PullToRefresh({
       ref={rootRef}
       aria-label={ariaLabel}
       aria-busy={isRefreshing}
-      data-state={status}
+      data-state={displayStatus}
       data-disabled={disabled || undefined}
       onPointerDown={startPointerPull}
       onPointerMove={movePointerPull}
@@ -469,7 +476,7 @@ export function PullToRefresh({
         // only the pull itself suppresses selection, and only while it runs,
         // so dragging the page down cannot highlight it on the way.
         TOUCH_GESTURE_CONTENT_CLASS,
-        status === "pulling" || status === "ready"
+        displayStatus === "pulling" || displayStatus === "ready"
           ? "cursor-grabbing select-none"
           : "cursor-grab",
         (disabled || isRefreshing) && "cursor-default",
@@ -491,13 +498,13 @@ export function PullToRefresh({
       >
         <RefreshBuddy
           progress={progress}
-          status={status}
+          status={displayStatus}
           reduce={Boolean(reduce)}
         />
         <span className="relative h-4 min-w-24 text-center">
           <AnimatePresence initial={false} mode="wait">
             <motion.span
-              key={status}
+              key={displayStatus}
               initial={reduce ? { opacity: 0 } : { opacity: 0, y: 3 }}
               animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, y: -3 }}

@@ -19,9 +19,9 @@ export function PowerpointIcon(props: SVGProps<SVGSVGElement>) {
           gradientTransform="translate(0 1756)"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0" stop-color="#ca4c28" />
-          <stop offset=".5" stop-color="#c5401e" />
-          <stop offset="1" stop-color="#b62f14" />
+          <stop offset="0" stopColor="#ca4c28" />
+          <stop offset=".5" stopColor="#c5401e" />
+          <stop offset="1" stopColor="#b62f14" />
         </linearGradient>
       </defs>
       <path

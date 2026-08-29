@@ -18,7 +18,6 @@ export default defineConfig({
       ".env.example",
       "pnpm-workspace.yaml",
       "components/ui/**",
-      "components/shared/**",
     ],
   },
 })

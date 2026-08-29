@@ -15,6 +15,13 @@ import {
   startOfDay,
 } from "@/lib/forms/calendar/calendar-utils"
 
+const DEFAULT_INTL_LOCALE = "en-US"
+const DEFAULT_INTL_TIME_ZONE = "UTC"
+
+function toUtcCalendarDate(date: Date) {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+}
+
 export type DateCalendarProps = Omit<
   React.ComponentProps<"div">,
   "defaultValue"
@@ -137,14 +144,41 @@ function DateCalendar({
     focusDay(clampDate(next, min, max))
   }
 
-  const monthFmt = new Intl.DateTimeFormat(locale, {
-    month: "long",
-    year: "numeric",
-  })
-  const weekdayFmt = new Intl.DateTimeFormat(locale, { weekday: "short" })
-  const dayLabelFmt = new Intl.DateTimeFormat(locale, { dateStyle: "full" })
-  const weekdays = Array.from({ length: 7 }, (_, i) =>
-    weekdayFmt.format(new Date(2021, 7, 1 + ((weekStartsOn + i) % 7)))
+  const resolvedLocale = locale ?? DEFAULT_INTL_LOCALE
+  const monthFmt = React.useMemo(
+    () =>
+      new Intl.DateTimeFormat(resolvedLocale, {
+        month: "long",
+        year: "numeric",
+        timeZone: DEFAULT_INTL_TIME_ZONE,
+      }),
+    [resolvedLocale]
+  )
+  const weekdayFmt = React.useMemo(
+    () =>
+      new Intl.DateTimeFormat(resolvedLocale, {
+        weekday: "short",
+        timeZone: DEFAULT_INTL_TIME_ZONE,
+      }),
+    [resolvedLocale]
+  )
+  const dayLabelFmt = React.useMemo(
+    () =>
+      new Intl.DateTimeFormat(resolvedLocale, {
+        dateStyle: "full",
+        timeZone: DEFAULT_INTL_TIME_ZONE,
+      }),
+    [resolvedLocale]
+  )
+  const monthCaption = monthFmt.format(toUtcCalendarDate(viewMonth))
+  const weekdays = React.useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) =>
+        weekdayFmt.format(
+          new Date(Date.UTC(2021, 7, 1 + ((weekStartsOn + i) % 7)))
+        )
+      ),
+    [weekStartsOn, weekdayFmt]
   )
 
   const cells = monthCells(viewMonth, weekStartsOn)
@@ -186,7 +220,7 @@ function DateCalendar({
           data-slot="date-picker-calendar-caption"
           className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase tabular-nums"
         >
-          {monthFmt.format(viewMonth)}
+          {monthCaption}
         </span>
         <Button
           type="button"
@@ -202,7 +236,7 @@ function DateCalendar({
       </div>
       <div
         role="grid"
-        aria-label={monthFmt.format(viewMonth)}
+        aria-label={monthCaption}
         data-slot="date-picker-calendar-grid"
         className="grid gap-y-0.5"
       >
@@ -232,7 +266,7 @@ function DateCalendar({
                 return (
                   <span
                     key={`empty-${viewMonth.getTime()}-${wi}-${weekdays[i]}`}
-                    role="gridcell"
+                    aria-hidden="true"
                     className="size-8"
                   />
                 )
@@ -240,6 +274,7 @@ function DateCalendar({
               const isSelected = sameDay(d, selected)
               const isToday = sameDay(d, today)
               const out = isDayDisabled(d)
+              const dayAriaLabel = dayLabelFmt.format(toUtcCalendarDate(d))
               return (
                 <button
                   key={d.getTime()}
@@ -250,7 +285,7 @@ function DateCalendar({
                   disabled={out}
                   aria-selected={isSelected}
                   aria-current={isToday ? "date" : undefined}
-                  aria-label={dayLabelFmt.format(d)}
+                  aria-label={dayAriaLabel}
                   onClick={() => setValue(d)}
                   onKeyDown={(e) => handleKey(e, d)}
                   tabIndex={sameDay(d, tabbable) ? 0 : -1}
@@ -367,6 +402,8 @@ function DatePickerTrigger({
   locale,
   className,
   children,
+  "aria-label": ariaLabelProp,
+  "aria-labelledby": ariaLabelledByProp,
   ...props
 }: Omit<React.ComponentProps<"button">, "children"> & {
   placeholder?: string
@@ -374,12 +411,33 @@ function DatePickerTrigger({
   children?: React.ReactNode
 }) {
   const ctx = useDatePicker()
-  const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "medium" })
+  const resolvedLocale = locale ?? DEFAULT_INTL_LOCALE
+  const fmt = React.useMemo(
+    () =>
+      new Intl.DateTimeFormat(resolvedLocale, {
+        dateStyle: "medium",
+        timeZone: DEFAULT_INTL_TIME_ZONE,
+      }),
+    [resolvedLocale]
+  )
+  const selectedValueLabel = ctx.value
+    ? fmt.format(toUtcCalendarDate(ctx.value))
+    : null
+  const triggerLabel = children ?? selectedValueLabel ?? placeholder
+  const triggerAriaLabel =
+    ariaLabelProp ??
+    (ariaLabelledByProp
+      ? undefined
+      : selectedValueLabel
+        ? `Selected date ${selectedValueLabel}`
+        : "Select date")
   return (
     <PopoverTrigger>
       <button
         type="button"
         disabled={ctx.disabled}
+        aria-label={triggerAriaLabel}
+        aria-labelledby={ariaLabelledByProp}
         data-slot="date-picker-trigger"
         data-state={ctx.open ? "open" : "closed"}
         className={cn(
@@ -393,7 +451,7 @@ function DatePickerTrigger({
       >
         <CalendarIcon className="size-3.5 shrink-0 text-muted-foreground" />
         <span data-slot="date-picker-trigger-label" className="flex-1 truncate">
-          {children ?? (ctx.value ? fmt.format(ctx.value) : placeholder)}
+          {triggerLabel}
         </span>
       </button>
     </PopoverTrigger>

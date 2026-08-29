@@ -9,7 +9,7 @@ const ChatGPTIcon = (props: SVGProps<SVGSVGElement>) => (
     viewBox="0 0 20 20"
     {...props}
   >
-    <g clip-path="url(#clip0_5142_3216)">
+    <g clipPath="url(#clip0_5142_3216)">
       <mask
         id="mask0_5142_3216"
         width="20"

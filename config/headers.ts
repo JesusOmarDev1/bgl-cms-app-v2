@@ -5,7 +5,7 @@ const isVisualEditingEnabled = isEnvFlagEnabled(
   process.env.NEXT_PUBLIC_ENABLE_VISUAL_EDITING
 )
 
-export function SecurityHeaders(response: Response): void {
+export function setSecurityHeaders(response: Response): void {
   if (process.env.NODE_ENV === "production") {
     response.headers.set(
       "Strict-Transport-Security",

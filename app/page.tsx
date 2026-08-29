@@ -1,7 +1,4 @@
-import { Suspense } from "react"
 import { Button } from "@/components/ui/button"
-import { HealthStatus } from "@/components/health/HealthStatus"
-import { HealthStatusSkeleton } from "@/components/health/HealthStatusSkeleton"
 
 export default function Page() {
   return (
@@ -15,14 +12,6 @@ export default function Page() {
             Button
           </Button>
         </div>
-        <Suspense
-          defer
-          name="health-status"
-          key="health-status"
-          fallback={<HealthStatusSkeleton />}
-        >
-          <HealthStatus />
-        </Suspense>
       </div>
     </div>
   )

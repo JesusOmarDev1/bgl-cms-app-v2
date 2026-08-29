@@ -19,9 +19,9 @@ export function ExcelIcon(props: SVGProps<SVGSVGElement>) {
           gradientTransform="translate(0 2100)"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0" stop-color="#18884f" />
-          <stop offset=".5" stop-color="#117e43" />
-          <stop offset="1" stop-color="#0b6631" />
+          <stop offset="0" stopColor="#18884f" />
+          <stop offset=".5" stopColor="#117e43" />
+          <stop offset="1" stopColor="#0b6631" />
         </linearGradient>
       </defs>
       <path

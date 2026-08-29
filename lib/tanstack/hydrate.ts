@@ -36,18 +36,22 @@ export async function dehydrate(
     queryClient.setQueryData(query.queryKey, query.data, { updatedAt })
   }
 
+  const dehydratedQueries = []
+
+  for (const query of queryClient.getQueryCache().getAll()) {
+    if (!defaultShouldDehydrateQuery(query)) continue
+
+    dehydratedQueries.push({
+      dehydratedAt: updatedAt,
+      queryHash: query.queryHash,
+      queryKey: query.queryKey,
+      state: query.state,
+      ...(query.meta ? { meta: query.meta } : {}),
+    })
+  }
+
   return {
     mutations: [],
-    queries: queryClient
-      .getQueryCache()
-      .getAll()
-      .filter((query) => defaultShouldDehydrateQuery(query))
-      .map((query) => ({
-        dehydratedAt: updatedAt,
-        queryHash: query.queryHash,
-        queryKey: query.queryKey,
-        state: query.state,
-        ...(query.meta ? { meta: query.meta } : {}),
-      })),
+    queries: dehydratedQueries,
   }
 }

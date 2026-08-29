@@ -15,6 +15,13 @@ After Cache Components, next-intl, or layout/provider changes, run in order:
 
 If `pnpm build` reports `blocking-prerender-dynamic`, use `pnpm exec next build --debug-prerender` for file:line. Apply the bundled recipe in `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`.
 
+After header-related changes, verify `/` response headers in runtime (no `curl`):
+
+- Present: `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`.
+- `Strict-Transport-Security` only in production runtime.
+- With visual editing disabled: `X-Frame-Options: DENY` and `Cross-Origin-Opener-Policy: same-origin`.
+- Absent from helper behavior: response `Accept-Encoding` and helper-forced `Cache-Control: no-store`.
+
 Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.
 
-Session memory: Engram (`mem_save`), not extra `.md` dumps. Persist long-term hardening in `.ai/rules`.
+Session memory: Engram (`mem_save` + `mem_session_summary`), not extra `.md` dumps. Persist long-term hardening in `.ai/rules`.

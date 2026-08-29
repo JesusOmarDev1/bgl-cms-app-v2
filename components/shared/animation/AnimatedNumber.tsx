@@ -64,7 +64,8 @@ function AnimatedNumber({
         setDisplay(value)
       })
       return () => {
-        if (frameRef.current !== undefined) cancelAnimationFrame(frameRef.current)
+        if (frameRef.current !== undefined)
+          cancelAnimationFrame(frameRef.current)
       }
     }
 

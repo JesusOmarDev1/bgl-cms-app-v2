@@ -1,0 +1,27 @@
+---
+description: proxy.ts is the single runtime writer for security headers
+globs: proxy.ts,config/headers.ts,config/csp.ts
+alwaysApply: true
+---
+
+# Proxy security headers hardening
+
+Keep runtime document security headers under a single-writer path:
+
+1. `proxy.ts` must follow:
+   - `const response = NextResponse.next()`
+   - `setSecurityHeaders(response)`
+   - `return response`
+2. Do not duplicate CSP/security header writers in `next.config.ts` `headers()`.
+3. Keep CSP static via `CSP_DIRECTIVES.join("; ")` while `cacheComponents` is enabled.
+4. Do not reintroduce nonce-based request propagation (`x-nonce`, request `Content-Security-Policy` writes) in proxy flow.
+5. Keep `Strict-Transport-Security` production-only (`NODE_ENV === "production"`).
+6. When visual editing is off, enforce:
+   - `X-Frame-Options: DENY`
+   - `Cross-Origin-Opener-Policy: same-origin`
+
+Header safety rules for document response helper:
+
+- Never set `Content-Encoding` manually.
+- Never set `Accept-Encoding` as a response header.
+- Never force `Cache-Control: no-store` from the helper.

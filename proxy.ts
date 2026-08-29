@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
-import { SecurityHeaders } from "@/config/headers"
+import { setSecurityHeaders } from "@/config/headers"
 
 export function proxy() {
   const response = NextResponse.next()
-  SecurityHeaders(response)
+  setSecurityHeaders(response)
   return response
 }
 

@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 
 /**
  * Runs `start` during the render in which `open` becomes true.
@@ -16,9 +16,9 @@ import { useState } from "react";
  * during this one's render. Put those in an effect keyed to `open`.
  */
 export function useOnOpen(open: boolean, start: () => void) {
-  const [wasOpen, setWasOpen] = useState(open);
+  const [wasOpen, setWasOpen] = useState(open)
   if (open !== wasOpen) {
-    setWasOpen(open);
-    if (open) start();
+    setWasOpen(open)
+    if (open) start()
   }
 }

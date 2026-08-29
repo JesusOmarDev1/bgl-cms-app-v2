@@ -396,20 +396,23 @@ function JsonNode({
 
       {isExpanded && (
         <>
-          {displayEntries.map(([k, v], i) => (
-            <JsonNode
-              key={`${k}-${i}`}
-              keyName={k}
-              value={v}
-              path={buildPath(path, k)}
-              depth={depth + 1}
-              defaultExpanded={defaultExpanded}
-              searchQuery={searchQuery}
-              collapsedPaths={collapsedPaths}
-              onToggle={onToggle}
-              isLast={i === displayEntries.length - 1}
-            />
-          ))}
+          {displayEntries.map(([k, v], i) => {
+            const childPath = buildPath(path, k)
+            return (
+              <JsonNode
+                key={childPath}
+                keyName={k}
+                value={v}
+                path={childPath}
+                depth={depth + 1}
+                defaultExpanded={defaultExpanded}
+                searchQuery={searchQuery}
+                collapsedPaths={collapsedPaths}
+                onToggle={onToggle}
+                isLast={i === displayEntries.length - 1}
+              />
+            )
+          })}
           <div
             className={cn(
               "font-mono text-xs",
