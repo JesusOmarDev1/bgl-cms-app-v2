@@ -7,6 +7,8 @@ import type { Key } from "react-aria-components"
 
 import { Box } from "@/components/shared/content/Box"
 import { ButtonWithIcon } from "@/components/shared/content/ButtonWithIcon"
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 import {
   Combobox,
   ComboboxContent,
@@ -15,13 +17,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/components/ui/combobox"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { debugSearchParams } from "@/app/debug/search-params"
 import {
   DEBUG_KINDS,
@@ -29,6 +25,7 @@ import {
   isDebugKind,
   type DebugKind,
 } from "@/services/domain/db/debug/catalog"
+import { cn } from "@/lib/utils"
 
 export function DebugToolbar() {
   const t = useTranslations("debug")
@@ -36,6 +33,21 @@ export function DebugToolbar() {
   const [committed, setDebugParams] = useQueryStates(debugSearchParams)
   const [kind, setKind] = useState<DebugKind | null>(committed.kind)
   const [resource, setResource] = useState<string | null>(committed.resource)
+  const [prevCommittedKind, setPrevCommittedKind] = useState(committed.kind)
+  const [prevCommittedResource, setPrevCommittedResource] = useState(
+    committed.resource
+  )
+
+  if (
+    committed.kind !== prevCommittedKind ||
+    committed.resource !== prevCommittedResource
+  ) {
+    setPrevCommittedKind(committed.kind)
+    setPrevCommittedResource(committed.resource)
+    setKind(committed.kind)
+    setResource(committed.resource)
+  }
+
   const resourceItems =
     kind === null
       ? []
@@ -47,6 +59,7 @@ export function DebugToolbar() {
     kind !== null &&
     resource !== null &&
     resourceItems.some((item) => item.id === resource)
+  const isComboboxDisabled = kind === null
 
   function handleKindChange(key: Key | null) {
     if (typeof key !== "string" || !isDebugKind(key)) {
@@ -77,64 +90,82 @@ export function DebugToolbar() {
   }
 
   return (
-    <Box display="flex" orientation="vertical" gap={3}>
-      <h1 className="text-lg font-semibold">{t("title")}</h1>
-      <Box
-        display="flex"
-        orientation="horizontal"
-        align="center"
-        gap={2}
-        wrap="wrap"
-      >
-        <Select
-          aria-label={t("kindLabel")}
-          placeholder={t("kindPlaceholder")}
-          selectedKey={kind}
-          onSelectionChange={handleKindChange}
-        >
-          <SelectTrigger className="min-w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {DEBUG_KINDS.map((debugKind) => (
-              <SelectItem key={debugKind} id={debugKind}>
-                {t(`kind.${debugKind}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Combobox
-          aria-label={t("resourceLabel")}
-          allowsEmptyCollection
-          isDisabled={kind === null}
-          selectedKey={resource}
-          onSelectionChange={handleResourceChange}
-        >
-          <ComboboxInput
-            className="min-w-56"
-            disabled={kind === null}
-            placeholder={t("resourcePlaceholder")}
-          />
-          <ComboboxContent>
-            <ComboboxEmpty>{t("resourceEmpty")}</ComboboxEmpty>
-            <ComboboxList items={resourceItems}>
-              {(item) => (
-                <ComboboxItem id={item.id} textValue={item.label}>
-                  {item.label}
-                </ComboboxItem>
+    <Box
+      className="top-0 z-10 rounded-xl border border-border/60 bg-card shadow-sm"
+      display="flex"
+      orientation="vertical"
+      padding={2}
+      gap={0.75}
+    >
+      <Box display="flex" orientation="vertical" gap={0.25}>
+        <h1 className="text-3xl font-bold text-balance">{t("title")}</h1>
+        <p className="text-sm text-pretty text-muted-foreground">
+          {t("subtitle")}
+        </p>
+      </Box>
+      <FieldGroup className="flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:gap-3">
+        <Field className="w-full sm:w-auto">
+          <FieldLabel>{t("kindLabel")}</FieldLabel>
+          <ButtonGroup aria-label={t("kindLabel")}>
+            {DEBUG_KINDS.map((debugKind) => {
+              const isSelected = kind === debugKind
+
+              return (
+                <Button
+                  key={debugKind}
+                  aria-pressed={isSelected}
+                  className="h-10 w-1/2 min-w-24"
+                  onPress={() => handleKindChange(debugKind)}
+                  size="xl"
+                  variant={isSelected ? "default" : "outline"}
+                >
+                  {t(`kind.${debugKind}`)}
+                </Button>
+              )
+            })}
+          </ButtonGroup>
+        </Field>
+        <Field className="w-full min-w-0 flex-1 sm:min-w-56">
+          <FieldLabel>{t("resourceLabel")}</FieldLabel>
+          <Combobox
+            aria-label={t("resourceLabel")}
+            allowsEmptyCollection
+            isDisabled={isComboboxDisabled}
+            selectedKey={resource}
+            onSelectionChange={handleResourceChange}
+          >
+            <ComboboxInput
+              className={cn(
+                "h-10 min-w-56",
+                isComboboxDisabled &&
+                  "cursor-not-allowed border-dashed bg-muted/40"
               )}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+              disabled={isComboboxDisabled}
+              placeholder={t("resourcePlaceholder")}
+            />
+            <ComboboxContent>
+              <ComboboxEmpty>{t("resourceEmpty")}</ComboboxEmpty>
+              <ComboboxList items={resourceItems}>
+                {(item) => (
+                  <ComboboxItem id={item.id} textValue={item.label}>
+                    {item.label}
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+        </Field>
         <ButtonWithIcon
+          className="w-full min-w-24 self-end transition-transform active:scale-[0.96] sm:w-auto"
           icon="output"
           isDisabled={!canExtract}
           isPending={isPending}
           onPress={handleExtract}
+          size="xl"
         >
           {t("extract")}
         </ButtonWithIcon>
-      </Box>
+      </FieldGroup>
     </Box>
   )
 }

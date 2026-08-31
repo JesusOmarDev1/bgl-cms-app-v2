@@ -1,17 +1,34 @@
 {
   "debug": {
     "title": "Inspector CMS",
+    "subtitle": "Elegí un tipo y un recurso, luego extraé el JSON del CMS.",
     "kindLabel": "Tipo",
-    "kindPlaceholder": "Tipo",
     "kind": {
-      "singleton": "singleton",
-      "collections": "collections"
+      "singleton": "Globales",
+      "collections": "Colección"
     },
     "resourceLabel": "Recurso",
     "resourcePlaceholder": "Filtrar recurso",
     "resourceEmpty": "Sin coincidencias",
     "extract": "Extraer",
-    "emptyTitle": "Ningun recurso seleccionado",
-    "emptyDescription": "Elige un tipo y un recurso, luego pulsa Extraer."
+    "emptyTitle": "Ningún recurso seleccionado",
+    "emptyDescription": "Elige un tipo y un recurso, luego pulsa Extraer.",
+    "jsonViewer": {
+      "search": "Buscar",
+      "expandAll": "Expandir todo",
+      "collapseAll": "Contraer todo",
+      "copy": "Copiar JSON",
+      "item": "elemento",
+      "items": "elementos",
+      "key": "clave",
+      "keys": "claves",
+      "closeSearch": "Cerrar búsqueda",
+      "clearSearch": "Limpiar búsqueda",
+      "searchPlaceholder": "Filtrar claves y valores…",
+      "searchInputLabel": "Filtrar claves y valores",
+      "copyPath": "Copiar ruta",
+      "expand": "Expandir",
+      "collapse": "Contraer"
+    }
   }
 }

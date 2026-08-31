@@ -1,16 +1,14 @@
 import "server-only"
 
-import { customEndpoint } from "@directus/sdk"
+import { readSingleton } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import type { SiteSettingsType } from "@/types/singletons/site-settings"
 
-type SingletonResponse<T> = { data: T }
-
 export const DEFAULT_SITE_SETTINGS: SiteSettingsType = {
   id: "site-settings-default",
-  maintenance_enabled: false,
+  maintenance_mode: false,
   maintenance_title: null,
   maintenance_message: null,
 }
@@ -19,20 +17,33 @@ export async function getSiteSettingsQuery(): Promise<SiteSettingsType> {
   const t = await getTranslations("db.site_settings")
 
   try {
-    const response = await directus.request(
-      customEndpoint<SingletonResponse<SiteSettingsType>>({
-        method: "GET",
-        path: "/items/site_settings",
+    const row = await directus.request(
+      readSingleton("site_settings", {
+        fields: [
+          "id",
+          "maintenance_mode",
+          "maintenance_title",
+          "maintenance_message",
+        ],
       })
     )
 
     return {
       ...DEFAULT_SITE_SETTINGS,
-      ...response.data,
-      maintenance_enabled: Boolean(response.data?.maintenance_enabled),
+      ...row,
+      id: row.id ?? DEFAULT_SITE_SETTINGS.id,
+      maintenance_mode: Boolean(row.maintenance_mode),
     }
   } catch (error) {
-    console.error(t("failed_to_fetch"), { cause: error })
+    const message =
+      error instanceof Error ? error.message : t("failed_to_fetch")
+
+    if (error instanceof Error && error.cause !== undefined) {
+      console.error(message, { cause: error.cause })
+    } else {
+      console.error(message)
+    }
+
     return DEFAULT_SITE_SETTINGS
   }
 }

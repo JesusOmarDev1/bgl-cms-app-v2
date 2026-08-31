@@ -1,8 +1,4 @@
-import {
-  createLoader,
-  parseAsString,
-  parseAsStringLiteral,
-} from "nuqs/server"
+import { createLoader, parseAsString, parseAsStringLiteral } from "nuqs/server"
 
 import { DEBUG_KINDS } from "@/services/domain/db/debug/catalog"
 

@@ -10,7 +10,7 @@ type MaintenanceGateProps = {
 export async function MaintenanceGate({ children }: MaintenanceGateProps) {
   const siteSettings = await getSiteSettingsRepository()
 
-  if (siteSettings.maintenance_enabled) {
+  if (siteSettings.maintenance_mode) {
     redirect("/maintenance")
   }
 

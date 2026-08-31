@@ -27,6 +27,89 @@ function useThemeColors(): JsonColorTheme | null {
   return React.use(ThemeContext)
 }
 
+type JsonViewerLabels = {
+  search: string
+  expandAll: string
+  collapseAll: string
+  copy: string
+  item: string
+  items: string
+  key: string
+  keys: string
+  closeSearch: string
+  clearSearch: string
+  searchPlaceholder: string
+  searchInputLabel: string
+  copyPath: string
+  expand: string
+  collapse: string
+}
+
+const DEFAULT_JSON_VIEWER_LABELS: JsonViewerLabels = {
+  search: "Search",
+  expandAll: "Expand all",
+  collapseAll: "Collapse all",
+  copy: "Copy JSON",
+  item: "item",
+  items: "items",
+  key: "key",
+  keys: "keys",
+  closeSearch: "Close search",
+  clearSearch: "Clear search",
+  searchPlaceholder: "Filter keys and values…",
+  searchInputLabel: "Filter keys and values",
+  copyPath: "Copy path",
+  expand: "Expand",
+  collapse: "Collapse",
+}
+
+const LabelsContext = React.createContext<JsonViewerLabels>(
+  DEFAULT_JSON_VIEWER_LABELS
+)
+
+function useViewerLabels(): JsonViewerLabels {
+  return React.use(LabelsContext)
+}
+
+const COPY_FLASH_MS = 1500
+
+const chromeButtonClassName =
+  "inline-flex size-10 items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+
+function useTimedFlag(durationMs: number): {
+  active: boolean
+  trigger: () => void
+} {
+  const [active, setActive] = React.useState(false)
+  const frameRef = React.useRef<number | null>(null)
+
+  const clearFrame = React.useCallback(() => {
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current)
+      frameRef.current = null
+    }
+  }, [])
+
+  const trigger = React.useCallback(() => {
+    setActive(true)
+    clearFrame()
+    const startedAt = performance.now()
+    const tick = (now: number) => {
+      if (now - startedAt >= durationMs) {
+        setActive(false)
+        frameRef.current = null
+        return
+      }
+      frameRef.current = requestAnimationFrame(tick)
+    }
+    frameRef.current = requestAnimationFrame(tick)
+  }, [clearFrame, durationMs])
+
+  React.useEffect(() => clearFrame, [clearFrame])
+
+  return { active, trigger }
+}
+
 function typeOf(value: JsonValue): string {
   if (value === null) return "null"
   if (Array.isArray(value)) return "array"
@@ -178,14 +261,15 @@ function JsonNode({
     if (isExpandable) onToggle(path)
   }, [isExpandable, onToggle, path])
 
-  const [pathCopied, setPathCopied] = React.useState(false)
+  const labels = useViewerLabels()
+  const { active: pathCopied, trigger: flashPathCopied } =
+    useTimedFlag(COPY_FLASH_MS)
 
   const handleCopyPath = React.useCallback(() => {
     navigator.clipboard.writeText(path).then(() => {
-      setPathCopied(true)
-      setTimeout(() => setPathCopied(false), 1500)
+      flashPathCopied()
     })
-  }, [path])
+  }, [flashPathCopied, path])
 
   const hoverBg = theme ? `${theme.fg}10` : undefined
 
@@ -293,7 +377,7 @@ function JsonNode({
         <button
           type="button"
           onClick={handleCopyPath}
-          aria-label={`Copy path: ${path}`}
+          aria-label={`${labels.copyPath}: ${path}`}
           className={copyIconClass}
           style={theme ? { color: theme.fg } : undefined}
         >
@@ -345,7 +429,7 @@ function JsonNode({
         <button
           type="button"
           onClick={handleToggle}
-          aria-label={isExpanded ? "Collapse" : "Expand"}
+          aria-label={isExpanded ? labels.collapse : labels.expand}
           className="flex size-4 shrink-0 items-center justify-center transition-transform"
           style={theme ? { color: theme.punctuation } : undefined}
         >
@@ -365,12 +449,12 @@ function JsonNode({
             <>
               <span
                 className={cn(
-                  "mx-1 text-[10px]",
+                  "mx-1 text-[10px] tabular-nums",
                   !theme && "text-muted-foreground/60"
                 )}
                 style={theme ? { color: `${theme.fg}60` } : undefined}
               >
-                {count} {count === 1 ? "item" : "items"}
+                {count} {count === 1 ? labels.item : labels.items}
               </span>
               <TokenSpan token="punctuation">
                 {closeBracket}
@@ -382,7 +466,7 @@ function JsonNode({
         <button
           type="button"
           onClick={handleCopyPath}
-          aria-label={`Copy path: ${path}`}
+          aria-label={`${labels.copyPath}: ${path}`}
           className={copyIconClass}
           style={theme ? { color: theme.fg } : undefined}
         >
@@ -501,6 +585,32 @@ interface JsonViewerProps extends Omit<
    * or a custom JsonColorTheme object. When omitted, uses Tailwind theme colors.
    */
   colorTheme?: ShikiThemeName | JsonColorTheme
+  /** Optional chrome labels. English defaults keep the viewer usable without i18n. */
+  labels?: Partial<JsonViewerLabels>
+}
+
+function resolveViewerLabels(
+  labels: Partial<JsonViewerLabels> | undefined
+): JsonViewerLabels {
+  return {
+    search: labels?.search ?? DEFAULT_JSON_VIEWER_LABELS.search,
+    expandAll: labels?.expandAll ?? DEFAULT_JSON_VIEWER_LABELS.expandAll,
+    collapseAll: labels?.collapseAll ?? DEFAULT_JSON_VIEWER_LABELS.collapseAll,
+    copy: labels?.copy ?? DEFAULT_JSON_VIEWER_LABELS.copy,
+    item: labels?.item ?? DEFAULT_JSON_VIEWER_LABELS.item,
+    items: labels?.items ?? DEFAULT_JSON_VIEWER_LABELS.items,
+    key: labels?.key ?? DEFAULT_JSON_VIEWER_LABELS.key,
+    keys: labels?.keys ?? DEFAULT_JSON_VIEWER_LABELS.keys,
+    closeSearch: labels?.closeSearch ?? DEFAULT_JSON_VIEWER_LABELS.closeSearch,
+    clearSearch: labels?.clearSearch ?? DEFAULT_JSON_VIEWER_LABELS.clearSearch,
+    searchPlaceholder:
+      labels?.searchPlaceholder ?? DEFAULT_JSON_VIEWER_LABELS.searchPlaceholder,
+    searchInputLabel:
+      labels?.searchInputLabel ?? DEFAULT_JSON_VIEWER_LABELS.searchInputLabel,
+    copyPath: labels?.copyPath ?? DEFAULT_JSON_VIEWER_LABELS.copyPath,
+    expand: labels?.expand ?? DEFAULT_JSON_VIEWER_LABELS.expand,
+    collapse: labels?.collapse ?? DEFAULT_JSON_VIEWER_LABELS.collapse,
+  }
 }
 
 function JsonViewer({
@@ -509,10 +619,13 @@ function JsonViewer({
   rootName = "root",
   defaultExpanded = 1,
   colorTheme,
+  labels,
   className,
   ...props
 }: JsonViewerProps) {
   const resolved = resolveTheme(colorTheme)
+  const resolvedLabels = resolveViewerLabels(labels)
+  const searchInputId = React.useId()
 
   const [collapsedPaths, setCollapsedPaths] = React.useState<Set<string>>(
     () => {
@@ -524,7 +637,8 @@ function JsonViewer({
   )
   const [searchQuery, setSearchQuery] = React.useState("")
   const [searchOpen, setSearchOpen] = React.useState(false)
-  const [copiedAll, setCopiedAll] = React.useState(false)
+  const { active: copiedAll, trigger: flashCopiedAll } =
+    useTimedFlag(COPY_FLASH_MS)
   const searchRef = React.useRef<HTMLInputElement>(null)
 
   const togglePath = React.useCallback((path: string) => {
@@ -550,10 +664,9 @@ function JsonViewer({
 
   const copyJson = React.useCallback(() => {
     navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
-      setCopiedAll(true)
-      setTimeout(() => setCopiedAll(false), 1500)
+      flashCopiedAll()
     })
-  }, [data])
+  }, [data, flashCopiedAll])
 
   const toggleSearch = React.useCallback(() => {
     const nextSearchOpen = !searchOpen
@@ -569,148 +682,175 @@ function JsonViewer({
 
   const isExpandable = data !== null && typeof data === "object"
   const type = typeOf(data)
+  const entryCount = isExpandable ? countEntries(data) : 0
+  const entryLabel =
+    type === "array"
+      ? entryCount === 1
+        ? resolvedLabels.item
+        : resolvedLabels.items
+      : entryCount === 1
+        ? resolvedLabels.key
+        : resolvedLabels.keys
 
   return (
     <ThemeContext value={resolved}>
-      <div
-        data-slot="json-viewer"
-        className={cn(
-          "overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm",
-          className
-        )}
-        {...props}
-      >
-        {/* Toolbar */}
-        <div className="flex items-center justify-between border-b border-border/40 px-3 py-2 sm:px-4">
-          <div className="flex items-center gap-2">
-            {title && (
-              <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-            )}
-            {isExpandable && (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                {countEntries(data)} {type === "array" ? "items" : "keys"}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-0.5">
-            <button
-              type="button"
-              onClick={toggleSearch}
-              aria-label={searchOpen ? "Close search" : "Search"}
-              className={cn(
-                "inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                searchOpen && "bg-muted text-foreground"
+      <LabelsContext value={resolvedLabels}>
+        <div
+          data-slot="json-viewer"
+          className={cn(
+            "overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm",
+            className
+          )}
+          {...props}
+        >
+          {/* Toolbar */}
+          <div className="flex items-center justify-between border-b border-border/40 px-3 py-2 sm:px-4">
+            <div className="flex items-center gap-2">
+              {title && (
+                <h3 className="text-sm font-semibold text-foreground">
+                  {title}
+                </h3>
               )}
-            >
-              <Search className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={expandAll}
-              aria-label="Expand all"
-              className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <UnfoldHorizontal className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={collapseAll}
-              aria-label="Collapse all"
-              className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <FoldHorizontal className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={copyJson}
-              aria-label="Copy JSON"
-              className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              {copiedAll ? (
-                <Check className="size-3.5 text-emerald-500" />
-              ) : (
-                <Copy className="size-3.5" />
+              {isExpandable && (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground tabular-nums">
+                  {entryCount} {entryLabel}
+                </span>
               )}
-            </button>
-          </div>
-        </div>
-
-        {/* Search bar */}
-        {searchOpen && (
-          <div className="flex items-center gap-2 border-b border-border/40 bg-muted/20 px-3 py-1.5 sm:px-4">
-            <Search className="size-3.5 shrink-0 text-muted-foreground" />
-            <input
-              ref={searchRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                const nextQuery = e.target.value
-                setSearchQuery(nextQuery)
-                if (nextQuery) {
-                  setCollapsedPaths(new Set())
-                }
-              }}
-              placeholder="Filter keys and values…"
-              className="min-w-0 flex-1 bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
-            />
-            {searchQuery && (
+            </div>
+            <div className="flex items-center gap-0.5">
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
-                aria-label="Clear search"
-                className="inline-flex items-center justify-center rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <X className="size-3" />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Tree */}
-        <div
-          className="overflow-auto py-1"
-          style={
-            resolved
-              ? {
-                  backgroundColor: resolved.bg,
-                  color: resolved.fg,
+                onClick={toggleSearch}
+                aria-label={
+                  searchOpen
+                    ? resolvedLabels.closeSearch
+                    : resolvedLabels.search
                 }
-              : undefined
-          }
-        >
-          {isExpandable ? (
-            <JsonNode
-              keyName={rootName}
-              value={data}
-              path={rootName}
-              depth={0}
-              defaultExpanded={defaultExpanded}
-              searchQuery={searchQuery}
-              collapsedPaths={collapsedPaths}
-              onToggle={togglePath}
-              isLast
-            />
-          ) : (
-            <div className="px-4 py-2 font-mono text-xs">
-              <TokenSpan token="key">{rootName}</TokenSpan>
-              <TokenSpan token="punctuation">: </TokenSpan>
-              {typeof data === "string" ? (
-                <TokenSpan token="string">&quot;{data}&quot;</TokenSpan>
-              ) : typeof data === "number" ? (
-                <TokenSpan token="number">{String(data)}</TokenSpan>
-              ) : typeof data === "boolean" ? (
-                <TokenSpan token="boolean">{String(data)}</TokenSpan>
-              ) : (
-                <TokenSpan token="null" italic>
-                  null
-                </TokenSpan>
+                className={cn(
+                  chromeButtonClassName,
+                  searchOpen && "bg-muted text-foreground"
+                )}
+              >
+                <Search className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={expandAll}
+                aria-label={resolvedLabels.expandAll}
+                className={chromeButtonClassName}
+              >
+                <UnfoldHorizontal className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={collapseAll}
+                aria-label={resolvedLabels.collapseAll}
+                className={chromeButtonClassName}
+              >
+                <FoldHorizontal className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={copyJson}
+                aria-label={resolvedLabels.copy}
+                className={chromeButtonClassName}
+              >
+                {copiedAll ? (
+                  <Check className="size-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="size-3.5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Search bar */}
+          {searchOpen && (
+            <div className="flex items-center gap-2 border-b border-border/40 bg-muted/20 px-3 py-1.5 sm:px-4">
+              <Search className="size-3.5 shrink-0 text-muted-foreground" />
+              <label className="sr-only" htmlFor={searchInputId}>
+                {resolvedLabels.searchInputLabel}
+              </label>
+              <input
+                id={searchInputId}
+                ref={searchRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  const nextQuery = e.target.value
+                  setSearchQuery(nextQuery)
+                  if (nextQuery) {
+                    setCollapsedPaths(new Set())
+                  }
+                }}
+                placeholder={resolvedLabels.searchPlaceholder}
+                aria-label={resolvedLabels.searchInputLabel}
+                className="min-w-0 flex-1 bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label={resolvedLabels.clearSearch}
+                  className={chromeButtonClassName}
+                >
+                  <X className="size-3.5" />
+                </button>
               )}
             </div>
           )}
+
+          {/* Tree */}
+          <div
+            className="overflow-auto py-1"
+            style={
+              resolved
+                ? {
+                    backgroundColor: resolved.bg,
+                    color: resolved.fg,
+                  }
+                : undefined
+            }
+          >
+            {isExpandable ? (
+              <JsonNode
+                keyName={rootName}
+                value={data}
+                path={rootName}
+                depth={0}
+                defaultExpanded={defaultExpanded}
+                searchQuery={searchQuery}
+                collapsedPaths={collapsedPaths}
+                onToggle={togglePath}
+                isLast
+              />
+            ) : (
+              <div className="px-4 py-2 font-mono text-xs">
+                <TokenSpan token="key">{rootName}</TokenSpan>
+                <TokenSpan token="punctuation">: </TokenSpan>
+                {typeof data === "string" ? (
+                  <TokenSpan token="string">&quot;{data}&quot;</TokenSpan>
+                ) : typeof data === "number" ? (
+                  <TokenSpan token="number">{String(data)}</TokenSpan>
+                ) : typeof data === "boolean" ? (
+                  <TokenSpan token="boolean">{String(data)}</TokenSpan>
+                ) : (
+                  <TokenSpan token="null" italic>
+                    null
+                  </TokenSpan>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </LabelsContext>
     </ThemeContext>
   )
 }
 
-export { JsonViewer, type JsonViewerProps, type JsonValue }
+export {
+  JsonViewer,
+  type JsonViewerProps,
+  type JsonViewerLabels,
+  type JsonValue,
+}

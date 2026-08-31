@@ -115,20 +115,21 @@
 
 @layer base {
   *::selection {
-    @apply bg-primary text-foreground;
+    @apply bg-[#e7000b] text-white;
   }
 
   *::-webkit-scrollbar-track {
-    @apply rounded-md bg-zinc-900;
+    border-radius: 0.3rem; /* rounded-md */
+    background-color: transparent;
   }
-
   *::-webkit-scrollbar-thumb {
-    @apply rounded-md bg-zinc-400;
+    border-radius: 0.3rem; /* rounded-md */
+    background-color: rgb(161 161 170); /* bg-zinc-400 */
+  }
+  *::-webkit-scrollbar {
+    width: 0.65rem; /* w-2.5 */
   }
 
-  *::-webkit-scrollbar {
-    @apply w-2;
-  }
   * {
     @apply border-border outline-ring/50;
   }
@@ -141,33 +142,5 @@
   }
   html {
     @apply font-sans;
-  }
-
-  /* Directus UI */
-  .rich-table-wrapper table {
-    width: max-content !important;
-    min-width: 100%;
-  }
-
-  .rich-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  table {
-    @apply h-auto;
-    min-width: 100%;
-  }
-
-  tr {
-    @apply m-0 border-t p-0 even:bg-muted/80;
-  }
-
-  td {
-    @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
-  }
-
-  th {
-    @apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
   }
 }

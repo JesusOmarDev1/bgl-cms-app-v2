@@ -1,0 +1,25 @@
+---
+description: Directus SDK client — one Schema client, rest request helpers, isDirectusError, no CMS writes
+globs: config/directus.ts,services/domain/db/**/*.ts
+alwaysApply: false
+---
+
+# Directus SDK client (read-only)
+
+One client in `config/directus.ts`: `createDirectus<Schema>(url).with(staticToken).with(rest())`. Schema generic is required. URL = `NEXT_PUBLIC_DIRECTUS_URL`. Token = `DIRECTUS_STATIC_TOKEN`. Never `?access_token=`. No second client / `graphql()` unless explicitly requested.
+
+Fetch with `directus.request(readItems | readItem | readSingleton | ...)`. Never `ofetch`/`fetch` to `/items/*` (ofetch is only `globals.fetch` on the client). Custom paths: `customEndpoint<OutputType>({ path, method })`.
+
+Catch API errors with `isDirectusError(error)`. This frontend is read-only: never `createItems` / `updateItems` / `deleteItems` / nested `{ create, update, delete }`. Writes live in Directus Studio.
+
+Install with **pnpm** only (`pnpm add @directus/sdk`). Never npm/npx.
+
+```ts
+// BAD
+await fetch(`${url}/items/pages?access_token=...`)
+await directus.request(createItems("pages", [...]))
+
+// GOOD
+await directus.request(readItems("pages", query))
+catch (e) { if (isDirectusError(e)) ... }
+```

@@ -13,12 +13,12 @@ export async function DebugEmpty() {
   const t = await getTranslations("debug")
 
   return (
-    <Empty className="border border-dashed">
+    <Empty className="rounded-xl border border-dashed">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <MaterialIcon name="data_object" />
         </EmptyMedia>
-        <EmptyTitle>{t("emptyTitle")}</EmptyTitle>
+        <EmptyTitle className="text-balance">{t("emptyTitle")}</EmptyTitle>
         <EmptyDescription>{t("emptyDescription")}</EmptyDescription>
       </EmptyHeader>
     </Empty>

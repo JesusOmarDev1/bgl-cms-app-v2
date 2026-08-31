@@ -6,3 +6,7 @@
 @import "shadcn/tailwind.css";
 @import "@material-symbols/font-400/rounded.css";
 @import "./animations.css";
+
+/* Box rem/grid responsive prefixes — keep in sync with spacing/grid maps in components/shared/content/Box.tsx */
+@source inline("{sm:,md:,lg:,xl:,2xl:}{p,pt,pb,px,m,mt,mb,mx,gap}-{0,1,2,3,4,6,8,12,16}");
+@source inline("{sm:,md:,lg:,xl:,2xl:}{grid-cols,grid-rows}-{1,2,3,4,5,6,7,8,9,10,11,12}");

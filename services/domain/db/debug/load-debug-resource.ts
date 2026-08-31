@@ -9,12 +9,7 @@ import {
 } from "@/services/domain/db/debug/catalog"
 
 type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue }
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
 
 function isJsonValue(value: unknown): value is JsonValue {
   if (value === null) {

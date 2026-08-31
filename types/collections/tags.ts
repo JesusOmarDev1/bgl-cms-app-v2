@@ -4,10 +4,11 @@ export interface TagTypes {
   // General
   id: string
   title: string
-  slug?: string
-  color?: string | null
-  status?: StatusType
+  slug: string | null
+  color: string
+  sort: number | null
+  status: StatusType
   // Audit
-  date_created?: Date | string
-  date_updated?: Date | string
+  date_created: "datetime"
+  date_updated: "datetime"
 }

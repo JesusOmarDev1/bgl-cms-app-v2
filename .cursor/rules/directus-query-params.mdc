@@ -1,0 +1,28 @@
+---
+description: Directus query params — explicit fields, deep underscore, limit, search vs filter, no page+offset
+globs: services/domain/db/queries/**/*.ts
+alwaysApply: false
+---
+
+# Directus query parameters
+
+Production queries list explicit `fields`. `*` / `*.*` are slow. Inspector may use top-level `*` plus nested M2A. New public queries: no `*.*.*`.
+
+`search` is full-text on this collection’s strings only — not related, not slug/status (use `filter`). `sort` defaults ASC; `-` is DESC; SDK array: `sort: ["sort", "-date_created"]`.
+
+Always set `limit`. Never `limit: -1`. Do not mix `page` and `offset`. `page` starts at `1`.
+
+`deep` nested params use `_` (`_filter`, `_sort`, `_limit`). No `fields` or `deep` inside `deep`. `alias` cannot be relational (`author.name`) and is poorly typed with `deep` — do not rely on it.
+
+`json()` is not a filter — use `_json`. Counts: `aggregate()`, not improvised `count`. If using `*.*`, set `backlink: false`.
+
+```ts
+// BAD
+readItems("pages", { search: "cotizar", limit: -1, page: 2, offset: 10 })
+deep: { body: { filter: { ... }, fields: ["*"] } }
+
+// GOOD
+filter: { slug: { _eq: "cotizar" } }
+limit: 10
+deep: { body: { _sort: ["sort"] } }
+```

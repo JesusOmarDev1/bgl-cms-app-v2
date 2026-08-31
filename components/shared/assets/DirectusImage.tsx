@@ -13,11 +13,7 @@ import {
 } from "@/lib/directus/image-variants"
 import { cn } from "@/lib/utils"
 
-export type {
-  DirectusImageQuality,
-  DirectusImageSizing,
-  DirectusImageVariant,
-}
+export type { DirectusImageQuality, DirectusImageSizing, DirectusImageVariant }
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

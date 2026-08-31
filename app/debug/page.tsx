@@ -36,20 +36,16 @@ export default function DebugPage({ searchParams }: DebugPageProps) {
 
   return (
     <Box
-      className="min-h-dvh"
+      className="mx-auto min-h-dvh w-full max-w-7xl"
       display="flex"
       orientation="vertical"
-      padding={4}
-      gap={4}
+      padding={3}
+      gap={1.5}
     >
       <Suspense fallback={<DebugToolbarSkeleton />}>
         <DebugToolbar />
       </Suspense>
-      <Suspense
-        defer
-        name="debug-payload"
-        fallback={<DebugPayloadSkeleton />}
-      >
+      <Suspense defer name="debug-payload" fallback={<DebugPayloadSkeleton />}>
         <DebugPagePayload searchParams={searchParams} />
       </Suspense>
     </Box>

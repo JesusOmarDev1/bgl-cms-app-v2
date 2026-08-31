@@ -29,7 +29,8 @@ type HealthStatusResolutionInput = {
 }
 
 type LatencySeverity = "normal" | "degraded" | "critical"
-type HealthIndicatorHint = "maintenance" | "degraded-latency" | "critical-latency"
+type HealthIndicatorHint =
+  "maintenance" | "degraded-latency" | "critical-latency"
 
 function resolveLatencySeverity(responseTime?: number): LatencySeverity {
   if (typeof responseTime !== "number" || Number.isNaN(responseTime)) {

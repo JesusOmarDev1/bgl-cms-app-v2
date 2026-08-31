@@ -19,7 +19,12 @@ import {
 } from "./helpers"
 import { HealthStatusChart } from "./HealthStatusChart"
 
-const HEALTH_CHART_STATUS_ORDER = ["ok", "warn", "error", "unreachable"] as const
+const HEALTH_CHART_STATUS_ORDER = [
+  "ok",
+  "warn",
+  "error",
+  "unreachable",
+] as const
 
 function buildHealthChartData(value: number) {
   return HEALTH_CHART_STATUS_ORDER.map((status) => ({
@@ -34,7 +39,7 @@ export async function HealthStatus() {
     getHealthRepository(),
     getSiteSettingsRepository(),
   ])
-  const maintenanceInProgress = siteSettings.maintenance_enabled
+  const maintenanceInProgress = siteSettings.maintenance_mode
   const resolvedStatus = resolveHealthIndicatorStatus({
     status: health.status,
     responseTime: health.responseTime,

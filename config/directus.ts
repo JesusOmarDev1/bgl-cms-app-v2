@@ -1,13 +1,7 @@
 import { createDirectus, rest, staticToken } from "@directus/sdk"
 import { ofetch } from "ofetch"
 import { getTranslations } from "next-intl/server"
-import { PagesTypes } from "@/types/collections/pages"
-import { SiteSettingsType } from "@/types/singletons/site-settings"
-
-type Schema = {
-  pages: PagesTypes[]
-  site_settings: SiteSettingsType
-}
+import type { Schema } from "@/types/schema"
 
 const t = await getTranslations("ofetch")
 
