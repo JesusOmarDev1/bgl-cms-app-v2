@@ -18,7 +18,7 @@ export async function DebugEmpty() {
         <EmptyMedia variant="icon">
           <MaterialIcon name="data_object" />
         </EmptyMedia>
-        <EmptyTitle className="text-balance">{t("emptyTitle")}</EmptyTitle>
+        <EmptyTitle>{t("emptyTitle")}</EmptyTitle>
         <EmptyDescription>{t("emptyDescription")}</EmptyDescription>
       </EmptyHeader>
     </Empty>

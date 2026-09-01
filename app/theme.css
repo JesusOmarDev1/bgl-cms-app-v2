@@ -119,15 +119,15 @@
   }
 
   *::-webkit-scrollbar-track {
-    border-radius: 0.3rem; /* rounded-md */
+    @apply rounded-md;
     background-color: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    border-radius: 0.3rem; /* rounded-md */
-    background-color: rgb(161 161 170); /* bg-zinc-400 */
+    @apply rounded-md;
+    @apply bg-zinc-400;
   }
   *::-webkit-scrollbar {
-    width: 0.65rem; /* w-2.5 */
+    @apply w-2;
   }
 
   * {

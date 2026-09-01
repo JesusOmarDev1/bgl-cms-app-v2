@@ -19,11 +19,11 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
-import { EASE_OUT } from "@/lib/ease"
+import { EASE_OUT } from "@/lib/search/ease"
 import { useOnOpen } from "@/lib/hooks/use-on-open"
 import { useRowCursor } from "@/lib/hooks/use-row-cursor"
 import { useTouchCapable } from "@/lib/hooks/use-touch-capable"
-import { PresenceGate } from "@/lib/presence-gate"
+import { PresenceGate } from "@/lib/animation/presence-gate"
 import { cn } from "@/lib/utils"
 
 export type CommandItem = {
