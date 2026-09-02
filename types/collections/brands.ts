@@ -6,7 +6,6 @@ export interface BrandsTypes {
   // General
   id: string
   title: string
-  sort: number | null
   excerpt: string | null
   logo: string | DirectusFileTypes
   slug: string | null

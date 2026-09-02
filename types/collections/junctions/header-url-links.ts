@@ -6,5 +6,4 @@ export interface HeaderUrlLinksJunction {
   header_id: string | HeaderType
   item: string | UrlLinksTypes
   collection: "url_links"
-  sort: number | null
 }

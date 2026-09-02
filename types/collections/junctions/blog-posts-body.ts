@@ -29,5 +29,4 @@ export interface BlogPostsBodyJunction {
     | QrCodeBlock
     | MediaBlock
     | CarouselBlock
-  sort: number | null
 }

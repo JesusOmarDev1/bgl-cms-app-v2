@@ -26,5 +26,4 @@ export interface ServicesBodyJunction {
     | QrCodeBlock
     | MediaBlock
     | CarouselBlock
-  sort: number | null
 }

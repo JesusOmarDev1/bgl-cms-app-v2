@@ -8,7 +8,6 @@ export interface PagesTypes {
   id: string
   title: string
   slug: string | null
-  sort: number | null
   status: StatusType
   image: string | DirectusFileTypes | null
   seo: string | SeoTypes

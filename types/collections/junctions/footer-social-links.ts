@@ -6,5 +6,4 @@ export interface FooterSocialLinksJunction {
   footer_id: string | FooterType
   item: string | SocialLinksTypes
   collection: "social_links"
-  sort: number | null
 }

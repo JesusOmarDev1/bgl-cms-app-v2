@@ -6,5 +6,4 @@ export interface HeaderSocialLinksJunction {
   header_id: string | HeaderType
   item: string | SocialLinksTypes
   collection: "social_links"
-  sort: number | null
 }

@@ -5,5 +5,4 @@ export interface ProductsProductAttributesJunction {
   id: number
   products_id: string | ProductsTypes
   product_attributes_id: string | ProductAttributesTypes
-  sort: number | null
 }

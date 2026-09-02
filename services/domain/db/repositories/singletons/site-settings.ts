@@ -1,6 +1,8 @@
-import type { SiteSettingsType } from "@/types/singletons/site-settings"
-import { getSiteSettingsQuery } from "@/services/domain/db/queries/singletons/site-settings"
+import {
+  getSiteSettingsQuery,
+  type SiteSettingsQueryResult,
+} from "@/services/domain/db/queries/singletons/site-settings/site-settings"
 
-export async function getSiteSettingsRepository(): Promise<SiteSettingsType> {
+export async function getSiteSettingsRepository(): Promise<SiteSettingsQueryResult> {
   return await getSiteSettingsQuery()
 }

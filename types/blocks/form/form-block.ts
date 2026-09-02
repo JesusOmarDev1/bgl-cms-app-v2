@@ -1,4 +1,5 @@
 import type { StatusType } from "@/types/enums/status-type"
+import type { FormBlockFieldsJunction } from "@/types/collections/junctions/form-block-fields"
 
 export interface FormBlock {
   // General
@@ -9,7 +10,7 @@ export interface FormBlock {
   captcha: boolean
   status: StatusType | null
   icon: string | null
-  fields: number[]
+  fields: number[] | FormBlockFieldsJunction[]
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

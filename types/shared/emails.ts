@@ -1,7 +1,6 @@
 export interface EmailTypes {
   // General
   id: string
-  sort?: number | null
   name: string
   email: string
   position: string

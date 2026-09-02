@@ -43,6 +43,20 @@ export function DebugToolbarSkeleton() {
         </Box>
         <Skeleton className="h-10 w-full min-w-24 self-end rounded-lg sm:w-24" />
       </Box>
+      <Box
+        className="w-full"
+        display="flex"
+        orientation="horizontal"
+        align="center"
+        justify="center"
+        gap={0.25}
+      >
+        <Skeleton className="h-8 w-20 rounded-lg" />
+        <Skeleton className="size-8 rounded-lg" />
+        <Skeleton className="size-8 rounded-lg" />
+        <Skeleton className="size-8 rounded-lg" />
+        <Skeleton className="h-8 w-20 rounded-lg" />
+      </Box>
     </Box>
   )
 }

@@ -5,5 +5,4 @@ export interface BlogPostsTagsJunction {
   id: number
   blog_posts_id: string | BlogPostsTypes
   tags_id: string | TagTypes
-  sort: number | null
 }

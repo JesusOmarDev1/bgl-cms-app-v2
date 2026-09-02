@@ -29,5 +29,4 @@ export interface ManualsBodyJunction {
     | QrCodeBlock
     | MediaBlock
     | CarouselBlock
-  sort: number | null
 }

@@ -5,5 +5,4 @@ export interface ModelsFilesJunction {
   id: number
   models_id: string | ModelsTypes
   directus_files_id: string | DirectusFileTypes
-  sort: number | null
 }

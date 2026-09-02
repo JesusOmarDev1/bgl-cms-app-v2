@@ -1,6 +1,7 @@
-export type ContentBlockLayout = "one" | "two" | "three"
-export type ContentBlockPadding = "default" | "none" | "compact" | "full_width"
-export type ContentBlockEdgePadding = "default" | "none" | "lg" | "md" | "sm"
+import type { ContentBlockContentJunction } from "@/types/collections/junctions/content-block-content"
+import type { ContentBlockLayout } from "@/types/enums/content-block-layout"
+import type { ContentBlockPadding } from "@/types/enums/content-block-padding"
+import type { ContentEdgePadding } from "@/types/enums/content-edge-padding"
 
 export interface ContentBlock {
   // General
@@ -9,9 +10,9 @@ export interface ContentBlock {
   title: string
   layout: ContentBlockLayout
   padding: ContentBlockPadding
-  padding_top: ContentBlockEdgePadding
-  padding_bottom: ContentBlockEdgePadding
-  content: number[]
+  padding_top: ContentEdgePadding
+  padding_bottom: ContentEdgePadding
+  content: number[] | ContentBlockContentJunction[]
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

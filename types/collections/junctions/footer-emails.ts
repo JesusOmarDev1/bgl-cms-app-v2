@@ -6,5 +6,4 @@ export interface FooterEmailsJunction {
   footer_id: string | FooterType
   item: string | EmailTypes
   collection: "emails"
-  sort: number | null
 }

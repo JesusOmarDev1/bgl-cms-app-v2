@@ -9,7 +9,7 @@
     "start": "next start",
     "typegen": "next typegen",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,mjs,json}\"",
     "typecheck": "tsc --noEmit",
     "reset": "clean --lockfile",
     "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm format && pnpm build"

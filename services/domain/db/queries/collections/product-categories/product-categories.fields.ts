@@ -1,0 +1,15 @@
+export const PRODUCT_CATEGORIES_FIELDS = [
+  "id",
+  "title",
+  "slug",
+  "status",
+  "icon",
+  "date_created",
+  "date_updated",
+  "image.*",
+  "parent.id",
+  "parent.title",
+  "parent.slug",
+  "parent.status",
+  "parent.icon",
+] as const

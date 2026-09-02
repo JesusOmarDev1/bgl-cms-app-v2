@@ -10,7 +10,6 @@ export interface SuppliersTypes {
   website: string | null
   slug: string | null
   logo: string | DirectusFileTypes | null
-  sort: number | null
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

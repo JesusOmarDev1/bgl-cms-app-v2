@@ -1,0 +1,50 @@
+import "server-only"
+import type { Query } from "@directus/sdk"
+import { aggregate, readItems } from "@directus/sdk"
+import { getTranslations } from "next-intl/server"
+import directus from "@/config/directus"
+import { REDIRECTS_FIELDS } from "@/services/domain/db/queries/collections/redirects/redirects.fields"
+import type { RedirectsTypes } from "@/types/collections/redirects"
+import type { Schema } from "@/types/schema"
+
+export interface RedirectsQuery {
+  limit?: number
+  page?: number
+}
+
+export async function getRedirectsQuery(query: RedirectsQuery = {}) {
+  const { limit = 10, page = 1 } = query
+  const t = await getTranslations("db.redirects")
+  try {
+    const items = await directus.request(
+      readItems("redirects", {
+        fields: REDIRECTS_FIELDS,
+        limit,
+        page,
+        sort: ["-date_created"],
+      } satisfies Query<Schema, RedirectsTypes>)
+    )
+    return items
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    return []
+  }
+}
+
+export async function getRedirectsCountQuery() {
+  const t = await getTranslations("db.redirects")
+  try {
+    const result = await directus.request(
+      aggregate("redirects", {
+        aggregate: { count: "*" },
+      })
+    )
+    const count = Number(result[0]?.count ?? 0)
+    return Number.isFinite(count) ? count : 0
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    return 0
+  }
+}
+
+export type RedirectsQueryResult = Awaited<ReturnType<typeof getRedirectsQuery>>

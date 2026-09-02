@@ -7,7 +7,6 @@ import type { ServicesBodyJunction } from "@/types/collections/junctions/service
 export interface ServicesTypes {
   // General
   id: string
-  sort: number | null
   title: string
   slug: string | null
   status: StatusType

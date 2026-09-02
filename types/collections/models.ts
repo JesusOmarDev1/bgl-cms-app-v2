@@ -8,7 +8,6 @@ export interface ModelsTypes {
   title: string
   slug: string | null
   image: string | DirectusFileTypes | null
-  sort: number | null
   status: StatusType
   images: number[] | ModelsFilesJunction[]
   // Audit

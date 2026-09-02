@@ -1,6 +1,5 @@
 import type { DirectusFileTypes } from "@/types/shared/directus-file"
-
-export type MediaBlockType = "pdf" | "image" | "video" | "multiple" | "audio"
+import type { MediaBlockType } from "@/types/enums/media-block-type"
 
 export interface MediaBlock {
   // General

@@ -1,13 +1,10 @@
+import type { SeoFrequency } from "@/types/enums/seo-frequency"
 import type { DirectusFileTypes } from "@/types/shared/directus-file"
-
-export type SeoFrequency =
-  "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
 
 export interface SeoTypes {
   // General
   id: string
   title: string
-  sort: number | null
   description: string
   no_index: boolean
   no_follow: boolean

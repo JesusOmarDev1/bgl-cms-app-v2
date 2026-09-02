@@ -1,4 +1,4 @@
-export type CtaBlockVariant = "normal"
+import type { CtaBlockVariant } from "@/types/enums/cta-block-variant"
 
 export interface CtaBlock {
   // General

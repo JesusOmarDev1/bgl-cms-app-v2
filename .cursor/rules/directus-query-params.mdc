@@ -8,7 +8,7 @@ alwaysApply: false
 
 Production queries list explicit `fields`. `*` / `*.*` are slow. Inspector may use top-level `*` plus nested M2A. New public queries: no `*.*.*`.
 
-`search` is full-text on this collection’s strings only — not related, not slug/status (use `filter`). `sort` defaults ASC; `-` is DESC; SDK array: `sort: ["sort", "-date_created"]`.
+`search` is full-text on this collection’s strings only — not related, not slug/status (use `filter`). `sort` defaults ASC; `-` is DESC; SDK array: `sort: ["-date_created"]`. Use `deep._sort: ["sort"]` to order M2A; do not select `sort` in `fields`.
 
 Always set `limit`. Never `limit: -1`. Do not mix `page` and `offset`. `page` starts at `1`.
 
@@ -24,5 +24,6 @@ deep: { body: { filter: { ... }, fields: ["*"] } }
 // GOOD
 filter: { slug: { _eq: "cotizar" } }
 limit: 10
+sort: ["-date_created"]
 deep: { body: { _sort: ["sort"] } }
 ```

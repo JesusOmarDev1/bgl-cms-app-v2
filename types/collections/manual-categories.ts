@@ -4,7 +4,6 @@ import type { DirectusFileTypes } from "@/types/shared/directus-file"
 export interface ManualCategoriesTypes {
   // General
   id: string
-  sort: number | null
   title: string
   slug: string | null
   status: StatusType

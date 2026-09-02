@@ -11,7 +11,6 @@ export interface BlogPostsTypes {
   title: string
   slug: string | null
   published_at: "datetime"
-  sort: number | null
   seo: string | SeoTypes
   status: StatusType
   image: string | DirectusFileTypes | null

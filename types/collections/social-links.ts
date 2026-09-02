@@ -1,16 +1,8 @@
-export type SocialLinkType =
-  | "facebook"
-  | "instagram"
-  | "x_twitter"
-  | "whatsapp"
-  | "youtube"
-  | "pinterest"
-  | "tiktok"
+import type { SocialLinkType } from "@/types/enums/social-link-type"
 
 export interface SocialLinksTypes {
   // General
   id: string
-  sort: number | null
   title: string
   type: SocialLinkType
   url: string

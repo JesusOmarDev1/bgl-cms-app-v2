@@ -18,6 +18,7 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { DebugPagination } from "@/components/debug/DebugPagination"
 import { debugSearchParams } from "@/app/debug/search-params"
 import {
   DEBUG_KINDS,
@@ -27,7 +28,11 @@ import {
 } from "@/services/domain/db/debug/catalog"
 import { cn } from "@/lib/utils"
 
-export function DebugToolbar() {
+type DebugToolbarProps = {
+  total: number
+}
+
+export function DebugToolbar({ total }: DebugToolbarProps) {
   const t = useTranslations("debug")
   const [isPending, startTransition] = useTransition()
   const [committed, setDebugParams] = useQueryStates(debugSearchParams)
@@ -53,13 +58,17 @@ export function DebugToolbar() {
       ? []
       : getDebugResourcesByKind(kind).map((item) => ({
           id: item.key,
-          label: item.label,
+          label: t(item.labelKey),
         }))
   const canExtract =
     kind !== null &&
     resource !== null &&
     resourceItems.some((item) => item.id === resource)
   const isComboboxDisabled = kind === null
+  const showPager =
+    committed.kind === "collections" &&
+    committed.resource !== null &&
+    Math.ceil(total / committed.limit) > 1
 
   function handleKindChange(key: Key | null) {
     if (typeof key !== "string" || !isDebugKind(key)) {
@@ -86,7 +95,10 @@ export function DebugToolbar() {
       return
     }
 
-    void setDebugParams({ kind, resource }, { shallow: false, startTransition })
+    void setDebugParams(
+      { kind, resource, page: 1, limit: committed.limit },
+      { shallow: false, startTransition }
+    )
   }
 
   return (
@@ -106,7 +118,10 @@ export function DebugToolbar() {
       <FieldGroup className="flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:gap-3">
         <Field className="w-full sm:w-auto">
           <FieldLabel>{t("kindLabel")}</FieldLabel>
-          <ButtonGroup aria-label={t("kindLabel")}>
+          <ButtonGroup
+            className="flex flex-col sm:flex-row"
+            aria-label={t("kindLabel")}
+          >
             {DEBUG_KINDS.map((debugKind) => {
               const isSelected = kind === debugKind
 
@@ -114,7 +129,6 @@ export function DebugToolbar() {
                 <Button
                   key={debugKind}
                   aria-pressed={isSelected}
-                  className="h-10 w-1/2 min-w-24"
                   onPress={() => handleKindChange(debugKind)}
                   size="xl"
                   variant={isSelected ? "default" : "outline"}
@@ -125,7 +139,7 @@ export function DebugToolbar() {
             })}
           </ButtonGroup>
         </Field>
-        <Field className="w-full min-w-0 flex-1 sm:min-w-56">
+        <Field className="w-full min-w-0 flex-1">
           <FieldLabel>{t("resourceLabel")}</FieldLabel>
           <Combobox
             aria-label={t("resourceLabel")}
@@ -136,7 +150,7 @@ export function DebugToolbar() {
           >
             <ComboboxInput
               className={cn(
-                "h-10 min-w-56",
+                "h-10",
                 isComboboxDisabled &&
                   "cursor-not-allowed border-dashed bg-muted/40"
               )}
@@ -166,6 +180,15 @@ export function DebugToolbar() {
           {t("extract")}
         </ButtonWithIcon>
       </FieldGroup>
+      {showPager && committed.kind !== null && committed.resource !== null ? (
+        <DebugPagination
+          kind={committed.kind}
+          resource={committed.resource}
+          page={committed.page}
+          limit={committed.limit}
+          total={total}
+        />
+      ) : null}
     </Box>
   )
 }

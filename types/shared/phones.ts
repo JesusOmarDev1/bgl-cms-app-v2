@@ -1,7 +1,6 @@
 export interface PhoneTypes {
   // General
   id: string
-  sort?: number | null
   name: string
   phone: string
   position: string

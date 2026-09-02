@@ -6,5 +6,4 @@ export interface ServicesButtonServicesJunction {
   services_button_id: string | ServicesButtonType
   item: string | ServicesTypes
   collection: "services"
-  sort: number | null
 }

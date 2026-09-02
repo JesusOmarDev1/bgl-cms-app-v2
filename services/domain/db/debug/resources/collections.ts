@@ -1,0 +1,142 @@
+import type { DebugResourceDefinition } from "@/services/domain/db/debug/resources/types"
+
+export const DEBUG_COLLECTION_RESOURCES = [
+  {
+    kind: "collections",
+    key: "pages",
+    label: "pages",
+    labelKey: "resources.pages",
+  },
+  {
+    kind: "collections",
+    key: "blog_posts",
+    label: "blog_posts",
+    labelKey: "resources.blog_posts",
+  },
+  {
+    kind: "collections",
+    key: "blog_categories",
+    label: "blog_categories",
+    labelKey: "resources.blog_categories",
+  },
+  {
+    kind: "collections",
+    key: "services",
+    label: "services",
+    labelKey: "resources.services",
+  },
+  {
+    kind: "collections",
+    key: "services_categories",
+    label: "services_categories",
+    labelKey: "resources.services_categories",
+  },
+  {
+    kind: "collections",
+    key: "division_services",
+    label: "division_services",
+    labelKey: "resources.division_services",
+  },
+  {
+    kind: "collections",
+    key: "manuals",
+    label: "manuals",
+    labelKey: "resources.manuals",
+  },
+  {
+    kind: "collections",
+    key: "manual_categories",
+    label: "manual_categories",
+    labelKey: "resources.manual_categories",
+  },
+  {
+    kind: "collections",
+    key: "products",
+    label: "products",
+    labelKey: "resources.products",
+  },
+  {
+    kind: "collections",
+    key: "product_categories",
+    label: "product_categories",
+    labelKey: "resources.product_categories",
+  },
+  {
+    kind: "collections",
+    key: "product_attributes",
+    label: "product_attributes",
+    labelKey: "resources.product_attributes",
+  },
+  {
+    kind: "collections",
+    key: "brands",
+    label: "brands",
+    labelKey: "resources.brands",
+  },
+  {
+    kind: "collections",
+    key: "clients",
+    label: "clients",
+    labelKey: "resources.clients",
+  },
+  {
+    kind: "collections",
+    key: "suppliers",
+    label: "suppliers",
+    labelKey: "resources.suppliers",
+  },
+  {
+    kind: "collections",
+    key: "models",
+    label: "models",
+    labelKey: "resources.models",
+  },
+  {
+    kind: "collections",
+    key: "emails",
+    label: "emails",
+    labelKey: "resources.emails",
+  },
+  {
+    kind: "collections",
+    key: "phones",
+    label: "phones",
+    labelKey: "resources.phones",
+  },
+  {
+    kind: "collections",
+    key: "seo",
+    label: "seo",
+    labelKey: "resources.seo",
+  },
+  {
+    kind: "collections",
+    key: "redirects",
+    label: "redirects",
+    labelKey: "resources.redirects",
+  },
+  {
+    kind: "collections",
+    key: "tags",
+    label: "tags",
+    labelKey: "resources.tags",
+  },
+  {
+    kind: "collections",
+    key: "social_links",
+    label: "social_links",
+    labelKey: "resources.social_links",
+  },
+  {
+    kind: "collections",
+    key: "url_links",
+    label: "url_links",
+    labelKey: "resources.url_links",
+  },
+  {
+    kind: "collections",
+    key: "sub_links",
+    label: "sub_links",
+    labelKey: "resources.sub_links",
+  },
+] as const satisfies readonly DebugResourceDefinition[]

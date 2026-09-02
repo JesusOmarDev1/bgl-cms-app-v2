@@ -1,0 +1,17 @@
+export const BRANDS_FIELDS = [
+  "id",
+  "title",
+  "excerpt",
+  "slug",
+  "date_created",
+  "date_updated",
+  "logo.*",
+  "models.id",
+  "models.brands_id",
+  "models.models_id.id",
+  "models.models_id.title",
+  "models.models_id.slug",
+  "models.models_id.date_created",
+  "models.models_id.date_updated",
+  "models.models_id.image.*",
+] as const

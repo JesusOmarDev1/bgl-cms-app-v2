@@ -1,18 +1,11 @@
-export type EmailPosition =
-  | "ceo"
-  | "hr_director"
-  | "it_support"
-  | "finance_trainee"
-  | "sales_executive"
-  | "report_trainee"
+import type { ContactPosition } from "@/types/enums/contact-position"
 
 export interface EmailTypes {
   // General
   id: string
-  sort: number | null
   name: string
   email: string
-  position: EmailPosition
+  position: ContactPosition
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

@@ -4,7 +4,6 @@ import type { DirectusFileTypes } from "@/types/shared/directus-file"
 export interface ProductCategoriesTypes {
   // General
   id: string
-  sort: number | null
   image: string | DirectusFileTypes | null
   title: string
   slug: string | null

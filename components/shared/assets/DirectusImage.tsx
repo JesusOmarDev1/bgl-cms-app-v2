@@ -4,7 +4,8 @@ import { useState, type CSSProperties, type Ref } from "react"
 import Image, { type ImageProps } from "next/image"
 
 import { getAssetUrl } from "@/lib/directus/asset-url"
-import { directusImageLoader } from "@/lib/directus/directus-image-loader"
+import { UUID_REGEX } from "@/lib/validations/uuid"
+import { imageLoader } from "@/lib/directus/image-loader"
 import {
   VARIANT_CONFIG,
   type DirectusImageQuality,
@@ -15,9 +16,6 @@ import { cn } from "@/lib/utils"
 
 export type { DirectusImageQuality, DirectusImageSizing, DirectusImageVariant }
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
 function resolveDirectusSrc(
   src: string | null | undefined,
   fit: "cover" | "contain"
@@ -26,7 +24,7 @@ function resolveDirectusSrc(
   const trimmed = src.trim()
   if (!trimmed) return null
 
-  if (UUID_RE.test(trimmed)) {
+  if (UUID_REGEX.test(trimmed)) {
     return getAssetUrl(trimmed, { fit })
   }
 
@@ -160,7 +158,7 @@ export function DirectusImage({
           src={resolvedSrc}
           alt={alt}
           fill
-          loader={directusImageLoader}
+          loader={imageLoader}
           placeholder={config.placeholder}
           sizes={resolvedSizes}
           quality={resolvedQuality}
@@ -181,7 +179,7 @@ export function DirectusImage({
         alt={alt}
         width={resolvedWidth}
         height={resolvedHeight}
-        loader={directusImageLoader}
+        loader={imageLoader}
         placeholder={config.placeholder}
         sizes={resolvedSizes}
         quality={resolvedQuality}

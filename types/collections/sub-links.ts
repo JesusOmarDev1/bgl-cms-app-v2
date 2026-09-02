@@ -1,7 +1,6 @@
 export interface SubLinksTypes {
   // General
   id: string
-  sort: number | null
   title: string
   url: string
   icon: string | null

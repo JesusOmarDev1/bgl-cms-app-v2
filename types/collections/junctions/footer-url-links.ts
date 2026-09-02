@@ -6,5 +6,4 @@ export interface FooterUrlLinksJunction {
   footer_id: string | FooterType
   item: string | UrlLinksTypes
   collection: "url_links"
-  sort: number | null
 }

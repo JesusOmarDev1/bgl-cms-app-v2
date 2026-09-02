@@ -1,4 +1,8 @@
 import type { StatusType } from "@/types/enums/status-type"
+import type { ProductCatalogState } from "@/types/enums/product-catalog-state"
+import type { ProductEquipmentType } from "@/types/enums/product-equipment-type"
+import type { ProductWarranty } from "@/types/enums/product-warranty"
+import type { ProductWeightUnit } from "@/types/enums/product-weight-unit"
 import type { DirectusFileTypes } from "@/types/shared/directus-file"
 import type { SeoTypes } from "@/types/collections/seo"
 import type { BrandsTypes } from "@/types/collections/brands"
@@ -9,17 +13,6 @@ import type { ProductsFilesJunction } from "@/types/collections/junctions/produc
 import type { ProductsProductAttributesJunction } from "@/types/collections/junctions/products-product-attributes"
 import type { ProductsProductsJunction } from "@/types/collections/junctions/products-products"
 import type { ProductsTagsJunction } from "@/types/collections/junctions/products-tags"
-
-export type ProductEquipmentType = "scale" | "consumables"
-
-export type ProductWeightUnit =
-  "kilograms" | "grams" | "pounds" | "milligrams" | "micrograms" | "nanograms"
-
-export type ProductWarranty =
-  "no_warranty" | "30_days" | "90_days" | "6_months" | "1_year"
-
-export type ProductCatalogState =
-  "active" | "discontinued" | "out_of_stock" | "coming_soon"
 
 export interface ProductsTypes {
   // General
@@ -32,7 +25,6 @@ export interface ProductsTypes {
   supplier: string | SuppliersTypes | null
   model: string | ModelsTypes | null
   seo: string | SeoTypes
-  sort: number | null
   title: string
   featured_image: string | null
   published_at: "datetime"

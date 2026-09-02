@@ -6,7 +6,6 @@ export interface TagTypes {
   title: string
   slug: string | null
   color: string
-  sort: number | null
   status: StatusType
   // Audit
   date_created: "datetime"

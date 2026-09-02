@@ -5,5 +5,4 @@ export interface ProductsFilesJunction {
   id: number
   products_id: string | ProductsTypes
   directus_files_id: string | DirectusFileTypes
-  sort: number | null
 }

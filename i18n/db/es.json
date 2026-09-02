@@ -4,11 +4,111 @@
       "failed_to_fetch": "Error al obtener las páginas.",
       "not_found": "No se encontraron páginas."
     },
+    "blog_posts": {
+      "failed_to_fetch": "Error al obtener las entradas del blog.",
+      "not_found": "No se encontraron entradas del blog."
+    },
+    "blog_categories": {
+      "failed_to_fetch": "Error al obtener las categorías del blog.",
+      "not_found": "No se encontraron categorías del blog."
+    },
+    "services": {
+      "failed_to_fetch": "Error al obtener los servicios.",
+      "not_found": "No se encontraron servicios."
+    },
+    "services_categories": {
+      "failed_to_fetch": "Error al obtener las categorías de servicios.",
+      "not_found": "No se encontraron categorías de servicios."
+    },
+    "division_services": {
+      "failed_to_fetch": "Error al obtener las divisiones de servicios.",
+      "not_found": "No se encontraron divisiones de servicios."
+    },
+    "manuals": {
+      "failed_to_fetch": "Error al obtener los manuales.",
+      "not_found": "No se encontraron manuales."
+    },
+    "manual_categories": {
+      "failed_to_fetch": "Error al obtener las categorías de manuales.",
+      "not_found": "No se encontraron categorías de manuales."
+    },
+    "products": {
+      "failed_to_fetch": "Error al obtener los productos.",
+      "not_found": "No se encontraron productos."
+    },
+    "product_categories": {
+      "failed_to_fetch": "Error al obtener las categorías de productos.",
+      "not_found": "No se encontraron categorías de productos."
+    },
+    "product_attributes": {
+      "failed_to_fetch": "Error al obtener los atributos de productos.",
+      "not_found": "No se encontraron atributos de productos."
+    },
+    "brands": {
+      "failed_to_fetch": "Error al obtener las marcas.",
+      "not_found": "No se encontraron marcas."
+    },
+    "clients": {
+      "failed_to_fetch": "Error al obtener los clientes.",
+      "not_found": "No se encontraron clientes."
+    },
+    "suppliers": {
+      "failed_to_fetch": "Error al obtener los proveedores.",
+      "not_found": "No se encontraron proveedores."
+    },
+    "models": {
+      "failed_to_fetch": "Error al obtener los modelos.",
+      "not_found": "No se encontraron modelos."
+    },
+    "emails": {
+      "failed_to_fetch": "Error al obtener los correos.",
+      "not_found": "No se encontraron correos."
+    },
+    "phones": {
+      "failed_to_fetch": "Error al obtener los teléfonos.",
+      "not_found": "No se encontraron teléfonos."
+    },
+    "seo": {
+      "failed_to_fetch": "Error al obtener el SEO.",
+      "not_found": "No se encontró SEO."
+    },
+    "redirects": {
+      "failed_to_fetch": "Error al obtener las redirecciones.",
+      "not_found": "No se encontraron redirecciones."
+    },
+    "tags": {
+      "failed_to_fetch": "Error al obtener las etiquetas.",
+      "not_found": "No se encontraron etiquetas."
+    },
+    "social_links": {
+      "failed_to_fetch": "Error al obtener los enlaces sociales.",
+      "not_found": "No se encontraron enlaces sociales."
+    },
+    "url_links": {
+      "failed_to_fetch": "Error al obtener los enlaces URL.",
+      "not_found": "No se encontraron enlaces URL."
+    },
+    "sub_links": {
+      "failed_to_fetch": "Error al obtener los subenlaces.",
+      "not_found": "No se encontraron subenlaces."
+    },
     "health": {
       "failed_to_fetch": "Error al obtener el estado de la salud."
     },
     "site_settings": {
       "failed_to_fetch": "Error al obtener la configuracion global del sitio."
+    },
+    "header": {
+      "failed_to_fetch": "Error al obtener el encabezado."
+    },
+    "footer": {
+      "failed_to_fetch": "Error al obtener el pie de página."
+    },
+    "whatsapp_button": {
+      "failed_to_fetch": "Error al obtener el botón de WhatsApp."
+    },
+    "services_button": {
+      "failed_to_fetch": "Error al obtener el botón de servicios."
     }
   }
 }

@@ -1,0 +1,49 @@
+---
+description: Debug DB onboarding convention for scalable resources
+alwaysApply: false
+---
+
+# Debug DB onboarding convention
+
+Keep debug resource growth predictable, strictly typed, and consistent in `/debug`.
+
+## Goal
+
+Add a new debug-inspectable DB resource with minimal edits while preserving strict validation and stable UX.
+
+## Source of truth
+
+- `services/domain/db/debug/registry.ts` composes resource metadata.
+- Resource slices live in:
+  - `services/domain/db/debug/resources/singletons.ts`
+  - `services/domain/db/debug/resources/collections.ts`
+  - `services/domain/db/debug/resources/endpoints.ts`
+- Runtime loading is centralized in `services/domain/db/debug/load-debug-resource.ts`.
+
+## Required checklist
+
+1. Add query in `services/domain/db/queries/<group>/<kebab>/<kebab>.ts` plus fields in `services/domain/db/queries/<group>/<kebab>/<kebab>.fields.ts` (endpoints may omit `.fields.ts`).
+2. Add repository in `services/domain/db/repositories/<group>/<kebab>.ts`.
+3. Register metadata in `services/domain/db/debug/resources/<group>.ts` with:
+   - `kind` (`"singleton" | "collections" | "endpoints"`)
+   - `key` (stable technical key used in debug URLs)
+   - `label` (display fallback)
+   - `labelKey` (i18n key under `debug.resources.*`)
+4. Wire server loader in `DEBUG_RESOURCE_LOADERS` within `services/domain/db/debug/load-debug-resource.ts`. Collections also need `DEBUG_COLLECTION_COUNT_LOADERS` (React `cache()` around the count repo).
+5. If kind/labels are visible in UI, add i18n keys in `i18n/debug/es.json` (`debug.kind.*`, `debug.resources.*`) and `i18n/db/es.json` (`db.<key>.failed_to_fetch`; collections also `not_found`).
+6. Keep validation strict: invalid `kind` + `resource` must resolve to `null`.
+
+## Existing examples
+
+- Singleton: `site_settings`, `header`, `footer`, `whatsapp_button`, `services_button`
+- Collection: `pages` (and the rest of Schema collections)
+- Endpoint: `health`
+
+## Guardrails
+
+- Do not reintroduce manual switch-based resource dispatch.
+- Do not duplicate manual resource lists outside the `registry.ts` -> `catalog.ts` flow.
+- Keep `catalog.ts` derived from `registry.ts`.
+- Keep TypeScript strict (`no any`, `no @ts-ignore`).
+- Keep invalid `kind`/`resource` paths null-safe and crash-free.
+- Collections load one page only (`page` default 1, `limit` default 10, never `limit: -1`, never dump-all).

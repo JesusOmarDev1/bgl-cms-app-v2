@@ -1,4 +1,4 @@
-export type CarouselBlockVariant = "simple"
+import type { CarouselBlockVariant } from "@/types/enums/carousel-block-variant"
 
 export interface CarouselBlock {
   // General

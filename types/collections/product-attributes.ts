@@ -1,26 +1,7 @@
 import type { StatusType } from "@/types/enums/status-type"
-
-export type ProductAttributeUnit =
-  | "kilograms"
-  | "grams"
-  | "pounds"
-  | "milligrams"
-  | "micrograms"
-  | "nanograms"
-  | "liters"
-  | "gallons"
-  | "meters"
-  | "centimeters"
-  | "amperes"
-  | "volts"
-  | "kelvins"
-  | "seconds"
-  | "minutes"
-  | "hours"
-
-export type ProductAttributeGroup = "general" | "specs" | "functions" | "others"
-
-export type ProductAttributeType = "pdf" | "image" | "video" | "text"
+import type { ProductAttributeGroup } from "@/types/enums/product-attribute-group"
+import type { ProductAttributeType } from "@/types/enums/product-attribute-type"
+import type { ProductAttributeUnit } from "@/types/enums/product-attribute-unit"
 
 export interface ProductAttributesTypes {
   // General
@@ -30,7 +11,6 @@ export interface ProductAttributesTypes {
   units: ProductAttributeUnit
   value: string
   group: ProductAttributeGroup
-  sort: number | null
   type: ProductAttributeType
   status: StatusType
   // Audit

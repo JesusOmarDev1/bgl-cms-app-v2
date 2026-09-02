@@ -7,7 +7,6 @@ import type { ManualsBodyJunction } from "@/types/collections/junctions/manuals-
 export interface ManualsTypes {
   // General
   id: string
-  sort: number | null
   title: string
   status: StatusType
   excerpt: string | null

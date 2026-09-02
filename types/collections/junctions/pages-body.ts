@@ -56,5 +56,4 @@ export interface PagesBodyJunction {
     | FeaturedProductsBlock
     | LogosClientsBlock
     | DivisionServicesBlock
-  sort: number | null
 }

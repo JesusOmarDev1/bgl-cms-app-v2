@@ -3,7 +3,6 @@ import type { HttpRedirectType } from "@/types/enums/http-redirect"
 export interface RedirectsTypes {
   // General
   id: string
-  sort: number | null
   title: string
   origin: string
   destiny: string

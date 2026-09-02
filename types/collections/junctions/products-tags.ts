@@ -5,5 +5,4 @@ export interface ProductsTagsJunction {
   id: number
   products_id: string | ProductsTypes
   tags_id: string | TagTypes
-  sort: number | null
 }

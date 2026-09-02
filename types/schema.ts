@@ -33,13 +33,20 @@ import type { DivisionServicesTypes } from "@/types/collections/division-service
 import type { EmailTypes } from "@/types/collections/emails"
 import type { BlogPostsBodyJunction } from "@/types/collections/junctions/blog-posts-body"
 import type { BlogPostsTagsJunction } from "@/types/collections/junctions/blog-posts-tags"
+import type { BrandsBlockBrandsJunction } from "@/types/collections/junctions/brands-block-brands"
 import type { BrandsModelsJunction } from "@/types/collections/junctions/brands-models"
+import type { ContentBlockContentJunction } from "@/types/collections/junctions/content-block-content"
+import type { DivisionServicesBlockDivisionServicesJunction } from "@/types/collections/junctions/division-services-block-division-services"
 import type { FooterEmailsJunction } from "@/types/collections/junctions/footer-emails"
 import type { FooterPhonesJunction } from "@/types/collections/junctions/footer-phones"
 import type { FooterSocialLinksJunction } from "@/types/collections/junctions/footer-social-links"
 import type { FooterUrlLinksJunction } from "@/types/collections/junctions/footer-url-links"
+import type { FormBlockFieldsJunction } from "@/types/collections/junctions/form-block-fields"
 import type { HeaderSocialLinksJunction } from "@/types/collections/junctions/header-social-links"
 import type { HeaderUrlLinksJunction } from "@/types/collections/junctions/header-url-links"
+import type { HeroBlockBrandsJunction } from "@/types/collections/junctions/hero-block-brands"
+import type { HeroBlockFilesJunction } from "@/types/collections/junctions/hero-block-files"
+import type { LogosClientsBlockClientsJunction } from "@/types/collections/junctions/logos-clients-block-clients"
 import type { ManualsBodyJunction } from "@/types/collections/junctions/manuals-body"
 import type { ModelsFilesJunction } from "@/types/collections/junctions/models-files"
 import type { PagesBodyJunction } from "@/types/collections/junctions/pages-body"
@@ -126,6 +133,13 @@ export interface Schema {
   checkbox_block: CheckboxBlock[]
   phone_block: PhoneBlock[]
   directus_files: DirectusFileTypes[]
+  content_block_content: ContentBlockContentJunction[]
+  form_block_fields: FormBlockFieldsJunction[]
+  logos_clients_block_clients: LogosClientsBlockClientsJunction[]
+  brands_block_brands: BrandsBlockBrandsJunction[]
+  division_services_block_division_services: DivisionServicesBlockDivisionServicesJunction[]
+  hero_block_files: HeroBlockFilesJunction[]
+  hero_block_brands: HeroBlockBrandsJunction[]
   pages_body: PagesBodyJunction[]
   blog_posts_body: BlogPostsBodyJunction[]
   manuals_body: ManualsBodyJunction[]

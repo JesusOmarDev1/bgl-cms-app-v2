@@ -15,7 +15,7 @@
 #   PROVIDER="lmstudio:qwen2.5-coder-7b-instruct"
 #   PROVIDER="github:gpt-4o"
 #   PROVIDER="github:deepseek-r1"
-PROVIDER="cursor"
+PROVIDER="cursor:grok-4-5"
 
 # File patterns to include in review (comma-separated)
 # Default: * (all files)
@@ -23,7 +23,7 @@ PROVIDER="cursor"
 #   FILE_PATTERNS="*.ts,*.tsx"
 #   FILE_PATTERNS="*.py"
 #   FILE_PATTERNS="*.go,*.mod"
-FILE_PATTERNS="*.ts,*.tsx,*.js,*.jsx"
+FILE_PATTERNS="*.ts,*.tsx,*.js,*.jsx, *.mjs, *.json"
 
 # File patterns to exclude from review (comma-separated)
 # Default: none

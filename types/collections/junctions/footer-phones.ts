@@ -6,5 +6,4 @@ export interface FooterPhonesJunction {
   footer_id: string | FooterType
   item: string | PhoneTypes
   collection: "phones"
-  sort: number | null
 }

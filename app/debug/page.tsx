@@ -9,6 +9,7 @@ import { DebugPayloadSkeleton } from "@/components/debug/DebugPayloadSkeleton"
 import { DebugToolbar } from "@/components/debug/DebugToolbar"
 import { DebugToolbarSkeleton } from "@/components/debug/DebugToolbarSkeleton"
 import { loadDebugSearchParams } from "@/app/debug/search-params"
+import { loadDebugCollectionCount } from "@/services/domain/db/debug/load-debug-resource"
 
 export const instant = false
 
@@ -20,13 +21,26 @@ type DebugPageProps = {
   searchParams: Promise<SearchParams>
 }
 
-async function DebugPagePayload({
+async function DebugToolbarSlot({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>
 }) {
   const { kind, resource } = await loadDebugSearchParams(searchParams)
-  return <DebugPayload kind={kind} resource={resource} />
+  const total = await loadDebugCollectionCount(kind, resource)
+  return <DebugToolbar total={total} />
+}
+
+async function DebugPagePayload({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const { kind, resource, page, limit } =
+    await loadDebugSearchParams(searchParams)
+  return (
+    <DebugPayload kind={kind} resource={resource} page={page} limit={limit} />
+  )
 }
 
 export default function DebugPage({ searchParams }: DebugPageProps) {
@@ -43,7 +57,7 @@ export default function DebugPage({ searchParams }: DebugPageProps) {
       gap={1.5}
     >
       <Suspense fallback={<DebugToolbarSkeleton />}>
-        <DebugToolbar />
+        <DebugToolbarSlot searchParams={searchParams} />
       </Suspense>
       <Suspense defer name="debug-payload" fallback={<DebugPayloadSkeleton />}>
         <DebugPagePayload searchParams={searchParams} />

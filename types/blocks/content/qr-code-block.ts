@@ -1,5 +1,5 @@
-export type QrCodeBlockSize = "small" | "medium" | "big"
-export type QrCodeBlockAlignment = "left" | "center" | "right"
+import type { QrCodeBlockAlignment } from "@/types/enums/qr-code-block-alignment"
+import type { QrCodeBlockSize } from "@/types/enums/qr-code-block-size"
 
 export interface QrCodeBlock {
   // General

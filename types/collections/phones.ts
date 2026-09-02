@@ -1,18 +1,11 @@
-export type PhonePosition =
-  | "ceo"
-  | "hr_director"
-  | "it_support"
-  | "finance_trainee"
-  | "sales_executive"
-  | "report_trainee"
+import type { ContactPosition } from "@/types/enums/contact-position"
 
 export interface PhoneTypes {
   // General
   id: string
   name: string
   phone: string
-  sort: number | null
-  position: PhonePosition
+  position: ContactPosition
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

@@ -5,5 +5,4 @@ export interface UrlLinksSubLinksJunction {
   id: number
   url_links_id: string | UrlLinksTypes
   sub_links_id: string | SubLinksTypes
-  sort: number | null
 }

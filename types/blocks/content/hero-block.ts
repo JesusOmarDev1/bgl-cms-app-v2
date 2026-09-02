@@ -1,13 +1,7 @@
 import type { DirectusFileTypes } from "@/types/shared/directus-file"
-
-export type HeroBlockVariant =
-  | "simple"
-  | "background_img"
-  | "right_to_img"
-  | "left_to_img"
-  | "carousel"
-  | "bottom_to_img"
-  | "carousel_with_logos"
+import type { HeroBlockBrandsJunction } from "@/types/collections/junctions/hero-block-brands"
+import type { HeroBlockFilesJunction } from "@/types/collections/junctions/hero-block-files"
+import type { HeroBlockVariant } from "@/types/enums/hero-block-variant"
 
 export interface HeroBlock {
   // General
@@ -23,8 +17,8 @@ export interface HeroBlock {
   secondary_url: string | null
   secondary_icon: string | null
   excerpt: string | null
-  images: number[]
-  brands: number[]
+  images: number[] | HeroBlockFilesJunction[]
+  brands: number[] | HeroBlockBrandsJunction[]
   // Audit
   date_created: "datetime"
   date_updated: "datetime"
