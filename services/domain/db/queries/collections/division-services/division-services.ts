@@ -5,6 +5,8 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { DIVISION_SERVICES_FIELDS } from "@/services/domain/db/queries/collections/division-services/division-services.fields"
 import type { DivisionServicesTypes } from "@/types/collections/division-services"
 import type { StatusType } from "@/types/enums/status-type"
@@ -34,7 +36,11 @@ export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
     )
     return divisionServices
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getDivisionServicesQuery",
+      collection: "division_services",
+    })
     return []
   }
 }
@@ -45,7 +51,7 @@ export async function getDivisionServicesCountQuery(
   const { status = "published" } = query
   const t = await getTranslations("db.division_services")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("division_services", {
         aggregate: { count: "*" },
         query: {
@@ -53,12 +59,13 @@ export async function getDivisionServicesCountQuery(
         },
       })
     )
-    const total = result[0]?.count
-    if (total === null || total === undefined) return 0
-    const parsed = Number.parseInt(total, 10)
-    return Number.isFinite(parsed) ? parsed : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getDivisionServicesCountQuery",
+      collection: "division_services",
+    })
     return 0
   }
 }

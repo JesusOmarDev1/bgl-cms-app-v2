@@ -15,6 +15,6 @@ export async function getServicesCategoriesRepository({
 
 export async function getServicesCategoriesCountRepository({
   status = "published",
-}: ServicesCategoriesQuery = {}): Promise<number> {
+}: Pick<ServicesCategoriesQuery, "status"> = {}): Promise<number> {
   return await getServicesCategoriesCountQuery({ status })
 }

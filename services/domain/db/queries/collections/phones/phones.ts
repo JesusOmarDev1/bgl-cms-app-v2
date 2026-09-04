@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { PHONES_FIELDS } from "@/services/domain/db/queries/collections/phones/phones.fields"
 import type { PhoneTypes } from "@/types/collections/phones"
 import type { Schema } from "@/types/schema"
@@ -26,7 +28,11 @@ export async function getPhonesQuery(query: PhonesQuery = {}) {
     )
     return items
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getPhonesQuery",
+      collection: "phones",
+    })
     return []
   }
 }
@@ -34,15 +40,18 @@ export async function getPhonesQuery(query: PhonesQuery = {}) {
 export async function getPhonesCountQuery() {
   const t = await getTranslations("db.phones")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("phones", {
         aggregate: { count: "*" },
       })
     )
-    const count = Number(result[0]?.count ?? 0)
-    return Number.isFinite(count) ? count : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getPhonesCountQuery",
+      collection: "phones",
+    })
     return 0
   }
 }

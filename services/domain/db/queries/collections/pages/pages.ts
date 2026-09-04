@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import type { PagesTypes } from "@/types/collections/pages"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
@@ -12,15 +14,6 @@ export interface PagesQuery {
   status?: StatusType
   limit?: number
   page?: number
-}
-
-const PAGES_BODY_DEEP = {
-  body: { _sort: ["sort"] },
-} as unknown as Query<Schema, PagesTypes>["deep"]
-
-function parseAggregateCount(count: string | null | undefined): number {
-  const parsed = Number(count ?? 0)
-  return Number.isFinite(parsed) ? parsed : 0
 }
 
 export async function getPagesQuery(query: PagesQuery) {
@@ -34,12 +27,15 @@ export async function getPagesQuery(query: PagesQuery) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status } },
-        deep: PAGES_BODY_DEEP,
       } satisfies Query<Schema, PagesTypes>)
     )
     return pages
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getPagesQuery",
+      collection: "pages",
+    })
     return []
   }
 }
@@ -55,12 +51,15 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status }, slug: { _eq: slug } },
-        deep: PAGES_BODY_DEEP,
       } satisfies Query<Schema, PagesTypes>)
     )
     return pageItem
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getPagesBySlugQuery",
+      collection: "pages",
+    })
     return []
   }
 }
@@ -81,7 +80,11 @@ export async function getPagesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getPagesCountQuery",
+      collection: "pages",
+    })
     return 0
   }
 }

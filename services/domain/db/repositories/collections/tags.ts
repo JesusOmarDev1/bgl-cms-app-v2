@@ -15,6 +15,6 @@ export async function getTagsRepository({
 
 export async function getTagsCountRepository({
   status = "published",
-}: TagsQuery = {}): Promise<number> {
+}: Pick<TagsQuery, "status"> = {}): Promise<number> {
   return await getTagsCountQuery({ status })
 }

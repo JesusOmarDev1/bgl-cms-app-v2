@@ -5,6 +5,8 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { PRODUCT_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections/product-categories/product-categories.fields"
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
 import type { StatusType } from "@/types/enums/status-type"
@@ -34,7 +36,11 @@ export async function getProductCategoriesQuery(query: ProductCategoriesQuery) {
     )
     return productCategories
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getProductCategoriesQuery",
+      collection: "product_categories",
+    })
     return []
   }
 }
@@ -45,7 +51,7 @@ export async function getProductCategoriesCountQuery(
   const { status = "published" } = query
   const t = await getTranslations("db.product_categories")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("product_categories", {
         aggregate: { count: "*" },
         query: {
@@ -53,12 +59,13 @@ export async function getProductCategoriesCountQuery(
         },
       })
     )
-    const total = result[0]?.count
-    if (total === null || total === undefined) return 0
-    const parsed = Number.parseInt(total, 10)
-    return Number.isFinite(parsed) ? parsed : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getProductCategoriesCountQuery",
+      collection: "product_categories",
+    })
     return 0
   }
 }

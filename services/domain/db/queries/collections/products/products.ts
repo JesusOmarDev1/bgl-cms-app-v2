@@ -5,6 +5,8 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { PRODUCTS_FIELDS } from "@/services/domain/db/queries/collections/products/products.fields"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { StatusType } from "@/types/enums/status-type"
@@ -15,13 +17,6 @@ export interface ProductsQuery {
   limit?: number
   page?: number
 }
-
-const PRODUCTS_DEEP = {
-  attributes: { _sort: ["sort"] },
-  images: { _sort: ["sort"] },
-  related_products: { _sort: ["sort"] },
-  tags: { _sort: ["sort"] },
-} as unknown as Query<Schema, ProductsTypes>["deep"]
 
 export async function getProductsQuery(query: ProductsQuery) {
   const { status = "published", limit = 10, page = 1 } = query
@@ -37,12 +32,15 @@ export async function getProductsQuery(query: ProductsQuery) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status } },
-        deep: PRODUCTS_DEEP,
       } satisfies Query<Schema, ProductsTypes>)
     )
     return products
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getProductsQuery",
+      collection: "products",
+    })
     return []
   }
 }
@@ -64,12 +62,15 @@ export async function getProductsBySlugQuery(
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status }, slug: { _eq: slug } },
-        deep: PRODUCTS_DEEP,
       } satisfies Query<Schema, ProductsTypes>)
     )
     return products
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getProductsBySlugQuery",
+      collection: "products",
+    })
     return []
   }
 }
@@ -80,7 +81,7 @@ export async function getProductsCountQuery(
   const { status = "published" } = query
   const t = await getTranslations("db.products")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("products", {
         aggregate: { count: "*" },
         query: {
@@ -88,12 +89,13 @@ export async function getProductsCountQuery(
         },
       })
     )
-    const total = result[0]?.count
-    if (total === null || total === undefined) return 0
-    const parsed = Number.parseInt(total, 10)
-    return Number.isFinite(parsed) ? parsed : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getProductsCountQuery",
+      collection: "products",
+    })
     return 0
   }
 }

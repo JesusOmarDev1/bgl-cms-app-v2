@@ -5,6 +5,8 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { MODELS_FIELDS } from "@/services/domain/db/queries/collections/models/models.fields"
 import type { ModelsTypes } from "@/types/collections/models"
 import type { StatusType } from "@/types/enums/status-type"
@@ -15,10 +17,6 @@ export interface ModelsQuery {
   limit?: number
   page?: number
 }
-
-const MODELS_DEEP = {
-  images: { _sort: ["sort"] },
-} as unknown as Query<Schema, ModelsTypes>["deep"]
 
 export async function getModelsQuery(query: ModelsQuery) {
   const { status = "published", limit = 10, page = 1 } = query
@@ -34,12 +32,15 @@ export async function getModelsQuery(query: ModelsQuery) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status } },
-        deep: MODELS_DEEP,
       } satisfies Query<Schema, ModelsTypes>)
     )
     return models
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getModelsQuery",
+      collection: "models",
+    })
     return []
   }
 }
@@ -50,7 +51,7 @@ export async function getModelsCountQuery(
   const { status = "published" } = query
   const t = await getTranslations("db.models")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("models", {
         aggregate: { count: "*" },
         query: {
@@ -58,12 +59,13 @@ export async function getModelsCountQuery(
         },
       })
     )
-    const total = result[0]?.count
-    if (total === null || total === undefined) return 0
-    const parsed = Number.parseInt(total, 10)
-    return Number.isFinite(parsed) ? parsed : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getModelsCountQuery",
+      collection: "models",
+    })
     return 0
   }
 }

@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { SERVICES_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections/services-categories/services-categories.fields"
 import type { ServicesCategoriesTypes } from "@/types/collections/services-categories"
 import type { StatusType } from "@/types/enums/status-type"
@@ -31,18 +33,22 @@ export async function getServicesCategoriesQuery(
     )
     return items
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getServicesCategoriesQuery",
+      collection: "services_categories",
+    })
     return []
   }
 }
 
 export async function getServicesCategoriesCountQuery(
-  query: ServicesCategoriesQuery = {}
+  query: Pick<ServicesCategoriesQuery, "status"> = {}
 ) {
   const { status = "published" } = query
   const t = await getTranslations("db.services_categories")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("services_categories", {
         aggregate: { count: "*" },
         query: {
@@ -50,10 +56,13 @@ export async function getServicesCategoriesCountQuery(
         },
       })
     )
-    const count = Number(result[0]?.count ?? 0)
-    return Number.isFinite(count) ? count : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getServicesCategoriesCountQuery",
+      collection: "services_categories",
+    })
     return 0
   }
 }

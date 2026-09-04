@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import type { BlogPostsTypes } from "@/types/collections/blog-posts"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
@@ -12,15 +14,6 @@ export interface BlogPostsQuery {
   status?: StatusType
   limit?: number
   page?: number
-}
-
-const BLOG_POSTS_BODY_DEEP = {
-  body: { _sort: ["sort"] },
-} as unknown as Query<Schema, BlogPostsTypes>["deep"]
-
-function parseAggregateCount(count: string | null | undefined): number {
-  const parsed = Number(count ?? 0)
-  return Number.isFinite(parsed) ? parsed : 0
 }
 
 export async function getBlogPostsQuery(query: BlogPostsQuery) {
@@ -37,12 +30,15 @@ export async function getBlogPostsQuery(query: BlogPostsQuery) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status } },
-        deep: BLOG_POSTS_BODY_DEEP,
       } satisfies Query<Schema, BlogPostsTypes>)
     )
     return posts
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getBlogPostsQuery",
+      collection: "blog_posts",
+    })
     return []
   }
 }
@@ -64,12 +60,15 @@ export async function getBlogPostsBySlugQuery(
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status }, slug: { _eq: slug } },
-        deep: BLOG_POSTS_BODY_DEEP,
       } satisfies Query<Schema, BlogPostsTypes>)
     )
     return post
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getBlogPostsBySlugQuery",
+      collection: "blog_posts",
+    })
     return []
   }
 }
@@ -90,7 +89,11 @@ export async function getBlogPostsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getBlogPostsCountQuery",
+      collection: "blog_posts",
+    })
     return 0
   }
 }

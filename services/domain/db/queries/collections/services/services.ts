@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import type { ServicesTypes } from "@/types/collections/services"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
@@ -12,15 +14,6 @@ export interface ServicesQuery {
   status?: StatusType
   limit?: number
   page?: number
-}
-
-const SERVICES_BODY_DEEP = {
-  body: { _sort: ["sort"] },
-} as unknown as Query<Schema, ServicesTypes>["deep"]
-
-function parseAggregateCount(count: string | null | undefined): number {
-  const parsed = Number(count ?? 0)
-  return Number.isFinite(parsed) ? parsed : 0
 }
 
 export async function getServicesQuery(query: ServicesQuery) {
@@ -37,12 +30,15 @@ export async function getServicesQuery(query: ServicesQuery) {
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status } },
-        deep: SERVICES_BODY_DEEP,
       } satisfies Query<Schema, ServicesTypes>)
     )
     return services
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getServicesQuery",
+      collection: "services",
+    })
     return []
   }
 }
@@ -64,12 +60,15 @@ export async function getServicesBySlugQuery(
         page,
         sort: ["-date_created"],
         filter: { status: { _eq: status }, slug: { _eq: slug } },
-        deep: SERVICES_BODY_DEEP,
       } satisfies Query<Schema, ServicesTypes>)
     )
     return service
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getServicesBySlugQuery",
+      collection: "services",
+    })
     return []
   }
 }
@@ -90,7 +89,11 @@ export async function getServicesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getServicesCountQuery",
+      collection: "services",
+    })
     return 0
   }
 }

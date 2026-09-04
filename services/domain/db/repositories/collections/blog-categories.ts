@@ -15,6 +15,6 @@ export async function getBlogCategoriesRepository({
 
 export async function getBlogCategoriesCountRepository({
   status = "published",
-}: BlogCategoriesQuery = {}): Promise<number> {
+}: Pick<BlogCategoriesQuery, "status"> = {}): Promise<number> {
   return await getBlogCategoriesCountQuery({ status })
 }

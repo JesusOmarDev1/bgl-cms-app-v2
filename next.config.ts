@@ -7,6 +7,10 @@ const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  partialPrefetching: true,
+  logging: {
+    browserToTerminal: true,
+  },
   images: {
     qualities: [55, 60, 65, 70, 75, 80],
     remotePatterns: assetsRemotePatterns(),

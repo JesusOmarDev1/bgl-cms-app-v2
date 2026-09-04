@@ -15,6 +15,6 @@ export async function getManualCategoriesRepository({
 
 export async function getManualCategoriesCountRepository({
   status = "published",
-}: ManualCategoriesQuery = {}): Promise<number> {
+}: Pick<ManualCategoriesQuery, "status"> = {}): Promise<number> {
   return await getManualCategoriesCountQuery({ status })
 }

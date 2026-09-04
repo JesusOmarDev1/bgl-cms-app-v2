@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { BLOG_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections/blog-categories/blog-categories.fields"
 import type { BlogCategoriesTypes } from "@/types/collections/blog-categories"
 import type { StatusType } from "@/types/enums/status-type"
@@ -29,18 +31,22 @@ export async function getBlogCategoriesQuery(query: BlogCategoriesQuery = {}) {
     )
     return items
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getBlogCategoriesQuery",
+      collection: "blog_categories",
+    })
     return []
   }
 }
 
 export async function getBlogCategoriesCountQuery(
-  query: BlogCategoriesQuery = {}
+  query: Pick<BlogCategoriesQuery, "status"> = {}
 ) {
   const { status = "published" } = query
   const t = await getTranslations("db.blog_categories")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("blog_categories", {
         aggregate: { count: "*" },
         query: {
@@ -48,10 +54,13 @@ export async function getBlogCategoriesCountQuery(
         },
       })
     )
-    const count = Number(result[0]?.count ?? 0)
-    return Number.isFinite(count) ? count : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getBlogCategoriesCountQuery",
+      collection: "blog_categories",
+    })
     return 0
   }
 }

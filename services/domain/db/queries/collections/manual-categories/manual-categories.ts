@@ -3,6 +3,8 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
+import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { MANUAL_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections/manual-categories/manual-categories.fields"
 import type { ManualCategoriesTypes } from "@/types/collections/manual-categories"
 import type { StatusType } from "@/types/enums/status-type"
@@ -31,18 +33,22 @@ export async function getManualCategoriesQuery(
     )
     return items
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getManualCategoriesQuery",
+      collection: "manual_categories",
+    })
     return []
   }
 }
 
 export async function getManualCategoriesCountQuery(
-  query: ManualCategoriesQuery = {}
+  query: Pick<ManualCategoriesQuery, "status"> = {}
 ) {
   const { status = "published" } = query
   const t = await getTranslations("db.manual_categories")
   try {
-    const result = await directus.request(
+    const rows = await directus.request(
       aggregate("manual_categories", {
         aggregate: { count: "*" },
         query: {
@@ -50,10 +56,13 @@ export async function getManualCategoriesCountQuery(
         },
       })
     )
-    const count = Number(result[0]?.count ?? 0)
-    return Number.isFinite(count) ? count : 0
+    return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    console.error(error instanceof Error ? error.message : t("failed_to_fetch"))
+    logDirectusQueryError(error, t("failed_to_fetch"), {
+      component: "db.queries",
+      operation: "getManualCategoriesCountQuery",
+      collection: "manual_categories",
+    })
     return 0
   }
 }
