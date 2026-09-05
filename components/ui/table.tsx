@@ -63,7 +63,7 @@ function TableFooter<T>({ className, ...props }: TableFooterProps<T>) {
     <TableFooterPrimitive
       data-slot="table-footer"
       className={cn(
-        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        "border-t bg-muted/30 font-medium backdrop-blur-2xl [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -76,7 +76,7 @@ function TableRow<T>({ className, ...props }: RowProps<T>) {
     <RowPrimitive
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted data-selected:bg-muted",
+        "border-b backdrop-blur-2xl transition-colors hover:bg-muted/30 has-aria-expanded:bg-muted/30 data-[state=selected]:bg-muted data-selected:bg-muted",
         className
       )}
       {...props}
@@ -89,7 +89,7 @@ function TableHead({ className, ...props }: ColumnProps) {
     <ColumnPrimitive
       data-slot="table-head"
       className={cn(
-        "h-10 px-2 text-start align-middle font-medium whitespace-nowrap text-foreground [&:has([data-slot=checkbox])]:pe-0 [&:has([role=checkbox])]:pe-0",
+        "h-10 px-2 text-start align-middle font-medium whitespace-nowrap text-foreground backdrop-blur-2xl [&:has([data-slot=checkbox])]:pe-0 [&:has([role=checkbox])]:pe-0",
         className
       )}
       {...props}
@@ -102,7 +102,7 @@ function TableCell({ className, ...props }: CellProps) {
     <CellPrimitive
       data-slot="table-cell"
       className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([data-slot=checkbox])]:pe-0 [&:has([role=checkbox])]:pe-0",
+        "p-2 align-middle whitespace-nowrap backdrop-blur-2xl [&:has([data-slot=checkbox])]:pe-0 [&:has([role=checkbox])]:pe-0",
         className
       )}
       {...props}

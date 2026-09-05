@@ -7,6 +7,6 @@ type SiteLayoutProps = {
 
 export const instant = false
 
-export default function SiteLayout({ children }: SiteLayoutProps) {
+export default function template({ children }: SiteLayoutProps) {
   return <MaintenanceGate>{children}</MaintenanceGate>
 }

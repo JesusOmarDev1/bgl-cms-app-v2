@@ -3,7 +3,7 @@ import {
   type StatusIndicatorProps,
 } from "@/components/shared/debug/StatusIndicator"
 import type { HealthStatusType } from "@/types/enums/health-status"
-import { resolveHealthIndicatorStatus } from "./helpers"
+import { resolveHealthView } from "./helpers"
 
 type HealthStatusIndicatorProps = Omit<StatusIndicatorProps, "status"> & {
   status: HealthStatusType
@@ -19,14 +19,14 @@ export function HealthStatusIndicator({
   maintenanceInProgress = false,
   ...props
 }: HealthStatusIndicatorProps) {
-  const resolvedStatus = resolveHealthIndicatorStatus({
+  const { indicatorStatus } = resolveHealthView({
     status,
     responseTime,
     ping,
     maintenanceInProgress,
   })
 
-  return <StatusIndicator status={resolvedStatus} {...props} />
+  return <StatusIndicator status={indicatorStatus} {...props} />
 }
 
 export type { HealthStatusIndicatorProps }

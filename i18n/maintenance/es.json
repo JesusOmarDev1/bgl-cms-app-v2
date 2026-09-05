@@ -1,8 +1,8 @@
 {
   "maintenance": {
-    "title": "Estamos en mantenimiento",
-    "message": "Estamos realizando mejoras para volver pronto con una mejor experiencia.",
+    "title": "Estamos realizando mejoras",
+    "message": "Estamos trabajando para mejorar tu experiencia. El sitio estará disponible nuevamente en cuanto terminemos.",
     "statusLabel": "Mantenimiento en progreso",
-    "helperText": "El sitio principal estara disponible nuevamente cuando finalicen los trabajos."
+    "helperText": "Gracias por tu paciencia y comprensión mientras realizamos estos trabajos."
   }
 }

@@ -185,7 +185,7 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute touch-manipulation rounded-full",
+        "absolute touch-manipulation rounded-full bg-card/30 backdrop-blur-2xl",
         orientation === "horizontal"
           ? "inset-y-0 -start-12 my-auto"
           : "start-1/2 -top-12 -translate-x-1/2 rotate-90 rtl:translate-x-1/2",
@@ -215,7 +215,7 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute touch-manipulation rounded-full",
+        "absolute touch-manipulation rounded-full bg-card/30 backdrop-blur-2xl",
         orientation === "horizontal"
           ? "inset-y-0 -end-12 my-auto"
           : "start-1/2 -bottom-12 -translate-x-1/2 rotate-90 rtl:translate-x-1/2",
