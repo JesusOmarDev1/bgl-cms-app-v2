@@ -1,3 +1,7 @@
+import type { Query } from "@directus/sdk"
+import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
+import type { Schema } from "@/types/schema"
+
 export const PRODUCT_CATEGORIES_FIELDS = [
   "id",
   "title",
@@ -6,10 +10,10 @@ export const PRODUCT_CATEGORIES_FIELDS = [
   "icon",
   "date_created",
   "date_updated",
-  "image.*",
-  "parent.id",
-  "parent.title",
-  "parent.slug",
-  "parent.status",
-  "parent.icon",
-] as const
+  { image: ["*"] },
+  {
+    parent: ["id", "title", "slug", "status", "icon"],
+  },
+] as const satisfies NonNullable<
+  Query<Schema, ProductCategoriesTypes>["fields"]
+>

@@ -24,10 +24,7 @@ export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
   try {
     const divisionServices = await directus.request(
       readItems("division_services", {
-        fields: DIVISION_SERVICES_FIELDS as unknown as Query<
-          Schema,
-          DivisionServicesTypes
-        >["fields"],
+        fields: DIVISION_SERVICES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

@@ -24,10 +24,7 @@ export async function getProductsQuery(query: ProductsQuery) {
   try {
     const products = await directus.request(
       readItems("products", {
-        fields: PRODUCTS_FIELDS as unknown as Query<
-          Schema,
-          ProductsTypes
-        >["fields"],
+        fields: PRODUCTS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
@@ -54,10 +51,7 @@ export async function getProductsBySlugQuery(
   try {
     const products = await directus.request(
       readItems("products", {
-        fields: PRODUCTS_FIELDS as unknown as Query<
-          Schema,
-          ProductsTypes
-        >["fields"],
+        fields: PRODUCTS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

@@ -16,10 +16,7 @@ export async function getServicesButtonQuery() {
   try {
     return await directus.request(
       readSingleton("services_button", {
-        fields: SERVICES_BUTTON_FIELDS as unknown as Query<
-          Schema,
-          ServicesButtonType
-        >["fields"],
+        fields: SERVICES_BUTTON_FIELDS,
       } satisfies Query<Schema, ServicesButtonType>)
     )
   } catch (error) {

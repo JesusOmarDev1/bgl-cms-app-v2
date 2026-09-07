@@ -24,10 +24,7 @@ export async function getClientsQuery(query: ClientsQuery) {
   try {
     const clients = await directus.request(
       readItems("clients", {
-        fields: CLIENTS_FIELDS as unknown as Query<
-          Schema,
-          ClientsTypes
-        >["fields"],
+        fields: CLIENTS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

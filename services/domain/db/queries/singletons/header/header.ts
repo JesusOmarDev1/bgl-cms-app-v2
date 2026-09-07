@@ -16,7 +16,7 @@ export async function getHeaderQuery() {
   try {
     return await directus.request(
       readSingleton("header", {
-        fields: HEADER_FIELDS as unknown as Query<Schema, HeaderType>["fields"],
+        fields: HEADER_FIELDS,
       } satisfies Query<Schema, HeaderType>)
     )
   } catch (error) {

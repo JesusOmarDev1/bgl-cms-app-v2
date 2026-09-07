@@ -1,28 +1,46 @@
+import type { Query } from "@directus/sdk"
+import type { Schema } from "@/types/schema"
+import type { ServicesButtonType } from "@/types/singletons/services-button"
+
 export const SERVICES_BUTTON_FIELDS = [
   "id",
   "title",
   "excerpt",
   "date_created",
   "date_updated",
-  "services.id",
-  "services.collection",
-  "services.item:services.id",
-  "services.item:services.title",
-  "services.item:services.slug",
-  "services.item:services.status",
-  "services.item:services.excerpt",
-  "services.item:services.seo",
-  "services.item:services.service_category",
-  "services.item:services.date_created",
-  "services.item:services.date_updated",
-  "services.item:services.image.id",
-  "services.item:services.image.title",
-  "services.item:services.image.filename_download",
-  "services.item:services.image.type",
-  "services.item:services.image.width",
-  "services.item:services.image.height",
-  "services.item:services.image.filesize",
-  "services.item:services.image.created_on",
-  "services.item:services.image.modified_on",
-  "services.item:services.image.uploaded_on",
-] as const
+  {
+    services: [
+      "id",
+      "collection",
+      {
+        item: {
+          services: [
+            "id",
+            "title",
+            "slug",
+            "status",
+            "excerpt",
+            "seo",
+            "service_category",
+            "date_created",
+            "date_updated",
+            {
+              image: [
+                "id",
+                "title",
+                "filename_download",
+                "type",
+                "width",
+                "height",
+                "filesize",
+                "created_on",
+                "modified_on",
+                "uploaded_on",
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies NonNullable<Query<Schema, ServicesButtonType>["fields"]>

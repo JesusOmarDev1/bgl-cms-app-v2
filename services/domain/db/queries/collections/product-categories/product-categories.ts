@@ -24,10 +24,7 @@ export async function getProductCategoriesQuery(query: ProductCategoriesQuery) {
   try {
     const productCategories = await directus.request(
       readItems("product_categories", {
-        fields: PRODUCT_CATEGORIES_FIELDS as unknown as Query<
-          Schema,
-          ProductCategoriesTypes
-        >["fields"],
+        fields: PRODUCT_CATEGORIES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

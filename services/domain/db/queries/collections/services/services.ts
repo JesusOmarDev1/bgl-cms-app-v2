@@ -22,10 +22,7 @@ export async function getServicesQuery(query: ServicesQuery) {
   try {
     const services = await directus.request(
       readItems("services", {
-        fields: SERVICES_FIELDS as unknown as Query<
-          Schema,
-          ServicesTypes
-        >["fields"],
+        fields: SERVICES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
@@ -52,10 +49,7 @@ export async function getServicesBySlugQuery(
   try {
     const service = await directus.request(
       readItems("services", {
-        fields: SERVICES_FIELDS as unknown as Query<
-          Schema,
-          ServicesTypes
-        >["fields"],
+        fields: SERVICES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

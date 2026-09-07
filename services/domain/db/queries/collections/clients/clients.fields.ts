@@ -1,3 +1,7 @@
+import type { Query } from "@directus/sdk"
+import type { ClientsTypes } from "@/types/collections/clients"
+import type { Schema } from "@/types/schema"
+
 export const CLIENTS_FIELDS = [
   "id",
   "name",
@@ -7,5 +11,5 @@ export const CLIENTS_FIELDS = [
   "status",
   "date_created",
   "date_updated",
-  "logo.*",
-] as const
+  { logo: ["*"] },
+] as const satisfies NonNullable<Query<Schema, ClientsTypes>["fields"]>

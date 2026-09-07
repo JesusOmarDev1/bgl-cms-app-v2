@@ -1,5 +1,6 @@
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { MediaBlockFilesJunction } from "@/types/collections/junctions/media-block-files"
 import type { MediaBlockType } from "@/types/enums/media-block-type"
+import type { DirectusFileTypes } from "@/types/shared/directus-file"
 
 export interface MediaBlock {
   // General
@@ -12,7 +13,7 @@ export interface MediaBlock {
   video: string | DirectusFileTypes | null
   excerpt: string | null
   audio: string | DirectusFileTypes | null
-  files: number[]
+  files: number[] | MediaBlockFilesJunction[]
   // Audit
   date_created: "datetime"
   date_updated: "datetime"

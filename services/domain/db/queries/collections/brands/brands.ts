@@ -24,10 +24,7 @@ export async function getBrandsQuery(query: BrandsQuery) {
   try {
     const brands = await directus.request(
       readItems("brands", {
-        fields: BRANDS_FIELDS as unknown as Query<
-          Schema,
-          BrandsTypes
-        >["fields"],
+        fields: BRANDS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

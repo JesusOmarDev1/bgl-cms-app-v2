@@ -35,12 +35,14 @@ import type { BlogPostsBodyJunction } from "@/types/collections/junctions/blog-p
 import type { BlogPostsTagsJunction } from "@/types/collections/junctions/blog-posts-tags"
 import type { BrandsBlockBrandsJunction } from "@/types/collections/junctions/brands-block-brands"
 import type { BrandsModelsJunction } from "@/types/collections/junctions/brands-models"
+import type { CarouselBlockItemsJunction } from "@/types/collections/junctions/carousel-block-items"
 import type { ContentBlockContentJunction } from "@/types/collections/junctions/content-block-content"
 import type { DivisionServicesBlockDivisionServicesJunction } from "@/types/collections/junctions/division-services-block-division-services"
 import type { FooterEmailsJunction } from "@/types/collections/junctions/footer-emails"
 import type { FooterPhonesJunction } from "@/types/collections/junctions/footer-phones"
 import type { FooterSocialLinksJunction } from "@/types/collections/junctions/footer-social-links"
 import type { FooterUrlLinksJunction } from "@/types/collections/junctions/footer-url-links"
+import type { FaqBlockQuestionsJunction } from "@/types/collections/junctions/faq-block-questions"
 import type { FormBlockFieldsJunction } from "@/types/collections/junctions/form-block-fields"
 import type { HeaderSocialLinksJunction } from "@/types/collections/junctions/header-social-links"
 import type { HeaderUrlLinksJunction } from "@/types/collections/junctions/header-url-links"
@@ -48,6 +50,7 @@ import type { HeroBlockBrandsJunction } from "@/types/collections/junctions/hero
 import type { HeroBlockFilesJunction } from "@/types/collections/junctions/hero-block-files"
 import type { LogosClientsBlockClientsJunction } from "@/types/collections/junctions/logos-clients-block-clients"
 import type { ManualsBodyJunction } from "@/types/collections/junctions/manuals-body"
+import type { MediaBlockFilesJunction } from "@/types/collections/junctions/media-block-files"
 import type { ModelsFilesJunction } from "@/types/collections/junctions/models-files"
 import type { PagesBodyJunction } from "@/types/collections/junctions/pages-body"
 import type { ProductsFilesJunction } from "@/types/collections/junctions/products-files"
@@ -134,7 +137,10 @@ export interface Schema {
   phone_block: PhoneBlock[]
   directus_files: DirectusFileTypes[]
   content_block_content: ContentBlockContentJunction[]
+  carousel_block_items: CarouselBlockItemsJunction[]
   form_block_fields: FormBlockFieldsJunction[]
+  faq_block_questions: FaqBlockQuestionsJunction[]
+  media_block_files: MediaBlockFilesJunction[]
   logos_clients_block_clients: LogosClientsBlockClientsJunction[]
   brands_block_brands: BrandsBlockBrandsJunction[]
   division_services_block_division_services: DivisionServicesBlockDivisionServicesJunction[]

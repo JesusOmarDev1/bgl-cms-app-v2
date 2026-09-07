@@ -22,10 +22,7 @@ export async function getBlogPostsQuery(query: BlogPostsQuery) {
   try {
     const posts = await directus.request(
       readItems("blog_posts", {
-        fields: BLOG_POSTS_FIELDS as unknown as Query<
-          Schema,
-          BlogPostsTypes
-        >["fields"],
+        fields: BLOG_POSTS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
@@ -52,10 +49,7 @@ export async function getBlogPostsBySlugQuery(
   try {
     const post = await directus.request(
       readItems("blog_posts", {
-        fields: BLOG_POSTS_FIELDS as unknown as Query<
-          Schema,
-          BlogPostsTypes
-        >["fields"],
+        fields: BLOG_POSTS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

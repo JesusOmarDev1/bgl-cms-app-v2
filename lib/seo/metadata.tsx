@@ -9,6 +9,7 @@ export interface MetadataProps {
   keywords: string[]
   category?: string
   canonical?: string
+  metadataBase?: URL | string
   openGraph: {
     title: string
     description: string
@@ -58,6 +59,7 @@ export const metadata = ({
   keywords,
   category,
   canonical,
+  metadataBase,
   openGraph,
   twitter,
 }: MetadataProps): Metadata => ({
@@ -65,6 +67,7 @@ export const metadata = ({
     default: title.default ?? "Pagina sin titulo",
     template: "%s · BGL BASCULAS INDUSTRIALES",
   },
+  metadataBase: metadataBase ? new URL(metadataBase) : new URL(BASE_URL),
   description: description ?? "Pagina sin descripcion",
   manifest: "/manifest.webmanifest",
   applicationName: "BGL BASCULAS INDUSTRIALES",

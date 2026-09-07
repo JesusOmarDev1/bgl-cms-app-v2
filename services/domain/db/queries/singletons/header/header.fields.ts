@@ -1,3 +1,8 @@
+import type { Query } from "@directus/sdk"
+
+import type { Schema } from "@/types/schema"
+import type { HeaderType } from "@/types/singletons/header"
+
 export const HEADER_FIELDS = [
   "id",
   "primary_button",
@@ -8,38 +13,66 @@ export const HEADER_FIELDS = [
   "secondary_icon",
   "date_created",
   "date_updated",
-  "logo_dark.id",
-  "logo_dark.title",
-  "logo_dark.filename_download",
-  "logo_dark.type",
-  "logo_dark.width",
-  "logo_dark.height",
-  "logo_dark.filesize",
-  "logo_dark.created_on",
-  "logo_dark.modified_on",
-  "logo_dark.uploaded_on",
-  "url_links.id",
-  "url_links.collection",
-  "url_links.item:url_links.id",
-  "url_links.item:url_links.title",
-  "url_links.item:url_links.url",
-  "url_links.item:url_links.type",
-  "url_links.item:url_links.icon",
-  "url_links.item:url_links.date_created",
-  "url_links.item:url_links.date_updated",
-  "url_links.item:url_links.sub_links.id",
-  "url_links.item:url_links.sub_links.sub_links_id.id",
-  "url_links.item:url_links.sub_links.sub_links_id.title",
-  "url_links.item:url_links.sub_links.sub_links_id.url",
-  "url_links.item:url_links.sub_links.sub_links_id.icon",
-  "url_links.item:url_links.sub_links.sub_links_id.date_created",
-  "url_links.item:url_links.sub_links.sub_links_id.date_updated",
-  "social_links.id",
-  "social_links.collection",
-  "social_links.item:social_links.id",
-  "social_links.item:social_links.title",
-  "social_links.item:social_links.type",
-  "social_links.item:social_links.url",
-  "social_links.item:social_links.date_created",
-  "social_links.item:social_links.date_updated",
-] as const
+  {
+    logo_dark: [
+      "id",
+      "title",
+      "filename_download",
+      "type",
+      "width",
+      "height",
+      "filesize",
+      "created_on",
+      "modified_on",
+      "uploaded_on",
+    ],
+    url_links: [
+      "id",
+      "collection",
+      {
+        item: {
+          url_links: [
+            "id",
+            "title",
+            "url",
+            "type",
+            "icon",
+            "date_created",
+            "date_updated",
+            {
+              sub_links: [
+                "id",
+                {
+                  sub_links_id: [
+                    "id",
+                    "title",
+                    "url",
+                    "icon",
+                    "date_created",
+                    "date_updated",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+    social_links: [
+      "id",
+      "collection",
+      {
+        item: {
+          social_links: [
+            "id",
+            "title",
+            "type",
+            "url",
+            "date_created",
+            "date_updated",
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies NonNullable<Query<Schema, HeaderType>["fields"]>

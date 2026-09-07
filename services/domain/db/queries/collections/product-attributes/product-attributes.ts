@@ -24,10 +24,7 @@ export async function getProductAttributesQuery(query: ProductAttributesQuery) {
   try {
     const productAttributes = await directus.request(
       readItems("product_attributes", {
-        fields: PRODUCT_ATTRIBUTES_FIELDS as unknown as Query<
-          Schema,
-          ProductAttributesTypes
-        >["fields"],
+        fields: PRODUCT_ATTRIBUTES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

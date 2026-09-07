@@ -16,7 +16,7 @@ export async function getFooterQuery() {
   try {
     return await directus.request(
       readSingleton("footer", {
-        fields: FOOTER_FIELDS as unknown as Query<Schema, FooterType>["fields"],
+        fields: FOOTER_FIELDS,
       } satisfies Query<Schema, FooterType>)
     )
   } catch (error) {

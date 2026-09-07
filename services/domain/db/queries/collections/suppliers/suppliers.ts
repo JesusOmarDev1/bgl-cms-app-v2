@@ -24,10 +24,7 @@ export async function getSuppliersQuery(query: SuppliersQuery) {
   try {
     const suppliers = await directus.request(
       readItems("suppliers", {
-        fields: SUPPLIERS_FIELDS as unknown as Query<
-          Schema,
-          SuppliersTypes
-        >["fields"],
+        fields: SUPPLIERS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

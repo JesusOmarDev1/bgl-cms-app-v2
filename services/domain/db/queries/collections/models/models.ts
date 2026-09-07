@@ -24,10 +24,7 @@ export async function getModelsQuery(query: ModelsQuery) {
   try {
     const models = await directus.request(
       readItems("models", {
-        fields: MODELS_FIELDS as unknown as Query<
-          Schema,
-          ModelsTypes
-        >["fields"],
+        fields: MODELS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

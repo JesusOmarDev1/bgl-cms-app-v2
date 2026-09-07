@@ -1,5 +1,10 @@
 import "server-only"
 
+import type { Query } from "@directus/sdk"
+import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fields"
+import type { ServicesTypes } from "@/types/collections/services"
+import type { Schema } from "@/types/schema"
+
 export const SERVICES_FIELDS = [
   "id",
   "title",
@@ -8,54 +13,86 @@ export const SERVICES_FIELDS = [
   "excerpt",
   "date_created",
   "date_updated",
-  "image.*",
-  "seo.id",
-  "seo.title",
-  "seo.description",
-  "seo.no_index",
-  "seo.no_follow",
-  "seo.frecuency",
-  "seo.og_image.*",
-  "seo.canonical",
-  "seo.keywords",
-  "seo.priority",
-  "seo.exclude",
-  "seo.date_created",
-  "seo.date_updated",
-  "service_category.id",
-  "service_category.title",
-  "service_category.slug",
-  "service_category.icon",
-  "service_category.parent",
-  "service_category.status",
-  "service_category.date_created",
-  "service_category.date_updated",
-  "service_category.image.*",
-  "body.id",
-  "body.collection",
-  "body.item:*",
-  "body.item:content_block.content.id",
-  "body.item:content_block.content.collection",
-  "body.item:content_block.content.item:content_column_block.*",
-  "body.item:hero_block.image.*",
-  "body.item:hero_block.images.id",
-  "body.item:hero_block.images.directus_files_id.*",
-  "body.item:hero_block.brands.id",
-  "body.item:hero_block.brands.brands_id.id",
-  "body.item:hero_block.brands.brands_id.title",
-  "body.item:hero_block.brands.brands_id.excerpt",
-  "body.item:hero_block.brands.brands_id.logo.*",
-  "body.item:hero_block.brands.brands_id.slug",
-  "body.item:hero_block.brands.brands_id.date_created",
-  "body.item:hero_block.brands.brands_id.date_updated",
-  "body.item:media_block.file.*",
-  "body.item:media_block.image.*",
-  "body.item:media_block.video.*",
-  "body.item:media_block.audio.*",
-  "body.item:media_block.files.id",
-  "body.item:media_block.files.directus_files_id.*",
-  "body.item:carousel_block.items.id",
-  "body.item:carousel_block.items.collection",
-  "body.item:carousel_block.items.item:carousel_items_block.*",
-  "body.item:carousel_block.items.item:carousel_items_block.image.*",
-] as const
+  { image: ["*"] },
+  { seo: SEO_FIELDS },
+  {
+    service_category: [
+      "id",
+      "title",
+      "slug",
+      "icon",
+      "parent",
+      "status",
+      "date_created",
+      "date_updated",
+      { image: ["*"] },
+    ],
+  },
+  {
+    body: [
+      "id",
+      "collection",
+      {
+        item: {
+          content_block: [
+            "*",
+            {
+              content: [
+                "id",
+                "collection",
+                { item: { content_column_block: ["*"] } },
+              ],
+            },
+          ],
+          cta_block: ["*"],
+          hero_block: [
+            "*",
+            {
+              image: ["*"],
+              images: ["id", { directus_files_id: ["*"] }],
+              brands: [
+                "id",
+                {
+                  brands_id: [
+                    "id",
+                    "title",
+                    "excerpt",
+                    { logo: ["*"] },
+                    "slug",
+                    "date_created",
+                    "date_updated",
+                  ],
+                },
+              ],
+            },
+          ],
+          qr_code_block: ["*"],
+          media_block: [
+            "*",
+            {
+              file: ["*"],
+              image: ["*"],
+              video: ["*"],
+              audio: ["*"],
+              files: ["id", { directus_files_id: ["*"] }],
+            },
+          ],
+          carousel_block: [
+            "*",
+            {
+              items: [
+                "id",
+                "collection",
+                {
+                  item: {
+                    carousel_items_block: ["*", { image: ["*"] }],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies NonNullable<Query<Schema, ServicesTypes>["fields"]>

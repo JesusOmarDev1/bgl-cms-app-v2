@@ -1,5 +1,10 @@
 import "server-only"
 
+import type { Query } from "@directus/sdk"
+import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fields"
+import type { ManualsTypes } from "@/types/collections/manuals"
+import type { Schema } from "@/types/schema"
+
 export const MANUALS_FIELDS = [
   "id",
   "title",
@@ -9,57 +14,96 @@ export const MANUALS_FIELDS = [
   "yt_video",
   "date_created",
   "date_updated",
-  "image.*",
-  "seo.id",
-  "seo.title",
-  "seo.description",
-  "seo.no_index",
-  "seo.no_follow",
-  "seo.frecuency",
-  "seo.og_image.*",
-  "seo.canonical",
-  "seo.keywords",
-  "seo.priority",
-  "seo.exclude",
-  "seo.date_created",
-  "seo.date_updated",
-  "manual_category.id",
-  "manual_category.title",
-  "manual_category.slug",
-  "manual_category.icon",
-  "manual_category.parent",
-  "manual_category.status",
-  "manual_category.date_created",
-  "manual_category.date_updated",
-  "manual_category.image.*",
-  "body.id",
-  "body.collection",
-  "body.item:*",
-  "body.item:content_block.content.id",
-  "body.item:content_block.content.collection",
-  "body.item:content_block.content.item:content_column_block.*",
-  "body.item:hero_block.image.*",
-  "body.item:hero_block.images.id",
-  "body.item:hero_block.images.directus_files_id.*",
-  "body.item:hero_block.brands.id",
-  "body.item:hero_block.brands.brands_id.id",
-  "body.item:hero_block.brands.brands_id.title",
-  "body.item:hero_block.brands.brands_id.excerpt",
-  "body.item:hero_block.brands.brands_id.logo.*",
-  "body.item:hero_block.brands.brands_id.slug",
-  "body.item:hero_block.brands.brands_id.date_created",
-  "body.item:hero_block.brands.brands_id.date_updated",
-  "body.item:faq_block.questions.id",
-  "body.item:faq_block.questions.collection",
-  "body.item:faq_block.questions.item:faq_questions.*",
-  "body.item:media_block.file.*",
-  "body.item:media_block.image.*",
-  "body.item:media_block.video.*",
-  "body.item:media_block.audio.*",
-  "body.item:media_block.files.id",
-  "body.item:media_block.files.directus_files_id.*",
-  "body.item:carousel_block.items.id",
-  "body.item:carousel_block.items.collection",
-  "body.item:carousel_block.items.item:carousel_items_block.*",
-  "body.item:carousel_block.items.item:carousel_items_block.image.*",
-] as const
+  { image: ["*"] },
+  { seo: SEO_FIELDS },
+  {
+    manual_category: [
+      "id",
+      "title",
+      "slug",
+      "icon",
+      "parent",
+      "status",
+      "date_created",
+      "date_updated",
+      { image: ["*"] },
+    ],
+  },
+  {
+    body: [
+      "id",
+      "collection",
+      {
+        item: {
+          map_block: ["*"],
+          content_block: [
+            "*",
+            {
+              content: [
+                "id",
+                "collection",
+                { item: { content_column_block: ["*"] } },
+              ],
+            },
+          ],
+          faq_block: [
+            "*",
+            {
+              questions: [
+                "id",
+                "collection",
+                { item: { faq_questions: ["*"] } },
+              ],
+            },
+          ],
+          hero_block: [
+            "*",
+            {
+              image: ["*"],
+              images: ["id", { directus_files_id: ["*"] }],
+              brands: [
+                "id",
+                {
+                  brands_id: [
+                    "id",
+                    "title",
+                    "excerpt",
+                    { logo: ["*"] },
+                    "slug",
+                    "date_created",
+                    "date_updated",
+                  ],
+                },
+              ],
+            },
+          ],
+          qr_code_block: ["*"],
+          media_block: [
+            "*",
+            {
+              file: ["*"],
+              image: ["*"],
+              video: ["*"],
+              audio: ["*"],
+              files: ["id", { directus_files_id: ["*"] }],
+            },
+          ],
+          carousel_block: [
+            "*",
+            {
+              items: [
+                "id",
+                "collection",
+                {
+                  item: {
+                    carousel_items_block: ["*", { image: ["*"] }],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
+] as const satisfies NonNullable<Query<Schema, ManualsTypes>["fields"]>

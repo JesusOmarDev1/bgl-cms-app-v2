@@ -2,8 +2,10 @@
 <browserconfig>
     <msapplication>
         <tile>
+            <square70x70logo src="/favicon.svg" />
             <square150x150logo src="/favicon.svg" />
-            <TileColor>#ffffff</TileColor>
+            <square310x310logo src="/favicon.svg" />
+            <TileColor>#000</TileColor>
         </tile>
     </msapplication>
 </browserconfig>

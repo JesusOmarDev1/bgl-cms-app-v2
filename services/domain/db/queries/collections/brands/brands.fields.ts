@@ -1,3 +1,7 @@
+import type { Query } from "@directus/sdk"
+import type { BrandsTypes } from "@/types/collections/brands"
+import type { Schema } from "@/types/schema"
+
 export const BRANDS_FIELDS = [
   "id",
   "title",
@@ -5,13 +9,21 @@ export const BRANDS_FIELDS = [
   "slug",
   "date_created",
   "date_updated",
-  "logo.*",
-  "models.id",
-  "models.brands_id",
-  "models.models_id.id",
-  "models.models_id.title",
-  "models.models_id.slug",
-  "models.models_id.date_created",
-  "models.models_id.date_updated",
-  "models.models_id.image.*",
-] as const
+  { logo: ["*"] },
+  {
+    models: [
+      "id",
+      "brands_id",
+      {
+        models_id: [
+          "id",
+          "title",
+          "slug",
+          "date_created",
+          "date_updated",
+          { image: ["*"] },
+        ],
+      },
+    ],
+  },
+] as const satisfies NonNullable<Query<Schema, BrandsTypes>["fields"]>

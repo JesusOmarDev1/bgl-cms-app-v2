@@ -22,10 +22,7 @@ export async function getManualsQuery(query: ManualsQuery) {
   try {
     const manuals = await directus.request(
       readItems("manuals", {
-        fields: MANUALS_FIELDS as unknown as Query<
-          Schema,
-          ManualsTypes
-        >["fields"],
+        fields: MANUALS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
@@ -49,10 +46,7 @@ export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
   try {
     const manual = await directus.request(
       readItems("manuals", {
-        fields: MANUALS_FIELDS as unknown as Query<
-          Schema,
-          ManualsTypes
-        >["fields"],
+        fields: MANUALS_FIELDS,
         limit,
         page,
         sort: ["-date_created"],

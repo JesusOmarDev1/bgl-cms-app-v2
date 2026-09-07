@@ -12,7 +12,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,mjs,json}\"",
     "typecheck": "tsc --noEmit",
     "reset": "clean --lockfile",
-    "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm format && pnpm build"
+    "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm format && pnpm build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@arcjet/inspect": "^1.10.0",
@@ -81,6 +83,18 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "react-doctor": "^0.9.12",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "storybook": "^10.6.0",
+    "@storybook/nextjs-vite": "^10.6.0",
+    "@storybook/addon-vitest": "^10.6.0",
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-mcp": "^10.6.0",
+    "vite": "latest",
+    "eslint-plugin-storybook": "^10.6.0",
+    "vitest": "latest",
+    "playwright": "latest",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest"
   }
 }

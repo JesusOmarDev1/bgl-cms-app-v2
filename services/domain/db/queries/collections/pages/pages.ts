@@ -22,7 +22,7 @@ export async function getPagesQuery(query: PagesQuery) {
   try {
     const pages = await directus.request(
       readItems("pages", {
-        fields: PAGES_FIELDS as unknown as Query<Schema, PagesTypes>["fields"],
+        fields: PAGES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
@@ -46,7 +46,7 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
   try {
     const pageItem = await directus.request(
       readItems("pages", {
-        fields: PAGES_FIELDS as unknown as Query<Schema, PagesTypes>["fields"],
+        fields: PAGES_FIELDS,
         limit,
         page,
         sort: ["-date_created"],
