@@ -40,6 +40,11 @@ function midpoint(a: Point, b: Point) {
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
 }
 
+function pointFromEvent(e: React.PointerEvent<HTMLCanvasElement>) {
+  const rect = e.currentTarget.getBoundingClientRect()
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top }
+}
+
 function drawSegment(ctx: CanvasRenderingContext2D, points: Stroke, i: number) {
   const prev = points[i - 1]
   const curr = points[i]
@@ -219,11 +224,6 @@ function SignaturePad({
     }),
     [clear, undo, resolveInk]
   )
-
-  const pointFromEvent = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top }
-  }
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (disabled || !e.isPrimary || drawingRef.current) return

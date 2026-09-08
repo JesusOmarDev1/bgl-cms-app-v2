@@ -1,6 +1,5 @@
 "use client"
 
-/* eslint-disable @next/next/no-img-element -- pan/zoom uses CSS translate+scale on an intrinsic img; next/image fill/sized wrappers break drag-to-pan */
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
@@ -206,6 +205,10 @@ function LightboxOverlay({
 const chromeButtonClass =
   "inline-flex items-center justify-center rounded-md bg-black/50 p-2 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
 
+function isRtl(el: HTMLElement) {
+  return getComputedStyle(el).direction === "rtl"
+}
+
 function LightboxContent({
   className,
   children,
@@ -242,10 +245,6 @@ function LightboxContent({
     })
     return () => cancelAnimationFrame(frame)
   }, [index, zoomed])
-
-  function isRtl(el: HTMLElement) {
-    return getComputedStyle(el).direction === "rtl"
-  }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     onKeyDown?.(event)
@@ -359,7 +358,6 @@ function LightboxContent({
           onPointerCancel={handlePointerCancel}
         >
           {item ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <Image
               data-slot="lightbox-image"
               src={item.src}

@@ -71,6 +71,12 @@ function rgbToHex({ r, g, b }: RGB): string {
   return `#${h(r)}${h(g)}${h(b)}`
 }
 
+function parseHex(raw: string) {
+  const v = raw.trim()
+  if (!/^#?[0-9a-fA-F]{6}$/.test(v)) return null
+  return (v.startsWith("#") ? v : `#${v}`).toLowerCase()
+}
+
 function rgbToHsv({ r, g, b }: RGB): HSV {
   const rn = r / 255
   const gn = g / 255
@@ -148,6 +154,8 @@ function rgbToHsl({ r, g, b }: RGB): HSL {
   }
   return { h, s: s * 100, l: l * 100 }
 }
+
+const COLOR_FORMATS: ColorFormat[] = ["hex", "rgb", "hsl"]
 
 const DEFAULT_SWATCHES = [
   "#0ea5e9",
@@ -567,7 +575,6 @@ function ColorPickerFormatTabs({
   ...props
 }: Omit<React.ComponentProps<typeof Tabs>, "value" | "onValueChange">) {
   const ctx = useColorPicker()
-  const formats: ColorFormat[] = ["hex", "rgb", "hsl"]
   return (
     <Tabs
       {...props}
@@ -577,7 +584,7 @@ function ColorPickerFormatTabs({
       className={className}
     >
       <TabsList className="w-full">
-        {formats.map((f) => (
+        {COLOR_FORMATS.map((f) => (
           <TabsTrigger
             key={f}
             id={f}
@@ -599,16 +606,10 @@ function ColorPickerFormatInputs({
   const rgb = hexToRgb(ctx.hex) ?? { r: 0, g: 0, b: 0 }
   const hsl = rgbToHsl(rgb)
 
-  const [hexDraft, setHexDraft] = React.useState(ctx.hex.toUpperCase())
+  const [hexDraft, setHexDraft] = React.useState(() => ctx.hex.toUpperCase())
   const [hexFocused, setHexFocused] = React.useState(false)
   const hexIsComposingRef = React.useRef(false)
   const hexDisplay = hexFocused ? hexDraft : ctx.hex.toUpperCase()
-
-  const parseHex = (raw: string) => {
-    const v = raw.trim()
-    if (!/^#?[0-9a-fA-F]{6}$/.test(v)) return null
-    return (v.startsWith("#") ? v : `#${v}`).toLowerCase()
-  }
 
   const commitHexDraft = () => {
     const next = parseHex(hexDraft)

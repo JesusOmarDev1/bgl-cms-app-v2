@@ -86,6 +86,126 @@ function resistedDistance(distance: number, maxPull: number) {
   return maxPull * (1 - Math.exp(-Math.max(0, distance) / maxPull))
 }
 
+function refreshBuddySvgMotion(
+  refreshing: boolean,
+  reduce: boolean,
+  ready: boolean
+) {
+  if (refreshing) {
+    return reduce
+      ? { opacity: [0.55, 1, 0.55] }
+      : { y: [0, -2, 0], rotate: [-3, 3, -3] }
+  }
+  if (reduce) return { opacity: 1 }
+  return { y: 0, rotate: 0, scale: ready ? 1.08 : 1 }
+}
+
+function refreshBuddyArrowMotion(
+  refreshing: boolean,
+  reduce: boolean,
+  ready: boolean
+) {
+  if (refreshing && !reduce) return { rotate: [0, 360] }
+  if (reduce) return undefined
+  return { rotate: ready ? 0 : -35 }
+}
+
+function refreshBuddyEyesMotion(
+  refreshing: boolean,
+  reduce: boolean,
+  ready: boolean
+) {
+  if (refreshing && !reduce) return { scaleY: [1, 1, 0.15, 1, 1] }
+  if (reduce) return { opacity: 1 }
+  return { scaleY: ready ? 1.18 : 1 }
+}
+
+function RefreshBuddyFace({
+  ready,
+  refreshing,
+  reduce,
+}: {
+  ready: boolean
+  refreshing: boolean
+  reduce: boolean
+}) {
+  return (
+    <>
+      <motion.g
+        style={{ transformOrigin: "18px 18px" }}
+        animate={refreshBuddyArrowMotion(refreshing, reduce, ready)}
+        transition={
+          refreshing ? (reduce ? CALM_PULSE : CHARACTER_LOOP) : SPRING_SWAP
+        }
+        className={cn(
+          "transition-opacity duration-150",
+          ready || refreshing ? "opacity-100" : "opacity-0"
+        )}
+      >
+        <path
+          d="M18 2.5a15.5 15.5 0 0 1 12.7 6.6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          className="text-muted-foreground"
+        />
+        <circle cx="31.3" cy="10.2" r="2.2" className="fill-foreground" />
+      </motion.g>
+
+      <rect
+        x="7"
+        y="7"
+        width="22"
+        height="22"
+        rx="9"
+        className="fill-foreground"
+      />
+
+      <motion.g
+        style={{ opacity: 1, transformOrigin: "18px 16px" }}
+        animate={refreshBuddyEyesMotion(refreshing, reduce, ready)}
+        transition={refreshing && !reduce ? CHARACTER_LOOP : SPRING_SWAP}
+      >
+        <circle cx="14.2" cy="16" r="1.45" className="fill-background" />
+        <circle cx="21.8" cy="16" r="1.45" className="fill-background" />
+      </motion.g>
+
+      <path
+        d="M14.5 21h7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        className={cn(
+          "text-background transition-opacity duration-150",
+          ready || refreshing ? "opacity-0" : "opacity-100"
+        )}
+      />
+      <path
+        d="M14 20.5c1 2.4 7 2.4 8 0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        className={cn(
+          "text-background transition-opacity duration-150",
+          ready ? "opacity-100" : "opacity-0"
+        )}
+      />
+      <circle
+        cx="18"
+        cy="21"
+        r="1.6"
+        className={cn(
+          "fill-background transition-opacity duration-150",
+          refreshing ? "opacity-100" : "opacity-0"
+        )}
+      />
+    </>
+  )
+}
+
 function RefreshBuddy({
   progress,
   status,
@@ -111,104 +231,74 @@ function RefreshBuddy({
         viewBox="0 0 36 36"
         style={{ opacity: 1 }}
         className="h-full w-full overflow-visible"
-        animate={
-          refreshing
-            ? reduce
-              ? { opacity: [0.55, 1, 0.55] }
-              : { y: [0, -2, 0], rotate: [-3, 3, -3] }
-            : reduce
-              ? { opacity: 1 }
-              : { y: 0, rotate: 0, scale: ready ? 1.08 : 1 }
-        }
+        animate={refreshBuddySvgMotion(refreshing, reduce, ready)}
         transition={
           refreshing ? (reduce ? CALM_PULSE : CHARACTER_LOOP) : SPRING_SWAP
         }
       >
-        <motion.g
-          style={{ transformOrigin: "18px 18px" }}
-          animate={
-            refreshing && !reduce
-              ? { rotate: [0, 360] }
-              : reduce
-                ? undefined
-                : { rotate: ready ? 0 : -35 }
-          }
-          transition={
-            refreshing ? (reduce ? CALM_PULSE : CHARACTER_LOOP) : SPRING_SWAP
-          }
-          className={cn(
-            "transition-opacity duration-150",
-            ready || refreshing ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <path
-            d="M18 2.5a15.5 15.5 0 0 1 12.7 6.6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            className="text-muted-foreground"
-          />
-          <circle cx="31.3" cy="10.2" r="2.2" className="fill-foreground" />
-        </motion.g>
-
-        <rect
-          x="7"
-          y="7"
-          width="22"
-          height="22"
-          rx="9"
-          className="fill-foreground"
-        />
-
-        <motion.g
-          style={{ opacity: 1, transformOrigin: "18px 16px" }}
-          animate={
-            refreshing && !reduce
-              ? { scaleY: [1, 1, 0.15, 1, 1] }
-              : reduce
-                ? { opacity: 1 }
-                : { scaleY: ready ? 1.18 : 1 }
-          }
-          transition={refreshing && !reduce ? CHARACTER_LOOP : SPRING_SWAP}
-        >
-          <circle cx="14.2" cy="16" r="1.45" className="fill-background" />
-          <circle cx="21.8" cy="16" r="1.45" className="fill-background" />
-        </motion.g>
-
-        <path
-          d="M14.5 21h7"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          className={cn(
-            "text-background transition-opacity duration-150",
-            ready || refreshing ? "opacity-0" : "opacity-100"
-          )}
-        />
-        <path
-          d="M14 20.5c1 2.4 7 2.4 8 0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          className={cn(
-            "text-background transition-opacity duration-150",
-            ready ? "opacity-100" : "opacity-0"
-          )}
-        />
-        <circle
-          cx="18"
-          cy="21"
-          r="1.6"
-          className={cn(
-            "fill-background transition-opacity duration-150",
-            refreshing ? "opacity-100" : "opacity-0"
-          )}
+        <RefreshBuddyFace
+          ready={ready}
+          refreshing={refreshing}
+          reduce={reduce}
         />
       </motion.svg>
     </motion.span>
+  )
+}
+
+type PullIndicatorProps = {
+  displayStatus: PullToRefreshStatus
+  label: ReactNode
+  reduce: boolean
+  progress: MotionValue<number>
+  indicatorOpacity: MotionValue<number>
+  indicatorScale: MotionValue<number>
+  indicatorClassName?: string
+}
+
+function PullIndicator({
+  displayStatus,
+  label,
+  reduce,
+  progress,
+  indicatorOpacity,
+  indicatorScale,
+  indicatorClassName,
+}: PullIndicatorProps) {
+  return (
+    <motion.div
+      aria-live="polite"
+      aria-atomic="true"
+      style={
+        reduce
+          ? { opacity: indicatorOpacity }
+          : { opacity: indicatorOpacity, scale: indicatorScale }
+      }
+      className={cn(
+        "pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[4.25rem] flex-col items-center justify-center gap-0.5 bg-gradient-to-b from-background via-background/95 to-transparent text-[11px] font-medium text-muted-foreground",
+        indicatorClassName
+      )}
+    >
+      <RefreshBuddy
+        progress={progress}
+        status={displayStatus}
+        reduce={reduce}
+      />
+      <span className="relative h-4 min-w-24 text-center">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.span
+            key={displayStatus}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 3 }}
+            animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -3 }}
+            transition={LABEL_SWAP}
+            className="absolute inset-x-0 whitespace-nowrap"
+          >
+            {label}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </motion.div>
   )
 }
 
@@ -483,39 +573,15 @@ export function PullToRefresh({
         className
       )}
     >
-      <motion.div
-        aria-live="polite"
-        aria-atomic="true"
-        style={
-          reduce
-            ? { opacity: indicatorOpacity }
-            : { opacity: indicatorOpacity, scale: indicatorScale }
-        }
-        className={cn(
-          "pointer-events-none absolute inset-x-0 top-0 z-20 flex h-[4.25rem] flex-col items-center justify-center gap-0.5 bg-gradient-to-b from-background via-background/95 to-transparent text-[11px] font-medium text-muted-foreground",
-          indicatorClassName
-        )}
-      >
-        <RefreshBuddy
-          progress={progress}
-          status={displayStatus}
-          reduce={Boolean(reduce)}
-        />
-        <span className="relative h-4 min-w-24 text-center">
-          <AnimatePresence initial={false} mode="wait">
-            <motion.span
-              key={displayStatus}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 3 }}
-              animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -3 }}
-              transition={LABEL_SWAP}
-              className="absolute inset-x-0 whitespace-nowrap"
-            >
-              {label}
-            </motion.span>
-          </AnimatePresence>
-        </span>
-      </motion.div>
+      <PullIndicator
+        displayStatus={displayStatus}
+        label={label}
+        reduce={Boolean(reduce)}
+        progress={progress}
+        indicatorOpacity={indicatorOpacity}
+        indicatorScale={indicatorScale}
+        indicatorClassName={indicatorClassName}
+      />
 
       <motion.div
         style={reduce ? undefined : { y }}

@@ -10,6 +10,14 @@ export interface MetadataProps {
   category?: string
   canonical?: string
   metadataBase?: URL | string
+  robots?: {
+    index?: boolean
+    follow?: boolean
+    googleBot?: {
+      index?: boolean
+      follow?: boolean
+    }
+  }
   openGraph: {
     title: string
     description: string
@@ -58,6 +66,7 @@ export const metadata = ({
   description,
   keywords,
   category,
+  robots,
   canonical,
   metadataBase,
   openGraph,
@@ -67,15 +76,29 @@ export const metadata = ({
     default: title.default ?? "Pagina sin titulo",
     template: "%s · BGL BASCULAS INDUSTRIALES",
   },
-  metadataBase: metadataBase ? new URL(metadataBase) : new URL(BASE_URL),
+  metadataBase: metadataBase
+    ? new URL(decodeURIComponent(String(metadataBase)))
+    : new URL(decodeURIComponent(String(BASE_URL))),
   description: description ?? "Pagina sin descripcion",
   manifest: "/manifest.webmanifest",
   applicationName: "BGL BASCULAS INDUSTRIALES",
   keywords: keywords?.join(", ") ?? [],
   category: category ?? "Pagina sin categoria",
-  appleWebApp: true,
+  appleWebApp: {
+    title: "BGL BASCULAS INDUSTRIALES",
+    statusBarStyle: "black-translucent",
+    capable: true,
+  },
   creator: "BGL BASCULAS INDUSTRIALES <soporte@bglbasculas.com>",
   publisher: "BGL BASCULAS INDUSTRIALES <soporte@bglbasculas.com>",
+  robots: {
+    index: robots?.index ?? true,
+    follow: robots?.follow ?? true,
+    googleBot: {
+      index: robots?.googleBot?.index ?? true,
+      follow: robots?.googleBot?.follow ?? true,
+    },
+  },
   icons: {
     icon: [
       {
@@ -161,4 +184,5 @@ export const metadata = ({
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
   },
+  assets: [`${BASE_URL}/pwa`, `${BASE_URL}/static`],
 })

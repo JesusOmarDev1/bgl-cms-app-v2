@@ -68,6 +68,75 @@ const PANEL_SPRING = {
   mass: 0.5,
 } as const
 
+type CommandPaletteItemProps = {
+  item: CommandItem
+  index: number
+  isActive: boolean
+  hasIcons: boolean
+  uid: string
+  reduce: boolean
+  onHover: (id: string) => void
+  onPick: (item: CommandItem) => void
+}
+
+function CommandPaletteItem({
+  item,
+  index,
+  isActive,
+  hasIcons,
+  uid,
+  reduce,
+  onHover,
+  onPick,
+}: CommandPaletteItemProps) {
+  const Icon = item.icon
+  return (
+    <button
+      type="button"
+      id={`${uid}-opt-${index}`}
+      role="option"
+      aria-selected={isActive}
+      data-index={index}
+      onMouseEnter={() => onHover(item.id)}
+      onClick={() => onPick(item)}
+      className={cn(
+        "relative isolate flex w-full items-center gap-3 rounded-md px-2 py-2 text-start text-sm transition-colors",
+        isActive ? "text-foreground" : "text-muted-foreground"
+      )}
+    >
+      {isActive ? (
+        <m.span
+          layoutId={`${uid}-active`}
+          className="absolute inset-0 z-0 rounded-md bg-primary/[0.05]"
+          transition={
+            reduce
+              ? { duration: 0 }
+              : {
+                  type: "spring",
+                  stiffness: 480,
+                  damping: 38,
+                }
+          }
+        />
+      ) : null}
+      {Icon ? (
+        <Icon className="relative z-10 h-4 w-4" />
+      ) : hasIcons ? (
+        <span className="relative z-10 h-4 w-4" />
+      ) : null}
+      <span className="relative z-10 flex-1 truncate">{item.label}</span>
+      {item.badge ? (
+        <span className="relative z-10 shrink-0">{item.badge}</span>
+      ) : null}
+      {item.hint ? (
+        <kbd className="relative z-10 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          {item.hint}
+        </kbd>
+      ) : null}
+    </button>
+  )
+}
+
 export function CommandPalette({
   items,
   shortcut = "k",
@@ -315,63 +384,21 @@ export function CommandPalette({
                             // `rows` holds these very objects, in render order.
                             const idx = rows.indexOf(it)
                             const isActive = idx === active
-                            const Icon = it.icon
                             return (
-                              <button
+                              <CommandPaletteItem
                                 key={it.id}
-                                type="button"
-                                id={`${uid}-opt-${idx}`}
-                                role="option"
-                                aria-selected={isActive}
-                                data-index={idx}
-                                onMouseEnter={() => moveTo(it.id)}
-                                onClick={() => {
-                                  it.onSelect()
+                                item={it}
+                                index={idx}
+                                isActive={isActive}
+                                hasIcons={hasIcons}
+                                uid={uid}
+                                reduce={Boolean(reduce)}
+                                onHover={moveTo}
+                                onPick={(picked) => {
+                                  picked.onSelect()
                                   setOpen(false)
                                 }}
-                                className={cn(
-                                  "relative isolate flex w-full items-center gap-3 rounded-md px-2 py-2 text-start text-sm transition-colors",
-                                  isActive
-                                    ? "text-foreground"
-                                    : "text-muted-foreground"
-                                )}
-                              >
-                                {isActive ? (
-                                  <m.span
-                                    layoutId={`${uid}-active`}
-                                    className="absolute inset-0 z-0 rounded-md bg-primary/[0.05]"
-                                    transition={
-                                      reduce
-                                        ? { duration: 0 }
-                                        : // Tracks rapid arrow-key navigation — keep it tighter
-                                          // than SPRING_LAYOUT so it never lags the active row.
-                                          {
-                                            type: "spring",
-                                            stiffness: 480,
-                                            damping: 38,
-                                          }
-                                    }
-                                  />
-                                ) : null}
-                                {Icon ? (
-                                  <Icon className="relative z-10 h-4 w-4" />
-                                ) : hasIcons ? (
-                                  <span className="relative z-10 h-4 w-4" />
-                                ) : null}
-                                <span className="relative z-10 flex-1 truncate">
-                                  {it.label}
-                                </span>
-                                {it.badge ? (
-                                  <span className="relative z-10 shrink-0">
-                                    {it.badge}
-                                  </span>
-                                ) : null}
-                                {it.hint ? (
-                                  <kbd className="relative z-10 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                                    {it.hint}
-                                  </kbd>
-                                ) : null}
-                              </button>
+                              />
                             )
                           })}
                         </div>

@@ -1542,7 +1542,6 @@ AudioPlayerSkipBack.displayName = "AudioPlayerSkipBack"
 AudioQueue.displayName = "AudioQueue"
 
 export {
-  audioPlayerVariants,
   AudioProvider,
   AudioPlayer,
   AudioPlayerButton,

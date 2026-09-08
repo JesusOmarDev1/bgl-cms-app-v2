@@ -23,6 +23,7 @@
   "menuAccent": "subtle",
   "registries": {
     "@jalco": "https://ui.justinlevine.me/r/{name}.json",
-    "@beui": "https://beui.dev/r/{name}.json"
+    "@beui": "https://beui.dev/r/{name}.json",
+    "@spell": "https://spell.sh/r/{name}.json"
   }
 }

@@ -102,6 +102,67 @@ function useControllableAccordionValue({
   return [currentValue, setValue] as const
 }
 
+function BouncyAccordionContent({
+  open,
+  reduce,
+  contentId,
+  triggerId,
+  description,
+  contentRef,
+  contentHeight,
+  contentClassName,
+  descriptionClassName,
+}: {
+  open: boolean
+  reduce: boolean | null
+  contentId: string
+  triggerId: string
+  description?: ReactNode
+  contentRef: React.RefObject<HTMLDivElement | null>
+  contentHeight: number
+  contentClassName?: string
+  descriptionClassName?: string
+}) {
+  return (
+    <motion.div
+      layout="size"
+      id={contentId}
+      role="region"
+      aria-labelledby={triggerId}
+      aria-hidden={!open}
+      inert={!open}
+      initial={false}
+      style={{ height: open && description ? contentHeight : 0 }}
+      transition={
+        reduce
+          ? { duration: 0 }
+          : open
+            ? CONTENT_OPEN_TRANSITION
+            : CONTENT_CLOSE_TRANSITION
+      }
+      className={cn("overflow-hidden", contentClassName)}
+    >
+      <motion.div
+        ref={contentRef}
+        animate={{
+          opacity: open ? 1 : 0,
+        }}
+        transition={reduce ? { duration: 0 } : DESCRIPTION_TRANSITION}
+        className="px-5 pb-5"
+      >
+        <div
+          className={cn(
+            "text-[15px] leading-6 text-muted-foreground",
+            descriptionClassName
+          )}
+        >
+          {description}
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 function BouncyAccordionRow({
   item,
   open,
@@ -214,42 +275,17 @@ function BouncyAccordionRow({
           </motion.span>
         </button>
 
-        <motion.div
-          layout="size"
-          id={contentId}
-          role="region"
-          aria-labelledby={triggerId}
-          aria-hidden={!open}
-          inert={!open}
-          initial={false}
-          style={{ height: open && item.description ? contentHeight : 0 }}
-          transition={
-            reduce
-              ? { duration: 0 }
-              : open
-                ? CONTENT_OPEN_TRANSITION
-                : CONTENT_CLOSE_TRANSITION
-          }
-          className={cn("overflow-hidden", classNames?.content)}
-        >
-          <motion.div
-            ref={contentRef}
-            animate={{
-              opacity: open ? 1 : 0,
-            }}
-            transition={reduce ? { duration: 0 } : DESCRIPTION_TRANSITION}
-            className="px-5 pb-5"
-          >
-            <div
-              className={cn(
-                "text-[15px] leading-6 text-muted-foreground",
-                classNames?.description
-              )}
-            >
-              {item.description}
-            </div>
-          </motion.div>
-        </motion.div>
+        <BouncyAccordionContent
+          open={open}
+          reduce={reduce}
+          contentId={contentId}
+          triggerId={triggerId}
+          description={item.description}
+          contentRef={contentRef}
+          contentHeight={contentHeight}
+          contentClassName={classNames?.content}
+          descriptionClassName={classNames?.description}
+        />
       </motion.div>
     </motion.div>
   )

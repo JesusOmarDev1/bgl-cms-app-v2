@@ -1,13 +1,20 @@
 import arcjet, { shield, ArcjetMode, detectBot, filter } from "@arcjet/next"
 
+const ARCJET_MODE = process.env.ARCJET_MODE! as ArcjetMode;
+const ARCJET_KEY = process.env.ARCJET_KEY! as string;
+
+if (!ARCJET_MODE || !ARCJET_KEY) {
+  throw new Error("You must set security credentials in the environment variables");
+}
+
 export const aj = arcjet({
-  key: process.env.ARCJET_KEY! as string,
+  key: ARCJET_KEY,
   rules: [
     shield({
-      mode: process.env.ARCJET_MODE! as ArcjetMode,
+      mode: ARCJET_MODE,
     }),
     detectBot({
-      mode: process.env.ARCJET_MODE! as ArcjetMode,
+      mode: ARCJET_MODE,
       allow: [
         "CATEGORY:SEARCH_ENGINE",
         "CATEGORY:GOOGLE",
@@ -26,7 +33,7 @@ export const aj = arcjet({
       deny: [
         'ip.src.vpn or ip.src.tor or lower(http.request.headers["user-agent"]) matches "curl" or len(http.request.headers["user-agent"]) eq 0',
       ],
-      mode: process.env.ARCJET_MODE! as ArcjetMode,
+      mode: ARCJET_MODE,
     }),
   ],
 })

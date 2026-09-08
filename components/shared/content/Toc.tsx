@@ -515,7 +515,7 @@ function TableOfContentsProgress({
         strokeDashoffset={offset}
         strokeLinecap="round"
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        className="transition-all duration-300"
+        className="transition-[stroke-dashoffset] duration-300"
       />
     </svg>
   )

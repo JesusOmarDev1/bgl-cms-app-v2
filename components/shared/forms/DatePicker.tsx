@@ -39,6 +39,262 @@ export type DateCalendarProps = Omit<
   weekStartsOn?: 0 | 1
 }
 
+type DateCalendarDayProps = {
+  day: Date
+  selected: Date | null
+  today: Date
+  disabled: boolean
+  dayLabel: string
+  tabIndex: number
+  onSelect: (day: Date) => void
+  onKeyDown: (event: React.KeyboardEvent, day: Date) => void
+}
+
+function DateCalendarDay({
+  day,
+  selected,
+  today,
+  disabled,
+  dayLabel,
+  tabIndex,
+  onSelect,
+  onKeyDown,
+}: DateCalendarDayProps) {
+  const isSelected = sameDay(day, selected)
+  const isToday = sameDay(day, today)
+
+  return (
+    <button
+      type="button"
+      role="gridcell"
+      data-day={day.getTime()}
+      data-slot="date-picker-calendar-day"
+      disabled={disabled}
+      aria-selected={isSelected}
+      aria-current={isToday ? "date" : undefined}
+      aria-label={dayLabel}
+      onClick={() => onSelect(day)}
+      onKeyDown={(e) => onKeyDown(e, day)}
+      tabIndex={tabIndex}
+      className={cn(
+        "relative size-8 rounded-sm font-mono text-xs tabular-nums transition-colors outline-none",
+        "hover:bg-accent hover:text-accent-foreground",
+        "focus-visible:ring-2 focus-visible:ring-ring",
+        "disabled:opacity-30 disabled:hover:bg-transparent",
+        isSelected && "bg-primary text-primary-foreground hover:bg-primary",
+        !isSelected && isToday && "ring-1 ring-primary/60 ring-inset"
+      )}
+    >
+      {day.getDate()}
+    </button>
+  )
+}
+
+type DateCalendarWeekProps = {
+  week: (Date | null)[]
+  weekIndex: number
+  viewMonth: Date
+  weekdays: string[]
+  selected: Date | null
+  today: Date
+  tabbable: Date
+  isDayDisabled: (day: Date) => boolean
+  dayLabelFmt: Intl.DateTimeFormat
+  onSelect: (day: Date) => void
+  onKeyDown: (event: React.KeyboardEvent, day: Date) => void
+}
+
+function DateCalendarWeek({
+  week,
+  weekIndex,
+  viewMonth,
+  weekdays,
+  selected,
+  today,
+  tabbable,
+  isDayDisabled,
+  dayLabelFmt,
+  onSelect,
+  onKeyDown,
+}: DateCalendarWeekProps) {
+  return (
+    <div
+      key={
+        week.find((cell) => cell !== null)?.getTime() ??
+        `empty-week-${viewMonth.getTime()}-${weekIndex}`
+      }
+      role="row"
+      className="grid grid-cols-7"
+    >
+      {week.map((day, dayIndex) => {
+        if (!day) {
+          return (
+            <span
+              key={`empty-${viewMonth.getTime()}-${weekIndex}-${weekdays[dayIndex]}`}
+              aria-hidden="true"
+              className="size-8"
+            />
+          )
+        }
+
+        return (
+          <DateCalendarDay
+            key={day.getTime()}
+            day={day}
+            selected={selected}
+            today={today}
+            disabled={isDayDisabled(day)}
+            dayLabel={dayLabelFmt.format(toUtcCalendarDate(day))}
+            tabIndex={sameDay(day, tabbable) ? 0 : -1}
+            onSelect={onSelect}
+            onKeyDown={onKeyDown}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+
+function buildMonthWeeks(viewMonth: Date, weekStartsOn: 0 | 1) {
+  const cells = monthCells(viewMonth, weekStartsOn)
+  const weeks: (Date | null)[][] = []
+  for (let i = 0; i < cells.length; i += 7) {
+    weeks.push(cells.slice(i, i + 7))
+  }
+  return weeks
+}
+
+function resolveTabbableDay(
+  selected: Date | null,
+  today: Date,
+  viewMonth: Date,
+  isMonthVisible: (day: Date) => boolean
+) {
+  if (selected && isMonthVisible(selected)) return selected
+  if (isMonthVisible(today)) return today
+  return viewMonth
+}
+
+function DateCalendarHeader({
+  monthCaption,
+  canPrev,
+  canNext,
+  onPrev,
+  onNext,
+}: {
+  monthCaption: string
+  canPrev: boolean
+  canNext: boolean
+  onPrev: () => void
+  onNext: () => void
+}) {
+  return (
+    <div
+      data-slot="date-picker-calendar-header"
+      className="mb-2 flex items-center justify-between"
+    >
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Previous month"
+        isDisabled={!canPrev}
+        onClick={onPrev}
+        className="size-7"
+      >
+        <ChevronLeft className="size-3.5 rtl:rotate-180" />
+      </Button>
+      <span
+        data-slot="date-picker-calendar-caption"
+        className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase tabular-nums"
+      >
+        {monthCaption}
+      </span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Next month"
+        isDisabled={!canNext}
+        onClick={onNext}
+        className="size-7"
+      >
+        <ChevronRight className="size-3.5 rtl:rotate-180" />
+      </Button>
+    </div>
+  )
+}
+
+type DateCalendarGridProps = {
+  monthCaption: string
+  weekdays: string[]
+  weeks: (Date | null)[][] 
+  viewMonth: Date
+  selected: Date | null
+  today: Date
+  tabbable: Date
+  isDayDisabled: (day: Date) => boolean
+  dayLabelFmt: Intl.DateTimeFormat
+  onSelect: (day: Date) => void
+  onKeyDown: (event: React.KeyboardEvent, day: Date) => void
+}
+
+function DateCalendarGrid({
+  monthCaption,
+  weekdays,
+  weeks,
+  viewMonth,
+  selected,
+  today,
+  tabbable,
+  isDayDisabled,
+  dayLabelFmt,
+  onSelect,
+  onKeyDown,
+}: DateCalendarGridProps) {
+  return (
+    <div
+      role="grid"
+      aria-label={monthCaption}
+      data-slot="date-picker-calendar-grid"
+      className="grid gap-y-0.5"
+    >
+      <div role="row" className="grid grid-cols-7">
+        {weekdays.map((label) => (
+          <span
+            key={label}
+            role="columnheader"
+            data-slot="date-picker-calendar-weekday"
+            className="flex h-7 items-center justify-center font-mono text-[10px] text-muted-foreground uppercase"
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+      {weeks.map((week, weekIndex) => (
+        <DateCalendarWeek
+          key={
+            week.find((cell) => cell !== null)?.getTime() ??
+            `empty-week-${viewMonth.getTime()}-${weekIndex}`
+          }
+          week={week}
+          weekIndex={weekIndex}
+          viewMonth={viewMonth}
+          weekdays={weekdays}
+          selected={selected}
+          today={today}
+          tabbable={tabbable}
+          isDayDisabled={isDayDisabled}
+          dayLabelFmt={dayLabelFmt}
+          onSelect={onSelect}
+          onKeyDown={onKeyDown}
+        />
+      ))}
+    </div>
+  )
+}
+
 function DateCalendar({
   value: valueProp,
   defaultValue = null,
@@ -181,18 +437,13 @@ function DateCalendar({
     [weekStartsOn, weekdayFmt]
   )
 
-  const cells = monthCells(viewMonth, weekStartsOn)
-  const weeks: (Date | null)[][] = []
-  for (let i = 0; i < cells.length; i += 7) {
-    weeks.push(cells.slice(i, i + 7))
-  }
-
-  const tabbable =
-    selected && isMonthVisible(selected)
-      ? selected
-      : isMonthVisible(today)
-        ? today
-        : viewMonth
+  const weeks = buildMonthWeeks(viewMonth, weekStartsOn)
+  const tabbable = resolveTabbableDay(
+    selected,
+    today,
+    viewMonth,
+    isMonthVisible
+  )
 
   return (
     <div
@@ -201,113 +452,26 @@ function DateCalendar({
       className={cn("w-60", className)}
       {...props}
     >
-      <div
-        data-slot="date-picker-calendar-header"
-        className="mb-2 flex items-center justify-between"
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Previous month"
-          isDisabled={!canPrev}
-          onClick={() => stepMonth(-1)}
-          className="size-7"
-        >
-          <ChevronLeft className="size-3.5 rtl:rotate-180" />
-        </Button>
-        <span
-          data-slot="date-picker-calendar-caption"
-          className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase tabular-nums"
-        >
-          {monthCaption}
-        </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Next month"
-          isDisabled={!canNext}
-          onClick={() => stepMonth(1)}
-          className="size-7"
-        >
-          <ChevronRight className="size-3.5 rtl:rotate-180" />
-        </Button>
-      </div>
-      <div
-        role="grid"
-        aria-label={monthCaption}
-        data-slot="date-picker-calendar-grid"
-        className="grid gap-y-0.5"
-      >
-        <div role="row" className="grid grid-cols-7">
-          {weekdays.map((label) => (
-            <span
-              key={label}
-              role="columnheader"
-              data-slot="date-picker-calendar-weekday"
-              className="flex h-7 items-center justify-center font-mono text-[10px] text-muted-foreground uppercase"
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-        {weeks.map((week, wi) => (
-          <div
-            key={
-              week.find((cell) => cell !== null)?.getTime() ??
-              `empty-week-${viewMonth.getTime()}-${wi}`
-            }
-            role="row"
-            className="grid grid-cols-7"
-          >
-            {week.map((d, i) => {
-              if (!d) {
-                return (
-                  <span
-                    key={`empty-${viewMonth.getTime()}-${wi}-${weekdays[i]}`}
-                    aria-hidden="true"
-                    className="size-8"
-                  />
-                )
-              }
-              const isSelected = sameDay(d, selected)
-              const isToday = sameDay(d, today)
-              const out = isDayDisabled(d)
-              const dayAriaLabel = dayLabelFmt.format(toUtcCalendarDate(d))
-              return (
-                <button
-                  key={d.getTime()}
-                  type="button"
-                  role="gridcell"
-                  data-day={d.getTime()}
-                  data-slot="date-picker-calendar-day"
-                  disabled={out}
-                  aria-selected={isSelected}
-                  aria-current={isToday ? "date" : undefined}
-                  aria-label={dayAriaLabel}
-                  onClick={() => setValue(d)}
-                  onKeyDown={(e) => handleKey(e, d)}
-                  tabIndex={sameDay(d, tabbable) ? 0 : -1}
-                  className={cn(
-                    "relative size-8 rounded-sm font-mono text-xs tabular-nums transition-colors outline-none",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    "focus-visible:ring-2 focus-visible:ring-ring",
-                    "disabled:opacity-30 disabled:hover:bg-transparent",
-                    isSelected &&
-                      "bg-primary text-primary-foreground hover:bg-primary",
-                    !isSelected &&
-                      isToday &&
-                      "ring-1 ring-primary/60 ring-inset"
-                  )}
-                >
-                  {d.getDate()}
-                </button>
-              )
-            })}
-          </div>
-        ))}
-      </div>
+      <DateCalendarHeader
+        monthCaption={monthCaption}
+        canPrev={canPrev}
+        canNext={canNext}
+        onPrev={() => stepMonth(-1)}
+        onNext={() => stepMonth(1)}
+      />
+      <DateCalendarGrid
+        monthCaption={monthCaption}
+        weekdays={weekdays}
+        weeks={weeks}
+        viewMonth={viewMonth}
+        selected={selected}
+        today={today}
+        tabbable={tabbable}
+        isDayDisabled={isDayDisabled}
+        dayLabelFmt={dayLabelFmt}
+        onSelect={setValue}
+        onKeyDown={handleKey}
+      />
     </div>
   )
 }

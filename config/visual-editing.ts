@@ -8,16 +8,24 @@ import { isEnvFlagEnabled } from "@/lib/browser/env"
 const VISUAL_EDITING_PARAM = "visual-editing"
 const VISUAL_EDITING_KEY = "directus-visual-editing"
 
-export const isVisualEditingEnabled = isEnvFlagEnabled(
+const ENABLE_VISUAL_EDITING = isEnvFlagEnabled(
   process.env.NEXT_PUBLIC_ENABLE_VISUAL_EDITING
 )
+
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL! as string
+
+if (!ENABLE_VISUAL_EDITING || !DIRECTUS_URL) {
+  throw new Error(
+    "You must set visual editing flag and API credentials in the environment variables"
+  )
+}
 
 export function useVisualEditing() {
   const [visualEditing, setVisualEditing] = useState(false)
   const t = useTranslations("visual-editing")
 
   useEffect(() => {
-    if (isVisualEditingEnabled) return
+    if (!ENABLE_VISUAL_EDITING) return
 
     let cancelled = false
     queueMicrotask(() => {
@@ -50,9 +58,9 @@ export function useVisualEditing() {
   }, [t])
 
   const activate = useCallback(() => {
-    if (!visualEditing || !process.env.NEXT_PUBLIC_DIRECTUS_URL) return
+    if (!visualEditing || !DIRECTUS_URL) return
     apply({
-      directusUrl: process.env.NEXT_PUBLIC_DIRECTUS_URL as string,
+      directusUrl: DIRECTUS_URL,
       onSaved: () => window.location.reload(),
     })
   }, [visualEditing])

@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
+
+export const metadata: Metadata = {
+  title: "BGL Básculas Industriales",
+  description: "Sitio web de BGL Básculas Industriales.",
+}
 
 export default function Page() {
   return (

@@ -122,7 +122,6 @@ function StatusIndicator({
 
 export {
   StatusIndicator,
-  statusIndicatorVariants,
   STATUS_CONFIG,
   type StatusIndicatorProps,
   type Status,

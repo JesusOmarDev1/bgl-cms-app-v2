@@ -540,4 +540,4 @@ function Box({
   return <div {...dataAttributes} className={resolvedClassName} {...props} />
 }
 
-export { Box, boxVariants }
+export { Box }
