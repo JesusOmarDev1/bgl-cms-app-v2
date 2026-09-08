@@ -8,9 +8,36 @@
     --typeset-font-body: inherit;
     --typeset-font-heading: var(--font-heading);
     --typeset-font-mono: var(--font-mono);
-    --typeset-size: 1em;
+    --typeset-size: 1.25em;
+    --typeset-leading: 1.6;
+    --typeset-flow: 1.25em;
+  }
+
+  .typeset-article {
+    --typeset-font-body: var(--font-sans);
+    --typeset-font-heading: var(--font-heading);
+    --typeset-font-mono: var(--font-mono);
+    --typeset-size: 1.0625rem;
     --typeset-leading: 1.75;
     --typeset-flow: 1.25em;
+  }
+  .typeset-compact {
+    --typeset-size: 0.875rem;
+    --typeset-leading: 1.6;
+    --typeset-flow: 1em;
+  }
+  .typeset-docs {
+    --typeset-font-body: var(--font-geist);
+    --typeset-font-heading: var(--font-geist);
+    --typeset-font-mono: var(--font-geist-mono);
+    --typeset-size: 1.125rem;
+    --typeset-leading: 1.6;
+    --typeset-flow: 1.5em;
+  }
+
+  .typeset :where(.typeset-lead) {
+    color: var(--typeset-muted);
+    font-size: 0.95em;
   }
 }
 
@@ -486,21 +513,5 @@
       )
     ) {
     margin-block-start: 0;
-  }
-}
-
-@layer components {
-  .typeset-article {
-    --typeset-font-body: var(--font-sans);
-    --typeset-font-heading: var(--font-heading);
-    --typeset-font-mono: var(--font-mono);
-    --typeset-size: 1.0625rem;
-    --typeset-leading: 1.75;
-    --typeset-flow: 1.25em;
-  }
-  .typeset-compact {
-    --typeset-size: 0.875rem;
-    --typeset-leading: 1.6;
-    --typeset-flow: 1em;
   }
 }

@@ -155,7 +155,6 @@ function DateCalendarWeek({
   )
 }
 
-
 function buildMonthWeeks(viewMonth: Date, weekStartsOn: 0 | 1) {
   const cells = monthCells(viewMonth, weekStartsOn)
   const weeks: (Date | null)[][] = []
@@ -229,7 +228,7 @@ function DateCalendarHeader({
 type DateCalendarGridProps = {
   monthCaption: string
   weekdays: string[]
-  weeks: (Date | null)[][] 
+  weeks: (Date | null)[][]
   viewMonth: Date
   selected: Date | null
   today: Date

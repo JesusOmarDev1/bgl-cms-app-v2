@@ -6,9 +6,15 @@ import { ThemeProvider } from "@/providers/ThemeProvider"
 import { QueryProvider } from "@/providers/QueryProvider"
 import { Toaster } from "@/components/ui/sonner"
 import { preloadResources } from "@/lib/seo/preload-resources"
+import { createRootMetadata } from "@/lib/seo/metadata"
 import { cn } from "@/lib/utils"
 import { geist, geistMono } from "@/lib/fonts/geist"
 import { Viewport } from "next"
+import { HeaderNav } from "@/components/blocks/singletons/header/HeaderNav"
+import { Suspense } from "react"
+import { HeaderNavSkeleton } from "@/components/blocks/singletons/header/HeaderNavSkeleton"
+
+export const metadata = createRootMetadata()
 
 export const viewport: Viewport = {
   themeColor: "#000000",
@@ -49,7 +55,12 @@ export default function RootLayout({
               storageKey="bgl-theme"
               enableSystem={false}
             >
-              <NuqsAdapter>{children}</NuqsAdapter>
+              <NuqsAdapter>
+                <Suspense fallback={<HeaderNavSkeleton />}>
+                  <HeaderNav />
+                </Suspense>
+                {children}
+              </NuqsAdapter>
               <Toaster
                 richColors
                 closeButton

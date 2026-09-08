@@ -1,10 +1,12 @@
 import arcjet, { shield, ArcjetMode, detectBot, filter } from "@arcjet/next"
 
-const ARCJET_MODE = process.env.ARCJET_MODE! as ArcjetMode;
-const ARCJET_KEY = process.env.ARCJET_KEY! as string;
+const ARCJET_MODE = process.env.ARCJET_MODE! as ArcjetMode
+const ARCJET_KEY = process.env.ARCJET_KEY! as string
 
 if (!ARCJET_MODE || !ARCJET_KEY) {
-  throw new Error("You must set security credentials in the environment variables");
+  throw new Error(
+    "You must set security credentials in the environment variables"
+  )
 }
 
 export const aj = arcjet({

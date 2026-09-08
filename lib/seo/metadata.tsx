@@ -1,12 +1,9 @@
 import type { Metadata } from "next"
 
 export interface MetadataProps {
-  title: {
-    default: string
-    template?: string
-  }
+  title: string
   description: string
-  keywords: string[]
+  keywords?: string[]
   category?: string
   canonical?: string
   metadataBase?: URL | string
@@ -60,6 +57,8 @@ export interface MetadataProps {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? ""
+const SITE_NAME = "BGL BASCULAS INDUSTRIALES"
+const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
 
 export const metadata = ({
   title,
@@ -72,25 +71,22 @@ export const metadata = ({
   openGraph,
   twitter,
 }: MetadataProps): Metadata => ({
-  title: {
-    default: title.default ?? "Pagina sin titulo",
-    template: "%s · BGL BASCULAS INDUSTRIALES",
-  },
+  title: title || "Pagina sin titulo",
   metadataBase: metadataBase
     ? new URL(decodeURIComponent(String(metadataBase)))
     : new URL(decodeURIComponent(String(BASE_URL))),
   description: description ?? "Pagina sin descripcion",
   manifest: "/manifest.webmanifest",
-  applicationName: "BGL BASCULAS INDUSTRIALES",
+  applicationName: SITE_NAME,
   keywords: keywords?.join(", ") ?? [],
   category: category ?? "Pagina sin categoria",
   appleWebApp: {
-    title: "BGL BASCULAS INDUSTRIALES",
+    title: SITE_NAME,
     statusBarStyle: "black-translucent",
     capable: true,
   },
-  creator: "BGL BASCULAS INDUSTRIALES <soporte@bglbasculas.com>",
-  publisher: "BGL BASCULAS INDUSTRIALES <soporte@bglbasculas.com>",
+  creator: `${SITE_NAME} <soporte@bglbasculas.com>`,
+  publisher: `${SITE_NAME} <soporte@bglbasculas.com>`,
   robots: {
     index: robots?.index ?? true,
     follow: robots?.follow ?? true,
@@ -133,7 +129,7 @@ export const metadata = ({
   },
   authors: [
     {
-      name: "BGL BASCULAS INDUSTRIALES",
+      name: SITE_NAME,
       url: BASE_URL,
     },
   ],
@@ -141,12 +137,12 @@ export const metadata = ({
     canonical: canonical ?? BASE_URL,
   },
   openGraph: {
-    title: openGraph.title,
-    description: openGraph.description,
-    type: openGraph.type,
-    locale: openGraph.locale,
-    siteName: openGraph.siteName,
-    url: openGraph.url,
+    title: openGraph?.title ?? "",
+    description: openGraph?.description ?? "",
+    type: openGraph?.type ?? "website",
+    locale: openGraph?.locale ?? "es_MX",
+    siteName: openGraph?.siteName ?? SITE_NAME,
+    url: openGraph?.url ?? BASE_URL,
     images: [
       {
         url: "/favicon.svg",
@@ -158,8 +154,8 @@ export const metadata = ({
     ],
   },
   twitter: {
-    title: twitter?.title ?? openGraph.title,
-    description: twitter?.description ?? openGraph.description,
+    title: twitter?.title ?? openGraph?.title ?? "",
+    description: twitter?.description ?? openGraph?.description ?? "",
     card: twitter?.card ?? "summary_large_image",
     images: [
       {
@@ -186,3 +182,21 @@ export const metadata = ({
   },
   assets: [`${BASE_URL}/pwa`, `${BASE_URL}/static`],
 })
+
+export function createRootMetadata(): Metadata {
+  return {
+    ...metadata({
+      title: SITE_NAME,
+      description: "Sitio web de BGL Básculas Industriales.",
+      openGraph: {
+        title: SITE_NAME,
+        description: "Sitio web de BGL Básculas Industriales.",
+        type: "website",
+      },
+    }),
+    title: {
+      default: SITE_NAME,
+      template: TITLE_TEMPLATE,
+    },
+  }
+}

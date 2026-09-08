@@ -36,8 +36,13 @@ import type { BlogPostsTagsJunction } from "@/types/collections/junctions/blog-p
 import type { BrandsBlockBrandsJunction } from "@/types/collections/junctions/brands-block-brands"
 import type { BrandsModelsJunction } from "@/types/collections/junctions/brands-models"
 import type { CarouselBlockItemsJunction } from "@/types/collections/junctions/carousel-block-items"
+import type { ClientsBlockClientsJunction } from "@/types/collections/junctions/clients-block-clients"
+import type { ContactBlockEmailsJunction } from "@/types/collections/junctions/contact-block-emails"
+import type { ContactBlockPhonesJunction } from "@/types/collections/junctions/contact-block-phones"
 import type { ContentBlockContentJunction } from "@/types/collections/junctions/content-block-content"
 import type { DivisionServicesBlockDivisionServicesJunction } from "@/types/collections/junctions/division-services-block-division-services"
+import type { FeaturedProductsBlockProductsJunction } from "@/types/collections/junctions/featured-products-block-products"
+import type { FeaturedServicesBlockServicesJunction } from "@/types/collections/junctions/featured-services-block-services"
 import type { FooterEmailsJunction } from "@/types/collections/junctions/footer-emails"
 import type { FooterPhonesJunction } from "@/types/collections/junctions/footer-phones"
 import type { FooterSocialLinksJunction } from "@/types/collections/junctions/footer-social-links"
@@ -59,6 +64,7 @@ import type { ProductsProductsJunction } from "@/types/collections/junctions/pro
 import type { ProductsTagsJunction } from "@/types/collections/junctions/products-tags"
 import type { ServicesBodyJunction } from "@/types/collections/junctions/services-body"
 import type { ServicesButtonServicesJunction } from "@/types/collections/junctions/services-button-services"
+import type { SuppliersBlockSuppliersJunction } from "@/types/collections/junctions/suppliers-block-suppliers"
 import type { UrlLinksSubLinksJunction } from "@/types/collections/junctions/url-links-sub-links"
 import type { ManualCategoriesTypes } from "@/types/collections/manual-categories"
 import type { ManualsTypes } from "@/types/collections/manuals"
@@ -143,6 +149,12 @@ export interface Schema {
   media_block_files: MediaBlockFilesJunction[]
   logos_clients_block_clients: LogosClientsBlockClientsJunction[]
   brands_block_brands: BrandsBlockBrandsJunction[]
+  clients_block_clients: ClientsBlockClientsJunction[]
+  suppliers_block_suppliers: SuppliersBlockSuppliersJunction[]
+  featured_services_block_services: FeaturedServicesBlockServicesJunction[]
+  featured_products_block_products: FeaturedProductsBlockProductsJunction[]
+  contact_block_emails: ContactBlockEmailsJunction[]
+  contact_block_phones: ContactBlockPhonesJunction[]
   division_services_block_division_services: DivisionServicesBlockDivisionServicesJunction[]
   hero_block_files: HeroBlockFilesJunction[]
   hero_block_brands: HeroBlockBrandsJunction[]

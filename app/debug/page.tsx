@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import type { SearchParams } from "nuqs/server"
-
 import { Box } from "@/components/shared/content/Box"
 import { DebugPayload } from "@/components/debug/DebugPayload"
 import { DebugPayloadSkeleton } from "@/components/debug/DebugPayloadSkeleton"

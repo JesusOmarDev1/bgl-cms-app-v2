@@ -5,7 +5,7 @@ export interface UrlLinksTypes {
   // General
   id: string
   title: string
-  url: string
+  url: string | null
   type: UrlLinkType
   icon: string | null
   sub_links: number[] | UrlLinksSubLinksJunction[]

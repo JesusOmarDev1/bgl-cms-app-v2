@@ -26,7 +26,7 @@ const meta = {
     nextjs: { appDirectory: true },
   },
   args: {
-    header: mockHeader,
+    data: mockHeader,
   },
 } satisfies Meta<typeof HeaderNavClient>
 

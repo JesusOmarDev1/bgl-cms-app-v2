@@ -9,5 +9,5 @@ interface HeaderNavProps {
 export async function HeaderNav({ className }: HeaderNavProps) {
   const header = await getHeaderRepository()
   if (!header.id) return <HeaderNavSkeleton />
-  return <HeaderNavClient header={header} className={className} />
+  return <HeaderNavClient data={header} className={className} />
 }

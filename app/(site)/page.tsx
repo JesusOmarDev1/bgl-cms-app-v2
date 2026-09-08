@@ -1,22 +1,15 @@
-import type { Metadata } from "next"
-import { Button } from "@/components/ui/button"
+import { metadata as createMetadata } from "@/lib/seo/metadata"
 
-export const metadata: Metadata = {
-  title: "BGL Básculas Industriales",
+export const metadata = createMetadata({
+  title: "Inicio",
   description: "Sitio web de BGL Básculas Industriales.",
-}
+  openGraph: {
+    title: "Inicio",
+    description: "Sitio web de BGL Básculas Industriales.",
+    type: "website",
+  },
+})
 
 export default function Page() {
-  return (
-    <div className="flex min-h-svh p-6">
-      <section className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <h1 className="font-medium">Project ready!</h1>
-        <p>You may now add components and start building.</p>
-        <p>We&apos;ve already added the button component for you.</p>
-        <Button variant={"red"} className="mt-2">
-          Button
-        </Button>
-      </section>
-    </div>
-  )
+  return <></>
 }

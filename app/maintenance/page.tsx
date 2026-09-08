@@ -8,9 +8,7 @@ import { metadata as createMetadata } from "@/lib/seo/metadata"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? ""
 
 export const metadata = createMetadata({
-  title: {
-    default: "Pagina de mantenimiento",
-  },
+  title: "Pagina de mantenimiento",
   description: "Esta pagina es para fines de mantenimiento del sitio web.",
   keywords: ["maintenance", "maintenance page", "maintenance mode"],
   canonical: `${BASE_URL}/maintenance`,

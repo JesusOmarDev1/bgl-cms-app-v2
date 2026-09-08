@@ -8,15 +8,9 @@ const boxVariants = cva("group/box min-w-0", {
     variant: {
       transparent: "bg-transparent",
     },
-    size: {
-      sm: "text-xs",
-      default: "text-sm",
-      lg: "text-base",
-    },
   },
   defaultVariants: {
     variant: "transparent",
-    size: "default",
   },
 })
 
@@ -419,7 +413,6 @@ function resolveDataAttribute<T extends string | number>(
 function Box({
   className,
   variant = "transparent",
-  size = "default",
   display = "block",
   orientation,
   contentAlign,
@@ -446,7 +439,7 @@ function Box({
     : orientation
 
   const resolvedClassName = cn(
-    boxVariants({ variant, size }),
+    boxVariants({ variant }),
     resolveResponsiveClasses(display, (value) => boxDisplayClasses[value]),
     resolveGatedResponsiveClasses(
       resolvedOrientation,
@@ -525,7 +518,6 @@ function Box({
     "data-content-justify": resolveDataAttribute(contentJustify),
     "data-align": resolveDataAttribute(align),
     "data-justify": resolveDataAttribute(justify),
-    "data-size": size ?? undefined,
     "data-variant": variant ?? undefined,
   } as const
 

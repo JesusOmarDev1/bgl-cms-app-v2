@@ -78,8 +78,54 @@ export const PAGES_FIELDS = [
           qr_code_block: ["*"],
           media_block: ["*"],
           carousel_block: ["*"],
-          clients_block: ["*"],
-          suppliers_block: ["*"],
+          clients_block: [
+            "*",
+            {
+              clients: [
+                "id",
+                "collection",
+                {
+                  item: {
+                    clients: [
+                      "id",
+                      "status",
+                      "name",
+                      "website",
+                      "active",
+                      "slug",
+                      { logo: ["*"] },
+                      "date_created",
+                      "date_updated",
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+          suppliers_block: [
+            "*",
+            {
+              suppliers: [
+                "id",
+                "collection",
+                {
+                  item: {
+                    suppliers: [
+                      "id",
+                      "name",
+                      "status",
+                      "active",
+                      "website",
+                      "slug",
+                      { logo: ["*"] },
+                      "date_created",
+                      "date_updated",
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
           brands_block: [
             "*",
             {
@@ -99,8 +145,46 @@ export const PAGES_FIELDS = [
               ],
             },
           ],
-          featured_services_block: ["*"],
-          featured_products_block: ["*"],
+          featured_services_block: [
+            "*",
+            {
+              services: [
+                "id",
+                {
+                  services_id: [
+                    "id",
+                    "title",
+                    "slug",
+                    "status",
+                    "excerpt",
+                    { image: ["*"] },
+                    "date_created",
+                    "date_updated",
+                  ],
+                },
+              ],
+            },
+          ],
+          featured_products_block: [
+            "*",
+            {
+              products: [
+                "id",
+                {
+                  products_id: [
+                    "id",
+                    "slug",
+                    "title",
+                    "status",
+                    "excerpt",
+                    { image: ["*"] },
+                    "date_created",
+                    "date_updated",
+                  ],
+                },
+              ],
+            },
+          ],
           logos_clients_block: [
             "*",
             {
