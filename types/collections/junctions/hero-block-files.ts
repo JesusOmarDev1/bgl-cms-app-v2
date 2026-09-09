@@ -1,5 +1,5 @@
 import type { HeroBlock } from "@/types/blocks/content/hero-block"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface HeroBlockFilesJunction {
   id: number

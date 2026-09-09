@@ -1,4 +1,4 @@
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 import type { FooterEmailsJunction } from "@/types/collections/junctions/footer-emails"
 import type { FooterPhonesJunction } from "@/types/collections/junctions/footer-phones"
 import type { FooterSocialLinksJunction } from "@/types/collections/junctions/footer-social-links"

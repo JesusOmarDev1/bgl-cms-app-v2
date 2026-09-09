@@ -1,5 +1,5 @@
 import type { ModelsTypes } from "@/types/collections/models"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface ModelsFilesJunction {
   id: number

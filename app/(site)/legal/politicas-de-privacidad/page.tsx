@@ -23,7 +23,7 @@ export default function Page() {
     <Fragment>
       <HeaderSpacer />
       <Box
-        className="mx-auto max-w-4xl"
+        className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto max-w-5xl lg:max-w-6xl xl:max-w-7xl"
         padding={2}
         paddingInline={{ base: 1, sm: 1.5 }}
       >

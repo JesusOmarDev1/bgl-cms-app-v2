@@ -59,7 +59,11 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
       >
         <NavigationMenuList className="flex w-full justify-between">
           <div className="flex items-center justify-center gap-4">
-            <Link href="/" aria-label="">
+            <Link
+              href="/"
+              aria-label="Logo de BGL Básculas Industriales"
+              title="Logo de BGL Básculas Industriales"
+            >
               {data?.logo_dark ? (
                 <DirectusImage
                   src={data?.logo_dark?.id ?? ""}
@@ -72,9 +76,8 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                   loading="eager"
                   fetchPriority="high"
                   preload
-                  sizes="(max-width: 320px) 500px, (max-width: 768px) 500px, 500px"
                   sizing="auto"
-                  variant="logo"
+                  variant="original"
                 />
               ) : (
                 <StaticLogo />
@@ -98,7 +101,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                         className="hidden lg:flex"
                         key={link.id}
                       >
-                        <NavigationMenuTrigger className="flex items-center gap-1.5">
+                        <NavigationMenuTrigger className="flex items-center gap-1.5 text-base lg:text-lg">
                           <MaterialIcon
                             className="text-muted-foreground"
                             name={item.icon ?? ""}
@@ -121,7 +124,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                                 key={subItem.id}
                                 className={cn(
                                   navigationMenuTriggerStyle(),
-                                  "flex w-full justify-start"
+                                  "flex w-full justify-start text-base lg:text-lg"
                                 )}
                                 render={
                                   <Link
@@ -153,7 +156,10 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                       key={link.id}
                     >
                       <NavigationMenuLink
-                        className={cn(navigationMenuTriggerStyle())}
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          "text-base lg:text-lg"
+                        )}
                         render={
                           <Link
                             href={url}

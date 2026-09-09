@@ -3,7 +3,7 @@ import { serverHealth } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { logDirectusQueryError } from "@/lib/directus/query-error"
-import { HealthResult } from "@/types/shared/health-result"
+import { HealthResult } from "@/types/shared/health/health-result"
 import { HEALTH_FIELDS } from "./health.fields"
 
 export async function getHealthQuery(): Promise<HealthResult> {

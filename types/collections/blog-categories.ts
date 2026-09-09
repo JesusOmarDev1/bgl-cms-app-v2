@@ -1,5 +1,5 @@
 import type { StatusType } from "@/types/enums/status-type"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface BlogCategoriesTypes {
   // General

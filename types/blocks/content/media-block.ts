@@ -1,6 +1,6 @@
 import type { MediaBlockFilesJunction } from "@/types/collections/junctions/media-block-files"
 import type { MediaBlockType } from "@/types/enums/media-block-type"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface MediaBlock {
   // General

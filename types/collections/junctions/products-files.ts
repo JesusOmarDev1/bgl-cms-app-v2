@@ -1,5 +1,5 @@
 import type { ProductsTypes } from "@/types/collections/products"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface ProductsFilesJunction {
   id: number

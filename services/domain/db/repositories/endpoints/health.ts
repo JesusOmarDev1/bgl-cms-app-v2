@@ -1,4 +1,4 @@
-import { HealthResult } from "@/types/shared/health-result"
+import { HealthResult } from "@/types/shared/health/health-result"
 import { getHealthQuery } from "@/services/domain/db/queries/endpoints/health/health"
 
 export async function getHealthRepository(): Promise<HealthResult> {

@@ -1,4 +1,4 @@
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 
 export interface CarouselItemsBlock {
   // General

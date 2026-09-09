@@ -1,5 +1,5 @@
 import type { StatusType } from "@/types/enums/status-type"
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 import type { SeoTypes } from "@/types/collections/seo"
 import type { BlogCategoriesTypes } from "@/types/collections/blog-categories"
 import type { BlogPostsBodyJunction } from "@/types/collections/junctions/blog-posts-body"

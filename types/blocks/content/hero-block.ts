@@ -1,4 +1,4 @@
-import type { DirectusFileTypes } from "@/types/shared/directus-file"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
 import type { HeroBlockBrandsJunction } from "@/types/collections/junctions/hero-block-brands"
 import type { HeroBlockFilesJunction } from "@/types/collections/junctions/hero-block-files"
 import type { HeroBlockVariant } from "@/types/enums/hero-block-variant"
