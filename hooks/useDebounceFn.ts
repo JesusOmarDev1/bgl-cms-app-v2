@@ -1,25 +1,19 @@
 import { debounce } from "es-toolkit"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo } from "react"
 import type { DebounceOptions } from "es-toolkit"
 
 export type { DebounceOptions }
 
-export function useDebounceFn<Fn extends (...args: any[]) => any>(
+type DebounceCallback = Parameters<typeof debounce>[0]
+
+export function useDebounceFn<Fn extends DebounceCallback>(
   fn: Fn,
-  debounceMs?: number,
+  debounceMs = 1000,
   options?: DebounceOptions
 ) {
-  const fnRef = useRef(fn)
-  fnRef.current = fn
-
   const debouncedFn = useMemo(
-    () =>
-      debounce(
-        (...args: Parameters<Fn>) => fnRef.current!(...args),
-        debounceMs ?? 1000,
-        options
-      ),
-    [debounceMs, options]
+    () => debounce(fn, debounceMs, options),
+    [fn, debounceMs, options]
   )
 
   useEffect(() => () => debouncedFn.cancel(), [debouncedFn])

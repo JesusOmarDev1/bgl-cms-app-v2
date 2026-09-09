@@ -16,7 +16,10 @@ import {
 import { useScroll } from "@/hooks/useScroll"
 import { cn } from "@/lib/utils"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
+import { SearchBar } from "@/components/shared/search/SearchBar"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
+import { Button } from "@/components/ui/button"
 
 interface HeaderNavClientProps {
   data: HeaderQueryResult | null | undefined
@@ -51,7 +54,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
     >
       <NavigationMenu
         className={cn(
-          "flex h-24 min-w-screen items-center px-6 transition-all duration-400 animate-ease-in-out",
+          "flex h-24 min-w-screen items-center px-6 pr-20 transition-all duration-400 animate-ease-in-out lg:pr-64",
           {
             "h-20": scrolled,
           }
@@ -101,7 +104,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                         className="hidden lg:flex"
                         key={link.id}
                       >
-                        <NavigationMenuTrigger className="flex items-center gap-1.5 text-base lg:text-lg">
+                        <NavigationMenuTrigger className="flex items-center gap-1.5 text-sm md:text-base lg:text-lg">
                           <MaterialIcon
                             className="text-muted-foreground"
                             name={item.icon ?? ""}
@@ -124,7 +127,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                                 key={subItem.id}
                                 className={cn(
                                   navigationMenuTriggerStyle(),
-                                  "flex w-full justify-start text-base lg:text-lg"
+                                  "flex w-full justify-start text-sm md:text-base lg:text-lg"
                                 )}
                                 render={
                                   <Link
@@ -182,6 +185,22 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
           </div>
         </NavigationMenuList>
       </NavigationMenu>
+      <div className="absolute inset-y-0 right-6 flex items-center gap-2.5">
+        <SearchBar variant="header" />
+        <MexicoCityIcon className="hidden size-8 lg:flex" />
+        {data?.primary_button && (
+          <Link href={data.primary_url ?? ""}>
+            <Button
+              variant="red"
+              size="xl"
+              className="hidden rounded-full px-3 lg:flex"
+            >
+              {data.primary_button}
+              <MaterialIcon name={data.primary_icon ?? ""} />
+            </Button>
+          </Link>
+        )}
+      </div>
     </header>
   )
 }

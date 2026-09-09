@@ -20,13 +20,12 @@ export async function getHeaderQuery() {
       } satisfies Query<Schema, HeaderType>)
     )
   } catch (error) {
-    const message = t("failed_to_fetch")
-    logDirectusQueryError(error, message, {
+    logDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getHeaderQuery",
       collection: "header",
     })
-    throw error instanceof Error ? error : new Error(message)
+    return null
   }
 }
 

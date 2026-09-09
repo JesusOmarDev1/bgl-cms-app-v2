@@ -19,12 +19,27 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { DirectusImage } from "@/components/shared/assets/DirectusImage"
+import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
+import { SearchHitsSkeleton } from "@/components/shared/search/SearchHitsSkeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { EASE_OUT } from "@/lib/search/ease"
 import { useOnOpen } from "@/hooks/useOnOpen"
 import { useRowCursor } from "@/hooks/useRowCursor"
 import { useTouchCapable } from "@/hooks/useTouchCapable"
 import { PresenceGate } from "@/lib/animation/presence-gate"
 import { cn } from "@/lib/utils"
+import { Kbd, KbdGroup } from "@/components/ui/kbd"
+import { SafeHtml } from "./SafeHtml"
+
+export type CommandPaletteStatus = "prompt" | "loading" | "error" | "empty"
 
 export type CommandItem = {
   id: string
@@ -34,6 +49,8 @@ export type CommandItem = {
   keywords?: string[]
   icon?: LucideIcon
   badge?: ReactNode
+  image?: string | null
+  description?: string
   onSelect: () => void
 }
 
@@ -43,8 +60,18 @@ export interface CommandPaletteProps {
   shortcut?: string
   placeholder?: string
   emptyMessage?: string
+  errorMessage?: string
+  promptTitle?: string
+  promptDescription?: string
+  emptyTitle?: string
+  emptyDescription?: string
+  errorTitle?: string
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  onQueryChange?: (query: string) => void
+  /** When false, skip local fuzzy matching (server already filtered). */
+  filterItems?: boolean
+  status?: CommandPaletteStatus
 }
 
 function fuzzyMatch(needle: string, hay: string) {
@@ -73,10 +100,72 @@ type CommandPaletteItemProps = {
   index: number
   isActive: boolean
   hasIcons: boolean
+  hasImages: boolean
   uid: string
   reduce: boolean
   onHover: (id: string) => void
   onPick: (item: CommandItem) => void
+}
+
+function PaletteStatusPanel({
+  status,
+  emptyMessage,
+  errorMessage,
+  promptTitle,
+  promptDescription,
+  emptyTitle,
+  emptyDescription,
+  errorTitle,
+}: {
+  status: CommandPaletteStatus
+  emptyMessage: string
+  errorMessage?: string
+  promptTitle: string
+  promptDescription: string
+  emptyTitle: string
+  emptyDescription: string
+  errorTitle: string
+}) {
+  if (status === "loading") {
+    return <SearchHitsSkeleton />
+  }
+
+  const copy =
+    status === "error"
+      ? {
+          icon: "error",
+          title: errorTitle,
+          description: errorMessage ?? emptyMessage,
+        }
+      : status === "empty"
+        ? {
+            icon: "search_off",
+            title: emptyTitle,
+            description: emptyDescription,
+          }
+        : {
+            icon: "search",
+            title: promptTitle,
+            description: promptDescription,
+          }
+
+  return (
+    <Empty className="border-none bg-transparent py-6">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <MaterialIcon
+            name={copy.icon}
+            size={18}
+            className="text-muted-foreground"
+          />
+        </EmptyMedia>
+        <EmptyTitle className="text-sm font-medium">{copy.title}</EmptyTitle>
+        <EmptyDescription className="text-xs">
+          {copy.description}
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  )
 }
 
 function CommandPaletteItem({
@@ -84,6 +173,7 @@ function CommandPaletteItem({
   index,
   isActive,
   hasIcons,
+  hasImages,
   uid,
   reduce,
   onHover,
@@ -119,12 +209,35 @@ function CommandPaletteItem({
           }
         />
       ) : null}
-      {Icon ? (
+      {item.image ? (
+        <DirectusImage
+          src={item.image}
+          alt={item.label}
+          variant="thumbnail"
+          sizing="contained"
+          width={80}
+          height={80}
+          quality={75}
+          className="relative z-10 size-20 shrink-0 rounded-md bg-muted"
+        />
+      ) : hasImages ? (
+        <span className="relative z-10 size-20 shrink-0 rounded-md bg-muted" />
+      ) : Icon ? (
         <Icon className="relative z-10 h-4 w-4" />
       ) : hasIcons ? (
         <span className="relative z-10 h-4 w-4" />
       ) : null}
-      <span className="relative z-10 flex-1 truncate">{item.label}</span>
+      <span className="relative z-10 flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="line-clamp-2 font-medium">{item.label}</span>
+        {item.description ? (
+          <span className="line-clamp-1 text-xs text-muted-foreground">
+            <SafeHtml
+              className="text-sm text-muted-foreground"
+              content={item.description}
+            />
+          </span>
+        ) : null}
+      </span>
       {item.badge ? (
         <span className="relative z-10 shrink-0">{item.badge}</span>
       ) : null}
@@ -142,8 +255,17 @@ export function CommandPalette({
   shortcut = "k",
   placeholder = "Type a command or search…",
   emptyMessage = "No results found.",
+  errorMessage,
+  promptTitle = "Search",
+  promptDescription = "Type to search.",
+  emptyTitle = "No results found.",
+  emptyDescription = "Try a different search.",
+  errorTitle = "Search failed.",
   open: controlledOpen,
   onOpenChange,
+  onQueryChange,
+  filterItems = true,
+  status,
 }: CommandPaletteProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const controlled = controlledOpen !== undefined
@@ -198,16 +320,15 @@ export function CommandPalette({
   }, [open])
 
   const filtered = useMemo(() => {
-    if (!query) return items
+    if (!filterItems || !query) return items
     return items.filter((it) => {
       const haystacks = [it.label, it.group ?? "", ...(it.keywords ?? [])]
       return haystacks.some((h) => fuzzyMatch(query, h))
     })
-  }, [items, query])
+  }, [filterItems, items, query])
 
-  // Reserve the icon column only when at least one item brings an icon, so
-  // icon-less lists don't render a dead gap before every label.
   const hasIcons = useMemo(() => items.some((it) => it.icon), [items])
+  const hasImages = useMemo(() => items.some((it) => it.image), [items])
 
   const grouped = useMemo(() => {
     const map = new Map<string, CommandItem[]>()
@@ -228,8 +349,6 @@ export function CommandPalette({
 
   const { activeIndex: active, moveTo, moveActive } = useRowCursor(rows, query)
 
-  // Clearing the query would drop the cursor on its own, but only if it had
-  // changed; `moveTo(null)` covers reopening on an already-empty query.
   useOnOpen(open, () => {
     setQuery("")
     moveTo(null)
@@ -329,36 +448,38 @@ export function CommandPalette({
                   transition={reduce ? { duration: 0.1 } : PANEL_SPRING}
                   {...gate}
                   onKeyDown={onKeyDown}
-                  className="pointer-events-auto w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+                  className="pointer-events-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
                 >
                   <div className="flex items-center gap-3 border-b border-border px-4">
-                    <Search className="h-4 w-4 text-muted-foreground" />
+                    {status === "loading" ? (
+                      <Spinner className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                    )}
                     <input
                       ref={inputRef}
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setQuery(next)
+                        onQueryChange?.(next)
+                      }}
                       placeholder={placeholder}
                       role="combobox"
-                      // The field only exists while the palette is open.
                       aria-expanded="true"
+                      aria-busy={status === "loading"}
                       aria-controls={`${uid}-list`}
                       aria-activedescendant={
-                        rows.length > 0 ? `${uid}-opt-${active}` : undefined
+                        !status && rows.length > 0
+                          ? `${uid}-opt-${active}`
+                          : undefined
                       }
                       aria-autocomplete="list"
                       className={cn(
                         "h-12 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground",
-                        // The palette focuses this field the moment it opens, and iOS
-                        // zooms the page in on a focused field under 16px: the fixed
-                        // overlay is magnified off-center — clipped leading edge, half
-                        // an icon column — and the zoom outlives the palette. 16px on
-                        // touch keeps the page at scale 1; pointer devices keep 14px.
                         canTouch && "text-base"
                       )}
                     />
-                    <kbd className="hidden rounded border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground sm:inline-block">
-                      ESC
-                    </kbd>
                   </div>
                   <div
                     ref={listRef}
@@ -367,7 +488,18 @@ export function CommandPalette({
                     aria-label="Commands"
                     className="max-h-[60vh] [scrollbar-width:none] overflow-y-auto overscroll-contain p-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                   >
-                    {rows.length === 0 ? (
+                    {status ? (
+                      <PaletteStatusPanel
+                        status={status}
+                        emptyMessage={emptyMessage}
+                        errorMessage={errorMessage}
+                        promptTitle={promptTitle}
+                        promptDescription={promptDescription}
+                        emptyTitle={emptyTitle}
+                        emptyDescription={emptyDescription}
+                        errorTitle={errorTitle}
+                      />
+                    ) : rows.length === 0 ? (
                       <div className="p-8 text-center text-sm text-muted-foreground">
                         {emptyMessage}
                       </div>
@@ -376,12 +508,11 @@ export function CommandPalette({
                         <div key={group} className="mb-1 last:mb-0">
                           <div
                             aria-hidden
-                            className="px-2 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+                            className="px-2 py-1.5 text-sm font-semibold tracking-wider text-muted-foreground uppercase"
                           >
                             {group}
                           </div>
                           {list.map((it) => {
-                            // `rows` holds these very objects, in render order.
                             const idx = rows.indexOf(it)
                             const isActive = idx === active
                             return (
@@ -391,6 +522,7 @@ export function CommandPalette({
                                 index={idx}
                                 isActive={isActive}
                                 hasIcons={hasIcons}
+                                hasImages={hasImages}
                                 uid={uid}
                                 reduce={Boolean(reduce)}
                                 onHover={moveTo}
@@ -404,6 +536,46 @@ export function CommandPalette({
                         </div>
                       ))
                     )}
+                  </div>
+                  <div className="hidden items-center justify-between border-t p-4 lg:flex">
+                    <KbdGroup className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <Kbd>
+                          <MaterialIcon name="arrow_upward" size={16} />
+                        </Kbd>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Subir
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Kbd>
+                          <MaterialIcon name="arrow_downward" size={16} />
+                        </Kbd>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Bajar
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Kbd>
+                          <MaterialIcon name="space_bar" size={16} />
+                        </Kbd>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Seleccionar
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Kbd>ESC</Kbd>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          Cancelar
+                        </span>
+                      </div>
+                    </KbdGroup>
+                    <KbdGroup className="flex items-center gap-1.5">
+                      <Kbd>Ctrl + K</Kbd>
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        Abrir buscador
+                      </span>
+                    </KbdGroup>
                   </div>
                 </m.div>
               </div>

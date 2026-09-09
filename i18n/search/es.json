@@ -2,6 +2,17 @@
   "search": {
     "unknown_error": "Error al realizar la búsqueda",
     "no_results": "No se encontraron resultados",
-    "no_query": "No se ha proporcionado una consulta"
+    "no_query": "No se ha proporcionado una consulta",
+    "error_search": "Error al realizar la búsqueda",
+    "search_placeholder": "Buscar productos, servicios y más…",
+    "minimal_placeholder": {
+      "1": "Buscar...",
+      "2": "Escribe algo...",
+      "3": "¿Qué estás buscando?"
+    },
+    "loading": "Buscando…",
+    "search_results": "Resultados de búsqueda",
+    "search_catalog": "Busca en nuestro catálogo",
+    "search_catalog_description": "Encuentra productos, servicios, publicaciones y más"
   }
 }

@@ -26,8 +26,8 @@ export default async function MaintenancePage() {
   return (
     <Suspense fallback={<MaintenanceViewSkeleton />}>
       <MaintenanceView
-        title={siteSettings.maintenance_title || t("title")}
-        message={siteSettings.maintenance_message || t("message")}
+        title={siteSettings?.maintenance_title || t("title")}
+        message={siteSettings?.maintenance_message || t("message")}
         statusLabel={t("statusLabel")}
         helperText={t("helperText")}
       />

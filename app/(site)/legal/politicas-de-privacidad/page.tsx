@@ -6,12 +6,15 @@ import { Fragment } from "react/jsx-runtime"
 import Link from "next/link"
 import { splitEmail } from "@/lib/formatting/split-email"
 
+const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
+
 export const metadata = createMetadata({
-  title: "Política de Privacidad",
-  description: "Política de Privacidad de BGL Básculas Industriales.",
+  title: "Políticas de Privacidad",
+  description: "Políticas de Privacidad de BGL Básculas Industriales.",
+  canonical: `${BASE_URL}/legal/politicas-de-privacidad`,
   openGraph: {
-    title: "Política de Privacidad",
-    description: "Política de Privacidad de BGL Básculas Industriales.",
+    title: "Políticas de Privacidad",
+    description: "Políticas de Privacidad de BGL Básculas Industriales.",
     type: "website",
   },
 })
@@ -32,10 +35,10 @@ export default function Page() {
             <StaticLogo className="aspect-auto h-32 w-auto" />
           </div>
           <h1 className="text-center text-3xl font-semibold md:text-6xl">
-            Política de Privacidad
+            Políticas de Privacidad
           </h1>
           <p className="text-center text-muted-foreground">
-            Última actualización: Junio 2026
+            Última actualización: Septiembre 2026
           </p>
         </div>
         <div className="typeset typeset-docs">

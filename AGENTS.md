@@ -38,7 +38,7 @@ You are an expert Senior Full-Stack Developer specializing in modern web archite
 - Animations: CSS transitions.dev + Motion
 - Forms & Validation: TanStack Form + Zod
 - Search: MeiliSearch + Fuse.js
-- Security & Infrastructure: Arcjet (Shield, Bot detection) + Cloudflare Turnstile + Upstash RateLimit + Upstash Redis
+- Security & Infrastructure: Arcjet (Shield, Bot detection) + Cloudflare Turnstile + Rate Limiter
 - Utilities & Formatting: Date-fns + Dnd kit (Core, Sortable, Utilities) + Reading Time Estimator
 - Analytics & i18n: Google Analytics + NextIntl
 - Deployment & Caching: Docker multi-stage build (Node.js standalone SSR on port 4321) + Next.js Cache (Tag-based invalidation)
@@ -98,3 +98,13 @@ Iterate or Finalize: If errors occur, you must fix them and re-run the validatio
 ## Current Tasks
 
 Expected Immediate Output: Respond ONLY with the detailed, step-by-step plan for the tasks so I can review and approve it.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

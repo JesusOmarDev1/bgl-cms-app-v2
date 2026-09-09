@@ -12,6 +12,8 @@
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s)
     infinite;
+  --animate-placeholder-slide-up: placeholder-slide-up 0.3s ease-in-out forwards;
+  --animate-placeholder-slide-in: placeholder-slide-in 0.3s ease-in-out forwards;
 }
 
 @keyframes shine {
@@ -109,6 +111,28 @@
   }
   50% {
     transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@keyframes placeholder-slide-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+}
+
+@keyframes placeholder-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -626,5 +650,10 @@
   .group .animate-marquee,
   .group .animate-marquee-vertical {
     animation-play-state: paused !important;
+  }
+
+  .animate-placeholder-slide-up,
+  .animate-placeholder-slide-in {
+    animation: none !important;
   }
 }

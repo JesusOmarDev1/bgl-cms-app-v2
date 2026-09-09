@@ -20,13 +20,12 @@ export async function getSiteSettingsQuery() {
       } satisfies Query<Schema, SiteSettingsType>)
     )
   } catch (error) {
-    const message = t("failed_to_fetch")
-    logDirectusQueryError(error, message, {
+    logDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getSiteSettingsQuery",
       collection: "site_settings",
     })
-    throw error instanceof Error ? error : new Error(message)
+    return null
   }
 }
 

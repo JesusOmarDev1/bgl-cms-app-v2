@@ -1,12 +1,13 @@
-import { Ratelimit } from "@upstash/ratelimit"
-import { Redis } from "@upstash/redis"
+import {
+  RateLimiterMemory,
+  type IRateLimiterOptions,
+} from "rate-limiter-flexible"
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, "10 s"),
-  analytics: false,
-  timeout: 30000,
-  prefix: "@bglbasculas/ratelimit",
-})
+const opts: IRateLimiterOptions = {
+  keyPrefix: "@bg-rate-limiter",
+  points: 6,
+  duration: 1,
+  blockDuration: 60,
+}
 
-export default ratelimit
+export const rateLimiter = new RateLimiterMemory(opts)

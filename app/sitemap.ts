@@ -1,23 +1,37 @@
 import type { MetadataRoute } from "next"
 
+const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://acme.com",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 1,
-    },
-    {
-      url: "https://acme.com/about",
+      url: `${BASE_URL}/`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 0.8,
+      priority: 0.9,
     },
     {
-      url: "https://acme.com/blog",
+      url: `${BASE_URL}/legal/terminos-de-uso-y-datos`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/legal/politicas-de-privacidad`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/legal/politicas-de-seguridad`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/legal/politicas-de-cookies`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
       priority: 0.5,
     },
   ]
