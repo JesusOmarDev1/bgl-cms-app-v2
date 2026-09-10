@@ -1,5 +1,7 @@
 # AGENTS.md
 
+<!-- BEGIN:nextjs-agent-rules -->
+
 ## Setup Commands
 
 _Agent Directive: Use these commands autonomously when appropriate during the workflow._
@@ -86,11 +88,7 @@ Execute: Write the code following all constraints.
 Validate: Once the code is written, you MUST autonomously run the following commands in the terminal:
 
 ```bash
-pnpm lint
-
-pnpm typecheck
-
-pnpm build
+pnpm pre-deploy
 ```
 
 Iterate or Finalize: If errors occur, you must fix them and re-run the validations. If everything passes successfully, document the successful completion of the plan in Engram.
@@ -98,8 +96,6 @@ Iterate or Finalize: If errors occur, you must fix them and re-run the validatio
 ## Current Tasks
 
 Expected Immediate Output: Respond ONLY with the detailed, step-by-step plan for the tasks so I can review and approve it.
-
-<!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
 

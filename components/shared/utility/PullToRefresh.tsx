@@ -2,13 +2,15 @@
 
 import {
   AnimatePresence,
+  LazyMotion,
   animate,
+  domAnimation,
   type MotionValue,
-  motion,
   useMotionValue,
   useReducedMotion,
   useTransform,
 } from "motion/react"
+import * as m from "motion/react-m"
 import {
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
@@ -131,7 +133,7 @@ function RefreshBuddyFace({
 }) {
   return (
     <>
-      <motion.g
+      <m.g
         style={{ transformOrigin: "18px 18px" }}
         animate={refreshBuddyArrowMotion(refreshing, reduce, ready)}
         transition={
@@ -151,7 +153,7 @@ function RefreshBuddyFace({
           className="text-muted-foreground"
         />
         <circle cx="31.3" cy="10.2" r="2.2" className="fill-foreground" />
-      </motion.g>
+      </m.g>
 
       <rect
         x="7"
@@ -162,14 +164,14 @@ function RefreshBuddyFace({
         className="fill-foreground"
       />
 
-      <motion.g
+      <m.g
         style={{ opacity: 1, transformOrigin: "18px 16px" }}
         animate={refreshBuddyEyesMotion(refreshing, reduce, ready)}
         transition={refreshing && !reduce ? CHARACTER_LOOP : SPRING_SWAP}
       >
         <circle cx="14.2" cy="16" r="1.45" className="fill-background" />
         <circle cx="21.8" cy="16" r="1.45" className="fill-background" />
-      </motion.g>
+      </m.g>
 
       <path
         d="M14.5 21h7"
@@ -222,11 +224,11 @@ function RefreshBuddy({
   const refreshing = status === "refreshing"
 
   return (
-    <motion.span
+    <m.span
       style={reduce ? undefined : { y: lift, rotate: tilt, scaleY: stretch }}
       className="block h-9 w-9 origin-bottom"
     >
-      <motion.svg
+      <m.svg
         aria-hidden="true"
         viewBox="0 0 36 36"
         style={{ opacity: 1 }}
@@ -241,8 +243,8 @@ function RefreshBuddy({
           refreshing={refreshing}
           reduce={reduce}
         />
-      </motion.svg>
-    </motion.span>
+      </m.svg>
+    </m.span>
   )
 }
 
@@ -266,7 +268,7 @@ function PullIndicator({
   indicatorClassName,
 }: PullIndicatorProps) {
   return (
-    <motion.div
+    <m.div
       aria-live="polite"
       aria-atomic="true"
       style={
@@ -286,7 +288,7 @@ function PullIndicator({
       />
       <span className="relative h-4 min-w-24 text-center">
         <AnimatePresence initial={false} mode="wait">
-          <motion.span
+          <m.span
             key={displayStatus}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 3 }}
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
@@ -295,10 +297,10 @@ function PullIndicator({
             className="absolute inset-x-0 whitespace-nowrap"
           >
             {label}
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -542,56 +544,58 @@ export function PullToRefresh({
         : pullingLabel
 
   return (
-    <section
-      ref={rootRef}
-      aria-label={ariaLabel}
-      aria-busy={isRefreshing}
-      data-state={displayStatus}
-      data-disabled={disabled || undefined}
-      onPointerDown={startPointerPull}
-      onPointerMove={movePointerPull}
-      onPointerUp={(event) => {
-        if (gestureRef.current.pointerId === event.pointerId) finishPull()
-      }}
-      onPointerCancel={(event) => {
-        if (gestureRef.current.pointerId === event.pointerId) finishPull()
-      }}
-      className={cn(
-        "relative w-full overflow-y-auto overscroll-contain bg-background",
-        // No `touch-none` here — this element is the scroller, and the pull
-        // only takes over once the content is already at the top. The callout
-        // has to be off from the first frame though: iOS decides on it while
-        // the finger is still resting, long before the pull is recognised.
-        // Whatever the consumer renders inside stays selectable with a mouse;
-        // only the pull itself suppresses selection, and only while it runs,
-        // so dragging the page down cannot highlight it on the way.
-        TOUCH_GESTURE_CONTENT_CLASS,
-        displayStatus === "pulling" || displayStatus === "ready"
-          ? "cursor-grabbing select-none"
-          : "cursor-grab",
-        (disabled || isRefreshing) && "cursor-default",
-        className
-      )}
-    >
-      <PullIndicator
-        displayStatus={displayStatus}
-        label={label}
-        reduce={Boolean(reduce)}
-        progress={progress}
-        indicatorOpacity={indicatorOpacity}
-        indicatorScale={indicatorScale}
-        indicatorClassName={indicatorClassName}
-      />
-
-      <motion.div
-        style={reduce ? undefined : { y }}
+    <LazyMotion features={domAnimation}>
+      <section
+        ref={rootRef}
+        aria-label={ariaLabel}
+        aria-busy={isRefreshing}
+        data-state={displayStatus}
+        data-disabled={disabled || undefined}
+        onPointerDown={startPointerPull}
+        onPointerMove={movePointerPull}
+        onPointerUp={(event) => {
+          if (gestureRef.current.pointerId === event.pointerId) finishPull()
+        }}
+        onPointerCancel={(event) => {
+          if (gestureRef.current.pointerId === event.pointerId) finishPull()
+        }}
         className={cn(
-          "relative z-10 min-h-full bg-inherit will-change-transform",
-          contentClassName
+          "relative w-full overflow-y-auto overscroll-contain bg-background",
+          // No `touch-none` here — this element is the scroller, and the pull
+          // only takes over once the content is already at the top. The callout
+          // has to be off from the first frame though: iOS decides on it while
+          // the finger is still resting, long before the pull is recognised.
+          // Whatever the consumer renders inside stays selectable with a mouse;
+          // only the pull itself suppresses selection, and only while it runs,
+          // so dragging the page down cannot highlight it on the way.
+          TOUCH_GESTURE_CONTENT_CLASS,
+          displayStatus === "pulling" || displayStatus === "ready"
+            ? "cursor-grabbing select-none"
+            : "cursor-grab",
+          (disabled || isRefreshing) && "cursor-default",
+          className
         )}
       >
-        {children}
-      </motion.div>
-    </section>
+        <PullIndicator
+          displayStatus={displayStatus}
+          label={label}
+          reduce={Boolean(reduce)}
+          progress={progress}
+          indicatorOpacity={indicatorOpacity}
+          indicatorScale={indicatorScale}
+          indicatorClassName={indicatorClassName}
+        />
+
+        <m.div
+          style={reduce ? undefined : { y }}
+          className={cn(
+            "relative z-10 min-h-full bg-inherit will-change-transform",
+            contentClassName
+          )}
+        >
+          {children}
+        </m.div>
+      </section>
+    </LazyMotion>
   )
 }

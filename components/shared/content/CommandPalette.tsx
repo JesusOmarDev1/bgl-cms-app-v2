@@ -10,6 +10,7 @@ import {
 import { Search, type LucideIcon } from "lucide-react"
 import {
   type ReactNode,
+  type RefObject,
   useCallback,
   useEffect,
   useEffectEvent,
@@ -168,6 +169,44 @@ function PaletteStatusPanel({
   )
 }
 
+function CommandPaletteItemMedia({
+  item,
+  hasIcons,
+  hasImages,
+}: {
+  item: CommandItem
+  hasIcons: boolean
+  hasImages: boolean
+}) {
+  const Icon = item.icon
+  if (item.image) {
+    return (
+      <DirectusImage
+        src={item.image}
+        alt={item.label}
+        variant="thumbnail"
+        sizing="contained"
+        width={80}
+        height={80}
+        quality={75}
+        className="relative z-10 size-20 shrink-0 rounded-md bg-muted"
+      />
+    )
+  }
+  if (hasImages) {
+    return (
+      <span className="relative z-10 size-20 shrink-0 rounded-md bg-muted" />
+    )
+  }
+  if (Icon) {
+    return <Icon className="relative z-10 h-4 w-4" />
+  }
+  if (hasIcons) {
+    return <span className="relative z-10 h-4 w-4" />
+  }
+  return null
+}
+
 function CommandPaletteItem({
   item,
   index,
@@ -179,7 +218,6 @@ function CommandPaletteItem({
   onHover,
   onPick,
 }: CommandPaletteItemProps) {
-  const Icon = item.icon
   return (
     <button
       type="button"
@@ -209,24 +247,11 @@ function CommandPaletteItem({
           }
         />
       ) : null}
-      {item.image ? (
-        <DirectusImage
-          src={item.image}
-          alt={item.label}
-          variant="thumbnail"
-          sizing="contained"
-          width={80}
-          height={80}
-          quality={75}
-          className="relative z-10 size-20 shrink-0 rounded-md bg-muted"
-        />
-      ) : hasImages ? (
-        <span className="relative z-10 size-20 shrink-0 rounded-md bg-muted" />
-      ) : Icon ? (
-        <Icon className="relative z-10 h-4 w-4" />
-      ) : hasIcons ? (
-        <span className="relative z-10 h-4 w-4" />
-      ) : null}
+      <CommandPaletteItemMedia
+        item={item}
+        hasIcons={hasIcons}
+        hasImages={hasImages}
+      />
       <span className="relative z-10 flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="line-clamp-2 font-medium">{item.label}</span>
         {item.description ? (
@@ -247,6 +272,210 @@ function CommandPaletteItem({
         </kbd>
       ) : null}
     </button>
+  )
+}
+
+function CommandPaletteSearchField({
+  status,
+  inputRef,
+  query,
+  setQuery,
+  onQueryChange,
+  placeholder,
+  uid,
+  active,
+  rowCount,
+  canTouch,
+}: {
+  status: CommandPaletteStatus | undefined
+  inputRef: RefObject<HTMLInputElement | null>
+  query: string
+  setQuery: (query: string) => void
+  onQueryChange: ((query: string) => void) | undefined
+  placeholder: string
+  uid: string
+  active: number
+  rowCount: number
+  canTouch: boolean
+}) {
+  return (
+    <div className="flex items-center gap-3 border-b border-border px-4">
+      {status === "loading" ? (
+        <Spinner className="h-4 w-4 text-muted-foreground" />
+      ) : (
+        <Search className="h-4 w-4 text-muted-foreground" />
+      )}
+      <input
+        ref={inputRef}
+        value={query}
+        onChange={(e) => {
+          const next = e.target.value
+          setQuery(next)
+          onQueryChange?.(next)
+        }}
+        placeholder={placeholder}
+        role="combobox"
+        aria-expanded="true"
+        aria-busy={status === "loading"}
+        aria-controls={`${uid}-list`}
+        aria-activedescendant={
+          !status && rowCount > 0 ? `${uid}-opt-${active}` : undefined
+        }
+        aria-autocomplete="list"
+        className={cn(
+          "h-12 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground",
+          canTouch && "text-base"
+        )}
+      />
+    </div>
+  )
+}
+
+function CommandPaletteResults({
+  listRef,
+  uid,
+  status,
+  emptyMessage,
+  errorMessage,
+  promptTitle,
+  promptDescription,
+  emptyTitle,
+  emptyDescription,
+  errorTitle,
+  rows,
+  grouped,
+  active,
+  hasIcons,
+  hasImages,
+  reduce,
+  onHover,
+  onPick,
+}: {
+  listRef: RefObject<HTMLDivElement | null>
+  uid: string
+  status: CommandPaletteStatus | undefined
+  emptyMessage: string
+  errorMessage: string | undefined
+  promptTitle: string
+  promptDescription: string
+  emptyTitle: string
+  emptyDescription: string
+  errorTitle: string
+  rows: CommandItem[]
+  grouped: [string, CommandItem[]][]
+  active: number
+  hasIcons: boolean
+  hasImages: boolean
+  reduce: boolean
+  onHover: (id: string | null) => void
+  onPick: (item: CommandItem) => void
+}) {
+  let content: ReactNode
+  if (status) {
+    content = (
+      <PaletteStatusPanel
+        status={status}
+        emptyMessage={emptyMessage}
+        errorMessage={errorMessage}
+        promptTitle={promptTitle}
+        promptDescription={promptDescription}
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        errorTitle={errorTitle}
+      />
+    )
+  } else if (rows.length === 0) {
+    content = (
+      <div className="p-8 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </div>
+    )
+  } else {
+    content = grouped.map(([group, list]) => (
+      <div key={group} className="mb-1 last:mb-0">
+        <div
+          aria-hidden
+          className="px-2 py-1.5 text-sm font-semibold tracking-wider text-muted-foreground uppercase"
+        >
+          {group}
+        </div>
+        {list.map((it) => {
+          const idx = rows.indexOf(it)
+          const isActive = idx === active
+          return (
+            <CommandPaletteItem
+              key={it.id}
+              item={it}
+              index={idx}
+              isActive={isActive}
+              hasIcons={hasIcons}
+              hasImages={hasImages}
+              uid={uid}
+              reduce={reduce}
+              onHover={onHover}
+              onPick={onPick}
+            />
+          )
+        })}
+      </div>
+    ))
+  }
+
+  return (
+    <div
+      ref={listRef}
+      id={`${uid}-list`}
+      role="listbox"
+      aria-label="Commands"
+      className="max-h-[60vh] [scrollbar-width:none] overflow-y-auto overscroll-contain p-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {content}
+    </div>
+  )
+}
+
+function CommandPaletteHotkeys() {
+  return (
+    <div className="hidden items-center justify-between border-t p-4 lg:flex">
+      <KbdGroup className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5">
+          <Kbd>
+            <MaterialIcon name="arrow_upward" size={16} />
+          </Kbd>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Subir
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Kbd>
+            <MaterialIcon name="arrow_downward" size={16} />
+          </Kbd>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Bajar
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Kbd>
+            <MaterialIcon name="space_bar" size={16} />
+          </Kbd>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Seleccionar
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Kbd>ESC</Kbd>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Cancelar
+          </span>
+        </div>
+      </KbdGroup>
+      <KbdGroup className="flex items-center gap-1.5">
+        <Kbd>Ctrl + K</Kbd>
+        <span className="text-xs font-semibold text-muted-foreground">
+          Abrir buscador
+        </span>
+      </KbdGroup>
+    </div>
   )
 }
 
@@ -450,133 +679,42 @@ export function CommandPalette({
                   onKeyDown={onKeyDown}
                   className="pointer-events-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
                 >
-                  <div className="flex items-center gap-3 border-b border-border px-4">
-                    {status === "loading" ? (
-                      <Spinner className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Search className="h-4 w-4 text-muted-foreground" />
-                    )}
-                    <input
-                      ref={inputRef}
-                      value={query}
-                      onChange={(e) => {
-                        const next = e.target.value
-                        setQuery(next)
-                        onQueryChange?.(next)
-                      }}
-                      placeholder={placeholder}
-                      role="combobox"
-                      aria-expanded="true"
-                      aria-busy={status === "loading"}
-                      aria-controls={`${uid}-list`}
-                      aria-activedescendant={
-                        !status && rows.length > 0
-                          ? `${uid}-opt-${active}`
-                          : undefined
-                      }
-                      aria-autocomplete="list"
-                      className={cn(
-                        "h-12 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground",
-                        canTouch && "text-base"
-                      )}
-                    />
-                  </div>
-                  <div
-                    ref={listRef}
-                    id={`${uid}-list`}
-                    role="listbox"
-                    aria-label="Commands"
-                    className="max-h-[60vh] [scrollbar-width:none] overflow-y-auto overscroll-contain p-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                  >
-                    {status ? (
-                      <PaletteStatusPanel
-                        status={status}
-                        emptyMessage={emptyMessage}
-                        errorMessage={errorMessage}
-                        promptTitle={promptTitle}
-                        promptDescription={promptDescription}
-                        emptyTitle={emptyTitle}
-                        emptyDescription={emptyDescription}
-                        errorTitle={errorTitle}
-                      />
-                    ) : rows.length === 0 ? (
-                      <div className="p-8 text-center text-sm text-muted-foreground">
-                        {emptyMessage}
-                      </div>
-                    ) : (
-                      grouped.map(([group, list]) => (
-                        <div key={group} className="mb-1 last:mb-0">
-                          <div
-                            aria-hidden
-                            className="px-2 py-1.5 text-sm font-semibold tracking-wider text-muted-foreground uppercase"
-                          >
-                            {group}
-                          </div>
-                          {list.map((it) => {
-                            const idx = rows.indexOf(it)
-                            const isActive = idx === active
-                            return (
-                              <CommandPaletteItem
-                                key={it.id}
-                                item={it}
-                                index={idx}
-                                isActive={isActive}
-                                hasIcons={hasIcons}
-                                hasImages={hasImages}
-                                uid={uid}
-                                reduce={Boolean(reduce)}
-                                onHover={moveTo}
-                                onPick={(picked) => {
-                                  picked.onSelect()
-                                  setOpen(false)
-                                }}
-                              />
-                            )
-                          })}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className="hidden items-center justify-between border-t p-4 lg:flex">
-                    <KbdGroup className="flex items-center gap-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <Kbd>
-                          <MaterialIcon name="arrow_upward" size={16} />
-                        </Kbd>
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          Subir
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Kbd>
-                          <MaterialIcon name="arrow_downward" size={16} />
-                        </Kbd>
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          Bajar
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Kbd>
-                          <MaterialIcon name="space_bar" size={16} />
-                        </Kbd>
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          Seleccionar
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Kbd>ESC</Kbd>
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          Cancelar
-                        </span>
-                      </div>
-                    </KbdGroup>
-                    <KbdGroup className="flex items-center gap-1.5">
-                      <Kbd>Ctrl + K</Kbd>
-                      <span className="text-xs font-semibold text-muted-foreground">
-                        Abrir buscador
-                      </span>
-                    </KbdGroup>
-                  </div>
+                  <CommandPaletteSearchField
+                    status={status}
+                    inputRef={inputRef}
+                    query={query}
+                    setQuery={setQuery}
+                    onQueryChange={onQueryChange}
+                    placeholder={placeholder}
+                    uid={uid}
+                    active={active}
+                    rowCount={rows.length}
+                    canTouch={canTouch}
+                  />
+                  <CommandPaletteResults
+                    listRef={listRef}
+                    uid={uid}
+                    status={status}
+                    emptyMessage={emptyMessage}
+                    errorMessage={errorMessage}
+                    promptTitle={promptTitle}
+                    promptDescription={promptDescription}
+                    emptyTitle={emptyTitle}
+                    emptyDescription={emptyDescription}
+                    errorTitle={errorTitle}
+                    rows={rows}
+                    grouped={grouped}
+                    active={active}
+                    hasIcons={hasIcons}
+                    hasImages={hasImages}
+                    reduce={Boolean(reduce)}
+                    onHover={moveTo}
+                    onPick={(picked) => {
+                      picked.onSelect()
+                      setOpen(false)
+                    }}
+                  />
+                  <CommandPaletteHotkeys />
                 </m.div>
               </div>
             )}

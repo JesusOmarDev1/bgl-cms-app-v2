@@ -1,6 +1,12 @@
 "use client"
 
-import { motion, useReducedMotion, type Transition } from "motion/react"
+import {
+  LazyMotion,
+  domMax,
+  useReducedMotion,
+  type Transition,
+} from "motion/react"
+import * as m from "motion/react-m"
 import { ChevronDown } from "lucide-react"
 import {
   useCallback,
@@ -124,7 +130,7 @@ function BouncyAccordionContent({
   descriptionClassName?: string
 }) {
   return (
-    <motion.div
+    <m.div
       layout="size"
       id={contentId}
       role="region"
@@ -142,7 +148,7 @@ function BouncyAccordionContent({
       }
       className={cn("overflow-hidden", contentClassName)}
     >
-      <motion.div
+      <m.div
         ref={contentRef}
         animate={{
           opacity: open ? 1 : 0,
@@ -158,8 +164,8 @@ function BouncyAccordionContent({
         >
           {description}
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   )
 }
 
@@ -208,13 +214,13 @@ function BouncyAccordionRow({
   }, [])
 
   return (
-    <motion.div
+    <m.div
       layout="position"
       initial={false}
       style={{ marginTop: separatedFromPrevious ? 12 : 0 }}
       transition={reduce ? { duration: 0 } : ROW_TRANSITION}
     >
-      <motion.div
+      <m.div
         data-state={open ? "open" : "closed"}
         initial={false}
         animate={{
@@ -262,7 +268,7 @@ function BouncyAccordionRow({
           >
             {item.title}
           </span>
-          <motion.span
+          <m.span
             aria-hidden
             animate={{ rotate: open ? 180 : 0 }}
             transition={reduce ? { duration: 0 } : CHEVRON_TRANSITION}
@@ -272,7 +278,7 @@ function BouncyAccordionRow({
             )}
           >
             <ChevronDown className="h-4 w-4" />
-          </motion.span>
+          </m.span>
         </button>
 
         <BouncyAccordionContent
@@ -286,8 +292,8 @@ function BouncyAccordionRow({
           contentClassName={classNames?.content}
           descriptionClassName={classNames?.description}
         />
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   )
 }
 
@@ -324,33 +330,35 @@ export function BouncyAccordion({
   )
 
   return (
-    <div className={cn("w-full", className, classNames?.root)}>
-      {items.map((item, index) => {
-        const open = activeValue === item.id
-        const previousIsOpen = activeIndex === index - 1
-        const nextIsOpen = activeIndex === index + 1
-        const startsGroup = open || index === 0 || previousIsOpen
-        const endsGroup = open || index === items.length - 1 || nextIsOpen
-        const separatedFromPrevious = index > 0 && (open || previousIsOpen)
-        const contentId = `${baseId}-${item.id}-content`
-        const triggerId = `${baseId}-${item.id}-trigger`
+    <LazyMotion features={domMax}>
+      <div className={cn("w-full", className, classNames?.root)}>
+        {items.map((item, index) => {
+          const open = activeValue === item.id
+          const previousIsOpen = activeIndex === index - 1
+          const nextIsOpen = activeIndex === index + 1
+          const startsGroup = open || index === 0 || previousIsOpen
+          const endsGroup = open || index === items.length - 1 || nextIsOpen
+          const separatedFromPrevious = index > 0 && (open || previousIsOpen)
+          const contentId = `${baseId}-${item.id}-content`
+          const triggerId = `${baseId}-${item.id}-trigger`
 
-        return (
-          <BouncyAccordionRow
-            key={item.id}
-            item={item}
-            open={open}
-            startsGroup={startsGroup}
-            endsGroup={endsGroup}
-            separatedFromPrevious={separatedFromPrevious}
-            contentId={contentId}
-            triggerId={triggerId}
-            reduce={reduce}
-            classNames={classNames}
-            onToggle={() => toggleItem(item.id)}
-          />
-        )
-      })}
-    </div>
+          return (
+            <BouncyAccordionRow
+              key={item.id}
+              item={item}
+              open={open}
+              startsGroup={startsGroup}
+              endsGroup={endsGroup}
+              separatedFromPrevious={separatedFromPrevious}
+              contentId={contentId}
+              triggerId={triggerId}
+              reduce={reduce}
+              classNames={classNames}
+              onToggle={() => toggleItem(item.id)}
+            />
+          )
+        })}
+      </div>
+    </LazyMotion>
   )
 }

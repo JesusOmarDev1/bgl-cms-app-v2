@@ -1,0 +1,20 @@
+name: shadscan
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write # only needed with create-issue
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: TheOrcDev/shadscan@main
+        with:
+          path: .
+          version: 0.17.1 # pin an exact CLI version
+          fail-under: "80"
+          create-issue: "true"

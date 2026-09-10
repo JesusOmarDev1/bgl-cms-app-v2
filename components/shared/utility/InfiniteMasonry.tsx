@@ -2,7 +2,8 @@
 
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { AlertCircle, Inbox } from "lucide-react"
-import { motion, useReducedMotion } from "motion/react"
+import { LazyMotion, domAnimation, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import {
   useEffect,
   useRef,
@@ -141,7 +142,7 @@ function MasonryItemReveal({
   const delay = Math.min(lane, 3) * 0.04
 
   return (
-    <motion.div
+    <m.div
       initial={shouldReveal ? { opacity: 0, y: 12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{
@@ -150,7 +151,7 @@ function MasonryItemReveal({
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -274,91 +275,93 @@ function MasonryVirtualizerBoundary<T>({
     columns > 0 ? Math.max(0, (width - gap * (columns - 1)) / columns) : 0
 
   return (
-    <section
-      ref={scrollRef}
-      aria-label={ariaLabel}
-      aria-busy={loading}
-      className={cn(
-        "w-full [scrollbar-gutter:stable] overflow-y-auto overscroll-none rounded-3xl border border-border bg-background p-3 contain-[layout_paint] [overflow-anchor:none]",
-        className
-      )}
-    >
-      <div
-        ref={contentRef}
-        className={cn("relative w-full", contentClassName)}
-        style={{ height: virtualizer.getTotalSize() }}
+    <LazyMotion features={domAnimation}>
+      <section
+        ref={scrollRef}
+        aria-label={ariaLabel}
+        aria-busy={loading}
+        className={cn(
+          "w-full [scrollbar-gutter:stable] overflow-y-auto overscroll-none rounded-3xl border border-border bg-background p-3 contain-[layout_paint] [overflow-anchor:none]",
+          className
+        )}
       >
-        {virtualItems.map((virtualItem) => {
-          const isTail = virtualItem.index >= items.length
-          const tailIndex = virtualItem.index - items.length
+        <div
+          ref={contentRef}
+          className={cn("relative w-full", contentClassName)}
+          style={{ height: virtualizer.getTotalSize() }}
+        >
+          {virtualItems.map((virtualItem) => {
+            const isTail = virtualItem.index >= items.length
+            const tailIndex = virtualItem.index - items.length
 
-          return (
-            <div
-              key={virtualItem.key}
-              ref={virtualizer.measureElement}
-              data-index={virtualItem.index}
-              className={cn(
-                "absolute start-0 top-0 will-change-transform",
-                !isTail && itemClassName
-              )}
-              style={{
-                width: columnWidth,
-                transform: `translate3d(${virtualItem.lane * (columnWidth + gap)}px, ${virtualItem.start}px, 0)`,
-              }}
-            >
-              {isTail ? (
-                hasError ? (
-                  <div className="flex min-h-36 flex-col items-start justify-center rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
-                    <div className="flex items-center gap-2 text-destructive">
-                      <AlertCircle className="size-4" aria-hidden="true" />
-                      <p className="text-sm font-medium">
-                        Couldn&apos;t load more
-                      </p>
+            return (
+              <div
+                key={virtualItem.key}
+                ref={virtualizer.measureElement}
+                data-index={virtualItem.index}
+                className={cn(
+                  "absolute start-0 top-0 will-change-transform",
+                  !isTail && itemClassName
+                )}
+                style={{
+                  width: columnWidth,
+                  transform: `translate3d(${virtualItem.lane * (columnWidth + gap)}px, ${virtualItem.start}px, 0)`,
+                }}
+              >
+                {isTail ? (
+                  hasError ? (
+                    <div className="flex min-h-36 flex-col items-start justify-center rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
+                      <div className="flex items-center gap-2 text-destructive">
+                        <AlertCircle className="size-4" aria-hidden="true" />
+                        <p className="text-sm font-medium">
+                          Couldn&apos;t load more
+                        </p>
+                      </div>
+                      <div className="mt-2 text-xs leading-5 text-muted-foreground">
+                        {error}
+                      </div>
+                      {onRetry ? (
+                        <button
+                          type="button"
+                          onClick={onRetry}
+                          className="mt-3 min-h-10 rounded-full border border-border bg-background px-4 text-xs font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                          Try again
+                        </button>
+                      ) : null}
                     </div>
-                    <div className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {error}
-                    </div>
-                    {onRetry ? (
-                      <button
-                        type="button"
-                        onClick={onRetry}
-                        className="mt-3 min-h-10 rounded-full border border-border bg-background px-4 text-xs font-medium text-foreground transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      >
-                        Try again
-                      </button>
-                    ) : null}
-                  </div>
+                  ) : (
+                    renderLoadingItem(tailIndex)
+                  )
                 ) : (
-                  renderLoadingItem(tailIndex)
-                )
-              ) : (
-                <MasonryItemReveal
-                  itemKey={virtualItem.key}
-                  lane={virtualItem.lane}
-                  revealedKeys={revealedKeysRef}
-                  animate={
-                    animateItems &&
-                    !reduceMotion &&
-                    virtualItem.index >= initialItemCountRef.current
-                  }
-                >
-                  {renderItem(items[virtualItem.index], virtualItem.index)}
-                </MasonryItemReveal>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {!hasMore && items.length > 0 && endState ? (
-        <div className="py-4 text-center text-xs text-muted-foreground">
-          {endState}
+                  <MasonryItemReveal
+                    itemKey={virtualItem.key}
+                    lane={virtualItem.lane}
+                    revealedKeys={revealedKeysRef}
+                    animate={
+                      animateItems &&
+                      !reduceMotion &&
+                      virtualItem.index >= initialItemCountRef.current
+                    }
+                  >
+                    {renderItem(items[virtualItem.index], virtualItem.index)}
+                  </MasonryItemReveal>
+                )}
+              </div>
+            )
+          })}
         </div>
-      ) : null}
-      <span className="sr-only" aria-live="polite">
-        {loading ? "Loading more items" : null}
-      </span>
-    </section>
+
+        {!hasMore && items.length > 0 && endState ? (
+          <div className="py-4 text-center text-xs text-muted-foreground">
+            {endState}
+          </div>
+        ) : null}
+        <span className="sr-only" aria-live="polite">
+          {loading ? "Loading more items" : null}
+        </span>
+      </section>
+    </LazyMotion>
   )
 }
 

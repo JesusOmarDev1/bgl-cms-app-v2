@@ -2,10 +2,12 @@
 
 import {
   AnimatePresence,
+  LazyMotion,
   animate,
-  motion,
+  domAnimation,
   useReducedMotion,
 } from "motion/react"
+import * as m from "motion/react-m"
 
 import {
   forwardRef,
@@ -67,7 +69,7 @@ function InputSuccessIcon({
   className?: string
 }) {
   return (
-    <motion.svg
+    <m.svg
       viewBox="0 0 24 24"
       fill="none"
       className={cn(
@@ -75,7 +77,7 @@ function InputSuccessIcon({
         className
       )}
     >
-      <motion.path
+      <m.path
         d="M5 12.5l4.5 4.5L19 7.5"
         stroke="currentColor"
         strokeWidth={2.5}
@@ -85,7 +87,7 @@ function InputSuccessIcon({
         animate={{ pathLength: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       />
-    </motion.svg>
+    </m.svg>
   )
 }
 
@@ -101,7 +103,7 @@ function InputErrorMessage({
   className?: string
 }) {
   return (
-    <motion.p
+    <m.p
       id={id}
       role="alert"
       initial={
@@ -115,7 +117,7 @@ function InputErrorMessage({
       className={cn("px-1 text-xs text-destructive", className)}
     >
       {message}
-    </motion.p>
+    </m.p>
   )
 }
 
@@ -279,57 +281,59 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   }
 
   return (
-    <div className={cn("flex flex-col gap-1.5", className, classNames?.root)}>
-      {label ? (
-        <label
-          htmlFor={id}
-          className={cn(
-            "px-1 text-sm font-medium text-foreground",
-            classNames?.label
-          )}
-        >
-          {label}
-        </label>
-      ) : null}
+    <LazyMotion features={domAnimation}>
+      <div className={cn("flex flex-col gap-1.5", className, classNames?.root)}>
+        {label ? (
+          <label
+            htmlFor={id}
+            className={cn(
+              "px-1 text-sm font-medium text-foreground",
+              classNames?.label
+            )}
+          >
+            {label}
+          </label>
+        ) : null}
 
-      <InputField
-        fieldRef={fieldRef}
-        id={id}
-        value={value}
-        disabled={disabled}
-        hasError={hasError}
-        success={success}
-        focused={focused}
-        leftIcon={leftIcon}
-        rightSlot={rightSlot}
-        reduce={reduce}
-        classNames={classNames}
-        type={type}
-        onChange={handleChange}
-        onFocus={(event) => {
-          setFocused(true)
-          onFocus?.(event)
-        }}
-        onBlur={(event) => {
-          setFocused(false)
-          onBlur?.(event)
-        }}
-        inputRef={ref}
-        rest={rest}
-      />
+        <InputField
+          fieldRef={fieldRef}
+          id={id}
+          value={value}
+          disabled={disabled}
+          hasError={hasError}
+          success={success}
+          focused={focused}
+          leftIcon={leftIcon}
+          rightSlot={rightSlot}
+          reduce={reduce}
+          classNames={classNames}
+          type={type}
+          onChange={handleChange}
+          onFocus={(event) => {
+            setFocused(true)
+            onFocus?.(event)
+          }}
+          onBlur={(event) => {
+            setFocused(false)
+            onBlur?.(event)
+          }}
+          inputRef={ref}
+          rest={rest}
+        />
 
-      <div className={reserveErrorLine ? "min-h-4" : "contents"}>
-        <AnimatePresence initial={false}>
-          {errorMessage ? (
-            <InputErrorMessage
-              id={`${id}-error`}
-              message={errorMessage}
-              reduce={reduce}
-              className={classNames?.errorMessage}
-            />
-          ) : null}
-        </AnimatePresence>
+        <div className={reserveErrorLine ? "min-h-4" : "contents"}>
+          <AnimatePresence initial={false}>
+            {errorMessage ? (
+              <InputErrorMessage
+                id={`${id}-error`}
+                message={errorMessage}
+                reduce={reduce}
+                className={classNames?.errorMessage}
+              />
+            ) : null}
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </LazyMotion>
   )
 })
