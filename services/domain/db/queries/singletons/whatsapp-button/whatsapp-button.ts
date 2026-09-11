@@ -9,8 +9,12 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { WHATSAPP_BUTTON_FIELDS } from "@/services/domain/db/queries/singletons/whatsapp-button/whatsapp-button.fields"
 import type { Schema } from "@/types/schema"
 import type { WhatsappButtonType } from "@/types/singletons/whatsapp-button"
+import { cacheLife, cacheTag } from "next/cache"
 
 export async function getWhatsappButtonQuery() {
+  "use cache"
+  cacheTag("whatsapp_button")
+  cacheLife("hours")
   const t = await getTranslations("db.whatsapp_button")
 
   try {

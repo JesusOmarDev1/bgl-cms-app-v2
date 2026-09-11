@@ -2,6 +2,7 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
+import { cacheLife, cacheTag } from "next/cache"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
@@ -11,6 +12,9 @@ import type { SiteSettingsType } from "@/types/singletons/site-settings"
 import { SITE_SETTINGS_FIELDS } from "./site-settings.fields"
 
 export async function getSiteSettingsQuery() {
+  "use cache"
+  cacheTag("site_settings")
+  cacheLife("minutes")
   const t = await getTranslations("db.site_settings")
 
   try {

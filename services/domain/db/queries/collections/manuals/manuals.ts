@@ -9,6 +9,7 @@ import type { ManualsTypes } from "@/types/collections/manuals"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { MANUALS_FIELDS } from "./manuals.fields"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ManualsQuery {
   status?: StatusType
@@ -17,6 +18,9 @@ export interface ManualsQuery {
 }
 
 export async function getManualsQuery(query: ManualsQuery) {
+  "use cache"
+  cacheTag("manuals")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.manuals")
   try {
@@ -41,6 +45,9 @@ export async function getManualsQuery(query: ManualsQuery) {
 }
 
 export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
+  "use cache"
+  cacheTag("manuals_by_slug")
+  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   const t = await getTranslations("db.manuals")
   try {
@@ -67,6 +74,9 @@ export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
 export async function getManualsCountQuery(
   query: Pick<ManualsQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("manuals_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.manuals")
   try {

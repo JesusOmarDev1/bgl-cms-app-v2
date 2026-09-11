@@ -11,6 +11,7 @@ import { CLIENTS_FIELDS } from "@/services/domain/db/queries/collections/clients
 import type { ClientsTypes } from "@/types/collections/clients"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ClientsQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface ClientsQuery {
 }
 
 export async function getClientsQuery(query: ClientsQuery) {
+  "use cache"
+  cacheTag("clients")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.clients")
   try {
@@ -45,6 +49,9 @@ export async function getClientsQuery(query: ClientsQuery) {
 export async function getClientsCountQuery(
   query: Pick<ClientsQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("clients_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.clients")
   try {

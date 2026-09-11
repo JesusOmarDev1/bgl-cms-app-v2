@@ -8,13 +8,16 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { EMAILS_FIELDS } from "@/services/domain/db/queries/collections/emails/emails.fields"
 import type { EmailTypes } from "@/types/collections/emails"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface EmailsQuery {
   limit?: number
   page?: number
 }
 
 export async function getEmailsQuery(query: EmailsQuery = {}) {
+  "use cache"
+  cacheTag("emails")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.emails")
   try {
@@ -38,6 +41,9 @@ export async function getEmailsQuery(query: EmailsQuery = {}) {
 }
 
 export async function getEmailsCountQuery() {
+  "use cache"
+  cacheTag("emails_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.emails")
   try {
     const rows = await directus.request(

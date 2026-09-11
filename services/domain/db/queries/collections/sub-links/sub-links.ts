@@ -8,13 +8,16 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { SUB_LINKS_FIELDS } from "@/services/domain/db/queries/collections/sub-links/sub-links.fields"
 import type { SubLinksTypes } from "@/types/collections/sub-links"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface SubLinksQuery {
   limit?: number
   page?: number
 }
 
 export async function getSubLinksQuery(query: SubLinksQuery = {}) {
+  "use cache"
+  cacheTag("sub_links")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.sub_links")
   try {
@@ -38,6 +41,9 @@ export async function getSubLinksQuery(query: SubLinksQuery = {}) {
 }
 
 export async function getSubLinksCountQuery() {
+  "use cache"
+  cacheTag("sub_links_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.sub_links")
   try {
     const rows = await directus.request(

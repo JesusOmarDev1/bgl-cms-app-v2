@@ -9,7 +9,7 @@ import { TAGS_FIELDS } from "@/services/domain/db/queries/collections/tags/tags.
 import type { TagTypes } from "@/types/collections/tags"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface TagsQuery {
   status?: StatusType
   limit?: number
@@ -17,6 +17,9 @@ export interface TagsQuery {
 }
 
 export async function getTagsQuery(query: TagsQuery = {}) {
+  "use cache"
+  cacheTag("tags")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.tags")
   try {
@@ -41,6 +44,9 @@ export async function getTagsQuery(query: TagsQuery = {}) {
 }
 
 export async function getTagsCountQuery(query: Pick<TagsQuery, "status"> = {}) {
+  "use cache"
+  cacheTag("tags_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.tags")
   try {

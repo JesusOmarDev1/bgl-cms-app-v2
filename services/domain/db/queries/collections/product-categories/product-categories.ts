@@ -11,6 +11,7 @@ import { PRODUCT_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collecti
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ProductCategoriesQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface ProductCategoriesQuery {
 }
 
 export async function getProductCategoriesQuery(query: ProductCategoriesQuery) {
+  "use cache"
+  cacheTag("product_categories")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.product_categories")
   try {
@@ -45,6 +49,9 @@ export async function getProductCategoriesQuery(query: ProductCategoriesQuery) {
 export async function getProductCategoriesCountQuery(
   query: Pick<ProductCategoriesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("product_categories_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.product_categories")
   try {

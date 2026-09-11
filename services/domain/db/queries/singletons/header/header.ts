@@ -2,6 +2,7 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
+import { cacheLife, cacheTag } from "next/cache"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
@@ -11,6 +12,9 @@ import type { Schema } from "@/types/schema"
 import type { HeaderType } from "@/types/singletons/header"
 
 export async function getHeaderQuery() {
+  "use cache"
+  cacheTag("header")
+  cacheLife("hours")
   const t = await getTranslations("db.header")
 
   try {

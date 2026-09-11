@@ -9,6 +9,7 @@ import type { BlogPostsTypes } from "@/types/collections/blog-posts"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { BLOG_POSTS_FIELDS } from "./blog-posts.fields"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface BlogPostsQuery {
   status?: StatusType
@@ -17,6 +18,9 @@ export interface BlogPostsQuery {
 }
 
 export async function getBlogPostsQuery(query: BlogPostsQuery) {
+  "use cache"
+  cacheTag("blog_posts")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.blog_posts")
   try {
@@ -44,6 +48,9 @@ export async function getBlogPostsBySlugQuery(
   query: BlogPostsQuery,
   slug: string
 ) {
+  "use cache"
+  cacheTag("blog_posts_by_slug")
+  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   const t = await getTranslations("db.blog_posts")
   try {
@@ -70,6 +77,9 @@ export async function getBlogPostsBySlugQuery(
 export async function getBlogPostsCountQuery(
   query: Pick<BlogPostsQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("blog_posts_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.blog_posts")
   try {

@@ -9,6 +9,7 @@ import { BLOG_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections
 import type { BlogCategoriesTypes } from "@/types/collections/blog-categories"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface BlogCategoriesQuery {
   status?: StatusType
@@ -17,6 +18,9 @@ export interface BlogCategoriesQuery {
 }
 
 export async function getBlogCategoriesQuery(query: BlogCategoriesQuery = {}) {
+  "use cache"
+  cacheTag("blog_categories")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.blog_categories")
   try {
@@ -43,6 +47,9 @@ export async function getBlogCategoriesQuery(query: BlogCategoriesQuery = {}) {
 export async function getBlogCategoriesCountQuery(
   query: Pick<BlogCategoriesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("blog_categories_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.blog_categories")
   try {

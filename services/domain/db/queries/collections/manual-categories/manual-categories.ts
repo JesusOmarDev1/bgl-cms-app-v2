@@ -9,6 +9,7 @@ import { MANUAL_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collectio
 import type { ManualCategoriesTypes } from "@/types/collections/manual-categories"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ManualCategoriesQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface ManualCategoriesQuery {
 export async function getManualCategoriesQuery(
   query: ManualCategoriesQuery = {}
 ) {
+  "use cache"
+  cacheTag("manual_categories")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.manual_categories")
   try {
@@ -45,6 +49,9 @@ export async function getManualCategoriesQuery(
 export async function getManualCategoriesCountQuery(
   query: Pick<ManualCategoriesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("manual_categories_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.manual_categories")
   try {

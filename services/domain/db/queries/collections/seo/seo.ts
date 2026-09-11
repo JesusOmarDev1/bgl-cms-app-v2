@@ -8,13 +8,16 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fields"
 import type { SeoTypes } from "@/types/collections/seo"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface SeoQuery {
   limit?: number
   page?: number
 }
 
 export async function getSeoQuery(query: SeoQuery = {}) {
+  "use cache"
+  cacheTag("seo")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.seo")
   try {
@@ -38,6 +41,9 @@ export async function getSeoQuery(query: SeoQuery = {}) {
 }
 
 export async function getSeoCountQuery() {
+  "use cache"
+  cacheTag("seo_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.seo")
   try {
     const rows = await directus.request(

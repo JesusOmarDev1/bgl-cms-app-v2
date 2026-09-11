@@ -44,6 +44,13 @@ function resolveDirectusSrc(
   }
 }
 
+function pairCssDimensions(style: CSSProperties): CSSProperties {
+  const hasWidth = style.width !== undefined
+  const hasHeight = style.height !== undefined
+  if (hasWidth === hasHeight) return style
+  return hasWidth ? { ...style, height: "auto" } : { ...style, width: "auto" }
+}
+
 type DirectusImageProps = Omit<
   ImageProps,
   | "src"
@@ -114,8 +121,9 @@ export function DirectusImage({
   const imageStyle: CSSProperties = {
     objectFit: config.objectFit,
     ...(sizing === "auto" && {
-      aspectRatio: String(config.ratio),
+      aspectRatio: `${resolvedWidth} / ${resolvedHeight}`,
       width: "100%",
+      height: "auto",
     }),
     ...(sizing === "fill" &&
       showPlaceholder && {
@@ -124,6 +132,9 @@ export function DirectusImage({
       }),
     ...style,
   }
+
+  const nonFillStyle =
+    sizing === "fill" ? imageStyle : pairCssDimensions(imageStyle)
 
   if (showPlaceholder) {
     return (
@@ -137,7 +148,7 @@ export function DirectusImage({
           width={resolvedWidth}
           height={resolvedHeight}
           className={imageClassName}
-          style={imageStyle}
+          style={nonFillStyle}
           data-placeholder="true"
         />
       </div>
@@ -184,7 +195,7 @@ export function DirectusImage({
         sizes={resolvedSizes}
         quality={resolvedQuality}
         className={imageClassName}
-        style={imageStyle}
+        style={nonFillStyle}
         onError={handleError}
       />
     </div>

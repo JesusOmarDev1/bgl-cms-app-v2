@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import { motion, stagger, useAnimate } from "motion/react";
+import { cn } from "@/lib/utils"
+import { useEffect } from "react"
+import { motion, stagger, useAnimate } from "motion/react"
 
 const defaultRevealText =
-  "ForgeUI is a beautifully designed component library built with Tailwind CSS and Motion. It helps developers build modern, animated UIs faster, with consistent styling and production-ready components.";
+  "ForgeUI is a beautifully designed component library built with Tailwind CSS and Motion. It helps developers build modern, animated UIs faster, with consistent styling and production-ready components."
 
 const TextReveal = ({
   text = defaultRevealText,
@@ -14,14 +14,14 @@ const TextReveal = ({
   duration = 0.5,
   staggerDelay = 0.2,
 }: {
-  text?: string;
-  className?: string;
-  filter?: boolean;
-  duration?: number;
-  staggerDelay?: number;
+  text?: string
+  className?: string
+  filter?: boolean
+  duration?: number
+  staggerDelay?: number
 }) => {
-  const [scope, animate] = useAnimate();
-  const textArray = text.split(" ");
+  const [scope, animate] = useAnimate()
+  const textArray = text.split(" ")
 
   useEffect(() => {
     animate(
@@ -34,9 +34,9 @@ const TextReveal = ({
         duration: duration,
         delay: stagger(staggerDelay),
         ease: "easeOut",
-      },
-    );
-  }, [animate, duration, filter, staggerDelay]);
+      }
+    )
+  }, [animate, duration, filter, staggerDelay])
 
   return (
     <div className={cn("leading-normal", className)}>
@@ -54,11 +54,11 @@ const TextReveal = ({
             >
               {word}
             </motion.span>
-          );
+          )
         })}
       </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default TextReveal;
+export default TextReveal

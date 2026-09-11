@@ -11,6 +11,7 @@ import { PRODUCT_ATTRIBUTES_FIELDS } from "@/services/domain/db/queries/collecti
 import type { ProductAttributesTypes } from "@/types/collections/product-attributes"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ProductAttributesQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface ProductAttributesQuery {
 }
 
 export async function getProductAttributesQuery(query: ProductAttributesQuery) {
+  "use cache"
+  cacheTag("product_attributes")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.product_attributes")
   try {
@@ -45,6 +49,9 @@ export async function getProductAttributesQuery(query: ProductAttributesQuery) {
 export async function getProductAttributesCountQuery(
   query: Pick<ProductAttributesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("product_attributes_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.product_attributes")
   try {

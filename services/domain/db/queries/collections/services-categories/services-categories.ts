@@ -9,7 +9,7 @@ import { SERVICES_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collect
 import type { ServicesCategoriesTypes } from "@/types/collections/services-categories"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface ServicesCategoriesQuery {
   status?: StatusType
   limit?: number
@@ -19,6 +19,9 @@ export interface ServicesCategoriesQuery {
 export async function getServicesCategoriesQuery(
   query: ServicesCategoriesQuery = {}
 ) {
+  "use cache"
+  cacheTag("services_categories")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.services_categories")
   try {
@@ -45,6 +48,9 @@ export async function getServicesCategoriesQuery(
 export async function getServicesCategoriesCountQuery(
   query: Pick<ServicesCategoriesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("services_categories_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.services_categories")
   try {

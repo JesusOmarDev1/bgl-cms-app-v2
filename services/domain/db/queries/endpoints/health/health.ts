@@ -5,8 +5,12 @@ import directus from "@/config/directus"
 import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { HealthResult } from "@/types/shared/health/health-result"
 import { HEALTH_FIELDS } from "./health.fields"
+import { cacheLife, cacheTag } from "next/cache"
 
 export async function getHealthQuery(): Promise<HealthResult> {
+  "use cache"
+  cacheTag("health")
+  cacheLife("seconds")
   const t = await getTranslations("db.health")
   const start = performance.now()
   const [statusField] = HEALTH_FIELDS

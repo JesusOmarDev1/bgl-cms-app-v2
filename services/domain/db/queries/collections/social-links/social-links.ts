@@ -8,13 +8,16 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { SOCIAL_LINKS_FIELDS } from "@/services/domain/db/queries/collections/social-links/social-links.fields"
 import type { SocialLinksTypes } from "@/types/collections/social-links"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface SocialLinksQuery {
   limit?: number
   page?: number
 }
 
 export async function getSocialLinksQuery(query: SocialLinksQuery = {}) {
+  "use cache"
+  cacheTag("social_links")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.social_links")
   try {
@@ -38,6 +41,9 @@ export async function getSocialLinksQuery(query: SocialLinksQuery = {}) {
 }
 
 export async function getSocialLinksCountQuery() {
+  "use cache"
+  cacheTag("social_links_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.social_links")
   try {
     const rows = await directus.request(

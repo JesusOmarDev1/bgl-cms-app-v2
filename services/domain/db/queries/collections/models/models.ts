@@ -11,6 +11,7 @@ import { MODELS_FIELDS } from "@/services/domain/db/queries/collections/models/m
 import type { ModelsTypes } from "@/types/collections/models"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface ModelsQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface ModelsQuery {
 }
 
 export async function getModelsQuery(query: ModelsQuery) {
+  "use cache"
+  cacheTag("models")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.models")
   try {
@@ -45,6 +49,9 @@ export async function getModelsQuery(query: ModelsQuery) {
 export async function getModelsCountQuery(
   query: Pick<ModelsQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("models_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.models")
   try {

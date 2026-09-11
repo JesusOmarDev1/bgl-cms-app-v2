@@ -9,8 +9,12 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { SERVICES_BUTTON_FIELDS } from "@/services/domain/db/queries/singletons/services-button/services-button.fields"
 import type { Schema } from "@/types/schema"
 import type { ServicesButtonType } from "@/types/singletons/services-button"
+import { cacheLife, cacheTag } from "next/cache"
 
 export async function getServicesButtonQuery() {
+  "use cache"
+  cacheTag("services_button")
+  cacheLife("hours")
   const t = await getTranslations("db.services_button")
 
   try {

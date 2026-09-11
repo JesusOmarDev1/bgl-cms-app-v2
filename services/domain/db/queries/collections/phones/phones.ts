@@ -8,6 +8,7 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { PHONES_FIELDS } from "@/services/domain/db/queries/collections/phones/phones.fields"
 import type { PhoneTypes } from "@/types/collections/phones"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface PhonesQuery {
   limit?: number
@@ -15,6 +16,9 @@ export interface PhonesQuery {
 }
 
 export async function getPhonesQuery(query: PhonesQuery = {}) {
+  "use cache"
+  cacheTag("phones")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.phones")
   try {
@@ -38,6 +42,9 @@ export async function getPhonesQuery(query: PhonesQuery = {}) {
 }
 
 export async function getPhonesCountQuery() {
+  "use cache"
+  cacheTag("phones_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.phones")
   try {
     const rows = await directus.request(

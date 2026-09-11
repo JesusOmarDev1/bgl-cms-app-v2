@@ -8,6 +8,7 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { REDIRECTS_FIELDS } from "@/services/domain/db/queries/collections/redirects/redirects.fields"
 import type { RedirectsTypes } from "@/types/collections/redirects"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface RedirectsQuery {
   limit?: number
@@ -15,6 +16,9 @@ export interface RedirectsQuery {
 }
 
 export async function getRedirectsQuery(query: RedirectsQuery = {}) {
+  "use cache"
+  cacheTag("redirects")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.redirects")
   try {
@@ -38,6 +42,9 @@ export async function getRedirectsQuery(query: RedirectsQuery = {}) {
 }
 
 export async function getRedirectsCountQuery() {
+  "use cache"
+  cacheTag("redirects_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.redirects")
   try {
     const rows = await directus.request(

@@ -11,6 +11,7 @@ import { BRANDS_FIELDS } from "@/services/domain/db/queries/collections/brands/b
 import type { BrandsTypes } from "@/types/collections/brands"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface BrandsQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface BrandsQuery {
 }
 
 export async function getBrandsQuery(query: BrandsQuery) {
+  "use cache"
+  cacheTag("brands")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.brands")
   try {

@@ -11,6 +11,7 @@ import { DIVISION_SERVICES_FIELDS } from "@/services/domain/db/queries/collectio
 import type { DivisionServicesTypes } from "@/types/collections/division-services"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface DivisionServicesQuery {
   status?: StatusType
@@ -19,6 +20,9 @@ export interface DivisionServicesQuery {
 }
 
 export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
+  "use cache"
+  cacheTag("division_services")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.division_services")
   try {
@@ -45,6 +49,9 @@ export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
 export async function getDivisionServicesCountQuery(
   query: Pick<DivisionServicesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("division_services_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.division_services")
   try {

@@ -9,7 +9,7 @@ import type { ServicesTypes } from "@/types/collections/services"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { SERVICES_FIELDS } from "./services.fields"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface ServicesQuery {
   status?: StatusType
   limit?: number
@@ -17,6 +17,9 @@ export interface ServicesQuery {
 }
 
 export async function getServicesQuery(query: ServicesQuery) {
+  "use cache"
+  cacheTag("services")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.services")
   try {
@@ -44,6 +47,9 @@ export async function getServicesBySlugQuery(
   query: ServicesQuery,
   slug: string
 ) {
+  "use cache"
+  cacheTag("services_by_slug")
+  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   const t = await getTranslations("db.services")
   try {
@@ -70,6 +76,9 @@ export async function getServicesBySlugQuery(
 export async function getServicesCountQuery(
   query: Pick<ServicesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("services_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.services")
   try {

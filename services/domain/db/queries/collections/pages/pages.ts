@@ -9,6 +9,7 @@ import type { PagesTypes } from "@/types/collections/pages"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { PAGES_FIELDS } from "./pages.fields"
+import { cacheLife, cacheTag } from "next/cache"
 
 export interface PagesQuery {
   status?: StatusType
@@ -17,6 +18,9 @@ export interface PagesQuery {
 }
 
 export async function getPagesQuery(query: PagesQuery) {
+  "use cache"
+  cacheTag("pages")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.pages")
   try {
@@ -41,6 +45,9 @@ export async function getPagesQuery(query: PagesQuery) {
 }
 
 export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
+  "use cache"
+  cacheTag("pages_by_slug")
+  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   const t = await getTranslations("db.pages")
   try {
@@ -67,6 +74,9 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
 export async function getPagesCountQuery(
   query: Pick<PagesQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("pages_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.pages")
   try {

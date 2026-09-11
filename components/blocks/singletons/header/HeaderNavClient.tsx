@@ -56,7 +56,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
         className={cn(
           "flex h-24 min-w-screen items-center px-6 pr-20 transition-all duration-400 animate-ease-in-out lg:pr-64",
           {
-            "h-20": scrolled,
+            "h-24": scrolled,
           }
         )}
       >
@@ -79,8 +79,9 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                   loading="eager"
                   fetchPriority="high"
                   preload
+                  sizes="100px"
                   sizing="auto"
-                  variant="original"
+                  variant="logo"
                 />
               ) : (
                 <StaticLogo />
@@ -193,10 +194,22 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
             <Button
               variant="red"
               size="xl"
-              className="hidden rounded-full px-3 lg:flex"
+              className="hidden rounded-full lg:flex"
             >
               {data.primary_button}
-              <MaterialIcon name={data.primary_icon ?? ""} />
+              <MaterialIcon name={data.primary_icon ?? ""} size={16} />
+            </Button>
+          </Link>
+        )}
+        {data?.secondary_button && (
+          <Link href={data.secondary_url ?? ""}>
+            <Button
+              variant="outline"
+              size="xl"
+              className="hidden rounded-full lg:flex"
+            >
+              {data.secondary_button}
+              <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
             </Button>
           </Link>
         )}

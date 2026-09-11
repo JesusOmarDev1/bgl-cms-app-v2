@@ -11,7 +11,7 @@ import { SUPPLIERS_FIELDS } from "@/services/domain/db/queries/collections/suppl
 import type { SuppliersTypes } from "@/types/collections/suppliers"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface SuppliersQuery {
   status?: StatusType
   limit?: number
@@ -19,6 +19,9 @@ export interface SuppliersQuery {
 }
 
 export async function getSuppliersQuery(query: SuppliersQuery) {
+  "use cache"
+  cacheTag("suppliers")
+  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   const t = await getTranslations("db.suppliers")
   try {
@@ -45,6 +48,9 @@ export async function getSuppliersQuery(query: SuppliersQuery) {
 export async function getSuppliersCountQuery(
   query: Pick<SuppliersQuery, "status"> = {}
 ) {
+  "use cache"
+  cacheTag("suppliers_count")
+  cacheLife("minutes")
   const { status = "published" } = query
   const t = await getTranslations("db.suppliers")
   try {

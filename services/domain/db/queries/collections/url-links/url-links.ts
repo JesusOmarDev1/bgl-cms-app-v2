@@ -8,13 +8,16 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { URL_LINKS_FIELDS } from "@/services/domain/db/queries/collections/url-links/url-links.fields"
 import type { UrlLinksTypes } from "@/types/collections/url-links"
 import type { Schema } from "@/types/schema"
-
+import { cacheLife, cacheTag } from "next/cache"
 export interface UrlLinksQuery {
   limit?: number
   page?: number
 }
 
 export async function getUrlLinksQuery(query: UrlLinksQuery = {}) {
+  "use cache"
+  cacheTag("url_links")
+  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   const t = await getTranslations("db.url_links")
   try {
@@ -38,6 +41,9 @@ export async function getUrlLinksQuery(query: UrlLinksQuery = {}) {
 }
 
 export async function getUrlLinksCountQuery() {
+  "use cache"
+  cacheTag("url_links_count")
+  cacheLife("minutes")
   const t = await getTranslations("db.url_links")
   try {
     const rows = await directus.request(

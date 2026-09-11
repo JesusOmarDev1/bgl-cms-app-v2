@@ -9,8 +9,12 @@ import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { FOOTER_FIELDS } from "@/services/domain/db/queries/singletons/footer/footer.fields"
 import type { Schema } from "@/types/schema"
 import type { FooterType } from "@/types/singletons/footer"
+import { cacheLife, cacheTag } from "next/cache"
 
 export async function getFooterQuery() {
+  "use cache"
+  cacheTag("footer")
+  cacheLife("hours")
   const t = await getTranslations("db.footer")
 
   try {
