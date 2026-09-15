@@ -17,6 +17,7 @@ export default getRequestConfig(async () => {
       ...(await import(`./theme/${locale}.json`)).default,
       ...(await import(`./health/${locale}.json`)).default,
       ...(await import(`./maintenance/${locale}.json`)).default,
+      ...(await import(`./unavailable/${locale}.json`)).default,
       ...(await import(`./debug/${locale}.json`)).default,
     },
   }

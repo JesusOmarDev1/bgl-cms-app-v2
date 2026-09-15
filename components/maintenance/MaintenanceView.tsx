@@ -1,6 +1,9 @@
 "use client"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
-import { StatusIndicator } from "@/components/shared/debug/StatusIndicator"
+import {
+  StatusIndicator,
+  type Status,
+} from "@/components/shared/debug/StatusIndicator"
 import {
   Card,
   CardContent,
@@ -16,6 +19,7 @@ type MaintenanceViewProps = {
   message: string
   statusLabel: string
   helperText: string
+  status?: Status
 }
 
 export function MaintenanceView({
@@ -23,6 +27,7 @@ export function MaintenanceView({
   message,
   statusLabel,
   helperText,
+  status = "maintenance",
 }: MaintenanceViewProps) {
   return (
     <main className="flex min-h-dvh items-center justify-center gap-4 p-6 pt-8">
@@ -35,7 +40,7 @@ export function MaintenanceView({
           <CardContent className="flex flex-col gap-3 px-7">
             <StatusIndicator
               className="w-fit"
-              status="maintenance"
+              status={status}
               label={statusLabel}
             />
           </CardContent>

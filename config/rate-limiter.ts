@@ -1,3 +1,5 @@
+import "server-only"
+
 import {
   RateLimiterMemory,
   type IRateLimiterOptions,
@@ -5,8 +7,8 @@ import {
 
 const opts: IRateLimiterOptions = {
   keyPrefix: "@bg-rate-limiter",
-  points: 6,
-  duration: 1,
+  points: 60,
+  duration: 10,
   blockDuration: 60,
 }
 

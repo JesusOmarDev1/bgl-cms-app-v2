@@ -1,0 +1,8 @@
+{
+  "unavailable": {
+    "title": "Demasiadas solicitudes",
+    "message": "Hemos recibido más solicitudes de las que podemos atender en este momento. Espera un momento e inténtalo de nuevo.",
+    "statusLabel": "Servicio temporalmente no disponible",
+    "helperText": "Si el problema continúa, espera un minuto y recarga la página."
+  }
+}
