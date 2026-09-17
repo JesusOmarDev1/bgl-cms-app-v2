@@ -6,7 +6,7 @@ export const ContactPositionEnum = [
   "sales_executive",
   "report_trainee",
 ] as const
-export type ContactPosition = (typeof ContactPositionEnum)[number]
+export type ContactPositionType = (typeof ContactPositionEnum)[number]
 
 export const ContactPositionLabel = {
   ceo: "CEO",
@@ -16,5 +16,5 @@ export const ContactPositionLabel = {
   sales_executive: "Ejecutivo de Ventas",
   report_trainee: "Soporte de Reportes",
 } as const
-export type ContactPositionLabel =
+export type ContactPositionLabelType =
   (typeof ContactPositionLabel)[keyof typeof ContactPositionLabel]

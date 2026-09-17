@@ -13,6 +13,8 @@ import { Viewport } from "next"
 import { HeaderNav } from "@/components/blocks/singletons/header/HeaderNav"
 import { Suspense } from "react"
 import { HeaderNavSkeleton } from "@/components/blocks/singletons/header/HeaderNavSkeleton"
+import { FooterNav } from "@/components/blocks/singletons/footer/FooterNav"
+import { FooterNavSkeleton } from "@/components/blocks/singletons/footer/FooterNavSkeleton"
 
 export const metadata = createRootMetadata()
 
@@ -60,6 +62,9 @@ export default function RootLayout({
                   <HeaderNav />
                 </Suspense>
                 {children}
+                <Suspense fallback={<FooterNavSkeleton />}>
+                  <FooterNav />
+                </Suspense>
               </NuqsAdapter>
               <Toaster
                 richColors

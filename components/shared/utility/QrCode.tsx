@@ -45,7 +45,7 @@ export const QRCode = ({
         imageSettings={
           image
             ? {
-                src: image,
+                src: image ?? "/static/logo.png",
                 height: imageSize,
                 width: imageSize,
                 excavate: imageExcavate,

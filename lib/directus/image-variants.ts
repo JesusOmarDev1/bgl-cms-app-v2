@@ -23,6 +23,10 @@ function dataImagePlaceholder(value: string): DataImagePlaceholder {
   return value as DataImagePlaceholder
 }
 
+function px(width: number): `${number}px` {
+  return `${width}px`
+}
+
 export type DirectusImageVariant =
   | "card"
   | "detail"
@@ -96,18 +100,18 @@ export const VARIANT_CONFIG = {
     placeholder: dataImagePlaceholder(placeholderLogo),
     objectFit: "contain",
     fit: "contain",
-    defaultSize: { w: 200, h: 200 },
-    sizes: "200px",
-    quality: 55,
+    defaultSize: { w: 80, h: 80 },
+    sizes: px(80),
+    quality: 80,
   },
   thumbnail: {
     ratio: 1 / 1,
     placeholder: dataImagePlaceholder(placeholderThumbnail),
     objectFit: "cover",
     fit: "cover",
-    defaultSize: { w: 100, h: 100 },
-    sizes: "200px",
-    quality: 60,
+    defaultSize: { w: 80, h: 80 },
+    sizes: px(80),
+    quality: 75,
   },
   original: {
     ratio: 3 / 2,

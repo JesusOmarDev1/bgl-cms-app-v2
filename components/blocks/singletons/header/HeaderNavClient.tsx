@@ -72,14 +72,10 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                   src={data?.logo_dark?.id ?? ""}
                   alt="Logo de BGL Básculas Industriales"
                   title="Logo de BGL Básculas Industriales"
-                  width={100}
-                  height={100}
-                  quality={80}
                   decoding="auto"
                   loading="eager"
                   fetchPriority="high"
                   preload
-                  sizes="100px"
                   sizing="auto"
                   variant="logo"
                 />

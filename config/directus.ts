@@ -8,7 +8,7 @@ const ofetchInstance = ofetch.create({
   retry: 1,
   retryDelay: 200,
   timeout: 30000,
-  retryStatusCodes: [408, 429, 500, 502, 503, 504, 409, 425],
+  retryStatusCodes: [408, 429, 500, 502, 503, 504, 409, 425, 505],
 })
 
 const DIRECTUS_STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN

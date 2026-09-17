@@ -5,11 +5,15 @@ import { z } from "zod"
 import meilisearch from "@/config/meilisearch"
 import { actionClient } from "@/lib/server/safe-action"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
+import { TEXT_REGEX } from "@/lib/validations/text"
 
 const searchSchema = z.object({
   query: z
     .string()
     .trim()
+    .regex(TEXT_REGEX, {
+      message: "La consulta debe contener solo letras y números.",
+    })
     .min(3, {
       message: "La consulta debe tener al menos 3 caracteres válidos.",
     })

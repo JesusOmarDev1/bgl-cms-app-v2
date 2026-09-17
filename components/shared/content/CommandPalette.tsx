@@ -186,9 +186,6 @@ function CommandPaletteItemMedia({
         alt={item.label}
         variant="thumbnail"
         sizing="contained"
-        width={80}
-        height={80}
-        quality={75}
         className="relative z-10 size-20 shrink-0 rounded-md bg-muted"
       />
     )
