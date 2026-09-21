@@ -1,7 +1,6 @@
 ---
 description: proxy.ts is the single runtime writer for security headers
-globs: proxy.ts,config/headers.ts,config/csp.ts
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Proxy security headers hardening
