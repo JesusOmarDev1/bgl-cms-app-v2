@@ -2,6 +2,7 @@
 
 import { setAttr } from "@directus/visual-editing"
 import Link from "next/link"
+import type { ReactNode } from "react"
 import { StaticLogo } from "@/assets/logos/static-logo"
 import { DirectusImage } from "@/components/shared/assets/DirectusImage"
 import {
@@ -14,7 +15,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { useScroll } from "@/hooks/useScroll"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 import { SearchBar } from "@/components/shared/search/SearchBar"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
@@ -24,9 +25,14 @@ import { Button } from "@/components/ui/button"
 interface HeaderNavClientProps {
   data: HeaderQueryResult | null | undefined
   className?: string
+  children?: ReactNode
 }
 
-export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
+export function HeaderNavClient({
+  data,
+  className,
+  children,
+}: HeaderNavClientProps) {
   const scrolled = useScroll(10)
 
   return (
@@ -40,11 +46,12 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
           "primary_url",
           "primary_icon",
           "url_links",
+          "social_links",
         ],
         mode: "popover",
       })}
       className={cn(
-        "fixed top-0 z-50 w-full border-b border-transparent transition-all duration-400 animate-ease-in-out",
+        "animate-ease-in-out fixed top-0 z-50 w-full border-b border-transparent transition-all duration-400",
         {
           "border-border bg-background/30 backdrop-blur-sm supports-backdrop-filter:bg-background/30":
             scrolled,
@@ -52,38 +59,31 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
         className
       )}
     >
-      <NavigationMenu
-        className={cn(
-          "flex h-24 min-w-screen items-center px-6 pr-20 transition-all duration-400 animate-ease-in-out lg:pr-64",
-          {
-            "h-24": scrolled,
-          }
-        )}
-      >
-        <NavigationMenuList className="flex w-full justify-between">
-          <div className="flex items-center justify-center gap-4">
-            <Link
-              href="/"
-              aria-label="Logo de BGL Básculas Industriales"
-              title="Logo de BGL Básculas Industriales"
-            >
-              {data?.logo_dark ? (
-                <DirectusImage
-                  src={data?.logo_dark?.id ?? ""}
-                  alt="Logo de BGL Básculas Industriales"
-                  title="Logo de BGL Básculas Industriales"
-                  decoding="auto"
-                  loading="eager"
-                  fetchPriority="high"
-                  preload
-                  sizing="auto"
-                  variant="logo"
-                />
-              ) : (
-                <StaticLogo />
-              )}
-            </Link>
-            <div className="flex items-center gap-2.5">
+      <div className="flex h-24 w-full flex-nowrap items-center justify-between gap-4 px-6">
+        <div className="flex min-w-0 items-center gap-4">
+          <Link
+            href="/"
+            aria-label="Logo de BGL Básculas Industriales"
+            title="Logo de BGL Básculas Industriales"
+          >
+            {data?.logo_dark ? (
+              <DirectusImage
+                src={data?.logo_dark?.id ?? ""}
+                alt="Logo de BGL Básculas Industriales"
+                title="Logo de BGL Básculas Industriales"
+                decoding="auto"
+                loading="eager"
+                fetchPriority="high"
+                preload
+                sizing="auto"
+                variant="logo"
+              />
+            ) : (
+              <StaticLogo />
+            )}
+          </Link>
+          <NavigationMenu className="hidden min-w-0 lg:flex">
+            <NavigationMenuList className="flex items-center gap-2.5">
               {data?.url_links &&
                 data.url_links.length > 0 &&
                 data.url_links.map((link) => {
@@ -97,11 +97,8 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                     const subLinks = item.sub_links ?? []
 
                     return (
-                      <NavigationMenuItem
-                        className="hidden lg:flex"
-                        key={link.id}
-                      >
-                        <NavigationMenuTrigger className="flex items-center gap-1.5 text-sm md:text-base lg:text-lg">
+                      <NavigationMenuItem key={link.id}>
+                        <NavigationMenuTrigger className="flex items-center gap-1.5 text-sm xl:text-base">
                           <MaterialIcon
                             className="text-muted-foreground"
                             name={item.icon ?? ""}
@@ -124,7 +121,7 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                                 key={subItem.id}
                                 className={cn(
                                   navigationMenuTriggerStyle(),
-                                  "flex w-full justify-start text-sm md:text-base lg:text-lg"
+                                  "flex w-full justify-start text-sm xl:text-base"
                                 )}
                                 render={
                                   <Link
@@ -151,14 +148,11 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                   if (url == null || url.length === 0) return null
 
                   return (
-                    <NavigationMenuItem
-                      className="hidden lg:flex"
-                      key={link.id}
-                    >
+                    <NavigationMenuItem key={link.id}>
                       <NavigationMenuLink
                         className={cn(
                           navigationMenuTriggerStyle(),
-                          "text-base lg:text-lg"
+                          "text-sm xl:text-base"
                         )}
                         render={
                           <Link
@@ -178,37 +172,38 @@ export function HeaderNavClient({ data, className }: HeaderNavClientProps) {
                     </NavigationMenuItem>
                   )
                 })}
-            </div>
-          </div>
-        </NavigationMenuList>
-      </NavigationMenu>
-      <div className="absolute inset-y-0 right-6 flex items-center gap-2.5">
-        <SearchBar variant="header" />
-        <MexicoCityIcon className="hidden size-8 lg:flex" />
-        {data?.primary_button && (
-          <Link href={data.primary_url ?? ""}>
-            <Button
-              variant="red"
-              size="xl"
-              className="hidden rounded-full lg:flex"
-            >
-              {data.primary_button}
-              <MaterialIcon name={data.primary_icon ?? ""} size={16} />
-            </Button>
-          </Link>
-        )}
-        {data?.secondary_button && (
-          <Link href={data.secondary_url ?? ""}>
-            <Button
-              variant="outline"
-              size="xl"
-              className="hidden rounded-full lg:flex"
-            >
-              {data.secondary_button}
-              <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
-            </Button>
-          </Link>
-        )}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+        <div className="flex shrink-0 items-center gap-2.5">
+          <SearchBar variant="header" />
+          <MexicoCityIcon className="hidden size-8 lg:flex" />
+          {data?.primary_button && (
+            <Link href={data.primary_url ?? ""}>
+              <Button
+                variant="red"
+                size="xl"
+                className="hidden rounded-full lg:flex"
+              >
+                {data.primary_button}
+                <MaterialIcon name={data.primary_icon ?? ""} size={16} />
+              </Button>
+            </Link>
+          )}
+          {data?.secondary_button && (
+            <Link href={data.secondary_url ?? ""}>
+              <Button
+                variant="outline"
+                size="xl"
+                className="hidden rounded-full lg:flex"
+              >
+                {data.secondary_button}
+                <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
+              </Button>
+            </Link>
+          )}
+          {children}
+        </div>
       </div>
     </header>
   )

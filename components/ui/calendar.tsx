@@ -19,7 +19,7 @@ import {
   type RangeCalendarProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Select,

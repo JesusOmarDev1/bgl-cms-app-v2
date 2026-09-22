@@ -16,7 +16,7 @@ import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { toSearchCommandItem } from "@/components/shared/search/map-search-hit"
 import { Kbd } from "@/components/ui/kbd"
 import { useIsMac } from "@/hooks/useIsMac"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { searchAction } from "@/services/domain/server/search/search"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
 
@@ -29,6 +29,9 @@ export type SearchBarVariant = "default" | "icon" | "header"
 export type SearchBarClientProps = {
   variant?: SearchBarVariant
   className?: string
+  portaled?: boolean
+  onNavigate?: () => void
+  onPaletteOpenChange?: (open: boolean) => void
 }
 
 function resolvePanelStatus(opts: {
@@ -47,6 +50,9 @@ function resolvePanelStatus(opts: {
 export function SearchBarClient({
   variant = "default",
   className,
+  portaled = true,
+  onNavigate,
+  onPaletteOpenChange,
 }: SearchBarClientProps) {
   const router = useRouter()
   const isMac = useIsMac()
@@ -78,6 +84,7 @@ export function SearchBarClient({
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next)
+    onPaletteOpenChange?.(next)
     if (!next) resetSearch()
   }
 
@@ -129,6 +136,7 @@ export function SearchBarClient({
     items.push({
       ...mapped,
       onSelect: () => {
+        onNavigate?.()
         router.push(url)
       },
     })
@@ -195,6 +203,7 @@ export function SearchBarClient({
       ) : null}
 
       <CommandPalette
+        portaled={portaled}
         items={status ? [] : items}
         open={open}
         onOpenChange={handleOpenChange}

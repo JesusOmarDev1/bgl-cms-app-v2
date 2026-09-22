@@ -25,6 +25,9 @@ _Agent Directive: Use these commands autonomously when appropriate during the wo
 - Generate build: pnpm build
 - Start preview server: pnpm start
 - Full pipeline before prod: pnpm pre-deploy
+
+# Engram
+- Load Skills in Cache: gentle-ai skill-registry refresh
 ```
 
 ## Role & Expertise

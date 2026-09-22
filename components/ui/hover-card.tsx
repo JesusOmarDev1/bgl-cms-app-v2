@@ -7,7 +7,7 @@ import {
   type PreviewTriggerProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function HoverCardTrigger({ children, ...props }: PreviewTriggerProps) {
   return (

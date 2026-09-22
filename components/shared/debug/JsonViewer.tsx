@@ -11,7 +11,7 @@ import {
   FoldHorizontal,
   X,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   jsonThemes,
   type JsonColorTheme,

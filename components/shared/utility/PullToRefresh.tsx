@@ -30,7 +30,7 @@ import {
   capturePointer,
   TOUCH_GESTURE_CONTENT_CLASS,
 } from "@/lib/refresh/touch"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type PullToRefreshStatus = "idle" | "pulling" | "ready" | "refreshing"
 

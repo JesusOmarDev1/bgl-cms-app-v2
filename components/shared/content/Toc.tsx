@@ -20,7 +20,7 @@ import {
   measureLinkMetrics,
   type TocLinkMetrics,
 } from "@/lib/toc/toc-path"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type TableOfContentsContextValue = {
   items: TocItemData[]

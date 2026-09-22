@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Check, ChevronDown, Copy } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import {

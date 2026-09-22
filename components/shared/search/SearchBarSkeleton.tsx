@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export function SearchBarSkeleton({ className }: { className?: string }) {
   return (

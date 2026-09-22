@@ -18,7 +18,7 @@ export function setSecurityHeaders(response: Response): void {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
   response.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()"
+    "camera=(), microphone=(), geolocation=(), tracking=()"
   )
 
   if (!isVisualEditingEnabled) {

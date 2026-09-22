@@ -3,7 +3,7 @@
 import * as React from "react"
 import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
 import {

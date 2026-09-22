@@ -26,7 +26,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import React from "react"
 import { createPortal } from "react-dom"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 
 const DRAG_OPACITY = 0.4

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Eraser, Undo2 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 
 type Point = { x: number; y: number; w: number }

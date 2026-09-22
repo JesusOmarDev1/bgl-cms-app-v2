@@ -16,7 +16,7 @@ import {
   type MenuSectionProps as MenuSectionPrimitiveProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 function ContextMenu({

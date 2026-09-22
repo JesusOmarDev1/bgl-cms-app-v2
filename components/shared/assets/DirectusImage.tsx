@@ -12,7 +12,7 @@ import {
   type DirectusImageSizing,
   type DirectusImageVariant,
 } from "@/lib/directus/image-variants"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type { DirectusImageQuality, DirectusImageSizing, DirectusImageVariant }
 

@@ -36,7 +36,7 @@ import { useOnOpen } from "@/hooks/useOnOpen"
 import { useRowCursor } from "@/hooks/useRowCursor"
 import { useTouchCapable } from "@/hooks/useTouchCapable"
 import { PresenceGate } from "@/lib/animation/presence-gate"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { SafeHtml } from "./SafeHtml"
 
@@ -73,6 +73,11 @@ export interface CommandPaletteProps {
   /** When false, skip local fuzzy matching (server already filtered). */
   filterItems?: boolean
   status?: CommandPaletteStatus
+  /**
+   * Portaled overlays are inert inside a React Aria modal.
+   * Set false to render inside the current dialog.
+   */
+  portaled?: boolean
 }
 
 function fuzzyMatch(needle: string, hay: string) {
@@ -492,6 +497,7 @@ export function CommandPalette({
   onQueryChange,
   filterItems = true,
   status,
+  portaled = true,
 }: CommandPaletteProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const controlled = controlledOpen !== undefined
@@ -513,6 +519,7 @@ export function CommandPalette({
 
   const onKeyDownEvent = useEffectEvent((e: KeyboardEvent) => {
     if (
+      portaled &&
       (e.metaKey || e.ctrlKey) &&
       e.key.toLowerCase() === shortcut.toLowerCase()
     ) {
@@ -533,7 +540,7 @@ export function CommandPalette({
   }, [])
 
   useEffect(() => {
-    if (!open) return
+    if (!open || !portaled) return
     const root = document.documentElement
     const previousRootOverflow = root.style.overflow
     const previousBodyOverflow = document.body.style.overflow
@@ -543,7 +550,7 @@ export function CommandPalette({
       root.style.overflow = previousRootOverflow
       document.body.style.overflow = previousBodyOverflow
     }
-  }, [open])
+  }, [open, portaled])
 
   const filtered = useMemo(() => {
     if (!filterItems || !query) return items
@@ -611,8 +618,10 @@ export function CommandPalette({
     el?.scrollIntoView({ block: "nearest" })
   }, [active, open])
 
+  const frame = portaled ? "fixed" : "absolute"
+
   // The portal host does not exist during the server pass.
-  if (typeof document === "undefined") return null
+  if (portaled && typeof document === "undefined") return null
 
   // Portaled to <body> so ancestors with transforms, filters, or fixed
   // positioning can't trap the overlay in their stacking context, and mounted
@@ -622,7 +631,7 @@ export function CommandPalette({
   // `PresenceGate`, so interaction releases in the same commit that starts the
   // exit rather than when it ends — `open` is already false for those frames.
   // See tests/fixed-overlay-edge-sampling.test.tsx.
-  return createPortal(
+  const overlay = (
     <LazyMotion features={domAnimation}>
       <AnimatePresence initial={false}>
         {open ? (
@@ -640,7 +649,10 @@ export function CommandPalette({
                 transition={{ duration: 0.18, ease: EASE_OUT }}
                 {...gate}
                 onClick={() => setOpen(false)}
-                className="pointer-events-auto fixed inset-0 z-[100] bg-background/5 [backdrop-filter:blur(12px)_saturate(140%)] [-webkit-backdrop-filter:blur(12px)_saturate(140%)]"
+                className={cn(
+                  frame,
+                  "pointer-events-auto inset-0 z-[100] bg-background/5 [backdrop-filter:blur(12px)_saturate(140%)] [-webkit-backdrop-filter:blur(12px)_saturate(140%)]"
+                )}
               />
             )}
           </PresenceGate>
@@ -653,7 +665,10 @@ export function CommandPalette({
               // `inert` alone rather than the gate's pointer-events value.
               <div
                 inert={!isPresent}
-                className="pointer-events-none fixed inset-x-4 top-[18vh] bottom-4 z-[100] flex items-start justify-center"
+                className={cn(
+                  frame,
+                  "pointer-events-none inset-x-4 top-[18vh] bottom-4 z-[100] flex items-start justify-center"
+                )}
               >
                 <m.div
                   role="dialog"
@@ -718,7 +733,9 @@ export function CommandPalette({
           </PresenceGate>
         ) : null}
       </AnimatePresence>
-    </LazyMotion>,
-    document.body
+    </LazyMotion>
   )
+
+  if (!portaled) return overlay
+  return createPortal(overlay, document.body)
 }

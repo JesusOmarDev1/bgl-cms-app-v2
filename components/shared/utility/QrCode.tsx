@@ -1,6 +1,6 @@
 import { QRCodeSVG } from "qrcode.react"
 import { type HTMLAttributes } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type QRCodeProps = HTMLAttributes<HTMLDivElement> & {
   /** Content to encode in the QR */

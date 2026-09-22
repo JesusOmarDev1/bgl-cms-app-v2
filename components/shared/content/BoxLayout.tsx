@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Box, type BoxProps } from "@/components/shared/content/Box"
 
 function BoxContainer({ className, ...props }: BoxProps) {

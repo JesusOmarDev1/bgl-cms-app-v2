@@ -19,7 +19,7 @@ export const metadata = createMetadata({
   },
 })
 
-const EMAIL = "bglbasculas@gmail.com" as const
+const EMAIL = "soporte@bglbasculas.com" as const
 
 export default function Page() {
   return (
@@ -35,7 +35,7 @@ export default function Page() {
             <StaticLogo className="aspect-auto h-32 w-auto" />
           </div>
           <h1 className="text-center text-3xl font-semibold md:text-6xl">
-            Políticas de Privacidad
+            Políticas de Cookies
           </h1>
           <p className="text-center text-muted-foreground">
             Última actualización: Septiembre 2026

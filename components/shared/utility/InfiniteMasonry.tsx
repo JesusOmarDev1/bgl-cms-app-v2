@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react"
 import { EASE_OUT, SPRING_PANEL } from "@/lib/masonry/ease"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type InfiniteMasonryKey = string | number | bigint
 

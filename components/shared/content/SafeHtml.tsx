@@ -1,7 +1,7 @@
 import type { ElementType, HTMLAttributes } from "react"
 import { sanitizeHtml } from "@/lib/formatting/sanitize"
 import { injectHeadingIds } from "@/lib/directus/anchor-injector"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type TypesetPreset = "article" | "compact"
 

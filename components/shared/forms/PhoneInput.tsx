@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type PhoneInputProps = Omit<
   React.ComponentProps<"input">,

@@ -1,7 +1,7 @@
 import type { ChangeEvent, InputHTMLAttributes, ReactNode } from "react"
 import { AnimatedSearchInput } from "@/components/shared/search/AnimatedSearchInput"
 import { SearchBarClient } from "@/components/shared/search/SearchBarClient"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const MINIMAL_PLACEHOLDERS = [
   "Buscar...",
@@ -14,6 +14,10 @@ type SearchBarMode = "command" | "input"
 type SearchBarProps = {
   mode?: SearchBarMode
   variant?: "default" | "icon" | "header"
+  /** False keeps the palette inside a parent modal instead of portaling to body. */
+  portaled?: boolean
+  onNavigate?: () => void
+  onPaletteOpenChange?: (open: boolean) => void
   className?: string
   inputClassName?: string
   placeholders?: string[]
@@ -26,6 +30,9 @@ type SearchBarProps = {
 function SearchBar({
   mode,
   variant = "default",
+  portaled = true,
+  onNavigate,
+  onPaletteOpenChange,
   className,
   inputClassName,
   placeholders,
@@ -56,7 +63,15 @@ function SearchBar({
     )
   }
 
-  return <SearchBarClient variant={variant} className={className} />
+  return (
+    <SearchBarClient
+      variant={variant}
+      className={className}
+      portaled={portaled}
+      onNavigate={onNavigate}
+      onPaletteOpenChange={onPaletteOpenChange}
+    />
+  )
 }
 
 function SearchBarMinimal({

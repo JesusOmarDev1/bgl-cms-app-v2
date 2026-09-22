@@ -7,7 +7,7 @@ import {
   type LabelProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Label({ className, htmlFor, slot, ...props }: LabelProps) {
   const label = (

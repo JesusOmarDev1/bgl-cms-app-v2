@@ -3,7 +3,7 @@ import {
   type Status,
 } from "@/components/shared/debug/StatusIndicator"
 import type { HealthStatusType } from "@/types/enums/health-status"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export const HEALTH_RESPONSE_TIME_DEGRADED_MS = 800
 export const HEALTH_RESPONSE_TIME_CRITICAL_MS = 3000

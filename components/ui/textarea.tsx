@@ -6,7 +6,7 @@ import {
   TextArea as TextareaPrimitive,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Textarea({
   className,

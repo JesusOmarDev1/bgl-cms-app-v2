@@ -6,7 +6,7 @@ import {
   Input as InputPrimitive,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Input({
   className,

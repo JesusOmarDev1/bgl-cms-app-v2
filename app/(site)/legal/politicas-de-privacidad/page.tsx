@@ -19,7 +19,7 @@ export const metadata = createMetadata({
   },
 })
 
-const EMAIL = "bglbasculas@gmail.com" as const
+const EMAIL = "soporte@bglbasculas.com" as const
 
 export default function Page() {
   return (

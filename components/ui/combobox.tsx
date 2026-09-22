@@ -32,7 +32,7 @@ import {
   type TagProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import {
   InputGroup,

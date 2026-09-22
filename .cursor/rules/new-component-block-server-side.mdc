@@ -1,0 +1,16 @@
+---
+description: New server-data blocks under components/blocks use a folder + server/client/skeleton trio
+alwaysApply: true
+---
+
+# New component block — server side
+
+Any **new** block under `components/blocks/` that needs server data gets its own directory and these three files, same base name:
+
+- `Name/Name.tsx` — async Server Component. Calls the repository. Missing data returns `NameSkeleton`. Otherwise renders `NameClient`. No `"use client"`.
+- `Name/NameClient.tsx` — `"use client"`. Receives the query result. No repository call, no `cookies()` / `headers()` / `connection()`.
+- `Name/NameSkeleton.tsx` — no fetch. Same outer slot as the resolved block. Suspense fallback and empty-data return.
+
+A server block is passed into a client parent as `children` from a Server Component. Do not import `Name.tsx` from a `"use client"` file.
+
+HeaderNav and FooterNav already follow the trio behavior and stay where they are (flat files). The folder rule applies to **new** blocks, starting with MobileNav.

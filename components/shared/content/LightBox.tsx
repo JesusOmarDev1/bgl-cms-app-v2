@@ -4,7 +4,7 @@ import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import Image from "next/image"
 
 export type LightboxItem = {

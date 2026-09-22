@@ -26,7 +26,7 @@ import {
   isDebugKind,
   type DebugKind,
 } from "@/services/domain/db/debug/catalog"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type DebugToolbarProps = {
   total: number

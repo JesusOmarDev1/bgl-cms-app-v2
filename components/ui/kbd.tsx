@@ -2,7 +2,7 @@
 
 import { Keyboard as KbdPrimitive } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   return (

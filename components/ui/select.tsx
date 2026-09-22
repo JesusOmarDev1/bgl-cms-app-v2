@@ -20,7 +20,7 @@ import {
   type SelectValueProps,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   InputGroup,
   InputGroupAddon,

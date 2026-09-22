@@ -9,7 +9,7 @@ import {
   Tabs as TabsPrimitive,
 } from "react-aria-components"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Tabs({
   className,

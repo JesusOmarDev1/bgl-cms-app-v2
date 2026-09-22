@@ -7,10 +7,10 @@ export function HeaderNavSkeleton() {
       aria-hidden="true"
       className="fixed top-0 z-50 w-full border-b border-transparent"
     >
-      <div className="mx-auto flex h-24 w-full items-center justify-between gap-4 px-6">
-        <div className="flex items-center gap-4">
+      <div className="mx-auto flex h-24 w-full flex-nowrap items-center justify-between gap-4 px-6">
+        <div className="flex min-w-0 items-center gap-4">
           <Skeleton className="size-20 rounded-full" />
-          <div className="flex items-center gap-2.5">
+          <div className="hidden items-center gap-2.5 lg:flex">
             <Skeleton className="h-10 w-28" />
             <Skeleton className="h-10 w-28" />
             <Skeleton className="h-10 w-28" />
@@ -19,10 +19,11 @@ export function HeaderNavSkeleton() {
             <Skeleton className="h-10 w-28" />
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex shrink-0 items-center gap-2.5">
           <SearchBarSkeleton />
-          <Skeleton className="h-10 w-14" />
-          <Skeleton className="h-10 w-28" />
+          <Skeleton className="hidden size-8 lg:flex" />
+          <Skeleton className="hidden h-10 w-28 rounded-full lg:flex" />
+          <Skeleton className="size-8 lg:hidden" />
         </div>
       </div>
     </header>

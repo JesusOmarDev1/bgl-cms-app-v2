@@ -17,7 +17,7 @@ import {
   type ReactNode,
 } from "react"
 import { EASE_OUT } from "@/lib/forms/accordion/ease"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type BouncyAccordionItem = {
   id: string

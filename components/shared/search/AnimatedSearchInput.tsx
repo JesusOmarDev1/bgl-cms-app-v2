@@ -14,13 +14,22 @@ import {
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { Kbd } from "@/components/ui/kbd"
 import { useIsMac } from "@/hooks/useIsMac"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const DEFAULT_PLACEHOLDERS = [
   "Buscar...",
   "Intenta 'básculas industriales'",
   "¿Qué necesitas hoy?",
 ]
+
+function readTextSwapDurationMs(): number {
+  const parsed = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      "--text-swap-dur"
+    )
+  )
+  return Number.isFinite(parsed) ? parsed : 150
+}
 
 export type AnimatedSearchInputProps = {
   placeholders?: string[]
@@ -48,28 +57,39 @@ export function AnimatedSearchInput({
   const reduce = useReducedMotion()
   const isMac = useIsMac()
   const inputRef = useRef<HTMLInputElement>(null)
+  const swapRef = useRef<HTMLSpanElement>(null)
+  const indexRef = useRef(0)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
   const [inputValue, setInputValue] = useState("")
   const shortcutLabel = isMac ? "⌘" : "Ctrl"
 
   useEffect(() => {
     if (inputValue || reduce || placeholders.length < 2) return
 
+    const swapEl = swapRef.current
     let nestedTimeout: number | undefined
     const timer = window.setInterval(() => {
-      setIsAnimating(true)
+      const el = swapRef.current
+      if (!el) return
+      el.classList.add("is-exit")
       nestedTimeout = window.setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % placeholders.length)
-        setIsAnimating(false)
-      }, 300)
+        const nextIndex = (indexRef.current + 1) % placeholders.length
+        indexRef.current = nextIndex
+        el.textContent = placeholders[nextIndex] ?? "Buscar..."
+        el.classList.remove("is-exit")
+        el.classList.add("is-enter-start")
+        void el.offsetHeight
+        el.classList.remove("is-enter-start")
+        setCurrentIndex(nextIndex)
+      }, readTextSwapDurationMs())
     }, interval)
 
     return () => {
       window.clearInterval(timer)
       if (nestedTimeout !== undefined) window.clearTimeout(nestedTimeout)
+      swapEl?.classList.remove("is-exit", "is-enter-start")
     }
-  }, [placeholders.length, interval, inputValue, reduce])
+  }, [placeholders, placeholders.length, interval, inputValue, reduce])
 
   useEffect(() => {
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
@@ -138,13 +158,8 @@ export function AnimatedSearchInput({
             {!inputValue ? (
               <div className="pointer-events-none absolute inset-0 flex items-center overflow-hidden">
                 <span
-                  className={cn(
-                    "text-[15px] text-muted-foreground",
-                    !reduce &&
-                      (isAnimating
-                        ? "animate-placeholder-slide-up"
-                        : "animate-placeholder-slide-in")
-                  )}
+                  ref={swapRef}
+                  className="t-text-swap text-[15px] text-muted-foreground"
                 >
                   {placeholder}
                 </span>
