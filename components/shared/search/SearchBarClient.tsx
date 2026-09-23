@@ -19,6 +19,7 @@ import { useIsMac } from "@/hooks/useIsMac"
 import { cn } from "cn"
 import { searchAction } from "@/services/domain/server/search/search"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
+import { Button } from "@/components/ui/button"
 
 const MIN_QUERY_LENGTH = 3
 const MAX_QUERY_LENGTH = 100
@@ -163,18 +164,19 @@ export function SearchBarClient({
   return (
     <>
       {showIcon ? (
-        <button
-          type="button"
+        <Button
+          variant="glass"
+          size="icon-xl"
           aria-label="Buscar"
           className={cn(
-            "inline-flex size-11 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground",
+            "rounded-full",
             variant === "header" && "lg:hidden",
             className
           )}
           onClick={() => handleOpenChange(true)}
         >
           <MaterialIcon name="search" size={20} />
-        </button>
+        </Button>
       ) : null}
 
       {showDefault ? (
@@ -182,7 +184,7 @@ export function SearchBarClient({
           type="button"
           aria-label="Buscar"
           className={cn(
-            "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-48 2xl:w-56",
+            "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44",
             variant === "header" && "hidden lg:inline-flex",
             className
           )}

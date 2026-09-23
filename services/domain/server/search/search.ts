@@ -1,8 +1,11 @@
 "use server"
 
+import { headers } from "next/headers"
 import { getTranslations } from "next-intl/server"
+import { returnServerError } from "next-safe-action"
 import { z } from "zod"
 import meilisearch from "@/config/meilisearch"
+import { searchLimiter } from "@/config/rate-limiter"
 import { actionClient } from "@/lib/server/safe-action"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
 import { TEXT_REGEX } from "@/lib/validations/text"
@@ -26,6 +29,21 @@ export const searchAction = actionClient
   .inputSchema(searchSchema)
   .action(async ({ parsedInput: { query } }) => {
     const t = await getTranslations("search")
+
+    const forwarded = (await headers()).get("x-forwarded-for")
+    const ip =
+      forwarded
+        ?.split(",")
+        .at(-1)
+        ?.trim()
+        .toLowerCase()
+        .replace(/^::ffff:/, "") || "missing"
+    try {
+      await searchLimiter.consume(ip)
+    } catch {
+      console.warn("[search] rate limited")
+      returnServerError(t("rate_limited"))
+    }
 
     try {
       const results = await meilisearch

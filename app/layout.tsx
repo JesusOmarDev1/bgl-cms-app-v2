@@ -67,12 +67,11 @@ export default function RootLayout({
                 </Suspense>
               </NuqsAdapter>
               <Toaster
-                richColors
                 closeButton
                 expand
                 theme="dark"
-                duration={2000}
-                position="top-center"
+                duration={1500}
+                position="bottom-right"
               />
             </ThemeProvider>
             {GA_MEASUREMENT_ID ? (

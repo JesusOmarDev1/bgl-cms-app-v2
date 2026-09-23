@@ -15,6 +15,10 @@ import {
 } from "@/types/enums/contact-position"
 import { splitEmail } from "@/lib/formatting/split-email"
 import { Separator } from "@/components/ui/separator"
+import { SocialIcon } from "@/components/shared/content/SocialIcon"
+import { FooterCopyright } from "./FooterCopyright"
+import { FooterCompanyLetters } from "./FooterCompanyLetters"
+import { CopyButton } from "@/components/shared/content/CopyButton"
 
 const FOOTER_LEGAL_LINKS = [
   {
@@ -137,7 +141,7 @@ export function FooterNavClient({ data, className }: FooterNavClientProps) {
     >
       <Box display={"grid"} cols={1} paddingInline={2}>
         <div className="grid grid-cols-1 place-content-center items-center gap-8 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:place-content-start lg:items-start">
-          <div>
+          <div className="flex flex-col gap-2.5">
             <Link href="/" aria-label="Inicio" title="Inicio">
               {data?.logo_dark ? (
                 <DirectusImage
@@ -267,6 +271,45 @@ export function FooterNavClient({ data, className }: FooterNavClientProps) {
               </div>
             </div>
           )}
+          <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
+            <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+              Horarios de atención
+            </span>
+            <div className="flex-1">
+              <div className="flex flex-col flex-wrap gap-3 lg:flex-row lg:gap-10">
+                <div className="flex items-center gap-2">
+                  <MaterialIcon
+                    name="schedule"
+                    size={18}
+                    className="text-muted-foreground"
+                  />
+                  <span className="font-medium text-white/80 hover:text-white lg:text-xl">
+                    Lunes a Viernes: 8:00 - 17:00
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MaterialIcon
+                    name="schedule"
+                    size={18}
+                    className="text-muted-foreground"
+                  />
+                  <span className="font-medium text-white/80 hover:text-white lg:text-xl">
+                    Sábado: 8:00 - 13:00
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MaterialIcon
+                    name="schedule"
+                    size={18}
+                    className="text-muted-foreground"
+                  />
+                  <span className="font-medium text-white/80 hover:text-white lg:text-xl">
+                    Domingo: Cerrado
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
           {data?.emails && data?.emails.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
               <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
@@ -275,46 +318,80 @@ export function FooterNavClient({ data, className }: FooterNavClientProps) {
               <div className="flex-1">
                 <div className="flex flex-col flex-wrap gap-3 lg:flex-row lg:gap-10">
                   {data?.emails.map((email) => (
-                    <div key={email.id} className="flex flex-col gap-1">
-                      <span className="font-medium text-white/80 lg:text-xl">
-                        {
-                          ContactPositionLabel[
-                            (email.item.position as ContactPositionType) ?? ""
-                          ]
-                        }
-                      </span>
-                      <span
-                        aria-label={`Enviar correo a ${email.item.email}`}
-                        className="group inline-flex items-center gap-2 text-lg text-white/60 transition-colors duration-200 hover:text-white"
-                      >
-                        <MaterialIcon
-                          name="mail"
-                          size={18}
-                          className="text-white/40 group-hover:text-white"
-                        />
-                        {(() => {
-                          const parts = splitEmail(email.item.email)
-                          if (!parts) return email.item.email
-                          return (
-                            <div className="flex items-center gap-0">
-                              {parts.localPart}
-                              <MaterialIcon
-                                name="alternate_email"
-                                size={18}
-                                className="text-white/60 group-hover:text-white"
-                              />
-                              {parts.domain}
-                            </div>
-                          )
-                        })()}
-                      </span>
+                    <div key={email.id} className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-white/80 lg:text-xl">
+                          {
+                            ContactPositionLabel[
+                              (email.item.position as ContactPositionType) ?? ""
+                            ]
+                          }
+                        </span>
+                        <span
+                          aria-label={`Enviar correo a ${email.item.email}`}
+                          className="group inline-flex items-center gap-2 text-lg text-white/60 transition-colors duration-200 hover:text-white"
+                        >
+                          <MaterialIcon
+                            name="mail"
+                            size={18}
+                            className="text-white/40 group-hover:text-white"
+                          />
+                          {(() => {
+                            const parts = splitEmail(email.item.email)
+                            if (!parts) return email.item.email
+                            return (
+                              <div className="flex items-center gap-0">
+                                {parts.localPart}
+                                <MaterialIcon
+                                  name="alternate_email"
+                                  size={18}
+                                  className="text-white/60 group-hover:text-white"
+                                />
+                                {parts.domain}
+                              </div>
+                            )
+                          })()}
+                        </span>
+                      </div>
+                      <CopyButton content={email.item.email ?? ""} />
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
+          {data?.social_links && data?.social_links.length > 0 && (
+            <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
+              <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+                Redes sociales
+              </span>
+              <div className="flex-1">
+                <div className="flex flex-col flex-wrap gap-3 lg:flex-row lg:gap-10">
+                  {data?.social_links.map((social) => (
+                    <div key={social.id} className="flex flex-col gap-1">
+                      <Link
+                        href={social.item.url}
+                        aria-label={`Ir a ${social.item.title}`}
+                        title={`Ir a ${social.item.title}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center gap-2.5 text-lg text-white/60 transition-colors duration-200 hover:text-white"
+                      >
+                        <SocialIcon type={social.item.type} />
+                        {social.item.title}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           <Separator className="mt-0.5 mb-4" orientation="horizontal" />
+          <div className="flex flex-col items-center gap-4">
+            <FooterCopyright />
+            <FooterCompanyLetters />
+          </div>
         </div>
       </Box>
     </footer>

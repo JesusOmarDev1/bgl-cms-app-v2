@@ -1,7 +1,7 @@
 import "@/app/globals.css"
 import type { Preview } from "@storybook/nextjs-vite"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { themes } from "storybook/theming"
+import { themes, ensure } from "storybook/theming"
 
 let storyQueryClient: QueryClient | undefined
 
@@ -27,7 +27,11 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    themes: themes.dark,
+    docs: {
+      toc: true,
+      codePanel: true,
+    },
+    themes: ensure(themes.dark),
   },
 }
 

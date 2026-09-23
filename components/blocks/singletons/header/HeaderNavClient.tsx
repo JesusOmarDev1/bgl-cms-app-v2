@@ -22,6 +22,29 @@ import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
 import { Button } from "@/components/ui/button"
 
+const HEADER_LEGAL_LINKS = [
+  {
+    href: "/legal/politicas-de-privacidad",
+    title: "Política de privacidad",
+    icon: "policy",
+  },
+  {
+    href: "/legal/politicas-de-cookies",
+    title: "Política de cookies",
+    icon: "cookie",
+  },
+  {
+    href: "/legal/politicas-de-seguridad",
+    title: "Política de seguridad",
+    icon: "verified_user",
+  },
+  {
+    href: "/legal/terminos-de-uso-y-datos",
+    title: "Términos de uso",
+    icon: "gavel",
+  },
+] as const
+
 interface HeaderNavClientProps {
   data: HeaderQueryResult | null | undefined
   className?: string
@@ -105,7 +128,7 @@ export function HeaderNavClient({
                           />
                           {title}
                         </NavigationMenuTrigger>
-                        <NavigationMenuContent className="flex min-w-2xs flex-col gap-1.5">
+                        <NavigationMenuContent className="flex min-w-3xs flex-col gap-1.5">
                           {subLinks.map((sub) => {
                             const subItem = sub.sub_links_id
                             if (subItem == null) return null
@@ -172,10 +195,37 @@ export function HeaderNavClient({
                     </NavigationMenuItem>
                   )
                 })}
+              <NavigationMenuItem key="legal">
+                <NavigationMenuTrigger className="flex items-center gap-2 text-sm xl:text-base">
+                  <MaterialIcon
+                    className="text-muted-foreground"
+                    name="cases"
+                  />
+                  <span>Legal</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="flex min-w-3xs flex-col gap-1.5">
+                  {HEADER_LEGAL_LINKS.map((link) => (
+                    <NavigationMenuItem key={link.title}>
+                      <NavigationMenuLink
+                        href={link.href}
+                        aria-label={link.title}
+                        title={link.title}
+                        className="flex items-center gap-1.5 text-sm xl:text-base"
+                      >
+                        <MaterialIcon
+                          className="text-muted-foreground"
+                          name={link.icon ?? ""}
+                        />
+                        {link.title}
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuContent>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           <SearchBar variant="header" />
           <MexicoCityIcon className="hidden size-8 lg:flex" />
           {data?.primary_button && (

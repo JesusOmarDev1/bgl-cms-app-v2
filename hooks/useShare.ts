@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { isBrowser } from "@/lib/browser/env"
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard"
-import { toast } from "sonner"
+import showToast from "@/hooks/useToast"
 
 interface ShareData {
   title?: string
@@ -75,7 +75,11 @@ export default function useShare(
         ) {
           await navigator.share(shareData)
         } else {
-          toast.warning("La API de Web Share no es compatible")
+          showToast({
+            title: "La API de Web Share no es compatible",
+            message: "La API de Web Share no es compatible",
+            variant: "warning",
+          })
         }
         onSuccess?.()
       } else if (fallbackCopy) {
@@ -89,12 +93,20 @@ export default function useShare(
           await copyToClipboard(textToCopy.trim())
           onSuccess?.()
         } else {
-          toast.warning("No hay contenido para compartir")
+          showToast({
+            title: "No hay contenido para compartir",
+            message: "No hay contenido para compartir",
+            variant: "warning",
+          })
         }
       } else {
-        toast.error(
-          "La API de Web Share no es compatible y la función de respaldo está deshabilitada"
-        )
+        showToast({
+          title:
+            "La API de Web Share no es compatible y la función de respaldo está deshabilitada",
+          message:
+            "La API de Web Share no es compatible y la función de respaldo está deshabilitada",
+          variant: "warning",
+        })
       }
     } catch (err) {
       const errorMessage =

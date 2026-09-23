@@ -737,5 +737,6 @@ export function CommandPalette({
   )
 
   if (!portaled) return overlay
+  if (typeof document === "undefined") return null
   return createPortal(overlay, document.body)
 }

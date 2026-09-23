@@ -50,8 +50,8 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
     <>
       <Button
         variant="ghost"
-        size="icon"
-        className="lg:hidden"
+        size="icon-xl"
+        className="rounded-full lg:hidden"
         aria-label="Abrir menú"
         onPress={() => setOpen(true)}
       >

@@ -1,15 +1,20 @@
-import "server-only"
+import "server-only";
+import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible";
+import redis from "@/config/redis";
 
-import {
-  RateLimiterMemory,
-  type IRateLimiterOptions,
-} from "rate-limiter-flexible"
-
-const opts: IRateLimiterOptions = {
-  keyPrefix: "@bg-rate-limiter",
+const searchLimiterMemory = new RateLimiterMemory({
+  keyPrefix: "search",
   points: 60,
-  duration: 10,
-  blockDuration: 60,
-}
+  duration: 60,
+});
 
-export const rateLimiter = new RateLimiterMemory(opts)
+export const searchLimiter = new RateLimiterRedis({
+  storeClient: redis,
+  keyPrefix: "search",
+  points: 60,
+  duration: 60,
+  blockDuration: 60,
+  inMemoryBlockOnConsumed: 60,
+  inMemoryBlockDuration: 60,
+  insuranceLimiter: searchLimiterMemory,
+});
