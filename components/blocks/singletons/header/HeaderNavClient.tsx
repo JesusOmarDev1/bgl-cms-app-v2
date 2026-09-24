@@ -130,34 +130,25 @@ export function HeaderNavClient({
                         </NavigationMenuTrigger>
                         <NavigationMenuContent className="flex min-w-3xs flex-col gap-1.5">
                           {subLinks.map((sub) => {
-                            const subItem = sub.sub_links_id
-                            if (subItem == null) return null
-                            if (
-                              subItem.url == null ||
-                              subItem.url.length === 0
-                            ) {
-                              return null
-                            }
-
                             return (
                               <NavigationMenuLink
-                                key={subItem.id}
+                                key={sub.id}
                                 className={cn(
                                   navigationMenuTriggerStyle(),
                                   "flex w-full justify-start text-sm xl:text-base"
                                 )}
                                 render={
                                   <Link
-                                    href={subItem.url}
-                                    aria-label={subItem.title}
-                                    title={subItem.title}
+                                    href={sub.sub_links_id.url}
+                                    aria-label={sub.sub_links_id.title}
+                                    title={sub.sub_links_id.title}
                                     className="flex items-center gap-1.5"
                                   >
                                     <MaterialIcon
                                       className="text-muted-foreground"
-                                      name={subItem.icon ?? ""}
+                                      name={sub.sub_links_id.icon ?? ""}
                                     />
-                                    {subItem.title}
+                                    {sub.sub_links_id.title}
                                   </Link>
                                 }
                               />
@@ -175,7 +166,7 @@ export function HeaderNavClient({
                       <NavigationMenuLink
                         className={cn(
                           navigationMenuTriggerStyle(),
-                          "text-sm xl:text-base"
+                          "flex w-full justify-start text-sm xl:text-base"
                         )}
                         render={
                           <Link
@@ -210,7 +201,10 @@ export function HeaderNavClient({
                         href={link.href}
                         aria-label={link.title}
                         title={link.title}
-                        className="flex items-center gap-1.5 text-sm xl:text-base"
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          "flex w-full justify-start text-sm xl:text-base"
+                        )}
                       >
                         <MaterialIcon
                           className="text-muted-foreground"
@@ -228,7 +222,7 @@ export function HeaderNavClient({
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           <SearchBar variant="header" />
           <MexicoCityIcon className="hidden size-8 lg:flex" />
-          {data?.primary_button && (
+          {data?.primary_button ? (
             <Link href={data.primary_url ?? ""}>
               <Button
                 variant="red"
@@ -239,8 +233,8 @@ export function HeaderNavClient({
                 <MaterialIcon name={data.primary_icon ?? ""} size={16} />
               </Button>
             </Link>
-          )}
-          {data?.secondary_button && (
+          ) : null}
+          {data?.secondary_button ? (
             <Link href={data.secondary_url ?? ""}>
               <Button
                 variant="outline"
@@ -251,7 +245,7 @@ export function HeaderNavClient({
                 <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
               </Button>
             </Link>
-          )}
+          ) : null}
           {children}
         </div>
       </div>

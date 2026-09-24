@@ -1,7 +1,7 @@
 {
   "health": {
     "title": "Estado del sistema",
-    "description": "Monitoriza el estado del sistema para garantizar que el sistema funciona correctamente.",
+    "description": "Aquí puedes consultar el estado actual del sistema y de sus principales servicios. Esta información permite conocer si los servicios se encuentran funcionando con normalidad, presentan algún inconveniente o están temporalmente fuera de servicio.",
     "status": {
       "ok": "Ok",
       "warn": "Advertencia",

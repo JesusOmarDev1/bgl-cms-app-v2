@@ -16,14 +16,15 @@ import {
   healthBadgeClassName,
   healthIconClassName,
   healthPingClassName,
-  resolveHealthView,
+  healthView,
 } from "./helpers"
 
 export async function HealthStatus() {
   const t = await getTranslations("health")
   const health = await getHealthRepository()
-  const view = resolveHealthView({
-    status: health.status,
+  const apiStatus = health.ping ? "ok" : "unreachable"
+  const view = healthView({
+    status: apiStatus,
     responseTime: health.responseTime,
     ping: health.ping,
   })
@@ -64,7 +65,7 @@ export async function HealthStatus() {
               data-icon="inline-start"
               className={healthIconClassName(view.indicatorStatus)}
             />
-            {t(`status.${health.status}`)}
+            {t(`status.${apiStatus}`)}
           </Badge>
         </div>
         {hintText ? (

@@ -30,7 +30,7 @@
     "@marsidev/react-turnstile": "^1.6.0",
     "@material-symbols/font-400": "^0.46.0",
     "@next-safe-action/adapter-tanstack-query": "^0.1.2",
-    "@next/third-parties": "^16.3.1",
+    "@next/third-parties": "16.3.6",
     "@radix-ui/react-dialog": "^1.1.23",
     "@shadcn/react": "^0.3.0",
     "@tanstack/react-form": "^1.33.5",
@@ -50,7 +50,7 @@
     "lucide-react": "^1.31.0",
     "meilisearch": "^0.60.0",
     "motion": "^13.1.1",
-    "next": "16.3.2",
+    "next": "16.3.6",
     "next-intl": "^4.13.7",
     "next-safe-action": "^8.6.1",
     "next-themes": "^0.4.6",
@@ -58,9 +58,9 @@
     "ofetch": "^1.5.1",
     "qrcode.react": "^4.2.0",
     "rate-limiter-flexible": "^11.2.0",
-    "react": "19.2.4",
+    "react": "19.3.0",
     "react-aria-components": "^1.20.0",
-    "react-dom": "19.2.4",
+    "react-dom": "19.3.0",
     "react-phone-number-input": "^3.4.17",
     "reading-time-estimator": "^2.13.0",
     "shadcn": "^4.18.0",
@@ -78,12 +78,12 @@
     "@storybook/nextjs-vite": "^10.6.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20.19.43",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "@vitest/browser-playwright": "latest",
     "@vitest/coverage-v8": "latest",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "16.2.6",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-storybook": "^10.6.0",
     "playwright": "latest",
@@ -95,5 +95,11 @@
     "typescript": "^6.0.3",
     "vite": "latest",
     "vitest": "latest"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.3.0",
+      "@types/react-dom": "19.3.0"
+    }
   }
 }

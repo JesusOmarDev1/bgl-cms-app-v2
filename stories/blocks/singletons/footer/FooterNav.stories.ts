@@ -23,6 +23,7 @@ const meta = {
   },
   args: {
     data: mockFooter,
+    healthStatus: "operational",
   },
 } satisfies Meta<typeof FooterNavClient>
 

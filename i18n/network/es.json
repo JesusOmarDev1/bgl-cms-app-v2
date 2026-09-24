@@ -1,0 +1,28 @@
+{
+  "network": {
+    "title": "Estado de la red",
+    "description": "Información sobre tu conexión a internet. Si no se muestra información, significa que no hay conexión a internet o que no se ha podido obtener la información del navegador.",
+    "statusLabel": "Conexión:",
+    "status": {
+      "online": "En línea",
+      "offline": "Sin conexión"
+    },
+    "speed": {
+      "label": "Velocidad:",
+      "fast": "Rápida",
+      "moderate": "Moderada",
+      "slow": "Lenta",
+      "value": "{mbps} Mbps"
+    },
+    "latency": {
+      "label": "Latencia:",
+      "value": "{ms} ms"
+    },
+    "saveData": {
+      "label": "Ahorro de datos:",
+      "on": "Activado",
+      "off": "Desactivado"
+    },
+    "unknown": "—"
+  }
+}

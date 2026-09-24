@@ -57,7 +57,7 @@ const HEALTH_STATUS_TO_INDICATOR_STATUS: Record<HealthStatusType, Status> = {
   unreachable: "major-outage",
 }
 
-function resolveLatencySeverity(responseTime?: number): LatencySeverity {
+function latencySeverity(responseTime?: number): LatencySeverity {
   if (typeof responseTime !== "number" || Number.isNaN(responseTime)) {
     return "normal"
   }
@@ -73,13 +73,13 @@ function resolveLatencySeverity(responseTime?: number): LatencySeverity {
   return "normal"
 }
 
-export function resolveHealthView({
+export function healthView({
   status,
   responseTime,
   ping = true,
   maintenanceInProgress = false,
 }: HealthStatusResolutionInput): HealthView {
-  const latency = resolveLatencySeverity(responseTime)
+  const latency = latencySeverity(responseTime)
   const cmsUi = STATUS_UI[status]
 
   if (maintenanceInProgress) {
@@ -147,16 +147,4 @@ export function healthIconClassName(status: Status, className?: string) {
 
 export function healthBadgeClassName(status: Status, className?: string) {
   return cn("uppercase", healthToneClassName(status), className)
-}
-
-export function resolveHealthIndicatorStatus(
-  input: HealthStatusResolutionInput
-): Status {
-  return resolveHealthView(input).indicatorStatus
-}
-
-export function resolveHealthIndicatorHint(
-  input: HealthStatusResolutionInput
-): HealthIndicatorHint | null {
-  return resolveHealthView(input).hint
 }

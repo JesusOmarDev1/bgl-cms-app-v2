@@ -9,6 +9,7 @@ import { DebugToolbar } from "@/components/debug/DebugToolbar"
 import { DebugToolbarSkeleton } from "@/components/debug/DebugToolbarSkeleton"
 import { loadDebugSearchParams } from "@/app/debug/search-params"
 import { loadDebugCollectionCount } from "@/services/domain/db/debug/load-debug-resource"
+import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
 
 export const instant = false
 
@@ -55,6 +56,7 @@ export default function DebugPage({ searchParams }: DebugPageProps) {
       padding={3}
       gap={1.5}
     >
+      <HeaderSpacer />
       <Suspense fallback={<DebugToolbarSkeleton />}>
         <DebugToolbarSlot searchParams={searchParams} />
       </Suspense>

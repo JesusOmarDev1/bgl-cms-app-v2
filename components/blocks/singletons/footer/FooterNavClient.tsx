@@ -8,7 +8,10 @@ import { Box } from "@/components/shared/content/Box"
 import { StaticLogo } from "@/assets/logos/static-logo"
 import { DirectusImage } from "@/components/shared/assets/DirectusImage"
 import Link from "next/link"
-import { StatusIndicator } from "@/components/shared/debug/StatusIndicator"
+import {
+  StatusIndicator,
+  type Status,
+} from "@/components/shared/debug/StatusIndicator"
 import {
   ContactPositionType,
   ContactPositionLabel,
@@ -19,6 +22,7 @@ import { SocialIcon } from "@/components/shared/content/SocialIcon"
 import { FooterCopyright } from "./FooterCopyright"
 import { FooterCompanyLetters } from "./FooterCompanyLetters"
 import { CopyButton } from "@/components/shared/content/CopyButton"
+import { useTranslations } from "next-intl"
 
 const FOOTER_LEGAL_LINKS = [
   {
@@ -46,6 +50,7 @@ const FOOTER_LEGAL_LINKS = [
 interface FooterNavClientProps {
   data: FooterQueryResult | null | undefined
   className?: string
+  healthStatus: Status
 }
 
 type FooterUrlLinkRow = NonNullable<
@@ -101,7 +106,12 @@ function FooterNavColumn({
   )
 }
 
-export function FooterNavClient({ data, className }: FooterNavClientProps) {
+export function FooterNavClient({
+  data,
+  className,
+  healthStatus,
+}: FooterNavClientProps) {
+  const t = useTranslations("health")
   const urlLinks = data?.url_links ?? []
   const dropdowns: { key: number; item: FooterUrlLinkItem }[] = []
   const links: {
@@ -163,14 +173,11 @@ export function FooterNavClient({ data, className }: FooterNavClientProps) {
               Soluciones de pesaje industrial con la más alta precisión y
               calidad.
             </p>
-            <Link
-              href="/health"
-              aria-label="Salud de la web"
-              title="Salud de la web"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <StatusIndicator status="operational" />
+            <Link href="/health" aria-label={t("title")} title={t("title")}>
+              <StatusIndicator
+                status={healthStatus}
+                label={t(`indicator.${healthStatus}`)}
+              />
             </Link>
           </div>
 
