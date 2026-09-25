@@ -1,17 +1,17 @@
 import "server-only"
 import { serverHealth } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { logDirectusQueryError } from "@/lib/directus/query-error"
 import { HealthResult } from "@/types/shared/health/health-result"
 import { HEALTH_FIELDS } from "./health.fields"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getHealthQuery(): Promise<HealthResult> {
+export async function getHealthQuery(
+  failedToFetchMessage: string
+): Promise<HealthResult> {
   "use cache"
   cacheTag("health")
-  cacheLife("seconds")
-  const t = await getTranslations("db.health")
+  cacheLife("minutes")
   const start = performance.now()
   const [statusField] = HEALTH_FIELDS
 
@@ -21,7 +21,7 @@ export async function getHealthQuery(): Promise<HealthResult> {
     return { status: health[statusField], responseTime, ping: true }
   } catch (error) {
     const responseTime = performance.now() - start
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    logDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getHealthQuery",
       collection: "health",

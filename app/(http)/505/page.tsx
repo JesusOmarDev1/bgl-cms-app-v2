@@ -4,25 +4,29 @@ import { metadata as createMetadata } from "@/lib/seo/metadata"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? ""
 
-export const metadata = createMetadata({
-  title: "Error del servidor",
-  description: "Error del servidor. Espera un momento e inténtalo de nuevo.",
-  keywords: ["505", "server error", "internal server error"],
-  canonical: `${BASE_URL}/505`,
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
+export async function generateMetadata() {
+  const t = await getTranslations("server-error")
+
+  return createMetadata({
+    title: t("title"),
+    description: t("message"),
+    keywords: ["505", "server error", "internal server error"],
+    canonical: `${BASE_URL}/505`,
+    robots: {
       index: false,
       follow: false,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
     },
-  },
-  openGraph: {
-    title: "Error del servidor",
-    description: "Error del servidor. Espera un momento e inténtalo de nuevo.",
-    type: "website",
-  },
-})
+    openGraph: {
+      title: t("title"),
+      description: t("message"),
+      type: "website",
+    },
+  })
+}
 
 export default async function ServerErrorPage() {
   const t = await getTranslations("server-error")

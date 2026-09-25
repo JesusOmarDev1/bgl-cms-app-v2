@@ -1,0 +1,8 @@
+{
+  "server-error": {
+    "title": "Error del servidor",
+    "message": "Error del servidor. Espera un momento e inténtalo de nuevo.",
+    "statusLabel": "Error interno del servidor",
+    "helperText": "Si el problema continúa, espera un minuto y recarga la página."
+  }
+}

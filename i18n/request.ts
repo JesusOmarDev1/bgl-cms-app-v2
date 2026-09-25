@@ -19,6 +19,7 @@ export default getRequestConfig(async () => {
       ...(await import(`./network/${locale}.json`)).default,
       ...(await import(`./maintenance/${locale}.json`)).default,
       ...(await import(`./unavailable/${locale}.json`)).default,
+      ...(await import(`./server-error/${locale}.json`)).default,
       ...(await import(`./debug/${locale}.json`)).default,
       ...(await import(`./cookies/${locale}.json`)).default,
     },
