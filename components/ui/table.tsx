@@ -21,6 +21,15 @@ import {
 import { cn } from "cn"
 
 function Table({ className, ...props }: TableProps) {
+  const collectionChildren: React.ReactNode[] = []
+  const caption: React.ReactNode[] = []
+  React.Children.forEach(props.children, (child) => {
+    if (React.isValidElement(child) && child.type === TableCaption) {
+      caption.push(child)
+    } else {
+      collectionChildren.push(child)
+    }
+  })
   return (
     <div
       data-slot="table-container"
@@ -30,7 +39,10 @@ function Table({ className, ...props }: TableProps) {
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
-      />
+      >
+        {collectionChildren}
+      </TablePrimitive>
+      {caption}
     </div>
   )
 }

@@ -17,7 +17,6 @@ import {
 import { useScroll } from "@/hooks/useScroll"
 import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
-import { SearchBar } from "@/components/shared/search/SearchBar"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
 import { Button } from "@/components/ui/button"
@@ -49,12 +48,14 @@ interface HeaderNavClientProps {
   data: HeaderQueryResult | null | undefined
   className?: string
   children?: ReactNode
+  search?: ReactNode
 }
 
 export function HeaderNavClient({
   data,
   className,
   children,
+  search,
 }: HeaderNavClientProps) {
   const scrolled = useScroll(10)
 
@@ -220,7 +221,7 @@ export function HeaderNavClient({
           </NavigationMenu>
         </div>
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
-          <SearchBar variant="header" />
+          {search}
           <MexicoCityIcon className="hidden size-8 lg:flex" />
           {data?.primary_button ? (
             <Link href={data.primary_url ?? ""}>

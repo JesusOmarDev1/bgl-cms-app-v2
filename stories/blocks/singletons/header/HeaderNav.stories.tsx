@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 
 import { HeaderNavClient } from "@/components/blocks/singletons/header/HeaderNavClient"
+import { MobileNavClient } from "@/components/blocks/singletons/header/mobile/MobileNavClient"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 
 const mockHeader = {
@@ -28,6 +29,11 @@ const meta = {
   args: {
     data: mockHeader,
   },
+  render: (args) => (
+    <HeaderNavClient {...args}>
+      <MobileNavClient data={mockHeader} search={false} />
+    </HeaderNavClient>
+  ),
 } satisfies Meta<typeof HeaderNavClient>
 
 export default meta

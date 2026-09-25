@@ -1,0 +1,489 @@
+{
+  "storybook": {
+    "accordion": {
+      "closed": "Cerrado",
+      "closed_hint": "Acordeón plegado; abre un ítem para leer el contenido.",
+      "expanded": "Expandido",
+      "expanded_hint": "Un ítem abierto de antemano con defaultExpandedKeys.",
+      "q1": "¿Qué es este servicio?",
+      "a1": "Es una plataforma para gestionar contenido y publicar información de forma sencilla.",
+      "q2": "¿Cómo contacto al soporte?",
+      "a2": "Puedes escribirnos por correo o usar el formulario de contacto en la sección de ayuda."
+    },
+    "alert": {
+      "sample": "Muestra",
+      "sample_hint": "Alerta con título y descripción; cambia la variante en Controls.",
+      "variants": "Variantes",
+      "variants_hint": "default y destructive para mensajes normales o de error.",
+      "title": "Atención",
+      "description": "Este es un mensaje de alerta informativo."
+    },
+    "alert_dialog": {
+      "closed": "Cerrado",
+      "closed_hint": "Diálogo de confirmación; el disparador abre el modal.",
+      "open_hint_label": "Disparador",
+      "open_hint": "Botón destructivo que abre el diálogo de confirmación.",
+      "trigger": "Abrir diálogo",
+      "title": "¿Estás seguro?",
+      "description": "Este diálogo es para confirmar una acción importante.",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar"
+    },
+    "attachment": {
+      "with_file": "Con adjunto",
+      "with_file_hint": "Archivo listo con icono, título y descripción.",
+      "empty": "Sin archivo",
+      "empty_hint": "Placeholder cuando aún no hay adjunto.",
+      "title": "informe-anual.pdf",
+      "description": "2,4 MB · Listo para descargar",
+      "empty_title": "Sin archivo",
+      "empty_description": "Arrastra un archivo o elige uno del dispositivo."
+    },
+    "avatar": {
+      "with_image": "Con imagen",
+      "with_image_hint": "Muestra AvatarImage; el fallback solo aparece si falla la carga.",
+      "fallback": "Solo iniciales",
+      "fallback_hint": "Sin imagen; se ven las iniciales del AvatarFallback.",
+      "alt": "Logo del sitio"
+    },
+    "badge": {
+      "sample": "Muestra",
+      "sample_hint": "Insignia controlable; cambia la variante en Controls.",
+      "variants": "Variantes",
+      "variants_hint": "Todas las variantes visuales del Badge.",
+      "label": "Etiqueta"
+    },
+    "breadcrumb": {
+      "default": "Predeterminado",
+      "default_hint": "Ruta jerárquica con enlaces y página actual.",
+      "current_only": "Solo página actual",
+      "current_only_hint": "Un único ítem sin enlaces previos.",
+      "home": "Inicio",
+      "library": "Biblioteca",
+      "articles": "Artículos"
+    },
+    "bubble": {
+      "sample": "Muestra",
+      "sample_hint": "Burbuja de mensaje; cambia la variante en Controls.",
+      "variants": "Variantes",
+      "variants_hint": "Todas las variantes de Bubble.",
+      "hello": "Hola, ¿en qué puedo ayudarte hoy?"
+    },
+    "button": {
+      "sample": "Muestra",
+      "sample_hint": "Botón controlable; variante, tamaño y efecto en Controls.",
+      "variants": "Variantes",
+      "variants_hint": "Todas las variantes visuales del Button.",
+      "sizes": "Tamaños",
+      "sizes_hint": "Escala de tamaños, incluidos los de icono.",
+      "effect": "Efecto",
+      "effect_hint": "Efectos visuales disponibles.",
+      "label": "Botón",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Botón no interactivo con isDisabled."
+    },
+    "button_group": {
+      "sample": "Muestra",
+      "sample_hint": "Grupo de botones; cambia la orientación en Controls.",
+      "horizontal": "Horizontal",
+      "horizontal_hint": "Botones en fila.",
+      "vertical": "Vertical",
+      "vertical_hint": "Botones apilados.",
+      "prev": "Anterior",
+      "current": "Actual",
+      "next": "Siguiente"
+    },
+    "calendar": {
+      "simple": "Simple",
+      "simple_hint": "Selector de una sola fecha.",
+      "range": "Rango",
+      "range_hint": "Selector de intervalo de fechas.",
+      "aria_simple": "Calendario",
+      "aria_range": "Calendario de rango"
+    },
+    "card": {
+      "with_data": "Con datos",
+      "with_data_hint": "Tarjeta con cabecera, cuerpo y pie de acción.",
+      "empty": "Vacía",
+      "empty_hint": "Solo título y descripción, sin contenido ni pie.",
+      "title": "Resumen del proyecto",
+      "description": "Vista general de la actividad reciente del equipo.",
+      "body": "Tienes tres tareas pendientes y dos publicaciones programadas para esta semana.",
+      "action": "Ver detalles",
+      "empty_title": "Sin contenido",
+      "empty_description": "Aún no hay datos para mostrar en esta tarjeta."
+    },
+    "carousel": {
+      "with_data": "Con datos",
+      "with_data_hint": "Carrusel con diapositivas y controles anterior/siguiente.",
+      "single": "Una diapositiva",
+      "single_hint": "Carrusel con un solo ítem.",
+      "slide1_title": "Primera diapositiva",
+      "slide1_body": "Contenido introductorio del carrusel.",
+      "slide2_title": "Segunda diapositiva",
+      "slide2_body": "Más información para el visitante.",
+      "slide3_title": "Tercera diapositiva",
+      "slide3_body": "Cierre con un mensaje de acción."
+    },
+    "checkbox": {
+      "unchecked": "Sin marcar",
+      "unchecked_hint": "Casilla disponible; la etiqueta va al lado, no dentro del control.",
+      "checked": "Seleccionado",
+      "checked_hint": "Marcada de antemano con defaultSelected.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "No interactiva; isDisabled evita el cambio.",
+      "terms": "Acepto los términos"
+    },
+    "collapsible": {
+      "closed": "Cerrado",
+      "closed_hint": "Contenido oculto hasta pulsar el disparador.",
+      "open": "Abierto",
+      "open_hint": "Expandido de antemano con defaultExpanded.",
+      "trigger": "Mostrar detalles adicionales",
+      "content": "Aquí puedes ampliar la información sin abandonar la página principal."
+    },
+    "combobox": {
+      "closed": "Cerrado",
+      "closed_hint": "Lista filtrable; escribe para buscar una opción.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Combobox no editable con isDisabled.",
+      "aria": "Buscar opción",
+      "placeholder": "Buscar...",
+      "one": "Uno",
+      "two": "Dos",
+      "three": "Tres"
+    },
+    "command": {
+      "with_data": "Con datos",
+      "with_data_hint": "Paleta de comandos; cada ítem necesita id y textValue.",
+      "empty": "Vacío",
+      "empty_hint": "Solo el estado sin resultados.",
+      "placeholder": "Buscar comando...",
+      "no_results": "Sin resultados",
+      "group_actions": "Acciones",
+      "group_nav": "Navegación",
+      "action": "Nueva acción",
+      "action_other": "Otra acción",
+      "nav_home": "Ir al inicio",
+      "nav_settings": "Ajustes",
+      "shortcut": "⌘K"
+    },
+    "context_menu": {
+      "closed": "Cerrado",
+      "closed_hint": "Clic derecho en el botón para abrir el menú contextual.",
+      "trigger": "Clic derecho aquí",
+      "copy": "Copiar",
+      "paste": "Pegar",
+      "delete": "Eliminar"
+    },
+    "dialog": {
+      "closed": "Cerrado",
+      "closed_hint": "Diálogo modal; el disparador lo abre.",
+      "trigger_label": "Disparador",
+      "trigger_hint": "Botón que abre el diálogo.",
+      "trigger": "Abrir diálogo",
+      "title": "Título del diálogo",
+      "description": "Descripción breve del contenido del diálogo.",
+      "close": "Cerrar"
+    },
+    "direction": {
+      "ltr": "LTR",
+      "ltr_hint": "Dirección de izquierda a derecha.",
+      "rtl": "RTL",
+      "rtl_hint": "Dirección de derecha a izquierda.",
+      "sample": "Texto de ejemplo"
+    },
+    "drawer": {
+      "closed": "Cerrado",
+      "closed_hint": "Panel lateral; el disparador lo abre.",
+      "trigger_label": "Disparador",
+      "trigger_hint": "Botón que abre el cajón.",
+      "trigger": "Abrir cajón",
+      "title": "Título del cajón",
+      "description": "Contenido auxiliar en un panel deslizante.",
+      "close": "Cerrar"
+    },
+    "dropdown_menu": {
+      "closed": "Cerrado",
+      "closed_hint": "Menú desplegable desde un botón.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Disparador deshabilitado; el menú no abre.",
+      "trigger": "Menú",
+      "option1": "Opción uno",
+      "option2": "Opción dos",
+      "option3": "Opción tres"
+    },
+    "empty": {
+      "filled": "Relleno",
+      "filled_hint": "Estado vacío con icono, título, descripción y acción.",
+      "icon_only": "Solo icono",
+      "icon_only_hint": "Misma estructura con EmptyMedia en variante default.",
+      "title": "No hay resultados",
+      "description": "Todavía no tienes elementos en esta sección. Crea uno para empezar.",
+      "action": "Crear elemento"
+    },
+    "field": {
+      "vertical": "Vertical",
+      "vertical_hint": "Etiqueta encima del control; orientación por defecto.",
+      "horizontal": "Horizontal",
+      "horizontal_hint": "Etiqueta e input en la misma fila.",
+      "invalid": "Inválido",
+      "invalid_hint": "Campo con error; muestra FieldError bajo el control.",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "nombre@ejemplo.com",
+      "email_description": "Usaremos este correo para enviarte notificaciones importantes.",
+      "name_label": "Nombre",
+      "name_placeholder": "Tu nombre",
+      "error": "Introduce un correo válido."
+    },
+    "hover_card": {
+      "closed": "Cerrado",
+      "closed_hint": "Pasa el cursor sobre el disparador para ver la tarjeta.",
+      "trigger": "Vista previa",
+      "content": "Contenido de la tarjeta que aparece al pasar el cursor."
+    },
+    "input": {
+      "default": "Predeterminado",
+      "default_hint": "Campo de texto vacío con placeholder.",
+      "with_value": "Con valor",
+      "with_value_hint": "Campo precargado con un valor inicial.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "No editable; isDisabled bloquea la entrada.",
+      "invalid": "Inválido",
+      "invalid_hint": "Marcado con aria-invalid para estado de error.",
+      "placeholder": "Escribe aquí…",
+      "aria": "Campo de texto",
+      "sample_value": "Texto de ejemplo"
+    },
+    "input_group": {
+      "empty": "Vacío",
+      "empty_hint": "InputGroup con icono de búsqueda y placeholder.",
+      "with_value": "Con valor",
+      "with_value_hint": "Mismo grupo con texto precargado.",
+      "placeholder": "Buscar en la biblioteca...",
+      "sample_value": "Informe anual"
+    },
+    "item": {
+      "default": "Predeterminado",
+      "default_hint": "Ítem de lista con título y descripción.",
+      "variants": "Variantes",
+      "variants_hint": "Variantes visuales del Item.",
+      "title": "Título del ítem",
+      "description": "Descripción breve del ítem."
+    },
+    "kbd": {
+      "single": "Una tecla",
+      "single_hint": "Representa una sola tecla del teclado.",
+      "combo": "Combinación",
+      "combo_hint": "Grupo Ctrl+K para atajos.",
+      "in_sentence": "En una frase",
+      "in_sentence_hint": "KbdGroup incrustado en texto corrido.",
+      "key": "K",
+      "ctrl": "Ctrl",
+      "sentence_before": "Pulsa",
+      "sentence_after": "para abrir la búsqueda."
+    },
+    "label": {
+      "default": "Predeterminado",
+      "default_hint": "Etiqueta asociada a un control con htmlFor.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Etiqueta junto a un control deshabilitado.",
+      "text": "Nombre",
+      "placeholder": "Tu nombre"
+    },
+    "marker": {
+      "default": "Predeterminado",
+      "default_hint": "Marcador de estado o categoría.",
+      "variants": "Variantes",
+      "variants_hint": "Variantes de color del Marker.",
+      "label": "Nuevo"
+    },
+    "message": {
+      "with_data": "Con datos",
+      "with_data_hint": "Conversación con avatar, burbuja y pie de hora.",
+      "single": "Un mensaje",
+      "single_hint": "Un solo mensaje entrante sin respuesta.",
+      "from": "Ana Soto",
+      "body_in": "¿Podemos revisar el borrador antes de publicarlo?",
+      "body_out": "Sí, lo reviso en unos minutos y te confirmo.",
+      "time_in": "10:24",
+      "time_out": "10:26"
+    },
+    "message_scroller": {
+      "with_data": "Con datos",
+      "with_data_hint": "Lista de burbujas con scroll; el botón salta al final.",
+      "aria": "Mensajes de ejemplo",
+      "m1": "Hola, ¿en qué puedo ayudarte?",
+      "m2": "Busco información sobre los servicios.",
+      "m3": "Claro, aquí tienes un resumen breve.",
+      "m4": "¿Incluye soporte técnico?",
+      "m5": "Sí, el plan incluye soporte por correo.",
+      "m6": "Perfecto, gracias.",
+      "m7": "¿Quieres que te envíe la documentación?",
+      "m8": "Sí, por favor."
+    },
+    "navigation_menu": {
+      "closed": "Cerrado",
+      "closed_hint": "Menú de navegación horizontal.",
+      "with_link": "Con enlace",
+      "with_link_hint": "Ítem de menú como enlace directo.",
+      "products": "Productos",
+      "docs": "Documentación",
+      "about": "Acerca de"
+    },
+    "pagination": {
+      "default": "Predeterminado",
+      "default_hint": "Controles de página con anterior y siguiente.",
+      "single": "Una página",
+      "single_hint": "Paginación mínima con un solo número.",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page": "Página"
+    },
+    "popover": {
+      "closed": "Cerrado",
+      "closed_hint": "Popover anclado al disparador.",
+      "trigger": "Abrir popover",
+      "title": "Información",
+      "description": "Contenido breve en un popover."
+    },
+    "radio_group": {
+      "default": "Predeterminado",
+      "default_hint": "Grupo de opciones; la etiqueta va al lado de cada radio.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Grupo completo no interactivo.",
+      "option1": "Opción uno",
+      "option2": "Opción dos",
+      "option3": "Opción tres"
+    },
+    "scroll_area": {
+      "with_content": "Con contenido",
+      "with_content_hint": "Área con overflow y barra de desplazamiento.",
+      "short": "Corto",
+      "short_hint": "Contenido que no necesita scroll.",
+      "item": "Elemento"
+    },
+    "select": {
+      "closed": "Cerrado",
+      "closed_hint": "Selector desplegable de una opción.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Select no interactivo.",
+      "placeholder": "Elige una opción",
+      "aria": "Selector de opción",
+      "one": "Uno",
+      "two": "Dos",
+      "three": "Tres"
+    },
+    "separator": {
+      "horizontal": "Horizontal",
+      "horizontal_hint": "Línea divisoria horizontal.",
+      "vertical": "Vertical",
+      "vertical_hint": "Línea divisoria vertical entre elementos."
+    },
+    "sheet": {
+      "closed": "Cerrado",
+      "closed_hint": "Hoja lateral; el disparador la abre.",
+      "trigger_label": "Disparador",
+      "trigger_hint": "Botón que abre la hoja.",
+      "trigger": "Abrir hoja",
+      "title": "Título de la hoja",
+      "description": "Contenido auxiliar en una hoja lateral.",
+      "close": "Cerrar"
+    },
+    "skeleton": {
+      "line": "Línea",
+      "line_hint": "Placeholder de una línea de texto.",
+      "avatar": "Avatar y líneas",
+      "avatar_hint": "Círculo más dos barras, típico de perfil.",
+      "card": "Tarjeta",
+      "card_hint": "Bloque rectangular que simula una tarjeta."
+    },
+    "slider": {
+      "default": "Predeterminado",
+      "default_hint": "Control deslizante de valor.",
+      "disabled": "Deshabilitado",
+      "disabled_hint": "Slider no interactivo.",
+      "aria": "Control deslizante"
+    },
+    "sonner": {
+      "default": "Predeterminado",
+      "default_hint": "Dispara un toast informativo con Sonner.",
+      "success": "Éxito",
+      "success_hint": "Toast de confirmación exitosa.",
+      "trigger": "Mostrar notificación",
+      "trigger_success": "Mostrar éxito",
+      "message": "Operación completada",
+      "success_message": "Guardado correctamente"
+    },
+    "spinner": {
+      "default": "Predeterminado",
+      "default_hint": "Indicador de carga animado.",
+      "with_label": "Con etiqueta",
+      "with_label_hint": "Spinner junto a texto de estado.",
+      "loading": "Cargando…"
+    },
+    "switch": {
+      "on": "Activado",
+      "on_hint": "Interruptor encendido con defaultSelected.",
+      "off": "Desactivado",
+      "off_hint": "Interruptor apagado (sin selección previa).",
+      "aria": "Activar notificaciones",
+      "label": "Notificaciones"
+    },
+    "table": {
+      "with_data": "Con datos",
+      "with_data_hint": "Tabla con filas, caption y pie con el conteo.",
+      "caption": "Lista de miembros del equipo editorial.",
+      "col_name": "Nombre",
+      "col_role": "Rol",
+      "col_status": "Estado",
+      "row1_name": "Ana García",
+      "row1_role": "Editora",
+      "row1_status": "Activa",
+      "row2_name": "Luis Pérez",
+      "row2_role": "Administrador",
+      "row2_status": "Activo",
+      "row3_name": "María López",
+      "row3_role": "Colaboradora",
+      "row3_status": "Pendiente",
+      "footer": "Total: 3 miembros",
+      "aria": "Usuarios del equipo"
+    },
+    "tabs": {
+      "default": "Predeterminado",
+      "default_hint": "Pestañas para alternar paneles de contenido.",
+      "disabled": "Con pestaña deshabilitada",
+      "disabled_hint": "Una pestaña no seleccionable.",
+      "tab1": "General",
+      "tab2": "Detalles",
+      "tab3": "Ajustes",
+      "panel1": "Contenido de la pestaña general.",
+      "panel2": "Contenido de la pestaña de detalles.",
+      "panel3": "Contenido de la pestaña de ajustes."
+    },
+    "textarea": {
+      "default": "Predeterminado",
+      "default_hint": "Área de texto multilínea vacía.",
+      "with_value": "Con valor",
+      "with_value_hint": "Textarea precargado.",
+      "placeholder": "Escribe un mensaje…",
+      "aria": "Área de texto",
+      "sample_value": "Texto de ejemplo en varias líneas."
+    },
+    "toggle": {
+      "sample": "Muestra",
+      "sample_hint": "Botón de conmutación; estado en Controls.",
+      "variants": "Variantes",
+      "variants_hint": "Variantes visuales del Toggle.",
+      "sizes": "Tamaños",
+      "sizes_hint": "Escala de tamaños del Toggle.",
+      "label": "Negrita"
+    },
+    "tooltip": {
+      "closed": "Cerrado",
+      "closed_hint": "Pasa el cursor o enfoca el disparador para ver el tip.",
+      "trigger": "Pasa el cursor",
+      "content": "Texto de ayuda breve"
+    }
+  }
+}

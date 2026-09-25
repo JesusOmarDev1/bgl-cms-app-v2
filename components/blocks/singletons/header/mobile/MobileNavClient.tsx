@@ -1,7 +1,6 @@
 "use client"
 
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
-import { SearchBar } from "@/components/shared/search/SearchBar"
 import {
   Accordion,
   AccordionContent,
@@ -14,17 +13,34 @@ import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { SocialIcon } from "@/components/shared/content/SocialIcon"
+
+type SearchBarComponent =
+  typeof import("@/components/shared/search/SearchBar").SearchBar
 
 interface MobileNavClientProps {
   data: NonNullable<HeaderQueryResult>
+  /** False skips the search chunk. Storybook sets this so ioredis never evaluates. */
+  search?: boolean
 }
 
-export function MobileNavClient({ data }: MobileNavClientProps) {
+export function MobileNavClient({ data, search = true }: MobileNavClientProps) {
   const [open, setOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [SearchBar, setSearchBar] = useState<SearchBarComponent | null>(null)
   const close = () => setOpen(false)
+
+  useEffect(() => {
+    if (!search) return
+    let live = true
+    void import("@/components/shared/search/SearchBar").then((mod) => {
+      if (live) setSearchBar(() => mod.SearchBar)
+    })
+    return () => {
+      live = false
+    }
+  }, [search])
 
   return (
     <>
@@ -53,15 +69,17 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
               Menú de navegación
             </SheetTitle>
           </SheetHeader>
-          <div className="shrink-0 border-b border-border px-4 py-4">
-            <SearchBar
-              variant="default"
-              portaled={false}
-              onNavigate={close}
-              onPaletteOpenChange={setSearchOpen}
-              className="w-full lg:w-full"
-            />
-          </div>
+          {SearchBar ? (
+            <div className="shrink-0 border-b border-border px-4 py-4">
+              <SearchBar
+                variant="default"
+                portaled={false}
+                onNavigate={close}
+                onPaletteOpenChange={setSearchOpen}
+                className="w-full lg:w-full"
+              />
+            </div>
+          ) : null}
           <ScrollArea className="min-h-0 flex-1 px-4">
             <p className="py-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
               Navegación

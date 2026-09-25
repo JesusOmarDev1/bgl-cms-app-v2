@@ -149,7 +149,7 @@ export function FooterNavClient({
       })}
       className={className}
     >
-      <Box display={"grid"} cols={1} paddingInline={2}>
+      <Box display="grid" cols={1} paddingInline={2}>
         <div className="grid grid-cols-1 place-content-center items-center gap-8 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:place-content-start lg:items-start">
           <div className="flex flex-col gap-2.5">
             <Link href="/" aria-label="Inicio" title="Inicio">

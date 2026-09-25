@@ -58,11 +58,19 @@ export default function RootLayout({
               enableSystem={false}
             >
               <NuqsAdapter>
-                <Suspense fallback={<HeaderNavSkeleton />}>
+                <Suspense
+                  key="header-nav"
+                  name="header-nav"
+                  fallback={<HeaderNavSkeleton />}
+                >
                   <HeaderNav />
                 </Suspense>
                 {children}
-                <Suspense fallback={<FooterNavSkeleton />}>
+                <Suspense
+                  key="footer-nav"
+                  name="footer-nav"
+                  fallback={<FooterNavSkeleton />}
+                >
                   <FooterNav />
                 </Suspense>
               </NuqsAdapter>

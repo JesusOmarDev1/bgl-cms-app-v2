@@ -22,6 +22,7 @@ export default getRequestConfig(async () => {
       ...(await import(`./server-error/${locale}.json`)).default,
       ...(await import(`./debug/${locale}.json`)).default,
       ...(await import(`./cookies/${locale}.json`)).default,
+      ...(await import(`./storybook/${locale}.json`)).default,
     },
   }
 })

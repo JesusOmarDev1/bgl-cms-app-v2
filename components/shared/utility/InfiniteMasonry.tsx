@@ -13,6 +13,15 @@ import {
 } from "react"
 import { EASE_OUT, SPRING_PANEL } from "@/lib/masonry/ease"
 import { cn } from "cn"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 
 export type InfiniteMasonryKey = string | number | bigint
 
@@ -94,27 +103,35 @@ function useMasonryMetrics({
 
 function DefaultLoadingItem({ index }: { index: number }) {
   return (
-    <div
+    <Skeleton
       aria-hidden="true"
       className="animate-pulse rounded-2xl border border-border bg-card p-3"
       style={{ minHeight: 144 + (index % 3) * 36 }}
     >
-      <div className="h-3 w-2/3 rounded-full bg-muted" />
-      <div className="mt-3 h-2 w-full rounded-full bg-muted" />
-      <div className="mt-2 h-2 w-4/5 rounded-full bg-muted" />
-    </div>
+      <Skeleton className="h-3 w-2/3 rounded-full bg-muted" />
+      <Skeleton className="mt-3 h-2 w-full rounded-full bg-muted" />
+      <Skeleton className="mt-2 h-2 w-4/5 rounded-full bg-muted" />
+    </Skeleton>
   )
 }
 
 function DefaultEmptyState() {
   return (
-    <div className="flex h-full min-h-64 flex-col items-center justify-center px-6 text-center">
-      <Inbox className="size-8 text-muted-foreground" aria-hidden="true" />
-      <p className="mt-3 text-sm font-medium text-foreground">No items yet</p>
-      <p className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">
-        New items will appear here when they become available.
-      </p>
-    </div>
+    <Empty className="flex h-full min-h-64 flex-col items-center justify-center px-6 text-center">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Inbox className="size-8 text-muted-foreground" aria-hidden="true" />
+        </EmptyMedia>
+      </EmptyHeader>
+      <EmptyContent>
+        <EmptyTitle className="mt-3 text-sm font-medium text-foreground">
+          No hay items aún
+        </EmptyTitle>
+        <EmptyDescription className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">
+          Los nuevos items aparecerán aquí cuando estén disponibles.
+        </EmptyDescription>
+      </EmptyContent>
+    </Empty>
   )
 }
 
@@ -314,7 +331,7 @@ function MasonryVirtualizerBoundary<T>({
                       <div className="flex items-center gap-2 text-destructive">
                         <AlertCircle className="size-4" aria-hidden="true" />
                         <p className="text-sm font-medium">
-                          Couldn&apos;t load more
+                          No se pudieron cargar más items
                         </p>
                       </div>
                       <div className="mt-2 text-xs leading-5 text-muted-foreground">
