@@ -23,7 +23,7 @@ export default function Page() {
       <HeaderSpacer />
       <Box
         display="flex"
-        orientation={{ base: "vertical", lg: "horizontal" }}
+        orientation="vertical"
         className="min-h-dvh"
         justify="evenly"
         align="center"

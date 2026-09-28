@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "cn": ["./node_modules/cn/dist/index"]
     }
   },
   "include": [

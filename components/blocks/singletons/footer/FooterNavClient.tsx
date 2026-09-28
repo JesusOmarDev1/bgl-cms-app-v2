@@ -245,7 +245,7 @@ export function FooterNavClient({
         <div className="grid grid-cols-1 gap-4">
           {data?.phones && data.phones.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+              <span className="text-xl font-semibold text-muted-foreground">
                 Telefonos
               </span>
               <div className="flex-1">
@@ -279,7 +279,7 @@ export function FooterNavClient({
             </div>
           )}
           <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-            <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+            <span className="text-xl font-semibold text-muted-foreground">
               Horarios de atención
             </span>
             <div className="flex-1">
@@ -319,7 +319,7 @@ export function FooterNavClient({
           </div>
           {data?.emails && data?.emails.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+              <span className="text-xl font-semibold text-muted-foreground">
                 Correos
               </span>
               <div className="flex-1">
@@ -369,7 +369,7 @@ export function FooterNavClient({
           )}
           {data?.social_links && data?.social_links.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-3xl font-semibold text-muted-foreground md:text-4xl">
+              <span className="text-xl font-semibold text-muted-foreground">
                 Redes sociales
               </span>
               <div className="flex-1">

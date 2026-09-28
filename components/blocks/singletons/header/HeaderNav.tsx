@@ -19,7 +19,12 @@ export async function HeaderNav({ className }: HeaderNavProps) {
       className={className}
       search={<SearchBar variant="header" />}
     >
-      <Suspense fallback={<MobileNavSkeleton />}>
+      <Suspense
+        defer
+        name="mobile-nav"
+        key="mobile-nav"
+        fallback={<MobileNavSkeleton />}
+      >
         <MobileNav />
       </Suspense>
     </HeaderNavClient>

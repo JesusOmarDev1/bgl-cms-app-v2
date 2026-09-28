@@ -71,6 +71,7 @@ function InputComponent({
     <Input
       className={cn("h-10 rounded-s-none rounded-e-lg", className)}
       {...props}
+      aria-label="Teléfono"
       ref={ref}
     />
   )
@@ -112,6 +113,7 @@ const CountrySelect = ({
           variant="outline"
           className="flex gap-1 rounded-s-lg rounded-e-none border-r-0 border-border bg-muted px-3 focus:z-10"
           isDisabled={disabled}
+          aria-label="Seleccionar país"
         >
           <FlagComponent
             country={selectedCountry}

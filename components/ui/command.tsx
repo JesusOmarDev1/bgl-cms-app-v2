@@ -6,7 +6,6 @@ import {
   Collection,
   composeRenderProps,
   Header,
-  Input,
   Menu,
   MenuItem,
   MenuSection,
@@ -14,7 +13,6 @@ import {
   Separator,
   useFilter,
   type AutocompleteProps,
-  type InputProps,
   type MenuItemProps,
   type MenuProps,
   type MenuSectionProps,
@@ -28,7 +26,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { InputGroup, InputGroupAddon } from "@/components/ui/input-group"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
 import { SearchIcon, CheckIcon } from "lucide-react"
 
 function Command({
@@ -101,7 +103,10 @@ function CommandDialog({
   )
 }
 
-function CommandInput({ className, ...props }: InputProps) {
+function CommandInput({
+  className,
+  ...props
+}: React.ComponentProps<typeof InputGroupInput>) {
   return (
     <SearchField
       autoFocus
@@ -110,9 +115,8 @@ function CommandInput({ className, ...props }: InputProps) {
       className="p-1 pb-0"
     >
       <InputGroup className="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:ps-2!">
-        <Input
+        <InputGroupInput
           {...props}
-          data-slot="command-input"
           className={cn(
             "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 [&::-webkit-search-cancel-button]:hidden",
             className

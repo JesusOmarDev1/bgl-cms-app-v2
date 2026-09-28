@@ -1,4 +1,11 @@
-import type { ChangeEvent, InputHTMLAttributes, ReactNode } from "react"
+"use client"
+
+import {
+  useTransition,
+  type ChangeEvent,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react"
 import { AnimatedSearchInput } from "@/components/shared/search/AnimatedSearchInput"
 import { SearchBarClient } from "@/components/shared/search/SearchBarClient"
 import { cn } from "cn"
@@ -42,6 +49,7 @@ function SearchBar({
   icon,
   ...inputProps
 }: SearchBarProps) {
+  const [isPending, startTransition] = useTransition()
   const inferredInputMode =
     mode === "input" ||
     Boolean(placeholders) ||
@@ -56,9 +64,15 @@ function SearchBar({
         placeholders={placeholders}
         interval={interval}
         onChange={onChange}
-        onSubmit={onSubmit}
+        onSubmit={(value) => {
+          startTransition(() => {
+            onSubmit?.(value)
+          })
+        }}
         icon={icon}
         {...inputProps}
+        disabled={isPending || Boolean(inputProps.disabled)}
+        aria-busy={isPending}
       />
     )
   }
@@ -82,14 +96,21 @@ function SearchBarMinimal({
   className,
   ...props
 }: Omit<SearchBarProps, "mode" | "variant">) {
+  const [isPending, startTransition] = useTransition()
   return (
     <SearchBar
       mode="input"
       placeholders={placeholders}
       interval={interval}
       onChange={onChange}
-      onSubmit={onSubmit}
+      onSubmit={(value) => {
+        startTransition(() => {
+          onSubmit?.(value)
+        })
+      }}
       className={cn("max-w-md", className)}
+      disabled={isPending || Boolean(props.disabled)}
+      aria-busy={isPending}
       {...props}
     />
   )

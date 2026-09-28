@@ -24,7 +24,12 @@ export default async function MaintenancePage() {
   const siteSettings = await getSiteSettingsRepository()
 
   return (
-    <Suspense fallback={<MaintenanceViewSkeleton />}>
+    <Suspense
+      defer
+      name="maintenance-view"
+      key="maintenance-view"
+      fallback={<MaintenanceViewSkeleton />}
+    >
       <MaintenanceView
         title={siteSettings?.maintenance_title || t("title")}
         message={siteSettings?.maintenance_message || t("message")}

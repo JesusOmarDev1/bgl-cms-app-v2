@@ -47,7 +47,7 @@ export function MobileNavClient({ data, search = true }: MobileNavClientProps) {
       <Button
         variant="ghost"
         size="icon-xl"
-        className="rounded-full lg:hidden"
+        className="rounded-full min-[1366px]:hidden"
         aria-label="Abrir menú"
         onPress={() => setOpen(true)}
       >

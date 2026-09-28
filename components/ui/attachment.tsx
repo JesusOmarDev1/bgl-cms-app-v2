@@ -172,7 +172,10 @@ function AttachmentTrigger({
     const renderProps = {
       ...props,
       "data-slot": "attachment-trigger",
-      className: cn("absolute inset-0 z-10 outline-none", className),
+      className: cn(
+        "absolute inset-0 z-10 outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+        className
+      ),
       children,
     }
 
@@ -184,7 +187,10 @@ function AttachmentTrigger({
       {...props}
       type={type ?? "button"}
       data-slot="attachment-trigger"
-      className={cn("absolute inset-0 z-10 outline-none", className)}
+      className={cn(
+        "absolute inset-0 z-10 outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+        className
+      )}
     >
       {children}
     </button>

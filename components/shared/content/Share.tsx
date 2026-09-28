@@ -67,16 +67,21 @@ export default function Share({
   }
 
   return (
-    <Button
-      className={cn(className, "cursor-pointer")}
-      size={size}
-      onClick={handleShare}
-      aria-label={title}
-      isDisabled={disabled}
-      variant={variant}
-    >
-      <MaterialIcon name="share" />
-      {t("share")}
-    </Button>
+    <>
+      <div role="status" aria-live="polite" className="sr-only">
+        {successMessage || errorMessage || ""}
+      </div>
+      <Button
+        className={cn(className, "cursor-pointer")}
+        size={size}
+        onClick={handleShare}
+        aria-label={title}
+        isDisabled={disabled}
+        variant={variant}
+      >
+        <MaterialIcon name="share" data-icon="inline-start" />
+        {t("share")}
+      </Button>
+    </>
   )
 }

@@ -61,6 +61,7 @@ export function AnimatedSearchInput({
   const indexRef = useRef(0)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [inputValue, setInputValue] = useState("")
+  const [isPending, setIsPending] = useState(false)
   const shortcutLabel = isMac ? "⌘" : "Ctrl"
 
   useEffect(() => {
@@ -111,8 +112,13 @@ export function AnimatedSearchInput({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const next = inputValue.trim()
-    if (!next) return
-    onSubmit?.(next)
+    if (!next || isPending) return
+    setIsPending(true)
+    try {
+      onSubmit?.(next)
+    } finally {
+      setIsPending(false)
+    }
   }
 
   const handleClear = () => {
@@ -148,11 +154,15 @@ export function AnimatedSearchInput({
               value={inputValue}
               onChange={updateSearchQuery}
               aria-label="Buscar"
+              aria-busy={isPending}
+              disabled={isPending}
               className={cn(
                 "h-full w-full bg-transparent pr-4 text-[15px] text-foreground outline-none placeholder:text-transparent focus-visible:ring-0",
                 inputClassName
               )}
               {...inputProps}
+              required
+              minLength={1}
             />
 
             {!inputValue ? (

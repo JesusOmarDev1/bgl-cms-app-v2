@@ -1,9 +1,8 @@
 import { StaticLogo } from "@/assets/logos/static-logo"
 import { Box } from "@/components/shared/content/Box"
-import Link from "next/link"
 import { Fragment } from "react/jsx-runtime"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 
 const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
@@ -57,44 +56,26 @@ export default function NotFound() {
             cotizar un producto.
           </p>
           <div className="flex flex-col justify-center gap-4 md:flex-row">
-            <Link
-              href="/inicio"
-              title="Volver a la página de inicio"
-              aria-label="Volver a la página de inicio"
-              className="text-center text-primary"
-            >
-              <Button size="lg">
-                <MaterialIcon name="arrow_back" />
-                Volver a la página de inicio
-              </Button>
-            </Link>
-            <Link
-              href="/cotizar"
-              title="Cotizar un producto"
-              aria-label="Cotizar un producto"
-              className="text-center text-primary"
-            >
-              <Button variant="red" size="lg">
-                <MaterialIcon name="shopping_bag_speed" />
-                Cotizar un producto
-              </Button>
-            </Link>
+            <LinkButton href="/inicio" size="lg">
+              <MaterialIcon name="arrow_back" data-icon="inline-start" />
+              Volver a la página de inicio
+            </LinkButton>
+            <LinkButton href="/cotizar" variant="red" size="lg">
+              <MaterialIcon
+                name="shopping_bag_speed"
+                data-icon="inline-start"
+              />
+              Cotizar un producto
+            </LinkButton>
           </div>
           <p className="text-center text-muted-foreground">
             Si tienes alguna pregunta, no dudes en contactar con nuestro equipo
             de soporte técnico.
           </p>
-          <Link
-            href="/soporte"
-            title="Contactar con el soporte técnico"
-            aria-label="Contactar con el soporte técnico"
-            className="text-center text-primary"
-          >
-            <Button size="lg" variant="secondary">
-              <MaterialIcon name="support_agent" />
-              Contactar soporte tecnico
-            </Button>
-          </Link>
+          <LinkButton href="/soporte" size="lg" variant="secondary">
+            <MaterialIcon name="support_agent" data-icon="inline-start" />
+            Contactar soporte tecnico
+          </LinkButton>
         </div>
       </Box>
     </Fragment>

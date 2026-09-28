@@ -576,6 +576,9 @@ export function PullToRefresh({
           className
         )}
       >
+        <div role="status" aria-live="polite" className="sr-only">
+          {label}
+        </div>
         <PullIndicator
           displayStatus={displayStatus}
           label={label}

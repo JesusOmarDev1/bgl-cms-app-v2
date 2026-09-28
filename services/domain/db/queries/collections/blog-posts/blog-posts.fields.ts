@@ -52,7 +52,15 @@ export const BLOG_POSTS_FIELDS = [
         item: {
           map_block: ["*"],
           content_block: [
-            "*",
+            "id",
+            "sort",
+            "title",
+            "layout",
+            "padding",
+            "padding_top",
+            "padding_bottom",
+            "date_created",
+            "date_updated",
             {
               content: [
                 "id",
@@ -63,7 +71,19 @@ export const BLOG_POSTS_FIELDS = [
           ],
           cta_block: ["*"],
           hero_block: [
-            "*",
+            "id",
+            "title",
+            "variant",
+            "sort",
+            "primary_button",
+            "primary_url",
+            "primary_icon",
+            "secondary_button",
+            "secondary_url",
+            "secondary_icon",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               image: ["*"],
               images: ["id", { directus_files_id: ["*"] }],
@@ -85,7 +105,13 @@ export const BLOG_POSTS_FIELDS = [
           ],
           qr_code_block: ["*"],
           media_block: [
-            "*",
+            "id",
+            "title",
+            "type",
+            "sort",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               file: ["*"],
               image: ["*"],
@@ -95,14 +121,27 @@ export const BLOG_POSTS_FIELDS = [
             },
           ],
           carousel_block: [
-            "*",
+            "id",
+            "variant",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
             {
               items: [
                 "id",
                 "collection",
                 {
                   item: {
-                    carousel_items_block: ["*", { image: ["*"] }],
+                    carousel_items_block: [
+                      "id",
+                      "sort",
+                      "title",
+                      "date_created",
+                      "date_updated",
+                      { image: ["*"] },
+                    ],
                   },
                 },
               ],

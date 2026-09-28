@@ -233,6 +233,7 @@ const SortableDragHandle = () => {
     <Button
       size="icon"
       variant="ghost"
+      aria-label="Reordenar"
       {...attributes}
       {...listeners}
       className="cursor-grab touch-none active:cursor-grabbing"

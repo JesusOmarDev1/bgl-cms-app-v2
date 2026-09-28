@@ -315,8 +315,9 @@ function ComboboxChip({
           size="icon-xs"
           className="-ms-1 opacity-50 hover:opacity-100"
           data-slot="combobox-chip-remove"
+          aria-label="Remove"
         >
-          <XIcon className="pointer-events-none" />
+          <XIcon className="pointer-events-none" data-icon="inline-start" />
         </Button>
       )}
     </TagPrimitive>
@@ -328,7 +329,10 @@ function ComboboxChipsInput({ className, ...props }: InputProps) {
   return (
     <InputPrimitive
       data-slot="combobox-chip-input"
-      className={cn("min-w-16 flex-1 outline-none", className)}
+      className={cn(
+        "min-w-16 flex-1 outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+        className
+      )}
       onKeyDown={(e) => {
         if (
           e.key === "Backspace" &&

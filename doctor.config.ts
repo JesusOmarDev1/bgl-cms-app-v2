@@ -21,4 +21,6 @@ export default defineConfig({
     ],
   },
   deadCode: false,
+  warnings: false,
+  verbose: true,
 })

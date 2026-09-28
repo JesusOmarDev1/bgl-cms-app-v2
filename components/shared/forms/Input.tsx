@@ -106,6 +106,7 @@ function InputErrorMessage({
     <m.p
       id={id}
       role="alert"
+      aria-live="assertive"
       initial={
         reduce ? { opacity: 0 } : { opacity: 0, y: -4, filter: "blur(4px)" }
       }
@@ -127,6 +128,7 @@ type InputFieldProps = {
   value: string
   disabled?: boolean
   hasError: boolean
+  errorDescribedBy?: string
   success?: boolean
   focused: boolean
   leftIcon?: ReactNode
@@ -138,6 +140,7 @@ type InputFieldProps = {
   onFocus: (event: React.FocusEvent<HTMLInputElement>) => void
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
   inputRef: React.ForwardedRef<HTMLInputElement>
+  label?: string
   rest: Omit<
     InputHTMLAttributes<HTMLInputElement>,
     "value" | "defaultValue" | "onChange" | "onFocus" | "onBlur" | "id" | "type"
@@ -150,6 +153,7 @@ function InputField({
   value,
   disabled,
   hasError,
+  errorDescribedBy,
   success,
   focused,
   leftIcon,
@@ -161,8 +165,18 @@ function InputField({
   onFocus,
   onBlur,
   inputRef,
+  label,
   rest,
 }: InputFieldProps) {
+  const {
+    "aria-label": restAriaLabel,
+    className: _unusedClassName,
+    ...restProps
+  } = rest
+  void _unusedClassName
+  const accessibleName =
+    (typeof restAriaLabel === "string" && restAriaLabel) || label || "Campo"
+
   return (
     <div
       ref={fieldRef}
@@ -194,13 +208,14 @@ function InputField({
         value={value}
         disabled={disabled}
         aria-invalid={hasError || undefined}
-        aria-describedby={hasError ? `${id}-error` : undefined}
-        {...rest}
+        aria-describedby={errorDescribedBy}
+        aria-label={accessibleName}
+        {...restProps}
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onBlur={onBlur}
         className={cn(
-          "peer h-full w-full bg-transparent text-base leading-6 text-foreground caret-foreground outline-none",
+          "peer h-full w-full bg-transparent text-base leading-6 text-foreground caret-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
           "placeholder:text-muted-foreground/60",
           leftIcon ? "ps-10" : "ps-3.5",
           rightSlot || success ? "pe-10" : "pe-3.5",
@@ -283,17 +298,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <LazyMotion features={domAnimation}>
       <div className={cn("flex flex-col gap-1.5", className, classNames?.root)}>
-        {label ? (
-          <label
-            htmlFor={id}
-            className={cn(
-              "px-1 text-sm font-medium text-foreground",
-              classNames?.label
-            )}
-          >
-            {label}
-          </label>
-        ) : null}
+        <div role="status" aria-live="polite" className="sr-only">
+          {errorMessage ?? ""}
+        </div>
+        <label
+          htmlFor={id}
+          className={cn(
+            "px-1 text-sm font-medium text-foreground",
+            !label && "sr-only",
+            classNames?.label
+          )}
+        >
+          {label || "Campo"}
+        </label>
 
         <InputField
           fieldRef={fieldRef}
@@ -301,6 +318,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           value={value}
           disabled={disabled}
           hasError={hasError}
+          errorDescribedBy={errorMessage ? `${id}-error` : undefined}
           success={success}
           focused={focused}
           leftIcon={leftIcon}
@@ -318,6 +336,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             onBlur?.(event)
           }}
           inputRef={ref}
+          label={label}
           rest={rest}
         />
 

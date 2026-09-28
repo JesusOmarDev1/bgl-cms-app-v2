@@ -453,8 +453,8 @@ const AudioPlayerPlay = React.memo(
 
     const togglePlay = useAudioStore((state) => state.togglePlay)
 
-    const handleKeyPress = React.useCallback(
-      (event: KeyboardEvent) => {
+    React.useEffect(() => {
+      const handleKeyPress = (event: KeyboardEvent) => {
         if (event.code === "Space") {
           const target = event.target as HTMLElement
           if (
@@ -466,14 +466,10 @@ const AudioPlayerPlay = React.memo(
           event.preventDefault()
           togglePlay()
         }
-      },
-      [togglePlay]
-    )
-
-    React.useEffect(() => {
+      }
       document.addEventListener("keydown", handleKeyPress)
       return () => document.removeEventListener("keydown", handleKeyPress)
-    }, [handleKeyPress])
+    }, [togglePlay])
 
     const showSpinner = isLoading || isBuffering
 
@@ -1312,6 +1308,7 @@ const AudioQueuePreferences = ({
         <DropdownMenuGroup>
           <DropdownMenuLabel>Insert Mode</DropdownMenuLabel>
           <RadioGroup
+            aria-label="Modo de inserción"
             onChange={(value: string) => setInsertMode(value as InsertMode)}
             value={insertMode}
           >
@@ -1519,6 +1516,7 @@ function AudioPlaybackSpeed({
         <DropdownMenuGroup>
           <DropdownMenuLabel>Velocidad de reproducción</DropdownMenuLabel>
           <RadioGroup
+            aria-label="Velocidad de reproducción"
             onChange={(value: string) => handleSpeedChange(value)}
             value={String(playbackRate)}
           >

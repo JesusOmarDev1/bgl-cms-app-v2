@@ -157,20 +157,33 @@ export function SearchBarClient({
       : "Intenta de nuevo."
     : undefined
 
+  const statusAnnouncement = loading
+    ? "Buscando…"
+    : errorMessage
+      ? errorMessage
+      : status === "empty"
+        ? "Sin resultados"
+        : ""
+
   const showIcon = variant === "icon" || variant === "header"
   const showDefault = variant === "default" || variant === "header"
   const shortcutLabel = isMac ? "⌘ K" : "Ctrl + K"
 
   return (
     <>
+      <div role="status" aria-live="polite" className="sr-only">
+        {statusAnnouncement}
+      </div>
       {showIcon ? (
         <Button
           variant="glass"
           size="icon-xl"
           aria-label="Buscar"
+          aria-busy={loading}
+          isDisabled={loading}
           className={cn(
             "rounded-full",
-            variant === "header" && "lg:hidden",
+            variant === "header" && "min-[1366px]:hidden",
             className
           )}
           onClick={() => handleOpenChange(true)}
@@ -183,9 +196,11 @@ export function SearchBarClient({
         <button
           type="button"
           aria-label="Buscar"
+          aria-busy={loading}
+          disabled={loading}
           className={cn(
             "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44",
-            variant === "header" && "hidden lg:inline-flex",
+            variant === "header" && "hidden min-[1366px]:inline-flex",
             className
           )}
           onClick={() => handleOpenChange(true)}
@@ -197,7 +212,7 @@ export function SearchBarClient({
           />
           <span className="flex w-full items-center justify-between">
             <span className="font-normal text-muted-foreground/70">
-              Buscar...
+              {loading ? "Buscando..." : "Buscar..."}
             </span>
             <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
           </span>

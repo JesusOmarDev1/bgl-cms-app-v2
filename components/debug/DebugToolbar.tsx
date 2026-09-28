@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl"
 import type { Key } from "react-aria-components"
 
 import { Box } from "@/components/shared/content/Box"
-import { ButtonWithIcon } from "@/components/shared/content/ButtonWithIcon"
-import { Button } from "@/components/ui/button"
+import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {
   Combobox,
@@ -169,16 +169,19 @@ export function DebugToolbar({ total }: DebugToolbarProps) {
             </ComboboxContent>
           </Combobox>
         </Field>
-        <ButtonWithIcon
-          className="w-full min-w-24 self-end transition-transform active:scale-[0.96] sm:w-auto"
-          icon="output"
-          isDisabled={!canExtract}
-          isPending={isPending}
-          onPress={handleExtract}
-          size="xl"
+        <button
+          type="button"
+          className={cn(
+            buttonVariants({ size: "xl" }),
+            "w-full min-w-24 self-end transition-transform active:scale-[0.96] sm:w-auto"
+          )}
+          disabled={!canExtract || isPending}
+          aria-busy={isPending}
+          onClick={handleExtract}
         >
+          <MaterialIcon name="output" data-icon="inline-start" />
           {t("extract")}
-        </ButtonWithIcon>
+        </button>
       </FieldGroup>
       {showPager && committed.kind !== null && committed.resource !== null ? (
         <DebugPagination

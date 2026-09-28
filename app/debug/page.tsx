@@ -57,10 +57,20 @@ export default function DebugPage({ searchParams }: DebugPageProps) {
       gap={1.5}
     >
       <HeaderSpacer />
-      <Suspense fallback={<DebugToolbarSkeleton />}>
+      <Suspense
+        defer
+        name="debug-toolbar"
+        key="debug-toolbar"
+        fallback={<DebugToolbarSkeleton />}
+      >
         <DebugToolbarSlot searchParams={searchParams} />
       </Suspense>
-      <Suspense defer name="debug-payload" fallback={<DebugPayloadSkeleton />}>
+      <Suspense
+        defer
+        name="debug-payload"
+        key="debug-payload"
+        fallback={<DebugPayloadSkeleton />}
+      >
         <DebugPagePayload searchParams={searchParams} />
       </Suspense>
     </Box>

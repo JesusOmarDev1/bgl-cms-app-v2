@@ -148,6 +148,7 @@ function CalendarInner({
         <Button
           variant={buttonVariant}
           slot="previous"
+          aria-label="Previous month"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
           <ChevronLeftIcon className="size-4 rtl:rotate-180" />
@@ -155,6 +156,7 @@ function CalendarInner({
         <Button
           variant={buttonVariant}
           slot="next"
+          aria-label="Next month"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
           <ChevronRightIcon className="size-4 rtl:rotate-180" />

@@ -145,11 +145,8 @@ export const metadata = ({
     url: openGraph?.url ?? BASE_URL,
     images: [
       {
-        url: "/favicon.svg",
-        width: "160",
-        height: "160",
-        alt: "Maintenance",
-        type: "image/png",
+        url: "/static/logo.png",
+        alt: "BGL Básculas Industriales",
       },
     ],
   },
@@ -159,10 +156,8 @@ export const metadata = ({
     card: twitter?.card ?? "summary_large_image",
     images: [
       {
-        url: "/favicon.svg",
-        width: "160",
-        height: "160",
-        alt: "Maintenance",
+        url: "/static/logo.png",
+        alt: "BGL Básculas Industriales",
         type: "image/png",
       },
     ],

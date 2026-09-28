@@ -19,7 +19,7 @@ import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
 import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 
 const HEADER_LEGAL_LINKS = [
   {
@@ -106,7 +106,10 @@ export function HeaderNavClient({
               <StaticLogo />
             )}
           </Link>
-          <NavigationMenu className="hidden min-w-0 lg:flex">
+          <NavigationMenu
+            aria-label="Principal"
+            className="hidden min-w-0 min-[1366px]:flex"
+          >
             <NavigationMenuList className="flex items-center gap-2.5">
               {data?.url_links &&
                 data.url_links.length > 0 &&
@@ -222,30 +225,36 @@ export function HeaderNavClient({
         </div>
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           {search}
-          <MexicoCityIcon className="hidden size-8 lg:flex" />
+          <MexicoCityIcon className="hidden size-8 min-[1366px]:flex" />
           {data?.primary_button ? (
-            <Link href={data.primary_url ?? ""}>
-              <Button
-                variant="red"
-                size="xl"
-                className="hidden rounded-full lg:flex"
-              >
-                {data.primary_button}
-                <MaterialIcon name={data.primary_icon ?? ""} size={16} />
-              </Button>
-            </Link>
+            <LinkButton
+              href={data.primary_url ?? ""}
+              variant="red"
+              size="xl"
+              className="hidden rounded-full min-[1366px]:flex"
+            >
+              {data.primary_button}
+              <MaterialIcon
+                name={data.primary_icon ?? ""}
+                size={16}
+                data-icon="inline-end"
+              />
+            </LinkButton>
           ) : null}
           {data?.secondary_button ? (
-            <Link href={data.secondary_url ?? ""}>
-              <Button
-                variant="outline"
-                size="xl"
-                className="hidden rounded-full lg:flex"
-              >
-                {data.secondary_button}
-                <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
-              </Button>
-            </Link>
+            <LinkButton
+              href={data.secondary_url ?? ""}
+              variant="outline"
+              size="xl"
+              className="hidden rounded-full min-[1366px]:flex"
+            >
+              {data.secondary_button}
+              <MaterialIcon
+                name={data.secondary_icon ?? ""}
+                size={16}
+                data-icon="inline-end"
+              />
+            </LinkButton>
           ) : null}
           {children}
         </div>

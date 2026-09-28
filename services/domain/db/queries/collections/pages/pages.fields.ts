@@ -24,7 +24,15 @@ export const PAGES_FIELDS = [
           faq_block: ["*"],
           map_block: ["*"],
           content_block: [
-            "*",
+            "id",
+            "sort",
+            "title",
+            "layout",
+            "padding",
+            "padding_top",
+            "padding_bottom",
+            "date_created",
+            "date_updated",
             {
               content: [
                 "id",
@@ -35,7 +43,15 @@ export const PAGES_FIELDS = [
           ],
           cta_block: ["*"],
           form_block: [
-            "*",
+            "id",
+            "title",
+            "sort",
+            "excerpt",
+            "captcha",
+            "status",
+            "icon",
+            "date_created",
+            "date_updated",
             {
               fields: [
                 "id",
@@ -55,7 +71,19 @@ export const PAGES_FIELDS = [
             },
           ],
           hero_block: [
-            "*",
+            "id",
+            "title",
+            "variant",
+            "sort",
+            "primary_button",
+            "primary_url",
+            "primary_icon",
+            "secondary_button",
+            "secondary_url",
+            "secondary_icon",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               image: ["*"],
               images: ["id", { directus_files_id: ["*"] }],
@@ -76,10 +104,30 @@ export const PAGES_FIELDS = [
             },
           ],
           qr_code_block: ["*"],
-          media_block: ["*"],
+          media_block: [
+            "id",
+            "title",
+            "type",
+            "sort",
+            "excerpt",
+            "date_created",
+            "date_updated",
+            {
+              file: ["*"],
+              image: ["*"],
+              video: ["*"],
+              audio: ["*"],
+              files: ["id", { directus_files_id: ["*"] }],
+            },
+          ],
           carousel_block: ["*"],
           clients_block: [
-            "*",
+            "id",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
             {
               clients: [
                 "id",
@@ -103,7 +151,12 @@ export const PAGES_FIELDS = [
             },
           ],
           suppliers_block: [
-            "*",
+            "id",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
             {
               suppliers: [
                 "id",
@@ -127,7 +180,12 @@ export const PAGES_FIELDS = [
             },
           ],
           brands_block: [
-            "*",
+            "id",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
             {
               brands: [
                 "id",
@@ -146,7 +204,12 @@ export const PAGES_FIELDS = [
             },
           ],
           featured_services_block: [
-            "*",
+            "id",
+            "sort",
+            "title",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               services: [
                 "id",
@@ -166,7 +229,12 @@ export const PAGES_FIELDS = [
             },
           ],
           featured_products_block: [
-            "*",
+            "id",
+            "sort",
+            "title",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               products: [
                 "id",
@@ -186,7 +254,12 @@ export const PAGES_FIELDS = [
             },
           ],
           logos_clients_block: [
-            "*",
+            "id",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
             {
               clients: [
                 "id",
@@ -207,7 +280,12 @@ export const PAGES_FIELDS = [
             },
           ],
           division_services_block: [
-            "*",
+            "id",
+            "sort",
+            "title",
+            "excerpt",
+            "date_created",
+            "date_updated",
             {
               division_services: [
                 "id",

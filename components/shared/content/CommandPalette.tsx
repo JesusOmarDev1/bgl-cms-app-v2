@@ -133,7 +133,11 @@ function PaletteStatusPanel({
   errorTitle: string
 }) {
   if (status === "loading") {
-    return <SearchHitsSkeleton />
+    return (
+      <div role="status" aria-live="polite">
+        <SearchHitsSkeleton />
+      </div>
+    )
   }
 
   const copy =
@@ -156,21 +160,23 @@ function PaletteStatusPanel({
           }
 
   return (
-    <Empty className="border-none bg-transparent py-6">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <MaterialIcon
-            name={copy.icon}
-            size={18}
-            className="text-muted-foreground"
-          />
-        </EmptyMedia>
-        <EmptyTitle className="text-sm font-medium">{copy.title}</EmptyTitle>
-        <EmptyDescription className="text-xs">
-          {copy.description}
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <div role="status" aria-live="polite">
+      <Empty className="border-none bg-transparent py-6">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <MaterialIcon
+              name={copy.icon}
+              size={18}
+              className="text-muted-foreground"
+            />
+          </EmptyMedia>
+          <EmptyTitle className="text-sm font-medium">{copy.title}</EmptyTitle>
+          <EmptyDescription className="text-xs">
+            {copy.description}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    </div>
   )
 }
 
@@ -317,6 +323,7 @@ function CommandPaletteSearchField({
         }}
         placeholder={placeholder}
         role="combobox"
+        aria-label="Buscar"
         aria-expanded="true"
         aria-busy={status === "loading"}
         aria-controls={`${uid}-list`}
@@ -375,20 +382,26 @@ function CommandPaletteResults({
   let content: ReactNode
   if (status) {
     content = (
-      <PaletteStatusPanel
-        status={status}
-        emptyMessage={emptyMessage}
-        errorMessage={errorMessage}
-        promptTitle={promptTitle}
-        promptDescription={promptDescription}
-        emptyTitle={emptyTitle}
-        emptyDescription={emptyDescription}
-        errorTitle={errorTitle}
-      />
+      <div role="status" aria-live="polite">
+        <PaletteStatusPanel
+          status={status}
+          emptyMessage={emptyMessage}
+          errorMessage={errorMessage}
+          promptTitle={promptTitle}
+          promptDescription={promptDescription}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
+          errorTitle={errorTitle}
+        />
+      </div>
     )
   } else if (rows.length === 0) {
     content = (
-      <div className="p-8 text-center text-sm text-muted-foreground">
+      <div
+        role="status"
+        aria-live="polite"
+        className="p-8 text-center text-sm text-muted-foreground"
+      >
         {emptyMessage}
       </div>
     )
@@ -516,6 +529,17 @@ export function CommandPalette({
   const canTouch = useTouchCapable()
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+
+  const statusAnnouncement =
+    status === "loading"
+      ? "Buscando…"
+      : status === "error"
+        ? (errorMessage ?? errorTitle)
+        : status === "empty"
+          ? emptyTitle
+          : status === "prompt"
+            ? promptTitle
+            : ""
 
   const onKeyDownEvent = useEffectEvent((e: KeyboardEvent) => {
     if (
@@ -691,6 +715,9 @@ export function CommandPalette({
                   onKeyDown={onKeyDown}
                   className="pointer-events-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
                 >
+                  <div role="status" aria-live="polite" className="sr-only">
+                    {statusAnnouncement}
+                  </div>
                   <CommandPaletteSearchField
                     status={status}
                     inputRef={inputRef}

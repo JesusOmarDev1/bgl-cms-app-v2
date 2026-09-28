@@ -7,6 +7,7 @@ export interface ContactBlock {
   sort: number | null
   title: string
   excerpt: string
+  address: string
   emails: number[] | ContactBlockEmailsJunction[]
   phones: number[] | ContactBlockPhonesJunction[]
   // Audit

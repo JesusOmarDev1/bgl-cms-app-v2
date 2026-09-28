@@ -674,7 +674,7 @@ function DatePickerContent({
               onClick={() => ctx.setValue(null)}
               className="h-7 gap-1 px-2 font-mono text-[10px] tracking-[0.08em] text-muted-foreground uppercase"
             >
-              <X className="size-3" />
+              <X className="size-3" data-icon="inline-start" />
               Clear
             </Button>
           </div>

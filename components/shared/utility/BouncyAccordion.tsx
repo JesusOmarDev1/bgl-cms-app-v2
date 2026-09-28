@@ -245,7 +245,7 @@ function BouncyAccordionRow({
           onClick={onToggle}
           className={cn(
             "flex min-h-[54px] w-full items-center gap-4 px-5 text-start transition-colors outline-none",
-            "focus-visible:bg-muted/25",
+            "focus-visible:bg-muted/25 focus-visible:ring-2 focus-visible:ring-ring/40",
             "disabled:pointer-events-none",
             classNames?.trigger
           )}
