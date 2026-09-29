@@ -1,6 +1,6 @@
 "use client"
 
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Accordion,
   AccordionContent,

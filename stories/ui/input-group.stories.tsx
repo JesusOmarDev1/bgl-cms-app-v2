@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { SearchIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   InputGroup,
   InputGroupAddon,
@@ -30,7 +30,7 @@ export const Default: Story = {
         >
           <InputGroup className="max-w-md">
             <InputGroupAddon>
-              <SearchIcon />
+              <MaterialIcon name="search" size={16} />
             </InputGroupAddon>
             <InputGroupInput placeholder={t("input_group.placeholder")} />
           </InputGroup>
@@ -41,7 +41,7 @@ export const Default: Story = {
         >
           <InputGroup className="max-w-md">
             <InputGroupAddon>
-              <SearchIcon />
+              <MaterialIcon name="search" size={16} />
             </InputGroupAddon>
             <InputGroupInput
               defaultValue={t("input_group.sample_value")}

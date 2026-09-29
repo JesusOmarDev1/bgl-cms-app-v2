@@ -14,7 +14,7 @@ import {
 
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
-import { XIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function DialogTrigger({ ...props }: DialogTriggerPrimitiveProps) {
   return <DialogTriggerPrimitive data-slot="dialog-trigger" {...props} />
@@ -92,7 +92,7 @@ function Dialog({
               className="absolute end-2 top-2"
               size="icon-sm"
             >
-              <XIcon />
+              <MaterialIcon name="close" size={16} />
               <span className="sr-only">Close</span>
             </DialogClose>
           )}

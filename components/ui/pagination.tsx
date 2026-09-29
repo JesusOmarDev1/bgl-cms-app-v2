@@ -2,11 +2,7 @@ import * as React from "react"
 
 import { cn } from "cn"
 import { LinkButton } from "@/components/ui/button"
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  MoreHorizontalIcon,
-} from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -72,7 +68,12 @@ function PaginationPrevious({
       className={cn("ps-1.5!", className)}
       {...props}
     >
-      <ChevronLeftIcon data-icon="inline-start" className="rtl:rotate-180" />
+      <MaterialIcon
+        name="chevron_left"
+        size={16}
+        data-icon="inline-start"
+        className="rtl:rotate-180"
+      />
       <span className="hidden sm:block">{text}</span>
     </PaginationLink>
   )
@@ -91,7 +92,12 @@ function PaginationNext({
       {...props}
     >
       <span className="hidden sm:block">{text}</span>
-      <ChevronRightIcon data-icon="inline-end" className="rtl:rotate-180" />
+      <MaterialIcon
+        name="chevron_right"
+        size={16}
+        data-icon="inline-end"
+        className="rtl:rotate-180"
+      />
     </PaginationLink>
   )
 }
@@ -110,7 +116,7 @@ function PaginationEllipsis({
       )}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MaterialIcon name="more_horiz" size={16} />
       <span className="sr-only">More pages</span>
     </span>
   )

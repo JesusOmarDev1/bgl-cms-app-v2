@@ -7,7 +7,7 @@ import {
   type Transition,
 } from "motion/react"
 import * as m from "motion/react-m"
-import { ChevronDown } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   useCallback,
   useId,
@@ -277,7 +277,7 @@ function BouncyAccordionRow({
               classNames?.chevron
             )}
           >
-            <ChevronDown className="h-4 w-4" />
+            <MaterialIcon name="expand_more" size={16} />
           </m.span>
         </button>
 

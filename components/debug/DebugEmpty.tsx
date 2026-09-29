@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server"
 
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Empty,
   EmptyDescription,

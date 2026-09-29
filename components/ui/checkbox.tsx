@@ -7,7 +7,7 @@ import {
 } from "react-aria-components"
 
 import { cn } from "cn"
-import { CheckIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Checkbox({ className, children, ...props }: CheckboxProps) {
   return (
@@ -27,7 +27,9 @@ function Checkbox({ className, children, ...props }: CheckboxProps) {
               data-slot="checkbox-indicator"
               className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
             >
-              {(isSelected || isIndeterminate) && <CheckIcon />}
+              {(isSelected || isIndeterminate) && (
+                <MaterialIcon name="check" size={14} />
+              )}
             </span>
             {children}
           </>

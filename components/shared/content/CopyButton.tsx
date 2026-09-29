@@ -4,7 +4,7 @@ import { type ComponentProps } from "react"
 
 import { cn } from "cn"
 import useCopyToClipboard from "@/hooks/useCopyToClipboard"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import showToast from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
 

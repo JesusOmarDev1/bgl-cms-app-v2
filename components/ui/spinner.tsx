@@ -1,15 +1,15 @@
-import { cn } from "cn"
-import { Loader2Icon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
+function Spinner({ className, ...props }: React.ComponentProps<"span">) {
   return (
-    <Loader2Icon
-      data-slot="spinner"
-      role="status"
-      aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
-      {...props}
-    />
+    <span data-slot="spinner" role="status" className={className} {...props}>
+      <span className="sr-only">Loading</span>
+      <MaterialIcon
+        name="progress_activity"
+        size={16}
+        className="animate-spin"
+      />
+    </span>
   )
 }
 

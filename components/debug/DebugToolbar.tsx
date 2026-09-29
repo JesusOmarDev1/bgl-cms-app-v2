@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import type { Key } from "react-aria-components"
 
 import { Box } from "@/components/shared/content/Box"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import {

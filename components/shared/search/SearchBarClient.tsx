@@ -12,7 +12,7 @@ import {
   type CommandItem,
   type CommandPaletteStatus,
 } from "@/components/shared/content/CommandPalette"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { toSearchCommandItem } from "@/components/shared/search/map-search-hit"
 import { Kbd } from "@/components/ui/kbd"
 import { useIsMac } from "@/hooks/useIsMac"

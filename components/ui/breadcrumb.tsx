@@ -12,7 +12,7 @@ import {
 } from "react-aria-components"
 
 import { cn } from "cn"
-import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -63,7 +63,11 @@ function BreadcrumbItem({
               aria-hidden="true"
               className={cn("[&>svg]:size-3.5", separatorClassName)}
             >
-              <ChevronRightIcon className="rtl:rotate-180" />
+              <MaterialIcon
+                name="chevron_right"
+                size={14}
+                className="rtl:rotate-180"
+              />
             </span>
           )}
         </>
@@ -111,7 +115,7 @@ function BreadcrumbEllipsis({
       )}
       {...props}
     >
-      <MoreHorizontalIcon />
+      <MaterialIcon name="more_horiz" size={16} />
       <span className="sr-only">More</span>
     </span>
   )

@@ -31,7 +31,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { SearchIcon, CheckIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Command({
   className,
@@ -123,7 +123,11 @@ function CommandInput({
           )}
         />
         <InputGroupAddon>
-          <SearchIcon className="size-4 shrink-0 opacity-50" />
+          <MaterialIcon
+            name="search"
+            size={16}
+            className="shrink-0 opacity-50"
+          />
         </InputGroupAddon>
       </InputGroup>
     </SearchField>
@@ -206,7 +210,11 @@ function CommandItem<T extends object>({
       {composeRenderProps(children, (children) => (
         <>
           {children}
-          <CheckIcon className="ms-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
+          <MaterialIcon
+            name="check"
+            size={16}
+            className="ms-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100"
+          />
         </>
       ))}
     </MenuItem>

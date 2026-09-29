@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useNetwork } from "@/hooks/useNetwork"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   healthBadgeClassName,
   healthIconClassName,

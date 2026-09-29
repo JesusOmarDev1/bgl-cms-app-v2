@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, ListTree } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -136,7 +136,7 @@ function TableOfContentsHeader({
 }
 
 function TableOfContentsIcon({ className }: { className?: string }) {
-  return <ListTree aria-hidden="true" className={className} />
+  return <MaterialIcon name="toc" size={14} className={className} />
 }
 
 type IndicatorState = {
@@ -666,7 +666,9 @@ function TableOfContentsMobileContent({
               {activeItemTitle}
             </span>
           </span>
-          <ChevronDown
+          <MaterialIcon
+            name="expand_more"
+            size={16}
             className={cn(
               "mx-0.5 shrink-0 transition-transform",
               open && "rotate-180"

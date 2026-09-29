@@ -174,6 +174,7 @@ export const metadata = ({
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
+    "responsive-embedded-sizing": "allow-origins=*",
   },
   assets: [`${BASE_URL}/pwa`, `${BASE_URL}/static`],
 })

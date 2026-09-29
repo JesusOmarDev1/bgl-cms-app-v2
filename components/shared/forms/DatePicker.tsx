@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
@@ -202,7 +202,11 @@ function DateCalendarHeader({
         onClick={onPrev}
         className="size-7"
       >
-        <ChevronLeft className="size-3.5 rtl:rotate-180" />
+        <MaterialIcon
+          name="chevron_left"
+          size={14}
+          className="rtl:rotate-180"
+        />
       </Button>
       <span
         data-slot="date-picker-calendar-caption"
@@ -219,7 +223,11 @@ function DateCalendarHeader({
         onClick={onNext}
         className="size-7"
       >
-        <ChevronRight className="size-3.5 rtl:rotate-180" />
+        <MaterialIcon
+          name="chevron_right"
+          size={14}
+          className="rtl:rotate-180"
+        />
       </Button>
     </div>
   )
@@ -612,7 +620,11 @@ function DatePickerTrigger({
         )}
         {...props}
       >
-        <CalendarIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        <MaterialIcon
+          name="calendar_today"
+          size={14}
+          className="shrink-0 text-muted-foreground"
+        />
         <span data-slot="date-picker-trigger-label" className="flex-1 truncate">
           {triggerLabel}
         </span>
@@ -674,7 +686,7 @@ function DatePickerContent({
               onClick={() => ctx.setValue(null)}
               className="h-7 gap-1 px-2 font-mono text-[10px] tracking-[0.08em] text-muted-foreground uppercase"
             >
-              <X className="size-3" data-icon="inline-start" />
+              <MaterialIcon name="close" size={12} data-icon="inline-start" />
               Clear
             </Button>
           </div>

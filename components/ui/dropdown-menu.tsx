@@ -17,7 +17,7 @@ import {
 } from "react-aria-components"
 
 import { cn } from "cn"
-import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function DropdownMenuTrigger({
   ...props
@@ -143,7 +143,7 @@ function DropdownMenuItem({
                     : "dropdown-menu-checkbox-item-indicator"
                 }
               >
-                {isSelected ? <CheckIcon /> : null}
+                {isSelected ? <MaterialIcon name="check" size={16} /> : null}
               </span>
             ) : null}
             {children}
@@ -182,7 +182,11 @@ function DropdownMenuSubTrigger({
       {composeRenderProps(children, (children) => (
         <>
           {children}
-          <ChevronRightIcon className="ms-auto rtl:rotate-180" />
+          <MaterialIcon
+            name="chevron_right"
+            size={16}
+            className="ms-auto rtl:rotate-180"
+          />
         </>
       ))}
     </MenuItemPrimitive>

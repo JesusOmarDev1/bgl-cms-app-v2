@@ -14,7 +14,7 @@ import {
 
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
-import { XIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function SheetTrigger({ ...props }: SheetTriggerPrimitiveProps) {
   return <SheetTriggerPrimitive data-slot="sheet-trigger" {...props} />
@@ -95,7 +95,7 @@ function Sheet({
               className="absolute end-3 top-3"
               size="icon-sm"
             >
-              <XIcon />
+              <MaterialIcon name="close" size={16} />
               <span className="sr-only">Close</span>
             </SheetClose>
           )}

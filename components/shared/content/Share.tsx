@@ -3,7 +3,7 @@
 import useShare from "@/hooks/useShare"
 import showToast from "@/hooks/useToast"
 import { Button } from "@/components/ui/button"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { cn } from "cn"
 import { useTranslations } from "next-intl"
 

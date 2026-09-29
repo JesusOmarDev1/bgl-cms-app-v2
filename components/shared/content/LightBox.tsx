@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
 import Image from "next/image"
@@ -401,9 +401,9 @@ function LightboxContent({
             className={chromeButtonClass}
           >
             {zoomed ? (
-              <ZoomOut className="size-4" />
+              <MaterialIcon name="zoom_out" size={16} />
             ) : (
-              <ZoomIn className="size-4" />
+              <MaterialIcon name="zoom_in" size={16} />
             )}
           </button>
           <DialogPrimitive.Close
@@ -411,7 +411,7 @@ function LightboxContent({
             aria-label="Close"
             className={chromeButtonClass}
           >
-            <X className="size-4" />
+            <MaterialIcon name="close" size={16} />
           </DialogPrimitive.Close>
         </div>
         {canPrev ? (
@@ -425,7 +425,11 @@ function LightboxContent({
               "absolute start-3 top-1/2 -translate-y-1/2"
             )}
           >
-            <ChevronLeft className="size-5 rtl:rotate-180" />
+            <MaterialIcon
+              name="chevron_left"
+              size={20}
+              className="rtl:rotate-180"
+            />
           </button>
         ) : null}
         {canNext ? (
@@ -439,7 +443,11 @@ function LightboxContent({
               "absolute end-3 top-1/2 -translate-y-1/2"
             )}
           >
-            <ChevronRight className="size-5 rtl:rotate-180" />
+            <MaterialIcon
+              name="chevron_right"
+              size={20}
+              className="rtl:rotate-180"
+            />
           </button>
         ) : null}
       </DialogPrimitive.Content>

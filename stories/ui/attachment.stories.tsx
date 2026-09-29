@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { FileTextIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Attachment,
   AttachmentContent,
@@ -32,7 +32,7 @@ export const Default: Story = {
         >
           <Attachment>
             <AttachmentMedia variant="icon">
-              <FileTextIcon />
+              <MaterialIcon name="description" size={16} />
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle>{t("attachment.title")}</AttachmentTitle>
@@ -48,7 +48,7 @@ export const Default: Story = {
         >
           <Attachment state="idle">
             <AttachmentMedia variant="icon">
-              <FileTextIcon />
+              <MaterialIcon name="description" size={16} />
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle>{t("attachment.empty_title")}</AttachmentTitle>

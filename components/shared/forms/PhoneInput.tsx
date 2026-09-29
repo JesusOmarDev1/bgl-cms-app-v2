@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import * as RPNInput from "react-phone-number-input"
 import flags from "react-phone-number-input/flags"
 

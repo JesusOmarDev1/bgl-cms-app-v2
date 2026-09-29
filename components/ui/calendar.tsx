@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 const cellVariants = cva(
   "group/day relative mt-2 aspect-square h-full w-full cursor-default rounded-(--cell-radius) p-0 text-center select-none [&:is(:last-child>[data-selected=true])>div]:rounded-e-(--cell-radius)",
@@ -151,7 +151,11 @@ function CalendarInner({
           aria-label="Previous month"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
-          <ChevronLeftIcon className="size-4 rtl:rotate-180" />
+          <MaterialIcon
+            name="chevron_left"
+            size={16}
+            className="rtl:rotate-180"
+          />
         </Button>
         <Button
           variant={buttonVariant}
@@ -159,7 +163,11 @@ function CalendarInner({
           aria-label="Next month"
           className="size-(--cell-size) p-0 select-none aria-disabled:opacity-50"
         >
-          <ChevronRightIcon className="size-4 rtl:rotate-180" />
+          <MaterialIcon
+            name="chevron_right"
+            size={16}
+            className="rtl:rotate-180"
+          />
         </Button>
       </header>
       {Array.from({ length: numberOfMonths }, (_, i) => (

@@ -2,9 +2,9 @@
 import {
   Empty,
   EmptyContent,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
+  EmptyDescription,
   EmptyTitle,
 } from "@/components/ui/empty"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
@@ -13,10 +13,10 @@ import { getAssetUrl } from "@/lib/directus/asset-url"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
-import { PdfIcon } from "@/assets/logos/docs/pdf"
+import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { formatBytes } from "@/lib/formatting/format-bytes"
 
-export default function PdfViewerClient({
+export default function ImageViewerClient({
   data,
 }: {
   data: DirectusFileTypes | null
@@ -26,12 +26,12 @@ export default function PdfViewerClient({
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <PdfIcon />
+            <MaterialIcon name="hide_image" size={24} />
           </EmptyMedia>
         </EmptyHeader>
         <EmptyContent>
-          <EmptyTitle>No se encontró el PDF</EmptyTitle>
-          <EmptyDescription>El PDF que buscas no existe.</EmptyDescription>
+          <EmptyTitle>No se encontró la imagen</EmptyTitle>
+          <EmptyDescription>La imagen que buscas no existe.</EmptyDescription>
         </EmptyContent>
       </Empty>
     )
@@ -39,10 +39,13 @@ export default function PdfViewerClient({
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
-        <embed
-          src={getAssetUrl(data.id) || ""}
-          type="application/pdf"
-          className="h-150 w-full rounded-md"
+        <DirectusImage
+          src={data.id}
+          alt={data.title || ""}
+          title={data.title || ""}
+          variant="detail"
+          width={100}
+          height={100}
         />
       </CardContent>
       <CardFooter>
@@ -61,7 +64,7 @@ export default function PdfViewerClient({
               key={data.title}
             >
               <MaterialIcon name="download" />
-              <span>Descargar PDF</span>
+              <span>Descargar Imagen</span>
             </Link>
           </Button>
         </div>

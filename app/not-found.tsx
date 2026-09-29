@@ -3,7 +3,7 @@ import { Box } from "@/components/shared/content/Box"
 import { Fragment } from "react/jsx-runtime"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
 import { LinkButton } from "@/components/ui/button"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
 

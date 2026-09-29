@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronDown, Copy } from "lucide-react"
 import { cn } from "cn"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import {
@@ -198,7 +198,11 @@ function AiCopyButton({
             : `${label} ${c("clipboard") as string}`
         }
       >
-        {copied ? <Check className="text-emerald-500" /> : <Copy />}
+        {copied ? (
+          <MaterialIcon name="check" size={16} className="text-emerald-500" />
+        ) : (
+          <MaterialIcon name="content_copy" size={16} />
+        )}
         {copied ? (c("copied") as string) : label}
       </Button>
 
@@ -207,7 +211,7 @@ function AiCopyButton({
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant={mappedVariant} size="icon" aria-label="Mas opciones">
-            <ChevronDown />
+            <MaterialIcon name="expand_more" size={16} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuSubContent className="w-48">

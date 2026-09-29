@@ -14,7 +14,7 @@ import {
 } from "react-aria-components"
 
 import { cn } from "cn"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Accordion({ className, ...props }: DisclosureGroupProps) {
   return (
@@ -53,11 +53,15 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <ChevronDownIcon
+        <MaterialIcon
+          name="expand_more"
+          size={16}
           data-slot="accordion-trigger-icon"
           className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
         />
-        <ChevronUpIcon
+        <MaterialIcon
+          name="expand_less"
+          size={16}
           data-slot="accordion-trigger-icon"
           className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
         />

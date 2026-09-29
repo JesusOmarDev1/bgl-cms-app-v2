@@ -40,7 +40,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function ComboboxValue<T>({ ...props }: ComboBoxValueProps<T>) {
   return <ComboBoxValuePrimitive data-slot="combobox-value" {...props} />
@@ -60,7 +60,11 @@ function ComboboxTrigger({
       {...props}
     >
       {children}
-      <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+      <MaterialIcon
+        name="expand_more"
+        size={16}
+        className="pointer-events-none text-muted-foreground"
+      />
     </ButtonPrimitive>
   )
 }
@@ -87,7 +91,7 @@ function ComboboxClear({
       slot={null}
       {...props}
     >
-      <XIcon className="pointer-events-none" />
+      <MaterialIcon name="close" size={16} className="pointer-events-none" />
     </InputGroupButton>
   )
 }
@@ -115,7 +119,11 @@ function ComboboxInput({
             className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent [&_svg:not([class*='size-'])]:size-4"
             isDisabled={disabled}
           >
-            <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+            <MaterialIcon
+              name="expand_more"
+              size={16}
+              className="pointer-events-none text-muted-foreground"
+            />
           </InputGroupButton>
         )}
         {showClear && <ComboboxClear isDisabled={disabled} />}
@@ -191,7 +199,13 @@ function ComboboxItem<T extends object>({
         <>
           {children}
           <span className="pointer-events-none absolute end-2 flex size-4 items-center justify-center">
-            {isSelected ? <CheckIcon className="pointer-events-none" /> : null}
+            {isSelected ? (
+              <MaterialIcon
+                name="check"
+                size={16}
+                className="pointer-events-none"
+              />
+            ) : null}
           </span>
         </>
       ))}
@@ -317,7 +331,12 @@ function ComboboxChip({
           data-slot="combobox-chip-remove"
           aria-label="Remove"
         >
-          <XIcon className="pointer-events-none" data-icon="inline-start" />
+          <MaterialIcon
+            name="close"
+            size={16}
+            className="pointer-events-none"
+            data-icon="inline-start"
+          />
         </Button>
       )}
     </TagPrimitive>

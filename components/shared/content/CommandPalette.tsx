@@ -7,7 +7,6 @@ import {
   m,
   useReducedMotion,
 } from "motion/react"
-import { Search, type LucideIcon } from "lucide-react"
 import {
   type ReactNode,
   type RefObject,
@@ -20,8 +19,8 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
-import { DirectusImage } from "@/components/shared/assets/DirectusImage"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Empty,
   EmptyDescription,
@@ -48,7 +47,7 @@ export type CommandItem = {
   group?: string
   hint?: string
   keywords?: string[]
-  icon?: LucideIcon
+  icon?: string
   badge?: ReactNode
   image?: string | null
   description?: string
@@ -189,7 +188,6 @@ function CommandPaletteItemMedia({
   hasIcons: boolean
   hasImages: boolean
 }) {
-  const Icon = item.icon
   if (item.image) {
     return (
       <DirectusImage
@@ -206,8 +204,8 @@ function CommandPaletteItemMedia({
       <span className="relative z-10 size-20 shrink-0 rounded-md bg-muted" />
     )
   }
-  if (Icon) {
-    return <Icon className="relative z-10 h-4 w-4" />
+  if (item.icon) {
+    return <MaterialIcon name={item.icon} size={16} className="relative z-10" />
   }
   if (hasIcons) {
     return <span className="relative z-10 h-4 w-4" />
@@ -311,7 +309,11 @@ function CommandPaletteSearchField({
       {status === "loading" ? (
         <Spinner className="h-4 w-4 text-muted-foreground" />
       ) : (
-        <Search className="h-4 w-4 text-muted-foreground" />
+        <MaterialIcon
+          name="search"
+          size={16}
+          className="text-muted-foreground"
+        />
       )}
       <input
         ref={inputRef}

@@ -17,7 +17,7 @@ import {
 } from "react-aria-components"
 
 import { cn } from "cn"
-import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function ContextMenu({
   "data-slot": dataSlot = "context-menu-content",
@@ -149,7 +149,7 @@ function ContextMenuItem({
                     : "context-menu-checkbox-item-indicator"
                 }
               >
-                {isSelected ? <CheckIcon /> : null}
+                {isSelected ? <MaterialIcon name="check" size={16} /> : null}
               </span>
             ) : null}
             {children}
@@ -188,7 +188,11 @@ function ContextMenuSubTrigger({
       {composeRenderProps(children, (children) => (
         <>
           {children}
-          <ChevronRightIcon className="ms-auto rtl:rotate-180" />
+          <MaterialIcon
+            name="chevron_right"
+            size={16}
+            className="ms-auto rtl:rotate-180"
+          />
         </>
       ))}
     </MenuItemPrimitive>

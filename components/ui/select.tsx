@@ -26,7 +26,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { ChevronDownIcon, SearchIcon, CheckIcon } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 function Select<T extends object, M extends "single" | "multiple" = "single">({
   className,
@@ -96,7 +96,11 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+      <MaterialIcon
+        name="expand_more"
+        size={16}
+        className="pointer-events-none text-muted-foreground"
+      />
     </ButtonPrimitive>
   )
 }
@@ -189,7 +193,11 @@ function SelectInput({ className, ...props }: SearchFieldProps) {
           className="[&::-webkit-search-cancel-button]:hidden"
         />
         <InputGroupAddon>
-          <SearchIcon className="size-4 shrink-0 opacity-50" />
+          <MaterialIcon
+            name="search"
+            size={16}
+            className="shrink-0 opacity-50"
+          />
         </InputGroupAddon>
       </InputGroup>
     </SearchField>
@@ -230,7 +238,13 @@ function SelectItem({
             {children}
           </span>
           <span className="pointer-events-none absolute end-2 flex size-4 items-center justify-center">
-            {isSelected ? <CheckIcon className="pointer-events-none" /> : null}
+            {isSelected ? (
+              <MaterialIcon
+                name="check"
+                size={16}
+                className="pointer-events-none"
+              />
+            ) : null}
           </span>
         </>
       ))}

@@ -1,7 +1,7 @@
 "use server"
 import { getTranslations } from "next-intl/server"
 import { getHealthRepository } from "@/services/domain/db/repositories/endpoints/health"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Card,
   CardFooter,

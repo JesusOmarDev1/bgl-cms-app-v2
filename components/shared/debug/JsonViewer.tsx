@@ -1,16 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {
-  Check,
-  ChevronRight,
-  Copy,
-  CopyPlus,
-  Search,
-  UnfoldHorizontal,
-  FoldHorizontal,
-  X,
-} from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { cn } from "cn"
 import {
   jsonThemes,
@@ -386,7 +377,11 @@ function JsonCopyPathButton({
       className={copyIconClass}
       style={theme ? { color: theme.fg } : undefined}
     >
-      <CopyPlus className={cn("size-3", copied && "text-emerald-500")} />
+      <MaterialIcon
+        name="content_copy"
+        size={12}
+        className={cn(copied && "text-emerald-500")}
+      />
     </button>
   )
 }
@@ -563,9 +558,11 @@ function JsonBranchNode({
       className="flex size-4 shrink-0 items-center justify-center transition-transform"
       style={theme ? { color: theme.punctuation } : undefined}
     >
-      <ChevronRight
+      <MaterialIcon
+        name="chevron_right"
+        size={12}
         className={cn(
-          "size-3 transition-transform",
+          "transition-transform",
           isExpanded && "rotate-90",
           !theme && "text-muted-foreground"
         )}
@@ -854,7 +851,7 @@ function JsonViewerToolbar({
             searchOpen && "bg-muted text-foreground"
           )}
         >
-          <Search className="size-3.5" />
+          <MaterialIcon name="search" size={14} />
         </button>
         <button
           type="button"
@@ -862,7 +859,7 @@ function JsonViewerToolbar({
           aria-label={labels.expandAll}
           className={chromeButtonClassName}
         >
-          <UnfoldHorizontal className="size-3.5" />
+          <MaterialIcon name="unfold_more" size={14} />
         </button>
         <button
           type="button"
@@ -870,7 +867,7 @@ function JsonViewerToolbar({
           aria-label={labels.collapseAll}
           className={chromeButtonClassName}
         >
-          <FoldHorizontal className="size-3.5" />
+          <MaterialIcon name="unfold_less" size={14} />
         </button>
         <button
           type="button"
@@ -879,9 +876,9 @@ function JsonViewerToolbar({
           className={chromeButtonClassName}
         >
           {copiedAll ? (
-            <Check className="size-3.5 text-emerald-500" />
+            <MaterialIcon name="check" size={14} className="text-emerald-500" />
           ) : (
-            <Copy className="size-3.5" />
+            <MaterialIcon name="content_copy" size={14} />
           )}
         </button>
       </div>
@@ -910,7 +907,11 @@ function JsonViewerSearchPanel({
 
   return (
     <div className="flex items-center gap-2 border-b border-border/40 bg-muted/20 px-3 py-1.5 sm:px-4">
-      <Search className="size-3.5 shrink-0 text-muted-foreground" />
+      <MaterialIcon
+        name="search"
+        size={14}
+        className="shrink-0 text-muted-foreground"
+      />
       <label className="sr-only" htmlFor={searchInputId}>
         {labels.searchInputLabel}
       </label>
@@ -931,7 +932,7 @@ function JsonViewerSearchPanel({
           aria-label={labels.clearSearch}
           className={chromeButtonClassName}
         >
-          <X className="size-3.5" />
+          <MaterialIcon name="close" size={14} />
         </button>
       ) : null}
     </div>

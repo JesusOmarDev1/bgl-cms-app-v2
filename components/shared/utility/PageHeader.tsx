@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Plus, Search, List, Grid } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 export default function PageHeaderBlock() {
   const [view, setView] = useState<"grid" | "list">("list")
@@ -30,7 +30,7 @@ export default function PageHeaderBlock() {
             </p>
           </div>
           <Button className="w-full sm:w-auto">
-            <Plus data-icon="inline-start" aria-hidden="true" />
+            <MaterialIcon name="add" size={16} data-icon="inline-start" />
             New project
           </Button>
         </div>
@@ -39,9 +39,10 @@ export default function PageHeaderBlock() {
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
-            <Search
-              className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
+            <MaterialIcon
+              name="search"
+              size={16}
+              className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               type="search"
@@ -85,7 +86,7 @@ export default function PageHeaderBlock() {
                     : "text-muted-foreground hover:bg-muted/60"
                 )}
               >
-                <List className="size-4" aria-hidden="true" />
+                <MaterialIcon name="view_list" size={16} />
               </button>
               <button
                 type="button"
@@ -99,7 +100,7 @@ export default function PageHeaderBlock() {
                     : "text-muted-foreground hover:bg-muted/60"
                 )}
               >
-                <Grid className="size-4" aria-hidden="true" />
+                <MaterialIcon name="grid_view" size={16} />
               </button>
             </div>
           </div>

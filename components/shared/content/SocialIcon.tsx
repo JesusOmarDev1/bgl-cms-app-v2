@@ -5,7 +5,7 @@ import { TiktokIcon } from "@/assets/logos/social/tiktok"
 import { TwitterXIcon } from "@/assets/logos/social/twitterX"
 import { WhatsAppIcon } from "@/assets/logos/social/whatsapp"
 import { YouTubeIcon } from "@/assets/logos/social/youtube"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { ReactElement } from "react"
 
 interface SocialIconProps {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { FileTextIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import {
   Item,
   ItemContent,
@@ -51,7 +51,7 @@ function SampleItem({
   return (
     <Item variant={variant} size={size} className="max-w-md">
       <ItemMedia variant="icon">
-        <FileTextIcon />
+        <MaterialIcon name="description" size={16} />
       </ItemMedia>
       <ItemContent>
         <ItemTitle>{title}</ItemTitle>

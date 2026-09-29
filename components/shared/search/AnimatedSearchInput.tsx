@@ -11,7 +11,7 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from "react"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Kbd } from "@/components/ui/kbd"
 import { useIsMac } from "@/hooks/useIsMac"
 import { cn } from "cn"

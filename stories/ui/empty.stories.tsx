@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
-import { InboxIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Button } from "@/components/ui/button"
 import {
   Empty,
@@ -36,7 +36,7 @@ export const Default: Story = {
           <Empty className="max-w-md border">
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <InboxIcon />
+                <MaterialIcon name="inbox" size={16} />
               </EmptyMedia>
               <EmptyTitle>{t("empty.title")}</EmptyTitle>
               <EmptyDescription>{t("empty.description")}</EmptyDescription>
@@ -54,7 +54,7 @@ export const Default: Story = {
           <Empty className="max-w-md border">
             <EmptyHeader>
               <EmptyMedia variant="default">
-                <InboxIcon />
+                <MaterialIcon name="inbox" size={16} />
               </EmptyMedia>
               <EmptyTitle>{t("empty.title")}</EmptyTitle>
               <EmptyDescription>{t("empty.description")}</EmptyDescription>

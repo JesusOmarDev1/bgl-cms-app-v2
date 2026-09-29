@@ -7,9 +7,18 @@ export type ReadingTimeResult = {
   label: string
 }
 
+/**
+ * Extract text from blocks.
+ * @param blocks - The blocks to extract text from
+ * @returns Text from blocks
+ */
 function extractTextFromBlocks(blocks: unknown[]): string {
   const htmlParts: string[] = []
 
+  /**
+   * Walk through the blocks and extract text.
+   * @param v - The value to walk through
+   */
   function walk(v: unknown) {
     if (typeof v === "string" && /<[a-z][\s>]/i.test(v)) {
       htmlParts.push(v)
@@ -22,11 +31,21 @@ function extractTextFromBlocks(blocks: unknown[]): string {
   return htmlParts.join(" ")
 }
 
+/**
+ * Get the plain text from blocks.
+ * @param blocks - The blocks to get the plain text from
+ * @returns Plain text from blocks
+ */
 export function getBlocksPlainText(blocks?: unknown[] | null): string {
   if (!blocks?.length) return ""
   return htmlToText(extractTextFromBlocks(blocks))
 }
 
+/**
+ * Get the reading time from blocks.
+ * @param blocks - The blocks to get the reading time from
+ * @returns Reading time from blocks
+ */
 export function getReadingTime(blocks?: unknown[] | null): ReadingTimeResult {
   const text = getBlocksPlainText(blocks)
   if (!text) return { minutes: 0, seconds: 0, label: "" }

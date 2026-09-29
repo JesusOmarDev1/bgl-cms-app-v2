@@ -4,7 +4,7 @@ import { setAttr } from "@directus/visual-editing"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import { StaticLogo } from "@/assets/logos/static-logo"
-import { DirectusImage } from "@/components/shared/assets/DirectusImage"
+import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -17,7 +17,7 @@ import {
 import { useScroll } from "@/hooks/useScroll"
 import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
-import { MaterialIcon } from "@/components/shared/assets/MaterialIcon"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
 import { LinkButton } from "@/components/ui/button"
 

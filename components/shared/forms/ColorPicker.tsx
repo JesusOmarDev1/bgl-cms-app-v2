@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Pipette } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
 import { Input } from "@/components/ui/input"
@@ -758,7 +758,7 @@ function ColorPickerEyedropper({
         className
       )}
     >
-      <Pipette className="size-3.5" />
+      <MaterialIcon name="colorize" size={14} />
     </button>
   )
 }

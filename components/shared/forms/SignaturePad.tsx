@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eraser, Undo2 } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
@@ -363,7 +363,7 @@ function SignaturePadClear({
       className={cn(className)}
       {...props}
     >
-      <Eraser aria-hidden />
+      <MaterialIcon name="ink_eraser" size={16} />
       {children ?? "Clear"}
     </Button>
   )
@@ -386,7 +386,7 @@ function SignaturePadUndo({
       className={cn(className)}
       {...props}
     >
-      <Undo2 aria-hidden />
+      <MaterialIcon name="undo" size={16} />
       {children ?? "Undo"}
     </Button>
   )

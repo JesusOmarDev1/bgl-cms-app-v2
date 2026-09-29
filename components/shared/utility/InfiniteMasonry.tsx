@@ -1,7 +1,7 @@
 "use client"
 
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { AlertCircle, Inbox } from "lucide-react"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { LazyMotion, domAnimation, useReducedMotion } from "motion/react"
 import * as m from "motion/react-m"
 import {
@@ -120,7 +120,12 @@ function DefaultEmptyState() {
     <Empty className="flex h-full min-h-64 flex-col items-center justify-center px-6 text-center">
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <Inbox className="size-8 text-muted-foreground" aria-hidden="true" />
+          <MaterialIcon
+            name="inbox"
+            size={32}
+            className="text-muted-foreground"
+            aria-hidden="true"
+          />
         </EmptyMedia>
       </EmptyHeader>
       <EmptyContent>
@@ -329,7 +334,11 @@ function MasonryVirtualizerBoundary<T>({
                   hasError ? (
                     <div className="flex min-h-36 flex-col items-start justify-center rounded-2xl border border-destructive/20 bg-destructive/5 p-4">
                       <div className="flex items-center gap-2 text-destructive">
-                        <AlertCircle className="size-4" aria-hidden="true" />
+                        <MaterialIcon
+                          name="error"
+                          size={16}
+                          aria-hidden="true"
+                        />
                         <p className="text-sm font-medium">
                           No se pudieron cargar más items
                         </p>
