@@ -242,10 +242,12 @@ export function FooterNavClient({
             ))}
           </FooterNavColumn>
         </div>
+
         <div className="grid grid-cols-1 gap-4">
+          {/* Phones */}
           {data?.phones && data.phones.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-xl font-semibold text-muted-foreground">
+              <span className="text-2xl font-semibold text-muted-foreground">
                 Telefonos
               </span>
               <div className="flex-1">
@@ -278,8 +280,9 @@ export function FooterNavClient({
               </div>
             </div>
           )}
+          {/* Hours */}
           <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-            <span className="text-xl font-semibold text-muted-foreground">
+            <span className="text-2xl font-semibold text-muted-foreground">
               Horarios de atención
             </span>
             <div className="flex-1">
@@ -317,9 +320,10 @@ export function FooterNavClient({
               </div>
             </div>
           </div>
+          {/* Emails */}
           {data?.emails && data?.emails.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-xl font-semibold text-muted-foreground">
+              <span className="text-2xl font-semibold text-muted-foreground">
                 Correos
               </span>
               <div className="flex-1">
@@ -367,9 +371,10 @@ export function FooterNavClient({
               </div>
             </div>
           )}
+          {/* Social Links */}
           {data?.social_links && data?.social_links.length > 0 && (
             <div className="flex flex-col items-start justify-start gap-4 border-t border-white/10 py-6 lg:flex-row lg:items-center lg:gap-10">
-              <span className="text-xl font-semibold text-muted-foreground">
+              <span className="text-2xl font-semibold text-muted-foreground">
                 Redes sociales
               </span>
               <div className="flex-1">

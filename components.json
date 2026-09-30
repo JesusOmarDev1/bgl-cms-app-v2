@@ -27,6 +27,7 @@
     "@spell": "https://spell.sh/r/{name}.json",
     "@7ovr": "https://7ovr.com/r/{name}.json",
     "@forgeui": "https://forgeui.in/r/{name}.json",
-    "@gammaui": "https://www.gammaui.com/r/{name}.json"
+    "@gammaui": "https://www.gammaui.com/r/{name}.json",
+    "@catalogs": "https://api.catalogs.dev/shadcn/{name}.json"
   }
 }

@@ -120,7 +120,33 @@ export const PAGES_FIELDS = [
               files: ["id", { directus_files_id: ["*"] }],
             },
           ],
-          carousel_block: ["*"],
+          carousel_block: [
+            "id",
+            "variant",
+            "title",
+            "excerpt",
+            "sort",
+            "date_created",
+            "date_updated",
+            {
+              items: [
+                "id",
+                "collection",
+                {
+                  item: {
+                    carousel_items_block: [
+                      "id",
+                      "sort",
+                      "title",
+                      "date_created",
+                      "date_updated",
+                      { image: ["*"] },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
           clients_block: [
             "id",
             "title",
