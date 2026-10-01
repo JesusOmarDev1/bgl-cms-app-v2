@@ -36,7 +36,7 @@ export function NetworkStatus() {
   const connectionStatus = online ? "operational" : "major-outage"
 
   return (
-    <Card className="w-full max-w-xl" role="status">
+    <Card className="w-full max-w-7xl" role="status">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <MaterialIcon name="wifi" size={24} />

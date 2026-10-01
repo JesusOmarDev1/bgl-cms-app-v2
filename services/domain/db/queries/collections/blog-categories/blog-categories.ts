@@ -4,7 +4,7 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { BLOG_CATEGORIES_FIELDS } from "@/services/domain/db/queries/collections/blog-categories/blog-categories.fields"
 import type { BlogCategoriesTypes } from "@/types/collections/blog-categories"
 import type { StatusType } from "@/types/enums/status-type"
@@ -35,7 +35,7 @@ export async function getBlogCategoriesQuery(query: BlogCategoriesQuery = {}) {
     )
     return items
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getBlogCategoriesQuery",
       collection: "blog_categories",
@@ -63,7 +63,7 @@ export async function getBlogCategoriesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getBlogCategoriesCountQuery",
       collection: "blog_categories",

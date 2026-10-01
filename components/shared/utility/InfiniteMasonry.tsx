@@ -11,7 +11,7 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from "react"
-import { EASE_OUT, SPRING_PANEL } from "@/lib/masonry/ease"
+import { EASE_OUT, SPRING_PANEL } from "@/lib/animation/masonry/ease"
 import { cn } from "cn"
 import { Skeleton } from "@/components/ui/skeleton"
 import {

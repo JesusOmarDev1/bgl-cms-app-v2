@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { CLIENTS_FIELDS } from "@/services/domain/db/queries/collections/clients/clients.fields"
 import type { ClientsTypes } from "@/types/collections/clients"
 import type { StatusType } from "@/types/enums/status-type"
@@ -37,7 +37,7 @@ export async function getClientsQuery(query: ClientsQuery) {
     )
     return clients
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getClientsQuery",
       collection: "clients",
@@ -65,7 +65,7 @@ export async function getClientsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getClientsCountQuery",
       collection: "clients",

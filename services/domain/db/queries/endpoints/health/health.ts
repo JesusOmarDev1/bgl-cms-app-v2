@@ -1,7 +1,7 @@
 import "server-only"
 import { serverHealth } from "@directus/sdk"
 import directus from "@/config/directus"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { HealthResult } from "@/types/shared/health/health-result"
 import { HEALTH_FIELDS } from "./health.fields"
 import { cacheLife, cacheTag } from "next/cache"
@@ -21,7 +21,7 @@ export async function getHealthQuery(
     return { status: health[statusField], responseTime, ping: true }
   } catch (error) {
     const responseTime = performance.now() - start
-    logDirectusQueryError(error, failedToFetchMessage, {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getHealthQuery",
       collection: "health",

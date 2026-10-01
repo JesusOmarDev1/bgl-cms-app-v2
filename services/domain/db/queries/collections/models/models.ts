@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { MODELS_FIELDS } from "@/services/domain/db/queries/collections/models/models.fields"
 import type { ModelsTypes } from "@/types/collections/models"
 import type { StatusType } from "@/types/enums/status-type"
@@ -37,7 +37,7 @@ export async function getModelsQuery(query: ModelsQuery) {
     )
     return models
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getModelsQuery",
       collection: "models",
@@ -65,7 +65,7 @@ export async function getModelsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getModelsCountQuery",
       collection: "models",

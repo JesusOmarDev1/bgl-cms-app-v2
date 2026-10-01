@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/empty"
 import { SearchHitsSkeleton } from "@/components/shared/search/SearchHitsSkeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { EASE_OUT } from "@/lib/search/ease"
+import { EASE_OUT } from "@/lib/animation/search/ease"
 import { useOnOpen } from "@/hooks/useOnOpen"
 import { useRowCursor } from "@/hooks/useRowCursor"
 import { useTouchCapable } from "@/hooks/useTouchCapable"

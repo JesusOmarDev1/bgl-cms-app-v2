@@ -5,7 +5,7 @@ import { readSingleton } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { FOOTER_FIELDS } from "@/services/domain/db/queries/singletons/footer/footer.fields"
 import type { Schema } from "@/types/schema"
 import type { FooterType } from "@/types/singletons/footer"
@@ -25,7 +25,7 @@ export async function getFooterQuery() {
     )
   } catch (error) {
     const message = t("failed_to_fetch")
-    logDirectusQueryError(error, message, {
+    returnDirectusQueryError(error, message, {
       component: "db.queries",
       operation: "getFooterQuery",
       collection: "footer",

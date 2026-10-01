@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { PRODUCTS_FIELDS } from "@/services/domain/db/queries/collections/products/products.fields"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { StatusType } from "@/types/enums/status-type"
@@ -37,7 +37,7 @@ export async function getProductsQuery(query: ProductsQuery) {
     )
     return products
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getProductsQuery",
       collection: "products",
@@ -67,7 +67,7 @@ export async function getProductsBySlugQuery(
     )
     return products
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getProductsBySlugQuery",
       collection: "products",
@@ -95,7 +95,7 @@ export async function getProductsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getProductsCountQuery",
       collection: "products",

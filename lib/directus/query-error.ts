@@ -73,7 +73,7 @@ function extractDirectusErrorInfo(error: unknown): {
  * Log a Directus query failure. `message` must be a safe i18n string.
  * FORBIDDEN / INVALID_TOKEN / LIMIT_EXCEEDED emit `warn`; other failures emit `error`.
  */
-export function logDirectusQueryError(
+export function returnDirectusQueryError(
   error: unknown,
   message: string,
   context: LogContext

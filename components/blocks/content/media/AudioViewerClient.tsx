@@ -13,7 +13,6 @@ import { getAssetUrl } from "@/lib/directus/asset-url"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
-import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { formatBytes } from "@/lib/formatting/format-bytes"
 import { Track } from "@/lib/audio/html-audio"
 import {

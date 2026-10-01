@@ -21,7 +21,21 @@ export const PAGES_FIELDS = [
       "collection",
       {
         item: {
-          faq_block: ["*"],
+          faq_block: [
+            "id",
+            "title",
+            "sort",
+            "excerpt",
+            "date_created",
+            "date_updated",
+            {
+              questions: [
+                "id",
+                "collection",
+                { item: { faq_questions: ["id", "question", "answer"] } },
+              ],
+            },
+          ],
           map_block: ["*"],
           content_block: [
             "id",

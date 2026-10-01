@@ -20,6 +20,7 @@ import { cn } from "cn"
 import { searchAction } from "@/services/domain/server/search/search"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
 import { Button } from "@/components/ui/button"
+import BorderBeam from "border-beam"
 
 const MIN_QUERY_LENGTH = 3
 const MAX_QUERY_LENGTH = 100
@@ -175,48 +176,52 @@ export function SearchBarClient({
         {statusAnnouncement}
       </div>
       {showIcon ? (
-        <Button
-          variant="glass"
-          size="icon-xl"
-          aria-label="Buscar"
-          aria-busy={loading}
-          isDisabled={loading}
-          className={cn(
-            "rounded-full",
-            variant === "header" && "min-[1366px]:hidden",
-            className
-          )}
-          onClick={() => handleOpenChange(true)}
-        >
-          <MaterialIcon name="search" size={20} />
-        </Button>
+        <BorderBeam size="md" colorVariant="colorful">
+          <Button
+            variant="glass"
+            size="icon-xl"
+            aria-label="Buscar"
+            aria-busy={loading}
+            isDisabled={loading}
+            className={cn(
+              "rounded-full",
+              variant === "header" && "min-[1366px]:hidden",
+              className
+            )}
+            onClick={() => handleOpenChange(true)}
+          >
+            <MaterialIcon name="search" size={20} />
+          </Button>
+        </BorderBeam>
       ) : null}
 
       {showDefault ? (
-        <button
-          type="button"
-          aria-label="Buscar"
-          aria-busy={loading}
-          disabled={loading}
-          className={cn(
-            "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44",
-            variant === "header" && "hidden min-[1366px]:inline-flex",
-            className
-          )}
-          onClick={() => handleOpenChange(true)}
-        >
-          <MaterialIcon
-            name="search"
-            size={16}
-            className="me-2 shrink-0 text-muted-foreground/80"
-          />
-          <span className="flex w-full items-center justify-between">
-            <span className="font-normal text-muted-foreground/70">
-              {loading ? "Buscando..." : "Buscar..."}
+        <BorderBeam size="md" colorVariant="colorful">
+          <button
+            type="button"
+            aria-label="Buscar"
+            aria-busy={loading}
+            disabled={loading}
+            className={cn(
+              "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44",
+              variant === "header" && "hidden min-[1366px]:inline-flex",
+              className
+            )}
+            onClick={() => handleOpenChange(true)}
+          >
+            <MaterialIcon
+              name="search"
+              size={16}
+              className="me-2 shrink-0 text-muted-foreground/80"
+            />
+            <span className="flex w-full items-center justify-between">
+              <span className="font-normal text-muted-foreground/70">
+                {loading ? "Buscando..." : "Buscar..."}
+              </span>
+              <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
             </span>
-            <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
-          </span>
-        </button>
+          </button>
+        </BorderBeam>
       ) : null}
 
       <CommandPalette

@@ -31,7 +31,7 @@ const meta = {
   },
   render: (args) => (
     <HeaderNavClient {...args}>
-      <MobileNavClient data={mockHeader} search={false} />
+      <MobileNavClient data={mockHeader} />
     </HeaderNavClient>
   ),
 } satisfies Meta<typeof HeaderNavClient>

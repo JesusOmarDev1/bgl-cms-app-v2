@@ -25,11 +25,11 @@ import {
   EASE_OUT,
   SPRING_PANEL,
   SPRING_SWAP,
-} from "@/lib/refresh/ease"
+} from "@/lib/animation/refresh/ease"
 import {
   capturePointer,
   TOUCH_GESTURE_CONTENT_CLASS,
-} from "@/lib/refresh/touch"
+} from "@/lib/animation/refresh/touch"
 import { cn } from "cn"
 
 export type PullToRefreshStatus = "idle" | "pulling" | "ready" | "refreshing"

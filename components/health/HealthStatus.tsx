@@ -39,7 +39,7 @@ export async function HealthStatus() {
           : null
 
   return (
-    <Card className="w-full max-w-xl" role="status">
+    <Card className="w-full max-w-7xl" role="status">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <MaterialIcon name="bigtop_updates" size={24} />

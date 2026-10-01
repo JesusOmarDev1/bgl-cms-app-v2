@@ -24,10 +24,11 @@ export default function Page() {
       <Box
         display="flex"
         orientation="vertical"
-        className="min-h-dvh"
-        justify="evenly"
+        className="min-h-dvh w-full"
+        justify="start"
         align="center"
-        gap={2}
+        gap={1}
+        paddingTop={4}
         wrap="wrap"
       >
         <Suspense

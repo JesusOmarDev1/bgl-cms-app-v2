@@ -15,6 +15,7 @@ import { Suspense } from "react"
 import { HeaderNavSkeleton } from "@/components/blocks/singletons/header/HeaderNavSkeleton"
 import { FooterNav } from "@/components/blocks/singletons/footer/FooterNav"
 import { FooterNavSkeleton } from "@/components/blocks/singletons/footer/FooterNavSkeleton"
+import { ScrollToTopButton } from "@/components/shared/utility/ScrollToTopButton"
 
 export const metadata = createRootMetadata()
 
@@ -66,6 +67,7 @@ export default function RootLayout({
                   <HeaderNav />
                 </Suspense>
                 {children}
+                <ScrollToTopButton className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2" />
                 <Suspense
                   key="footer-nav"
                   name="footer-nav"

@@ -4,7 +4,7 @@ import { aggregate, readItems } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { PagesTypes } from "@/types/collections/pages"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
@@ -35,7 +35,7 @@ export async function getPagesQuery(query: PagesQuery) {
     )
     return pages
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getPagesQuery",
       collection: "pages",
@@ -62,7 +62,7 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
     )
     return pageItem
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getPagesBySlugQuery",
       collection: "pages",
@@ -90,7 +90,7 @@ export async function getPagesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getPagesCountQuery",
       collection: "pages",

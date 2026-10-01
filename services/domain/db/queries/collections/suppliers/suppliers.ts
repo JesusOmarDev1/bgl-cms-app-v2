@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { SUPPLIERS_FIELDS } from "@/services/domain/db/queries/collections/suppliers/suppliers.fields"
 import type { SuppliersTypes } from "@/types/collections/suppliers"
 import type { StatusType } from "@/types/enums/status-type"
@@ -36,7 +36,7 @@ export async function getSuppliersQuery(query: SuppliersQuery) {
     )
     return suppliers
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getSuppliersQuery",
       collection: "suppliers",
@@ -64,7 +64,7 @@ export async function getSuppliersCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getSuppliersCountQuery",
       collection: "suppliers",

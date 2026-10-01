@@ -28,6 +28,9 @@
     "@7ovr": "https://7ovr.com/r/{name}.json",
     "@forgeui": "https://forgeui.in/r/{name}.json",
     "@gammaui": "https://www.gammaui.com/r/{name}.json",
-    "@catalogs": "https://api.catalogs.dev/shadcn/{name}.json"
+    "@catalogs": "https://api.catalogs.dev/shadcn/{name}.json",
+    "@ncdai": "https://chanhdai.com/r/{name}.json",
+    "@componentry": "https://componentry.fun/r/{name}.json",
+    "@pdfcn": "https://pdfcn.dev/r/{name}.json"
   }
 }

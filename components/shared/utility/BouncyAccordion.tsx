@@ -16,7 +16,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { EASE_OUT } from "@/lib/forms/accordion/ease"
+import { EASE_OUT } from "@/lib/animation/forms/accordion/ease"
 import { cn } from "cn"
 
 export type BouncyAccordionItem = {

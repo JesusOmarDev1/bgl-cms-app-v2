@@ -54,16 +54,10 @@ function AccordionTrigger({
       >
         {children}
         <MaterialIcon
-          name="expand_more"
+          name="expand_all"
           size={16}
           data-slot="accordion-trigger-icon"
           className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
-        />
-        <MaterialIcon
-          name="expand_less"
-          size={16}
-          data-slot="accordion-trigger-icon"
-          className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
         />
       </AccordionTriggerPrimitive>
     </AccordionHeaderPrimitive>

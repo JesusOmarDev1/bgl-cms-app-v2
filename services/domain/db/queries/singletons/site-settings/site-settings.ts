@@ -6,7 +6,7 @@ import { cacheLife, cacheTag } from "next/cache"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { Schema } from "@/types/schema"
 import type { SiteSettingsType } from "@/types/singletons/site-settings"
 import { SITE_SETTINGS_FIELDS } from "./site-settings.fields"
@@ -24,7 +24,7 @@ export async function getSiteSettingsQuery() {
       } satisfies Query<Schema, SiteSettingsType>)
     )
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getSiteSettingsQuery",
       collection: "site_settings",

@@ -5,7 +5,7 @@ import { readSingleton } from "@directus/sdk"
 import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { SERVICES_BUTTON_FIELDS } from "@/services/domain/db/queries/singletons/services-button/services-button.fields"
 import type { Schema } from "@/types/schema"
 import type { ServicesButtonType } from "@/types/singletons/services-button"
@@ -34,7 +34,7 @@ export async function getServicesButtonQuery() {
     )
   } catch (error) {
     const message = t("failed_to_fetch")
-    logDirectusQueryError(error, message, {
+    returnDirectusQueryError(error, message, {
       component: "db.queries",
       operation: "getServicesButtonQuery",
       collection: "services_button",

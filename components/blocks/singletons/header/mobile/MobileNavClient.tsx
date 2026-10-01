@@ -9,38 +9,25 @@ import {
 } from "@/components/ui/accordion"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { SocialIcon } from "@/components/shared/content/SocialIcon"
-
-type SearchBarComponent =
-  typeof import("@/components/shared/search/SearchBar").SearchBar
 
 interface MobileNavClientProps {
   data: NonNullable<HeaderQueryResult>
-  /** False skips the search chunk. Storybook sets this so ioredis never evaluates. */
-  search?: boolean
 }
 
-export function MobileNavClient({ data, search = true }: MobileNavClientProps) {
+export function MobileNavClient({ data }: MobileNavClientProps) {
   const [open, setOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [SearchBar, setSearchBar] = useState<SearchBarComponent | null>(null)
   const close = () => setOpen(false)
-
-  useEffect(() => {
-    if (!search) return
-    let live = true
-    void import("@/components/shared/search/SearchBar").then((mod) => {
-      if (live) setSearchBar(() => mod.SearchBar)
-    })
-    return () => {
-      live = false
-    }
-  }, [search])
 
   return (
     <>
@@ -56,30 +43,18 @@ export function MobileNavClient({ data, search = true }: MobileNavClientProps) {
       <SheetContent
         side="right"
         isOpen={open}
-        isKeyboardDismissDisabled={searchOpen}
-        onOpenChange={(next) => {
-          setOpen(next)
-          if (!next) setSearchOpen(false)
-        }}
+        onOpenChange={setOpen}
         className="gap-0 overflow-hidden bg-background p-0 sm:max-w-md"
       >
         <div className="flex h-full min-h-0 flex-col">
           <SheetHeader className="shrink-0 border-b border-border p-4 pe-12">
-            <SheetTitle className="text-base font-medium text-muted-foreground">
+            <SheetTitle className="text-base font-medium uppercase">
               Menú de navegación
             </SheetTitle>
+            <SheetDescription>
+              Aquí puedes encontrar todos los enlaces de navegación de la web.
+            </SheetDescription>
           </SheetHeader>
-          {SearchBar ? (
-            <div className="shrink-0 border-b border-border px-4 py-4">
-              <SearchBar
-                variant="default"
-                portaled={false}
-                onNavigate={close}
-                onPaletteOpenChange={setSearchOpen}
-                className="w-full lg:w-full"
-              />
-            </div>
-          ) : null}
           <ScrollArea className="min-h-0 flex-1 px-4">
             <p className="py-3 text-sm font-medium tracking-wider text-muted-foreground uppercase">
               Navegación

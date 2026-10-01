@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
-import { logDirectusQueryError } from "@/lib/directus/query-error"
+import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { BRANDS_FIELDS } from "@/services/domain/db/queries/collections/brands/brands.fields"
 import type { BrandsTypes } from "@/types/collections/brands"
 import type { StatusType } from "@/types/enums/status-type"
@@ -37,7 +37,7 @@ export async function getBrandsQuery(query: BrandsQuery) {
     )
     return brands
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getBrandsQuery",
       collection: "brands",
@@ -62,7 +62,7 @@ export async function getBrandsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    logDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, t("failed_to_fetch"), {
       component: "db.queries",
       operation: "getBrandsCountQuery",
       collection: "brands",
