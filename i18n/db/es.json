@@ -104,6 +104,9 @@
     "footer": {
       "failed_to_fetch": "Error al obtener el pie de página."
     },
+    "form_responses": {
+      "failed_to_create": "Error al crear la respuesta del formulario."
+    },
     "whatsapp_button": {
       "failed_to_fetch": "Error al obtener el botón de WhatsApp."
     },

@@ -5,7 +5,7 @@ import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverTrigger } from "@/components/ui/popover"
+import { Popover } from "@/components/ui/popover"
 import {
   clampDate,
   gridKeyToDate,
@@ -15,8 +15,8 @@ import {
   startOfDay,
 } from "@/lib/animation/forms/calendar/calendar-utils"
 
-const DEFAULT_INTL_LOCALE = "en-US"
-const DEFAULT_INTL_TIME_ZONE = "UTC"
+const DEFAULT_INTL_LOCALE = "es-ES"
+const DEFAULT_INTL_TIME_ZONE = "America/Mexico_City"
 
 function toUtcCalendarDate(date: Date) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -26,6 +26,10 @@ export type DateCalendarProps = Omit<
   React.ComponentProps<"div">,
   "defaultValue"
 > & {
+  id?: React.ComponentProps<"input">["id"]
+  required?: React.ComponentProps<"input">["required"]
+  autoComplete?: React.ComponentProps<"input">["autoComplete"]
+  inputMode?: React.ComponentProps<"input">["inputMode"]
   value?: Date | null
   defaultValue?: Date | null
   onValueChange?: (date: Date | null) => void
@@ -77,7 +81,7 @@ function DateCalendarDay({
       onKeyDown={(e) => onKeyDown(e, day)}
       tabIndex={tabIndex}
       className={cn(
-        "relative size-8 rounded-sm font-mono text-xs tabular-nums transition-colors outline-none",
+        "relative size-8 rounded-sm text-xs tabular-nums transition-colors outline-none",
         "hover:bg-accent hover:text-accent-foreground",
         "focus-visible:ring-2 focus-visible:ring-ring",
         "disabled:opacity-30 disabled:hover:bg-transparent",
@@ -210,7 +214,7 @@ function DateCalendarHeader({
       </Button>
       <span
         data-slot="date-picker-calendar-caption"
-        className="font-mono text-[11px] tracking-[0.08em] text-muted-foreground uppercase tabular-nums"
+        className="text-[11px] tracking-[0.08em] text-muted-foreground uppercase tabular-nums"
       >
         {monthCaption}
       </span>
@@ -273,7 +277,7 @@ function DateCalendarGrid({
             key={label}
             role="columnheader"
             data-slot="date-picker-calendar-weekday"
-            className="flex h-7 items-center justify-center font-mono text-[10px] text-muted-foreground uppercase"
+            className="flex h-7 items-center justify-center text-[10px] text-muted-foreground uppercase"
           >
             {label}
           </span>
@@ -305,6 +309,10 @@ function DateCalendarGrid({
 function DateCalendar({
   value: valueProp,
   defaultValue = null,
+  id,
+  required,
+  autoComplete,
+  inputMode,
   onValueChange,
   month: monthProp,
   defaultMonth,
@@ -496,6 +504,8 @@ type DatePickerContextValue = {
 const DatePickerContext = React.createContext<DatePickerContextValue | null>(
   null
 )
+const DatePickerTriggerRefContext =
+  React.createContext<React.RefObject<HTMLButtonElement | null> | null>(null)
 
 function useDatePicker() {
   const ctx = React.useContext(DatePickerContext)
@@ -508,6 +518,10 @@ function useDatePicker() {
 }
 
 export type DatePickerProps = {
+  id?: React.ComponentProps<"input">["id"]
+  required?: React.ComponentProps<"input">["required"]
+  autoComplete?: React.ComponentProps<"input">["autoComplete"]
+  inputMode?: React.ComponentProps<"input">["inputMode"]
   value?: Date | null
   defaultValue?: Date | null
   onValueChange?: (date: Date | null) => void
@@ -518,6 +532,7 @@ export type DatePickerProps = {
   max?: Date
   disabled?: boolean
   children?: React.ReactNode
+  className?: string
 }
 
 function DatePicker({
@@ -531,6 +546,7 @@ function DatePicker({
   max,
   disabled,
   children,
+  className,
 }: DatePickerProps) {
   const [internalValue, setInternalValue] = React.useState<Date | null>(
     defaultValue
@@ -554,6 +570,7 @@ function DatePicker({
     [openProp, onOpenChange]
   )
 
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
   const ctx = React.useMemo<DatePickerContextValue>(
     () => ({ value, setValue, open, setOpen, min, max, disabled }),
     [value, setValue, open, setOpen, min, max, disabled]
@@ -561,15 +578,15 @@ function DatePicker({
 
   return (
     <DatePickerContext.Provider value={ctx}>
-      <Popover isOpen={open} onOpenChange={setOpen}>
-        {children}
-      </Popover>
+      <DatePickerTriggerRefContext.Provider value={triggerRef}>
+        <div className={className}>{children}</div>
+      </DatePickerTriggerRefContext.Provider>
     </DatePickerContext.Provider>
   )
 }
 
 function DatePickerTrigger({
-  placeholder = "Pick a date",
+  placeholder = "Selecciona una fecha",
   locale,
   className,
   children,
@@ -582,6 +599,7 @@ function DatePickerTrigger({
   children?: React.ReactNode
 }) {
   const ctx = useDatePicker()
+  const triggerRef = React.useContext(DatePickerTriggerRefContext)
   const resolvedLocale = locale ?? DEFAULT_INTL_LOCALE
   const fmt = React.useMemo(
     () =>
@@ -603,38 +621,47 @@ function DatePickerTrigger({
         ? `Selected date ${selectedValueLabel}`
         : "Select date")
   return (
-    <PopoverTrigger>
-      <button
-        type="button"
-        disabled={ctx.disabled}
-        aria-label={triggerAriaLabel}
-        aria-labelledby={ariaLabelledByProp}
-        data-slot="date-picker-trigger"
-        data-state={ctx.open ? "open" : "closed"}
-        className={cn(
-          "inline-flex h-9 w-full items-center gap-2 rounded-sm border border-input bg-transparent px-3 text-start font-mono text-sm tabular-nums transition-colors outline-none",
-          "hover:border-ring/60 focus-visible:border-ring data-[state=open]:border-ring",
-          !ctx.value && "font-sans text-muted-foreground",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          className
-        )}
-        {...props}
-      >
-        <MaterialIcon
-          name="calendar_today"
-          size={14}
-          className="shrink-0 text-muted-foreground"
-        />
-        <span data-slot="date-picker-trigger-label" className="flex-1 truncate">
-          {triggerLabel}
-        </span>
-      </button>
-    </PopoverTrigger>
+    <button
+      {...props}
+      type="button"
+      ref={triggerRef}
+      disabled={ctx.disabled}
+      aria-label={triggerAriaLabel}
+      aria-labelledby={ariaLabelledByProp}
+      aria-haspopup="dialog"
+      aria-expanded={ctx.open}
+      data-slot="date-picker-trigger"
+      data-state={ctx.open ? "open" : "closed"}
+      className={cn(
+        "inline-flex h-9 w-full items-center gap-2 rounded-sm border border-input bg-transparent px-3 text-start text-sm tabular-nums transition-colors outline-none",
+        "hover:border-ring/60 focus-visible:border-ring data-[state=open]:border-ring",
+        !ctx.value && "font-sans text-muted-foreground",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      onClick={(event) => {
+        props.onClick?.(event)
+        if (!event.defaultPrevented) ctx.setOpen(!ctx.open)
+      }}
+    >
+      <MaterialIcon
+        name="calendar_today"
+        size={14}
+        className="shrink-0 text-muted-foreground"
+      />
+      <span data-slot="date-picker-trigger-label" className="flex-1 truncate">
+        {triggerLabel}
+      </span>
+    </button>
   )
 }
 
 function DatePickerContent({
   locale,
+  id,
+  required,
+  autoComplete,
+  inputMode,
   weekStartsOn,
   disabledDate,
   month,
@@ -644,6 +671,10 @@ function DatePickerContent({
   ...props
 }: React.ComponentProps<typeof Popover> & {
   locale?: string
+  id?: React.ComponentProps<"input">["id"]
+  required?: React.ComponentProps<"input">["required"]
+  autoComplete?: React.ComponentProps<"input">["autoComplete"]
+  inputMode?: React.ComponentProps<"input">["inputMode"]
   weekStartsOn?: 0 | 1
   disabledDate?: (d: Date) => boolean
   month?: Date
@@ -651,48 +682,62 @@ function DatePickerContent({
   onMonthChange?: (month: Date) => void
 }) {
   const ctx = useDatePicker()
+  const triggerRef = React.useContext(DatePickerTriggerRefContext)
   return (
-    <div
-      data-slot="date-picker-content"
-      className={cn("w-auto p-3", className)}
-      {...(props as React.HTMLAttributes<HTMLDivElement>)}
+    <Popover
+      {...props}
+      triggerRef={triggerRef ?? undefined}
+      isOpen={ctx.open}
+      onOpenChange={ctx.setOpen}
     >
-      <div data-slot="date-picker-content-body" className="flex flex-col gap-2">
-        <DateCalendar
-          value={ctx.value}
-          onValueChange={(d) => {
-            ctx.setValue(d)
-            ctx.setOpen(false)
-          }}
-          month={month}
-          defaultMonth={defaultMonth}
-          onMonthChange={onMonthChange}
-          min={ctx.min}
-          max={ctx.max}
-          disabledDate={disabledDate}
-          locale={locale}
-          weekStartsOn={weekStartsOn}
-        />
-        {ctx.value && (
-          <div
-            data-slot="date-picker-content-footer"
-            className="flex justify-end"
-          >
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              data-slot="date-picker-clear"
-              onClick={() => ctx.setValue(null)}
-              className="h-7 gap-1 px-2 font-mono text-[10px] tracking-[0.08em] text-muted-foreground uppercase"
+      <div
+        data-slot="date-picker-content"
+        className={cn("w-auto p-3", className)}
+      >
+        <div
+          data-slot="date-picker-content-body"
+          className="flex flex-col gap-2"
+        >
+          <DateCalendar
+            id={id}
+            required={required}
+            autoComplete={autoComplete}
+            inputMode={inputMode}
+            value={ctx.value}
+            onValueChange={(d) => {
+              ctx.setValue(d)
+              ctx.setOpen(false)
+            }}
+            month={month}
+            defaultMonth={defaultMonth}
+            onMonthChange={onMonthChange}
+            min={ctx.min}
+            max={ctx.max}
+            disabledDate={disabledDate}
+            locale={locale}
+            weekStartsOn={weekStartsOn}
+          />
+          {ctx.value && (
+            <div
+              data-slot="date-picker-content-footer"
+              className="flex justify-end"
             >
-              <MaterialIcon name="close" size={12} data-icon="inline-start" />
-              Clear
-            </Button>
-          </div>
-        )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                data-slot="date-picker-clear"
+                onClick={() => ctx.setValue(null)}
+                className="h-7 gap-1 px-2 text-[10px] tracking-[0.08em] text-muted-foreground uppercase"
+              >
+                <MaterialIcon name="close" size={12} data-icon="inline-start" />
+                Limpiar
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Popover>
   )
 }
 

@@ -5,7 +5,7 @@ export interface DateBlock {
   label: string
   required: boolean
   width: number
-  default: "datetime" | null
+  default: string | null
   hours: boolean
   sort: number | null
   icon: string | null

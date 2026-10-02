@@ -18,6 +18,7 @@ export type FormBlockFieldsCollection =
 
 export interface FormBlockFieldsJunction {
   id: number
+  sort: number | null
   form_block_id: string | FormBlock
   collection: FormBlockFieldsCollection
   item:

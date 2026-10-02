@@ -41,12 +41,7 @@ function StorySection({
   stack = false,
 }: StorySectionProps) {
   return (
-    <div
-      className={cn(
-        "flex w-full max-w-4xl flex-col gap-2 font-mono",
-        className
-      )}
-    >
+    <div className={cn("flex w-full max-w-4xl flex-col gap-2", className)}>
       <span className="text-2xl font-bold">{label}</span>
       {description ? (
         <p className="text-sm text-muted-foreground">{description}</p>

@@ -31,6 +31,7 @@ import type { BrandsTypes } from "@/types/collections/brands"
 import type { ClientsTypes } from "@/types/collections/clients"
 import type { DivisionServicesTypes } from "@/types/collections/division-services"
 import type { EmailTypes } from "@/types/collections/emails"
+import type { FormResponsesTypes } from "@/types/collections/form-responses"
 import type { BlogPostsBodyJunction } from "@/types/collections/junctions/blog-posts-body"
 import type { BlogPostsTagsJunction } from "@/types/collections/junctions/blog-posts-tags"
 import type { BrandsBlockBrandsJunction } from "@/types/collections/junctions/brands-block-brands"
@@ -107,6 +108,7 @@ export interface Schema {
   suppliers: SuppliersTypes[]
   models: ModelsTypes[]
   emails: EmailTypes[]
+  form_responses: FormResponsesTypes[]
   phones: PhoneTypes[]
   seo: SeoTypes[]
   redirects: RedirectsTypes[]
