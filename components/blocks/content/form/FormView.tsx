@@ -3,11 +3,8 @@
 import { useMemo, useState } from "react"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
-import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
-import { Box } from "@/components/shared/content/Box"
-import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import { Button } from "@/components/ui/button"
-import { FieldError, FieldGroup } from "@/components/ui/field"
+import { useTranslations } from "next-intl"
+import { BarsRotateDots } from "@/assets/loaders/BarsRotateDots"
 import { InputCheckboxClient } from "@/components/blocks/content/form/fields/InputCheckboxClient"
 import {
   dateFieldDefault,
@@ -18,76 +15,47 @@ import { InputNumberClient } from "@/components/blocks/content/form/fields/Input
 import { InputPhoneClient } from "@/components/blocks/content/form/fields/InputPhoneClient"
 import { InputTextAreaClient } from "@/components/blocks/content/form/fields/InputTextAreaClient"
 import { InputTextClient } from "@/components/blocks/content/form/fields/InputTextClient"
-import { buildFormValuesSchema } from "@/lib/validations/form-values"
-import type { CheckboxBlock } from "@/types/blocks/form/fields/checkbox-block"
-import type { DateBlock } from "@/types/blocks/form/fields/date-block"
-import type { EmailBlock } from "@/types/blocks/form/fields/email-block"
-import type { NumberBlock } from "@/types/blocks/form/fields/number-block"
-import type { PhoneBlock } from "@/types/blocks/form/fields/phone-block"
-import type { TextAreaBlock } from "@/types/blocks/form/fields/text-area-block"
-import type { TextBlock } from "@/types/blocks/form/fields/text-block"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
+import { Box } from "@/components/shared/content/Box"
+import { SafeHtml } from "@/components/shared/content/SafeHtml"
+import { Button } from "@/components/ui/button"
+import { FieldError, FieldGroup } from "@/components/ui/field"
+import {
+  buildFormValuesSchema,
+  expandedFormFields,
+  type ExpandedFormField,
+} from "@/lib/validations/form-values"
 import type { FormBlock } from "@/types/blocks/form/form-block"
-import type {
-  FormBlockFieldsCollection,
-  FormBlockFieldsJunction,
-} from "@/types/collections/junctions/form-block-fields"
+import type { FormResponseAnswer } from "@/types/collections/form-responses"
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
-type FieldBlock = Exclude<FormBlockFieldsJunction["item"], string>
-type ExpandedField = FormBlockFieldsJunction & { item: FieldBlock }
-type FormValue = string | number | boolean | null
-type FormValues = Record<string, FormValue>
-
-function isExpandedField(
-  row: number | FormBlockFieldsJunction
-): row is ExpandedField {
-  return typeof row !== "number" && typeof row.item !== "string"
-}
-
-function expandedFields(fields: FormBlock["fields"]): ExpandedField[] {
-  const rows: ExpandedField[] = []
-  for (const row of fields) {
-    if (!isExpandedField(row)) continue
-    rows.push(row)
-  }
-  return rows.sort(
-    (a, b) =>
-      (a.sort ?? Number.MAX_SAFE_INTEGER) - (b.sort ?? Number.MAX_SAFE_INTEGER)
-  )
-}
-
-function defaultValue(
-  collection: FormBlockFieldsCollection,
-  item: FieldBlock
-): FormValue {
-  switch (collection) {
+function defaultValue(row: ExpandedFormField): FormResponseAnswer[string] {
+  switch (row.collection) {
     case "checkbox_block":
-      return (item as CheckboxBlock).default === "true"
+      return row.item.default === "true"
     case "number_block":
-      return (item as NumberBlock).default
-    case "date_block": {
-      const block = item as DateBlock
-      return dateFieldDefault(block.default, block.hours)
-    }
+      return row.item.default
+    case "date_block":
+      return dateFieldDefault(row.item.default, row.item.hours)
     case "text_block":
     case "text_area_block":
     case "email_block":
     case "phone_block":
-      return (item as TextBlock).default ?? ""
+      return row.item.default ?? ""
   }
 }
 
-function defaultValues(rows: readonly ExpandedField[]): FormValues {
-  const values: FormValues = {}
+function defaultValues(rows: readonly ExpandedFormField[]): FormResponseAnswer {
+  const values: FormResponseAnswer = {}
   for (const row of rows) {
-    values[row.item.identifier] = defaultValue(row.collection, row.item)
+    values[row.item.identifier] = defaultValue(row)
   }
   return values
 }
 
-function toFieldErrors<T>(
-  issues: readonly T[],
+function toFieldErrors(
+  issues: readonly (string | { message?: string } | undefined)[],
   serverMessage?: string
 ): { message: string }[] | undefined {
   const errors: { message: string }[] = []
@@ -99,7 +67,6 @@ function toFieldErrors<T>(
     if (
       typeof issue === "object" &&
       issue !== null &&
-      "message" in issue &&
       typeof issue.message === "string" &&
       issue.message
     ) {
@@ -123,27 +90,25 @@ function FormHeading({ data }: { data: FormBlock }) {
 }
 
 function FieldControl({
-  collection,
-  item,
+  row,
   value,
   onChange,
   onBlur,
   errors,
 }: {
-  collection: FormBlockFieldsCollection
-  item: FieldBlock
-  value: FormValue
-  onChange: (value: FormValue) => void
+  row: ExpandedFormField
+  value: FormResponseAnswer[string]
+  onChange: (value: FormResponseAnswer[string]) => void
   onBlur: () => void
   errors?: { message: string }[]
 }) {
-  switch (collection) {
+  switch (row.collection) {
     case "text_block":
       return (
         <InputTextClient
-          data={item as TextBlock}
+          data={row.item}
           value={typeof value === "string" ? value : ""}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -151,9 +116,9 @@ function FieldControl({
     case "text_area_block":
       return (
         <InputTextAreaClient
-          data={item as TextAreaBlock}
+          data={row.item}
           value={typeof value === "string" ? value : ""}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -161,9 +126,9 @@ function FieldControl({
     case "email_block":
       return (
         <InputEmailClient
-          data={item as EmailBlock}
+          data={row.item}
           value={typeof value === "string" ? value : ""}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -171,9 +136,9 @@ function FieldControl({
     case "phone_block":
       return (
         <InputPhoneClient
-          data={item as PhoneBlock}
+          data={row.item}
           value={typeof value === "string" ? value : ""}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -181,9 +146,9 @@ function FieldControl({
     case "number_block":
       return (
         <InputNumberClient
-          data={item as NumberBlock}
+          data={row.item}
           value={typeof value === "number" ? value : null}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -191,9 +156,9 @@ function FieldControl({
     case "date_block":
       return (
         <InputDateClient
-          data={item as DateBlock}
+          data={row.item}
           value={typeof value === "string" ? value : ""}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -201,9 +166,9 @@ function FieldControl({
     case "checkbox_block":
       return (
         <InputCheckboxClient
-          data={item as CheckboxBlock}
+          data={row.item}
           value={value === true}
-          onChange={(next) => onChange(next)}
+          onChange={onChange}
           onBlur={onBlur}
           errors={errors}
         />
@@ -220,13 +185,22 @@ export function FormView({
   serverFieldErrors,
 }: {
   data: FormBlock
-  onSubmit: (values: FormValues, captchaToken: string) => void
+  onSubmit: (values: FormResponseAnswer, captchaToken: string) => void
   isSubmitting?: boolean
   submitted?: boolean
   formMessage?: string
   serverFieldErrors?: Record<string, string>
 }) {
-  const rows = useMemo(() => expandedFields(data.fields), [data.fields])
+  const t = useTranslations("db.form_responses")
+  const rows = useMemo(
+    () =>
+      expandedFormFields(data.fields).sort(
+        (a, b) =>
+          (a.sort ?? Number.MAX_SAFE_INTEGER) -
+          (b.sort ?? Number.MAX_SAFE_INTEGER)
+      ),
+    [data.fields]
+  )
   const values = useMemo(() => defaultValues(rows), [rows])
   const schema = useMemo(() => buildFormValuesSchema(rows), [rows])
   const [captchaToken, setCaptchaToken] = useState("")
@@ -238,8 +212,7 @@ export function FormView({
   const form = useForm({
     defaultValues: values,
     validators: {
-      // ObjectEntries types the schema input as unknown. The runtime schema is the field record.
-      onSubmit: schema as StandardSchemaV1<FormValues, unknown>,
+      onSubmit: schema as StandardSchemaV1<FormResponseAnswer, unknown>,
     },
     onSubmit: ({ value }) => {
       onSubmit(value, captchaToken)
@@ -250,7 +223,7 @@ export function FormView({
     <Box display="flex" orientation="vertical" gap={2}>
       <FormHeading data={data} />
       {submitted ? (
-        <p role="status">Recibimos tu información. Gracias.</p>
+        <p role="status">{t("success")}</p>
       ) : (
         <form
           aria-labelledby={`${data.id}-title`}
@@ -272,8 +245,7 @@ export function FormView({
                 <form.Field name={row.item.identifier}>
                   {(field) => (
                     <FieldControl
-                      collection={row.collection}
-                      item={row.item}
+                      row={row}
                       value={field.state.value}
                       onChange={(next) => field.handleChange(next)}
                       onBlur={field.handleBlur}
@@ -305,8 +277,14 @@ export function FormView({
             variant="default"
             className="self-start"
             isDisabled={isSubmitting}
+            aria-busy={isSubmitting}
           >
-            Enviar
+            {isSubmitting ? (
+              <span aria-hidden className="size-5">
+                <BarsRotateDots />
+              </span>
+            ) : null}
+            {isSubmitting ? t("submitting") : t("submit")}
           </Button>
         </form>
       )}

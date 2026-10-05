@@ -2,12 +2,43 @@ import * as v from "valibot"
 import { DATE_REGEX } from "@/lib/validations/date"
 import { EMAIL_REGEX } from "@/lib/validations/email"
 import { TELEPHONE_REGEX } from "@/lib/validations/telephone"
+import type { CheckboxBlock } from "@/types/blocks/form/fields/checkbox-block"
+import type { DateBlock } from "@/types/blocks/form/fields/date-block"
+import type { EmailBlock } from "@/types/blocks/form/fields/email-block"
 import type { NumberBlock } from "@/types/blocks/form/fields/number-block"
-import type { FormBlockFieldsJunction } from "@/types/collections/junctions/form-block-fields"
+import type { PhoneBlock } from "@/types/blocks/form/fields/phone-block"
+import type { TextAreaBlock } from "@/types/blocks/form/fields/text-area-block"
+import type { TextBlock } from "@/types/blocks/form/fields/text-block"
+import type { FormBlock } from "@/types/blocks/form/form-block"
+import type { FormResponseAnswer } from "@/types/collections/form-responses"
 
 const DATETIME_LOCAL_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 
-type FormFieldItem = Exclude<FormBlockFieldsJunction["item"], string>
+type ExpandedFormFieldBase = {
+  id: number
+  sort: number | null
+}
+
+export type ExpandedFormField =
+  | (ExpandedFormFieldBase & { collection: "text_block"; item: TextBlock })
+  | (ExpandedFormFieldBase & {
+      collection: "text_area_block"
+      item: TextAreaBlock
+    })
+  | (ExpandedFormFieldBase & { collection: "number_block"; item: NumberBlock })
+  | (ExpandedFormFieldBase & { collection: "date_block"; item: DateBlock })
+  | (ExpandedFormFieldBase & { collection: "email_block"; item: EmailBlock })
+  | (ExpandedFormFieldBase & {
+      collection: "checkbox_block"
+      item: CheckboxBlock
+    })
+  | (ExpandedFormFieldBase & { collection: "phone_block"; item: PhoneBlock })
+
+type FormFieldInput =
+  | number
+  | {
+      item: string | { identifier: string }
+    }
 
 function textSchema(required: boolean) {
   return required
@@ -42,43 +73,48 @@ function checkboxSchema(required: boolean) {
     : v.boolean()
 }
 
-function schemaFor(
-  collection: FormBlockFieldsJunction["collection"],
-  item: FormFieldItem
-) {
-  switch (collection) {
+function schemaFor(row: ExpandedFormField) {
+  switch (row.collection) {
     case "text_block":
     case "text_area_block":
-      return textSchema(item.required)
+      return textSchema(row.item.required)
     case "email_block":
-      return patternSchema(item.required, EMAIL_REGEX)
+      return patternSchema(row.item.required, EMAIL_REGEX)
     case "phone_block":
-      return patternSchema(item.required, TELEPHONE_REGEX)
+      return patternSchema(row.item.required, TELEPHONE_REGEX)
     case "number_block":
-      return "min" in item
-        ? numberSchema(item)
-        : item.required
-          ? v.number()
-          : v.nullable(v.number())
+      return numberSchema(row.item)
     case "date_block":
       return patternSchema(
-        item.required,
-        "hours" in item && item.hours ? DATETIME_LOCAL_REGEX : DATE_REGEX
+        row.item.required,
+        row.item.hours ? DATETIME_LOCAL_REGEX : DATE_REGEX
       )
     case "checkbox_block":
-      return checkboxSchema(item.required)
+      return checkboxSchema(row.item.required)
   }
 }
 
+export function expandedFormFields(
+  fields: FormBlock["fields"] | readonly FormFieldInput[]
+): ExpandedFormField[] {
+  const rows: readonly FormFieldInput[] = fields
+  return rows.filter(
+    (
+      row
+    ): row is Exclude<FormFieldInput, number> & {
+      item: { identifier: string }
+    } => typeof row !== "number" && typeof row.item !== "string"
+  ) as ExpandedFormField[]
+}
+
 export function buildFormValuesSchema(
-  fields: readonly FormBlockFieldsJunction[]
-) {
+  fields: readonly ExpandedFormField[]
+): v.GenericSchema<FormResponseAnswer> {
   const entries: v.ObjectEntries = {}
 
   for (const field of fields) {
-    if (typeof field.item === "string") continue
-    entries[field.item.identifier] = schemaFor(field.collection, field.item)
+    entries[field.item.identifier] = schemaFor(field)
   }
 
-  return v.object(entries)
+  return v.object(entries) as v.GenericSchema<FormResponseAnswer>
 }

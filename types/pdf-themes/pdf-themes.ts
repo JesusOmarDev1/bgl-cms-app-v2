@@ -1,100 +1,100 @@
 export interface TypographyScale {
   /** 10pt — Captions, footnotes */
-  xs: number;
+  xs: number
   /** 12pt — Body text (PDF standard) */
-  sm: number;
+  sm: number
   /** 15pt — Large body, small headings */
-  base: number;
+  base: number
   /** 18pt — H4 equivalent */
-  lg: number;
+  lg: number
   /** 22pt — H3 equivalent */
-  xl: number;
+  xl: number
   /** 28pt — H2 equivalent */
-  "2xl": number;
+  "2xl": number
   /** 36pt — H1 equivalent */
-  "3xl": number;
+  "3xl": number
 }
 
 /** Spacing scale based on a 4pt grid system */
 export interface SpacingScale {
   /** 0pt */
-  0: number;
+  0: number
   /** 2pt */
-  0.5: number;
+  0.5: number
   /** 4pt */
-  1: number;
+  1: number
   /** 8pt */
-  2: number;
+  2: number
   /** 12pt */
-  3: number;
+  3: number
   /** 16pt */
-  4: number;
+  4: number
   /** 20pt */
-  5: number;
+  5: number
   /** 24pt */
-  6: number;
+  6: number
   /** 32pt */
-  8: number;
+  8: number
   /** 40pt */
-  10: number;
+  10: number
   /** 48pt */
-  12: number;
+  12: number
   /** 64pt */
-  16: number;
+  16: number
 }
 
 /** Font weight scale */
 export interface FontWeights {
-  regular: number;
-  medium: number;
-  semibold: number;
-  bold: number;
+  regular: number
+  medium: number
+  semibold: number
+  bold: number
 }
 
 /** Line height scale */
 export interface LineHeights {
   /** 1.2 — Tight, for headings */
-  tight: number;
+  tight: number
   /** 1.4 — Normal, for body text */
-  normal: number;
+  normal: number
   /** 1.6 — Relaxed, for reading-heavy content */
-  relaxed: number;
+  relaxed: number
 }
 
 /** Border radius scale for rounded corners */
 export interface BorderRadiusScale {
   /** 0pt — Sharp corners */
-  none: number;
+  none: number
   /** 2pt — Subtle rounding */
-  sm: number;
+  sm: number
   /** 4pt — Standard rounding */
-  md: number;
+  md: number
   /** 8pt — Pronounced rounding */
-  lg: number;
+  lg: number
   /** 9999pt — Pill/circle shape */
-  full: number;
+  full: number
 }
 
 /** Letter spacing scale for typography adjustments */
 export interface LetterSpacingScale {
   /** -0.025em — Tighter spacing */
-  tight: number;
+  tight: number
   /** 0em — Normal spacing */
-  normal: number;
+  normal: number
   /** 0.025em — Slightly wider spacing */
-  wide: number;
+  wide: number
   /** 0.05em — Much wider spacing (for uppercase) */
-  wider: number;
+  wider: number
 }
 
 /** Raw design scales shared across themes */
 export interface PrimitiveTokens {
-  typography: TypographyScale;
-  spacing: SpacingScale;
-  fontWeights: FontWeights;
-  lineHeights: LineHeights;
-  borderRadius: BorderRadiusScale;
-  letterSpacing: LetterSpacingScale;
+  typography: TypographyScale
+  spacing: SpacingScale
+  fontWeights: FontWeights
+  lineHeights: LineHeights
+  borderRadius: BorderRadiusScale
+  letterSpacing: LetterSpacingScale
 }
 
 // ─── Semantic Tokens ────────────────────────────────────────────────────────
@@ -107,29 +107,29 @@ export interface PrimitiveTokens {
  */
 export interface ColorTokens {
   /** Primary text and content color */
-  foreground: string;
+  foreground: string
   /** Page background color */
-  background: string;
+  background: string
   /** Subtle background for secondary areas (e.g., code blocks, table headers) */
-  muted: string;
+  muted: string
   /** Text on muted backgrounds (captions, footnotes, timestamps) */
-  mutedForeground: string;
+  mutedForeground: string
   /** Brand/accent color for emphasis and highlights */
-  primary: string;
+  primary: string
   /** Text on primary-colored backgrounds */
-  primaryForeground: string;
+  primaryForeground: string
   /** Table borders, dividers, rules */
-  border: string;
+  border: string
   /** Secondary accent for call-to-action elements, badges */
-  accent: string;
+  accent: string
   /** Error text, warning indicators */
-  destructive: string;
+  destructive: string
   /** Success states (e.g., badges, confirmations) */
-  success: string;
+  success: string
   /** Warning states (e.g., badges, alerts) */
-  warning: string;
+  warning: string
   /** Info states (e.g., badges, informational alerts) */
-  info: string;
+  info: string
 }
 
 /** Typography semantic tokens — what fonts and sizes to use where */
@@ -137,55 +137,55 @@ export interface TypographyTokens {
   /** Body text settings */
   body: {
     /** Font family for body text (e.g., 'Helvetica') */
-    fontFamily: string;
+    fontFamily: string
     /** Base font size in points */
-    fontSize: number;
+    fontSize: number
     /** Line height multiplier */
-    lineHeight: number;
-  };
+    lineHeight: number
+  }
   /** Heading text settings */
   heading: {
     /** Font family for headings (e.g., 'Times-Roman', 'Courier') */
-    fontFamily: string;
+    fontFamily: string
     /** Font weight as numeric value (400-700) */
-    fontWeight: number;
+    fontWeight: number
     /** Line height multiplier for headings */
-    lineHeight: number;
+    lineHeight: number
     /** Font sizes for each heading level in points */
     fontSize: {
-      h1: number;
-      h2: number;
-      h3: number;
-      h4: number;
-      h5: number;
-      h6: number;
-    };
-  };
+      h1: number
+      h2: number
+      h3: number
+      h4: number
+      h5: number
+      h6: number
+    }
+  }
 }
 
 /** Spacing semantic tokens — consistent spacing across the document */
 export interface SpacingTokens {
   /** Page margin settings in points */
   page: {
-    marginTop: number;
-    marginRight: number;
-    marginBottom: number;
-    marginLeft: number;
-  };
+    marginTop: number
+    marginRight: number
+    marginBottom: number
+    marginLeft: number
+  }
   /** Space between major document sections (after h2, before new sections) */
-  sectionGap: number;
+  sectionGap: number
   /** Space between paragraphs and after text blocks */
-  paragraphGap: number;
+  paragraphGap: number
   /** Space between inline components, list items, table rows */
-  componentGap: number;
+  componentGap: number
 }
 
 /** Page layout defaults */
 export interface PageTokens {
   /** Default page size */
-  size: "A4" | "LETTER" | "LEGAL";
+  size: "A4" | "LETTER" | "LEGAL"
   /** Default page orientation */
-  orientation: "portrait" | "landscape";
+  orientation: "portrait" | "landscape"
 }
 
 // ─── Full Theme ─────────────────────────────────────────────────────────────
@@ -217,15 +217,15 @@ export interface PageTokens {
  */
 export interface PdfcnTheme {
   /** Theme name identifier */
-  name: string;
+  name: string
   /** Raw design scales */
-  primitives: PrimitiveTokens;
+  primitives: PrimitiveTokens
   /** Semantic color mappings */
-  colors: ColorTokens;
+  colors: ColorTokens
   /** Typography settings for body and headings */
-  typography: TypographyTokens;
+  typography: TypographyTokens
   /** Spacing settings for page, sections, and components */
-  spacing: SpacingTokens;
+  spacing: SpacingTokens
   /** Page layout defaults */
-  page: PageTokens;
+  page: PageTokens
 }

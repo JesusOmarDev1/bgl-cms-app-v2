@@ -1,13 +1,8 @@
-import type { Style } from "@formepdf/react";
+import type { Style } from "@formepdf/react"
 
 /** List visual style variant. */
 export type ListVariant =
-  | "bullet"
-  | "numbered"
-  | "checklist"
-  | "icon"
-  | "multi-level"
-  | "descriptive";
+  "bullet" | "numbered" | "checklist" | "icon" | "multi-level" | "descriptive"
 
 /**
  * A single list item, optionally with nested children.
@@ -15,10 +10,10 @@ export type ListVariant =
  * @see {@link ListItem}
  */
 export interface ListItem {
-  text: string;
-  description?: string;
-  checked?: boolean;
-  children?: ListItem[];
+  text: string
+  description?: string
+  checked?: boolean
+  children?: ListItem[]
 }
 
 /**
@@ -27,19 +22,19 @@ export interface ListItem {
  * @see {@link PdfListProps}
  */
 export interface PdfListProps {
-  items: ListItem[];
+  items: ListItem[]
   /**
    * @default 'bullet'
    */
-  variant?: ListVariant;
+  variant?: ListVariant
   /**
    * @default 'sm'
    */
-  gap?: "xs" | "sm" | "md";
-  style?: Style;
-  _level?: number;
+  gap?: "xs" | "sm" | "md"
+  style?: Style
+  _level?: number
   /**
    * @default false
    */
-  noWrap?: boolean;
+  noWrap?: boolean
 }

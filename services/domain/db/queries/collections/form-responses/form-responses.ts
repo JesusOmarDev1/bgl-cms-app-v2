@@ -8,7 +8,6 @@ import type {
   FormResponseAnswer,
   FormResponsesTypes,
 } from "@/types/collections/form-responses"
-import type { FormResponseStatusType } from "@/types/enums/form-response-status"
 import type { Schema } from "@/types/schema"
 
 const FORM_RESPONSE_FIELDS = ["id"] as const
@@ -23,11 +22,10 @@ export async function createFormResponseQuery({
   answer,
 }: CreateFormResponseInput) {
   const t = await getTranslations("db.form_responses")
-  const status = "new" satisfies FormResponseStatusType
 
   try {
     return await directus.request(
-      createItem("form_responses", { status, form, answer }, {
+      createItem("form_responses", { status: "new", form, answer }, {
         fields: FORM_RESPONSE_FIELDS,
       } as const satisfies Query<Schema, FormResponsesTypes>)
     )

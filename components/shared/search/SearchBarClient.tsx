@@ -196,7 +196,7 @@ export function SearchBarClient({
       ) : null}
 
       {showDefault ? (
-        <BorderBeam size="md" colorVariant="colorful">
+        <BorderBeam size="line" colorVariant="colorful">
           <button
             type="button"
             aria-label="Buscar"

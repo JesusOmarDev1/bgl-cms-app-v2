@@ -4,12 +4,28 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react"
 import { cn } from "cn"
 
 const CYCLE_INTERVAL = 1600
 const STAGGER_DELAY = 125
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION_QUERY)
+  mq.addEventListener("change", onStoreChange)
+  return () => mq.removeEventListener("change", onStoreChange)
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches
+}
+
+function getReducedMotionServerSnapshot() {
+  return false
+}
 
 interface MarqueeAppearProps {
   children: React.ReactNode
@@ -46,17 +62,11 @@ export function MarqueeAppear({
     return () => observer.disconnect()
   }, [])
 
-  const [reduceMotion, setReduceMotion] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setReduceMotion(mq.matches)
-
-    const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches)
-    mq.addEventListener("change", handler)
-
-    return () => mq.removeEventListener("change", handler)
-  }, [])
+  const reduceMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot
+  )
 
   const [activeIndices, setActiveIndices] = useState<number[]>(() =>
     columns.map(() => 0)

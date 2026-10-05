@@ -7,10 +7,8 @@ import {
 } from "@/components/shared/forms/DatePicker"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { formatDateValue, parseDateString } from "@/lib/formatting/format-date"
 import { DateBlock } from "@/types/blocks/form/fields/date-block"
-
-const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
-const LOCAL_DATE_TIME = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/
 
 interface InputDateClientProps {
   data: DateBlock
@@ -20,44 +18,11 @@ interface InputDateClientProps {
   errors?: { message?: string }[]
 }
 
-function pad(value: number): string {
-  return String(value).padStart(2, "0")
-}
-
-function formatDateOnly(date: Date): string {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
-}
-
-function formatDateTimeLocal(date: Date): string {
-  return `${formatDateOnly(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-
-function parseDateOnly(value: string): Date | null {
-  const match = DATE_ONLY.exec(value)
-  if (!match?.[1] || !match[2] || !match[3]) return null
-  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
-}
-
 export function dateFieldDefault(value: string | null, hours: boolean): string {
   if (!value) return ""
-  const dateOnly = DATE_ONLY.exec(value)
-  if (dateOnly?.[1] && dateOnly[2] && dateOnly[3]) {
-    const day = `${dateOnly[1]}-${dateOnly[2]}-${dateOnly[3]}`
-    return hours ? `${day}T00:00` : day
-  }
-  const zoned = value.endsWith("Z") || /[+-]\d{2}:\d{2}$/.test(value)
-  if (zoned) {
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return ""
-    return hours ? formatDateTimeLocal(date) : formatDateOnly(date)
-  }
-  const local = LOCAL_DATE_TIME.exec(value)
-  if (local?.[1] && local[2]) {
-    return hours ? `${local[1]}T${local[2]}` : local[1]
-  }
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return ""
-  return hours ? formatDateTimeLocal(date) : formatDateOnly(date)
+  const parsed = parseDateString(value)
+  if (parsed) return formatDateValue(parsed, hours)
+  return formatDateValue(new Date(value), hours)
 }
 
 export function InputDateClient({
@@ -89,8 +54,10 @@ export function InputDateClient({
         />
       ) : (
         <DatePicker
-          value={parseDateOnly(value)}
-          onValueChange={(date) => onChange(date ? formatDateOnly(date) : "")}
+          value={parseDateString(value) ?? null}
+          onValueChange={(date) =>
+            onChange(date ? formatDateValue(date, false) : "")
+          }
           className="w-full"
         >
           <DatePickerTrigger

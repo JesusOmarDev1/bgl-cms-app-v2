@@ -1,17 +1,17 @@
-import { Svg as FormeSvg } from "@formepdf/react";
+import { Svg as FormeSvg } from "@formepdf/react"
 import {
   Children,
   Fragment,
   cloneElement,
   createElement,
   isValidElement,
-} from "react";
-import type { ReactNode, CSSProperties } from "react";
+} from "react"
+import type { ReactNode, CSSProperties } from "react"
 
 type AnyProps = Record<string, unknown> & {
-  children?: ReactNode;
-  style?: CSSProperties;
-};
+  children?: ReactNode
+  style?: CSSProperties
+}
 
 const SVG_ATTRIBUTE_NAMES: Record<string, string> = {
   className: "class",
@@ -27,56 +27,56 @@ const SVG_ATTRIBUTE_NAMES: Record<string, string> = {
   strokeOpacity: "stroke-opacity",
   strokeWidth: "stroke-width",
   textAnchor: "text-anchor",
-};
+}
 
 const normalizeSvgProps = (props: AnyProps): AnyProps => {
-  const normalized: AnyProps = {};
+  const normalized: AnyProps = {}
 
   for (const [name, value] of Object.entries(props)) {
     if (value === undefined) {
-      continue;
+      continue
     }
 
     if (name === "style" && value && typeof value === "object") {
       for (const [styleName, styleValue] of Object.entries(value)) {
-        normalized[SVG_ATTRIBUTE_NAMES[styleName] ?? styleName] = styleValue;
+        normalized[SVG_ATTRIBUTE_NAMES[styleName] ?? styleName] = styleValue
       }
-      continue;
+      continue
     }
 
-    normalized[SVG_ATTRIBUTE_NAMES[name] ?? name] = value;
+    normalized[SVG_ATTRIBUTE_NAMES[name] ?? name] = value
   }
 
-  return normalized;
-};
+  return normalized
+}
 
 const resolveSvgChildren = (children: ReactNode): ReactNode =>
   Children.map(children, (child) => {
     if (!isValidElement<AnyProps>(child)) {
-      return child;
+      return child
     }
 
     if (typeof child.type === "function") {
       const resolved = (child.type as (props: AnyProps) => ReactNode)(
         child.props
-      );
-      return resolveSvgChildren(resolved);
+      )
+      return resolveSvgChildren(resolved)
     }
 
     if ((child.type as unknown) === Fragment) {
-      return resolveSvgChildren(child.props.children);
+      return resolveSvgChildren(child.props.children)
     }
 
     if (child.props.children === undefined) {
-      return child;
+      return child
     }
 
     return cloneElement(
       child,
       undefined,
       resolveSvgChildren(child.props.children)
-    );
-  });
+    )
+  })
 
 export const Svg = ({
   children,
@@ -95,20 +95,20 @@ export const Svg = ({
   >
     {resolveSvgChildren(children)}
   </FormeSvg>
-);
+)
 
 export const Circle = (props: AnyProps) =>
-  createElement("circle", normalizeSvgProps(props));
+  createElement("circle", normalizeSvgProps(props))
 export const Rect = (props: AnyProps) =>
-  createElement("rect", normalizeSvgProps(props));
+  createElement("rect", normalizeSvgProps(props))
 export const G = (props: AnyProps) =>
-  createElement("g", normalizeSvgProps(props));
+  createElement("g", normalizeSvgProps(props))
 export const Line = (props: AnyProps) =>
-  createElement("line", normalizeSvgProps(props));
+  createElement("line", normalizeSvgProps(props))
 export const Path = (props: AnyProps) =>
-  createElement("path", normalizeSvgProps(props));
+  createElement("path", normalizeSvgProps(props))
 export const SvgText = (props: AnyProps) =>
   createElement(
     "text",
     normalizeSvgProps({ fontFamily: "sans-serif", ...props })
-  );
+  )

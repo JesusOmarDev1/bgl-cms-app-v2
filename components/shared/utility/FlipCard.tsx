@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { cn } from "cn";
+import { cn } from "cn"
 import {
   LazyMotion,
   domAnimation,
@@ -10,27 +10,27 @@ import {
   useSpring,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import * as m from "motion/react-m";
-import { useRef } from "react";
+} from "motion/react"
+import * as m from "motion/react-m"
+import { useRef } from "react"
 
 export interface CaseStudyFlipItem {
-  number?: string;
-  eyebrow: string;
-  title: string;
-  description: string;
-  image: string;
-  imageAlt: string;
-  background: string;
-  foreground?: string;
+  number?: string
+  eyebrow: string
+  title: string
+  description: string
+  image: string
+  imageAlt: string
+  background: string
+  foreground?: string
 }
 
 interface CaseStudyFlipStackProps {
-  items?: CaseStudyFlipItem[];
-  className?: string;
-  hint?: string;
-  heading?: string;
-  endLabel?: string;
+  items?: CaseStudyFlipItem[]
+  className?: string
+  hint?: string
+  heading?: string
+  endLabel?: string
 }
 
 const DEFAULT_ITEMS: CaseStudyFlipItem[] = [
@@ -78,7 +78,7 @@ const DEFAULT_ITEMS: CaseStudyFlipItem[] = [
     background: "#3322a8",
     foreground: "#f3f1ff",
   },
-];
+]
 
 function FlipCard({
   item,
@@ -87,58 +87,56 @@ function FlipCard({
   progress,
   reduceMotion,
 }: {
-  item: CaseStudyFlipItem;
-  index: number;
-  total: number;
-  progress: MotionValue<number>;
-  reduceMotion: boolean;
+  item: CaseStudyFlipItem
+  index: number
+  total: number
+  progress: MotionValue<number>
+  reduceMotion: boolean
 }) {
-  const segment = 1 / Math.max(total, 1);
-  const start = index * segment;
-  const end = Math.min(start + segment, 1);
-  const entryStart = Math.max(0, start - segment);
+  const segment = 1 / Math.max(total, 1)
+  const start = index * segment
+  const end = Math.min(start + segment, 1)
+  const entryStart = Math.max(0, start - segment)
   const entryEnd =
-    index === 0
-      ? 0.0001
-      : Math.min(start, entryStart + segment * 0.7);
-  const exitStart = start;
-  const exitEnd = end;
-  const stackedCardGap = Math.min(24, 72 / Math.max(total - 1, 1));
-  const stackedOffset = index * stackedCardGap;
-  const restingOffset = Math.min(index * 12, 34);
-  const restingScale = 1 - Math.min(index * 0.012, 0.035);
+    index === 0 ? 0.0001 : Math.min(start, entryStart + segment * 0.7)
+  const exitStart = start
+  const exitEnd = end
+  const stackedCardGap = Math.min(24, 72 / Math.max(total - 1, 1))
+  const stackedOffset = index * stackedCardGap
+  const restingOffset = Math.min(index * 12, 34)
+  const restingScale = 1 - Math.min(index * 0.012, 0.035)
 
   const exitYPercent = useTransform(
     progress,
     [exitStart, exitEnd],
-    reduceMotion ? [0, 0] : [0, -118],
-  );
+    reduceMotion ? [0, 0] : [0, -118]
+  )
   const exitStackOffset = useTransform(
     progress,
     [exitStart, exitEnd],
-    reduceMotion ? [0, 0] : [0, stackedOffset],
-  );
-  const exitY = useMotionTemplate`calc(${exitYPercent}% + ${exitStackOffset}px)`;
+    reduceMotion ? [0, 0] : [0, stackedOffset]
+  )
+  const exitY = useMotionTemplate`calc(${exitYPercent}% + ${exitStackOffset}px)`
   const rotateX = useTransform(
     progress,
     [exitStart, exitEnd],
-    reduceMotion ? [0, 0] : [0, 22],
-  );
+    reduceMotion ? [0, 0] : [0, 22]
+  )
   const opacity = useTransform(
     progress,
     [exitStart, exitEnd],
-    reduceMotion ? [1, 0] : [1, 1],
-  );
+    reduceMotion ? [1, 0] : [1, 1]
+  )
   const entryScale = useTransform(
     progress,
     [entryStart, entryEnd],
-    index === 0 || reduceMotion ? [1, 1] : [restingScale, 1],
-  );
+    index === 0 || reduceMotion ? [1, 1] : [restingScale, 1]
+  )
   const entryY = useTransform(
     progress,
     [entryStart, entryEnd],
-    index === 0 || reduceMotion ? [0, 0] : [restingOffset, 0],
-  );
+    index === 0 || reduceMotion ? [0, 0] : [restingOffset, 0]
+  )
 
   return (
     <m.article
@@ -165,16 +163,16 @@ function FlipCard({
       >
         <div className="flex min-w-0 flex-col p-[clamp(24px,3vw,48px)] md:pe-[clamp(22px,3vw,48px)]">
           <div className="flex items-start">
-            <span className="text-[clamp(24px,2.5vw,36px)] font-medium leading-none tracking-[-0.06em]">
+            <span className="text-[clamp(24px,2.5vw,36px)] leading-none font-medium tracking-[-0.06em]">
               {item.number ?? String(index + 1).padStart(2, "0")}
             </span>
           </div>
 
           <div className="mt-auto max-w-[46rem] pt-8">
-            <p className="mb-[clamp(10px,1.5vw,22px)] text-[10px] font-semibold uppercase tracking-[0.16em] opacity-70 sm:text-xs">
+            <p className="mb-[clamp(10px,1.5vw,22px)] text-[10px] font-semibold tracking-[0.16em] uppercase opacity-70 sm:text-xs">
               {item.eyebrow}
             </p>
-            <h2 className="max-w-[16ch] text-balance text-[clamp(28px,3.25vw,48px)] font-semibold leading-[0.96] tracking-[-0.05em]">
+            <h2 className="max-w-[16ch] text-[clamp(28px,3.25vw,48px)] leading-[0.96] font-semibold tracking-[-0.05em] text-balance">
               {item.title}
             </h2>
             <p className="mt-[clamp(16px,1.8vw,24px)] max-w-[42rem] text-[clamp(13px,1.1vw,16px)] leading-[1.5] opacity-82">
@@ -195,7 +193,7 @@ function FlipCard({
         </div>
       </m.div>
     </m.article>
-  );
+  )
 }
 
 export function CaseStudyFlipStack({
@@ -205,32 +203,39 @@ export function CaseStudyFlipStack({
   heading = "Design That Delivers.",
   endLabel = "The End",
 }: CaseStudyFlipStackProps) {
-  const stackRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion() ?? false;
-  const safeItems = items.length > 0 ? items : DEFAULT_ITEMS;
+  const stackRef = useRef<HTMLDivElement>(null)
+  const reduceMotion = useReducedMotion() ?? false
+  const safeItems = items.length > 0 ? items : DEFAULT_ITEMS
   const { scrollYProgress } = useScroll({
     target: stackRef,
     offset: ["start start", "end end"],
-  });
+  })
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 120,
     damping: 22,
     mass: 0.8,
     restDelta: 0.0005,
-  });
-  const cardProgress = reduceMotion ? scrollYProgress : smoothProgress;
+  })
+  const cardProgress = reduceMotion ? scrollYProgress : smoothProgress
 
   return (
     <LazyMotion features={domAnimation}>
       <main
-        className={cn("relative bg-[#eeeae2] font-sans text-[#29251f]", className)}
+        className={cn(
+          "relative bg-[#eeeae2] font-sans text-[#29251f]",
+          className
+        )}
       >
         <section className="relative h-[82vh] min-h-[640px] overflow-hidden px-5 sm:px-10">
           <div className="absolute inset-x-0 top-[clamp(110px,16vh,165px)] flex items-center justify-center gap-[clamp(14px,2.5vw,32px)] text-[clamp(26px,3.5vw,52px)] font-medium tracking-[-0.055em]">
             <m.span
               aria-hidden="true"
               animate={reduceMotion ? undefined : { y: [0, 10, 0] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+              transition={{
+                duration: 1.4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             >
               ↓
             </m.span>
@@ -250,7 +255,7 @@ export function CaseStudyFlipStack({
           </div>
 
           <div className="absolute inset-x-5 top-[clamp(330px,43vh,440px)] flex justify-center sm:inset-x-10">
-            <h1 className="max-w-[18ch] text-center text-[clamp(42px,5.5vw,82px)] font-semibold leading-[0.92] tracking-[-0.06em] text-[#a94808]">
+            <h1 className="max-w-[18ch] text-center text-[clamp(42px,5.5vw,82px)] leading-[0.92] font-semibold tracking-[-0.06em] text-[#a94808]">
               {heading}
             </h1>
           </div>
@@ -264,7 +269,7 @@ export function CaseStudyFlipStack({
           <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden px-[clamp(14px,4vw,64px)] py-8">
             <div className="relative mx-auto aspect-[3/4] w-full max-w-[860px] [perspective:800px] sm:aspect-[1.76/1]">
               {[...safeItems].reverse().map((item, reverseIndex) => {
-                const index = safeItems.length - reverseIndex - 1;
+                const index = safeItems.length - reverseIndex - 1
                 return (
                   <FlipCard
                     key={`${item.title}-${index}`}
@@ -274,18 +279,18 @@ export function CaseStudyFlipStack({
                     progress={cardProgress}
                     reduceMotion={reduceMotion}
                   />
-                );
+                )
               })}
             </div>
           </div>
         </div>
 
         <section className="flex min-h-[120vh] items-center justify-center px-5 sm:px-10">
-          <p className="text-center text-[clamp(54px,9vw,144px)] font-semibold leading-none tracking-[-0.07em] text-[#29251f]">
+          <p className="text-center text-[clamp(54px,9vw,144px)] leading-none font-semibold tracking-[-0.07em] text-[#29251f]">
             {endLabel}
           </p>
         </section>
       </main>
     </LazyMotion>
-  );
+  )
 }

@@ -70,9 +70,9 @@ function InputComponent({
   return (
     <Input
       className={cn("h-10 rounded-s-none rounded-e-lg", className)}
-      {...props}
       aria-label="Teléfono"
       ref={ref}
+      {...props}
     />
   )
 }
@@ -97,9 +97,8 @@ const CountrySelect = ({
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
-    <Popover
+    <PopoverTrigger
       isOpen={isOpen}
-      isNonModal={false}
       onOpenChange={(open) => {
         setIsOpen(open)
         if (open) {
@@ -107,28 +106,26 @@ const CountrySelect = ({
         }
       }}
     >
-      <PopoverTrigger>
-        <Button
-          type="button"
-          variant="outline"
-          className="flex gap-1 rounded-s-lg rounded-e-none border-r-0 border-border bg-muted px-3 focus:z-10"
-          isDisabled={disabled}
-          aria-label="Seleccionar país"
-        >
-          <FlagComponent
-            country={selectedCountry}
-            countryName={selectedCountry}
-          />
-          <MaterialIcon
-            name="unfold_more"
-            className={cn(
-              "-mr-2 opacity-50",
-              disabled ? "hidden" : "opacity-100"
-            )}
-          />
-        </Button>
-      </PopoverTrigger>
-      <div className="w-75 border-0 p-0 shadow-xs">
+      <Button
+        type="button"
+        variant="outline"
+        className="flex gap-1 rounded-s-lg rounded-e-none border-r-0 border-border bg-muted px-3 focus:z-10"
+        isDisabled={disabled}
+        aria-label="Seleccionar país"
+      >
+        <FlagComponent
+          country={selectedCountry}
+          countryName={selectedCountry}
+        />
+        <MaterialIcon
+          name="unfold_more"
+          className={cn(
+            "-mr-2 opacity-50",
+            disabled ? "hidden" : "opacity-100"
+          )}
+        />
+      </Button>
+      <Popover className="w-75 border-0 p-0 shadow-xs">
         <Command>
           <CommandInput
             value={searchValue}
@@ -168,8 +165,8 @@ const CountrySelect = ({
             </ScrollArea>
           </CommandList>
         </Command>
-      </div>
-    </Popover>
+      </Popover>
+    </PopoverTrigger>
   )
 }
 
@@ -205,11 +202,12 @@ const CountrySelectOption = ({
 }
 
 const FlagComponent = ({ country, countryName }: RPNInput.FlagProps) => {
-  const Flag = flags[country]
+  const Flag = flags[country] as
+    React.ComponentType<{ title: string; className?: string }> | undefined
 
   return (
     <span className="flex h-4 w-6 overflow-hidden rounded-sm bg-foreground/20 [&_svg:not([class*='size-'])]:size-full">
-      {Flag && <Flag title={countryName} />}
+      {Flag && <Flag title={countryName} className="size-full" />}
     </span>
   )
 }

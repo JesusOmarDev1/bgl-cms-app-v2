@@ -105,7 +105,17 @@
       "failed_to_fetch": "Error al obtener el pie de página."
     },
     "form_responses": {
-      "failed_to_create": "Error al crear la respuesta del formulario."
+      "failed_to_create": "Error al crear la respuesta del formulario.",
+      "not_found": "No se encontró el formulario.",
+      "captcha_failed": "No se pudo verificar el captcha.",
+      "invalid": "Revisa los campos del formulario.",
+      "failed_to_submit": "No se pudo enviar el formulario.",
+      "success": "Recibimos tu información. Gracias.",
+      "submit": "Enviar",
+      "submitting": "Enviando"
+    },
+    "form_block": {
+      "failed_to_fetch": "Error al obtener el formulario."
     },
     "whatsapp_button": {
       "failed_to_fetch": "Error al obtener el botón de WhatsApp."

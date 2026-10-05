@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { themes, ensure } from "storybook/theming"
 import { geist, geistMono } from "@/lib/fonts/geist"
+import dbMessages from "@/i18n/db/es.json"
 import storybookMessages from "@/i18n/storybook/es.json"
 
 type StoryTheme = "light" | "dark"
@@ -37,7 +38,10 @@ const preview: Preview = {
         : "dark"
 
       return (
-        <NextIntlClientProvider locale="es" messages={storybookMessages}>
+        <NextIntlClientProvider
+          locale="es"
+          messages={{ ...dbMessages, ...storybookMessages }}
+        >
           <div
             className={`${theme === "dark" ? "dark" : ""}min-h-screen bg-background text-foreground antialiased ${geist.variable} ${geistMono.variable}`}
           >
