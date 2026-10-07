@@ -3,7 +3,7 @@
 import { getTranslations } from "next-intl/server"
 import * as v from "valibot"
 import { actionClient } from "@/lib/server/safe-action"
-import { verifyTurnstile } from "@/lib/turnstile"
+import { verifyTurnstile } from "@/lib/security/turnstile"
 import {
   buildFormValuesSchema,
   expandedFormFields,

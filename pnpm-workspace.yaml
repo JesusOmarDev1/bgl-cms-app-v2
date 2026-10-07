@@ -13,7 +13,7 @@ ignoredBuiltDependencies:
   - '@swc/core'
   - unrs-resolver
 
-minimumReleaseAge: 1280
+minimumReleaseAge: 1440
 
 onlyBuiltDependencies:
   - esbuild
