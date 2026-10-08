@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
     qualities: [55, 60, 65, 70, 75, 80],
     remotePatterns: assetsRemotePatterns(),
     formats: ["image/avif", "image/webp"],
+    loader: "custom",
+    loaderFile: "./assets/loaders/BarsRotateDots.tsx",
+  },
+  experimental: {
+    agentFeedback: true,
+    agentUpgrade: "security",
+    turbopackGc: true,
+    turbopackLazyDynamicImports: true,
+    turbopackPluginRuntimeStrategy: "workerThreads",
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
   },
 }
 
