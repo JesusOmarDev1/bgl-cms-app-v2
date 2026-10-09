@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface ProductsQuery {
   page?: number
 }
 
-export async function getProductsQuery(query: ProductsQuery) {
+export async function getProductsQuery(
+  query: ProductsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("products")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.products")
   try {
     const products = await directus.request(
       readItems("products", {
@@ -37,7 +38,7 @@ export async function getProductsQuery(query: ProductsQuery) {
     )
     return products
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getProductsQuery",
       collection: "products",
@@ -48,13 +49,13 @@ export async function getProductsQuery(query: ProductsQuery) {
 
 export async function getProductsBySlugQuery(
   query: ProductsQuery,
-  slug: string
+  slug: string,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("products_by_slug")
   cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
-  const t = await getTranslations("db.products")
   try {
     const products = await directus.request(
       readItems("products", {
@@ -67,7 +68,7 @@ export async function getProductsBySlugQuery(
     )
     return products
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getProductsBySlugQuery",
       collection: "products",
@@ -77,13 +78,13 @@ export async function getProductsBySlugQuery(
 }
 
 export async function getProductsCountQuery(
-  query: Pick<ProductsQuery, "status"> = {}
+  query: Pick<ProductsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("products_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.products")
   try {
     const rows = await directus.request(
       aggregate("products", {
@@ -95,7 +96,7 @@ export async function getProductsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getProductsCountQuery",
       collection: "products",

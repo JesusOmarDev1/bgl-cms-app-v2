@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getClientsCountQuery,
   getClientsQuery,
@@ -10,11 +11,13 @@ export async function getClientsRepository({
   limit = 10,
   page = 1,
 }: ClientsQuery = {}): Promise<ClientsQueryResult> {
-  return await getClientsQuery({ status, limit, page })
+  const t = await getTranslations("db.clients")
+  return await getClientsQuery({ status, limit, page }, t("failed_to_fetch"))
 }
 
 export async function getClientsCountRepository({
   status = "published",
 }: Pick<ClientsQuery, "status"> = {}): Promise<number> {
-  return await getClientsCountQuery({ status })
+  const t = await getTranslations("db.clients")
+  return await getClientsCountQuery({ status }, t("failed_to_fetch"))
 }

@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -17,13 +16,13 @@ export interface ServicesCategoriesQuery {
 }
 
 export async function getServicesCategoriesQuery(
-  query: ServicesCategoriesQuery = {}
+  query: ServicesCategoriesQuery,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("services_categories")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.services_categories")
   try {
     const items = await directus.request(
       readItems("services_categories", {
@@ -36,7 +35,7 @@ export async function getServicesCategoriesQuery(
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getServicesCategoriesQuery",
       collection: "services_categories",
@@ -46,13 +45,13 @@ export async function getServicesCategoriesQuery(
 }
 
 export async function getServicesCategoriesCountQuery(
-  query: Pick<ServicesCategoriesQuery, "status"> = {}
+  query: Pick<ServicesCategoriesQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("services_categories_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.services_categories")
   try {
     const rows = await directus.request(
       aggregate("services_categories", {
@@ -64,7 +63,7 @@ export async function getServicesCategoriesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getServicesCategoriesCountQuery",
       collection: "services_categories",

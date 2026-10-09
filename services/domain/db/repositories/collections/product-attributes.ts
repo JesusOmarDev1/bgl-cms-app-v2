@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getProductAttributesCountQuery,
   getProductAttributesQuery,
@@ -10,11 +11,16 @@ export async function getProductAttributesRepository({
   limit = 10,
   page = 1,
 }: ProductAttributesQuery = {}): Promise<ProductAttributesQueryResult> {
-  return await getProductAttributesQuery({ status, limit, page })
+  const t = await getTranslations("db.product_attributes")
+  return await getProductAttributesQuery(
+    { status, limit, page },
+    t("failed_to_fetch")
+  )
 }
 
 export async function getProductAttributesCountRepository({
   status = "published",
 }: Pick<ProductAttributesQuery, "status"> = {}): Promise<number> {
-  return await getProductAttributesCountQuery({ status })
+  const t = await getTranslations("db.product_attributes")
+  return await getProductAttributesCountQuery({ status }, t("failed_to_fetch"))
 }

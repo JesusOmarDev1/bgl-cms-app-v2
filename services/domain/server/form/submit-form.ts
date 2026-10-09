@@ -55,10 +55,8 @@ export const submitForm = actionClient
       return { ok: false, message: t("not_found") }
     }
 
-    if (form.captcha) {
-      if (!(await verifyTurnstile(captchaToken ?? ""))) {
-        return { ok: false, message: t("captcha_failed") }
-      }
+    if (form.captcha && !(await verifyTurnstile(captchaToken ?? ""))) {
+      return { ok: false, message: t("captcha_failed") }
     }
 
     const fields = expandedFormFields(form.fields)

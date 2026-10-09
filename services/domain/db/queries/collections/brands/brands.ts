@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface BrandsQuery {
   page?: number
 }
 
-export async function getBrandsQuery(query: BrandsQuery) {
+export async function getBrandsQuery(
+  query: BrandsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("brands")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.brands")
   try {
     const brands = await directus.request(
       readItems("brands", {
@@ -37,7 +38,7 @@ export async function getBrandsQuery(query: BrandsQuery) {
     )
     return brands
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getBrandsQuery",
       collection: "brands",
@@ -47,10 +48,10 @@ export async function getBrandsQuery(query: BrandsQuery) {
 }
 
 export async function getBrandsCountQuery(
-  query: Pick<BrandsQuery, "status"> = {}
+  query: Pick<BrandsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   const { status = "published" } = query
-  const t = await getTranslations("db.brands")
   try {
     const rows = await directus.request(
       aggregate("brands", {
@@ -62,7 +63,7 @@ export async function getBrandsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getBrandsCountQuery",
       collection: "brands",

@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -14,12 +13,14 @@ export interface EmailsQuery {
   page?: number
 }
 
-export async function getEmailsQuery(query: EmailsQuery = {}) {
+export async function getEmailsQuery(
+  query: EmailsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("emails")
   cacheLife("minutes")
   const { limit = 10, page = 1 } = query
-  const t = await getTranslations("db.emails")
   try {
     const items = await directus.request(
       readItems("emails", {
@@ -31,7 +32,7 @@ export async function getEmailsQuery(query: EmailsQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getEmailsQuery",
       collection: "emails",
@@ -40,11 +41,10 @@ export async function getEmailsQuery(query: EmailsQuery = {}) {
   }
 }
 
-export async function getEmailsCountQuery() {
+export async function getEmailsCountQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("emails_count")
   cacheLife("minutes")
-  const t = await getTranslations("db.emails")
   try {
     const rows = await directus.request(
       aggregate("emails", {
@@ -53,7 +53,7 @@ export async function getEmailsCountQuery() {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getEmailsCountQuery",
       collection: "emails",

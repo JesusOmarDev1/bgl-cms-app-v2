@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getRedirectsCountQuery,
   getRedirectsQuery,
@@ -9,9 +10,11 @@ export async function getRedirectsRepository({
   limit = 10,
   page = 1,
 }: RedirectsQuery = {}): Promise<RedirectsQueryResult> {
-  return await getRedirectsQuery({ limit, page })
+  const t = await getTranslations("db.redirects")
+  return await getRedirectsQuery({ limit, page }, t("failed_to_fetch"))
 }
 
 export async function getRedirectsCountRepository(): Promise<number> {
-  return await getRedirectsCountQuery()
+  const t = await getTranslations("db.redirects")
+  return await getRedirectsCountQuery(t("failed_to_fetch"))
 }

@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -14,12 +13,14 @@ export interface SocialLinksQuery {
   page?: number
 }
 
-export async function getSocialLinksQuery(query: SocialLinksQuery = {}) {
+export async function getSocialLinksQuery(
+  query: SocialLinksQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("social_links")
   cacheLife("minutes")
   const { limit = 10, page = 1 } = query
-  const t = await getTranslations("db.social_links")
   try {
     const items = await directus.request(
       readItems("social_links", {
@@ -31,7 +32,7 @@ export async function getSocialLinksQuery(query: SocialLinksQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSocialLinksQuery",
       collection: "social_links",
@@ -40,11 +41,10 @@ export async function getSocialLinksQuery(query: SocialLinksQuery = {}) {
   }
 }
 
-export async function getSocialLinksCountQuery() {
+export async function getSocialLinksCountQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("social_links_count")
   cacheLife("minutes")
-  const t = await getTranslations("db.social_links")
   try {
     const rows = await directus.request(
       aggregate("social_links", {
@@ -53,7 +53,7 @@ export async function getSocialLinksCountQuery() {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSocialLinksCountQuery",
       collection: "social_links",

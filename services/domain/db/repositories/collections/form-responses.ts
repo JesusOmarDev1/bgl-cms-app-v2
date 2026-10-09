@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   createFormResponseQuery,
   type CreateFormResponseInput,
@@ -7,5 +8,6 @@ import {
 export async function createFormResponseRepository(
   input: CreateFormResponseInput
 ): Promise<CreateFormResponseQueryResult> {
-  return await createFormResponseQuery(input)
+  const t = await getTranslations("db.form_responses")
+  return await createFormResponseQuery(input, t("failed_to_create"))
 }

@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -18,12 +17,14 @@ export interface SuppliersQuery {
   page?: number
 }
 
-export async function getSuppliersQuery(query: SuppliersQuery) {
+export async function getSuppliersQuery(
+  query: SuppliersQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("suppliers")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.suppliers")
   try {
     const suppliers = await directus.request(
       readItems("suppliers", {
@@ -36,7 +37,7 @@ export async function getSuppliersQuery(query: SuppliersQuery) {
     )
     return suppliers
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSuppliersQuery",
       collection: "suppliers",
@@ -46,13 +47,13 @@ export async function getSuppliersQuery(query: SuppliersQuery) {
 }
 
 export async function getSuppliersCountQuery(
-  query: Pick<SuppliersQuery, "status"> = {}
+  query: Pick<SuppliersQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("suppliers_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.suppliers")
   try {
     const rows = await directus.request(
       aggregate("suppliers", {
@@ -64,7 +65,7 @@ export async function getSuppliersCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSuppliersCountQuery",
       collection: "suppliers",

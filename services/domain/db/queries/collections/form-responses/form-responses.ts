@@ -1,7 +1,6 @@
 import "server-only"
 
 import { createItem, type Query } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type {
@@ -17,12 +16,10 @@ export interface CreateFormResponseInput {
   answer: FormResponseAnswer
 }
 
-export async function createFormResponseQuery({
-  form,
-  answer,
-}: CreateFormResponseInput) {
-  const t = await getTranslations("db.form_responses")
-
+export async function createFormResponseQuery(
+  { form, answer }: CreateFormResponseInput,
+  failedToCreateMessage: string
+) {
   try {
     return await directus.request(
       createItem("form_responses", { status: "new", form, answer }, {
@@ -30,7 +27,7 @@ export async function createFormResponseQuery({
       } as const satisfies Query<Schema, FormResponsesTypes>)
     )
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_create"), {
+    returnDirectusQueryError(error, failedToCreateMessage, {
       component: "db.queries",
       operation: "createFormResponseQuery",
       collection: "form_responses",

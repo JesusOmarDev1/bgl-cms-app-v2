@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface DivisionServicesQuery {
   page?: number
 }
 
-export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
+export async function getDivisionServicesQuery(
+  query: DivisionServicesQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("division_services")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.division_services")
   try {
     const divisionServices = await directus.request(
       readItems("division_services", {
@@ -37,7 +38,7 @@ export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
     )
     return divisionServices
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getDivisionServicesQuery",
       collection: "division_services",
@@ -47,13 +48,13 @@ export async function getDivisionServicesQuery(query: DivisionServicesQuery) {
 }
 
 export async function getDivisionServicesCountQuery(
-  query: Pick<DivisionServicesQuery, "status"> = {}
+  query: Pick<DivisionServicesQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("division_services_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.division_services")
   try {
     const rows = await directus.request(
       aggregate("division_services", {
@@ -65,7 +66,7 @@ export async function getDivisionServicesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getDivisionServicesCountQuery",
       collection: "division_services",

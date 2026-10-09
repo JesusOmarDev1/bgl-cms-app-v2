@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -17,12 +16,14 @@ export interface ManualsQuery {
   page?: number
 }
 
-export async function getManualsQuery(query: ManualsQuery) {
+export async function getManualsQuery(
+  query: ManualsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("manuals")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.manuals")
   try {
     const manuals = await directus.request(
       readItems("manuals", {
@@ -35,7 +36,7 @@ export async function getManualsQuery(query: ManualsQuery) {
     )
     return manuals
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getManualsQuery",
       collection: "manuals",
@@ -44,12 +45,15 @@ export async function getManualsQuery(query: ManualsQuery) {
   }
 }
 
-export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
+export async function getManualsBySlugQuery(
+  query: ManualsQuery,
+  slug: string,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("manuals_by_slug")
   cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
-  const t = await getTranslations("db.manuals")
   try {
     const manual = await directus.request(
       readItems("manuals", {
@@ -62,7 +66,7 @@ export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
     )
     return manual
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getManualsBySlugQuery",
       collection: "manuals",
@@ -72,13 +76,13 @@ export async function getManualsBySlugQuery(query: ManualsQuery, slug: string) {
 }
 
 export async function getManualsCountQuery(
-  query: Pick<ManualsQuery, "status"> = {}
+  query: Pick<ManualsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("manuals_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.manuals")
   try {
     const rows = await directus.request(
       aggregate("manuals", {
@@ -90,7 +94,7 @@ export async function getManualsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getManualsCountQuery",
       collection: "manuals",

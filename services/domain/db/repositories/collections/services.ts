@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getServicesBySlugQuery,
   getServicesCountQuery,
@@ -11,7 +12,8 @@ export async function getServicesRepository({
   limit = 10,
   page = 1,
 }: ServicesQuery = {}): Promise<ServicesQueryResult> {
-  return await getServicesQuery({ status, limit, page })
+  const t = await getTranslations("db.services")
+  return await getServicesQuery({ status, limit, page }, t("failed_to_fetch"))
 }
 
 export async function getServiceBySlugRepository({
@@ -20,11 +22,17 @@ export async function getServiceBySlugRepository({
   page = 1,
   slug,
 }: ServicesQuery & { slug: string }): Promise<ServicesQueryResult> {
-  return await getServicesBySlugQuery({ status, limit, page }, slug)
+  const t = await getTranslations("db.services")
+  return await getServicesBySlugQuery(
+    { status, limit, page },
+    slug,
+    t("failed_to_fetch")
+  )
 }
 
 export async function getServicesCountRepository({
   status = "published",
 }: Pick<ServicesQuery, "status"> = {}): Promise<number> {
-  return await getServicesCountQuery({ status })
+  const t = await getTranslations("db.services")
+  return await getServicesCountQuery({ status }, t("failed_to_fetch"))
 }

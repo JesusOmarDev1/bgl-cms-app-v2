@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -11,12 +10,10 @@ import type { Schema } from "@/types/schema"
 import type { ServicesButtonType } from "@/types/singletons/services-button"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getServicesButtonQuery() {
+export async function getServicesButtonQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("services_button")
   cacheLife("hours")
-  const t = await getTranslations("db.services_button")
-
   try {
     return await directus.request(
       readSingleton("services_button", {
@@ -33,13 +30,12 @@ export async function getServicesButtonQuery() {
       } satisfies Query<Schema, ServicesButtonType>)
     )
   } catch (error) {
-    const message = t("failed_to_fetch")
-    returnDirectusQueryError(error, message, {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getServicesButtonQuery",
       collection: "services_button",
     })
-    throw error instanceof Error ? error : new Error(message)
+    return null
   }
 }
 

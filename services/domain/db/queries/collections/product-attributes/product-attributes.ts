@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface ProductAttributesQuery {
   page?: number
 }
 
-export async function getProductAttributesQuery(query: ProductAttributesQuery) {
+export async function getProductAttributesQuery(
+  query: ProductAttributesQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("product_attributes")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.product_attributes")
   try {
     const productAttributes = await directus.request(
       readItems("product_attributes", {
@@ -37,7 +38,7 @@ export async function getProductAttributesQuery(query: ProductAttributesQuery) {
     )
     return productAttributes
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getProductAttributesQuery",
       collection: "product_attributes",
@@ -47,13 +48,13 @@ export async function getProductAttributesQuery(query: ProductAttributesQuery) {
 }
 
 export async function getProductAttributesCountQuery(
-  query: Pick<ProductAttributesQuery, "status"> = {}
+  query: Pick<ProductAttributesQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("product_attributes_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.product_attributes")
   try {
     const rows = await directus.request(
       aggregate("product_attributes", {
@@ -65,7 +66,7 @@ export async function getProductAttributesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getProductAttributesCountQuery",
       collection: "product_attributes",

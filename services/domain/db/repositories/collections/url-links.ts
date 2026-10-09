@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getUrlLinksCountQuery,
   getUrlLinksQuery,
@@ -9,9 +10,11 @@ export async function getUrlLinksRepository({
   limit = 10,
   page = 1,
 }: UrlLinksQuery = {}): Promise<UrlLinksQueryResult> {
-  return await getUrlLinksQuery({ limit, page })
+  const t = await getTranslations("db.url_links")
+  return await getUrlLinksQuery({ limit, page }, t("failed_to_fetch"))
 }
 
 export async function getUrlLinksCountRepository(): Promise<number> {
-  return await getUrlLinksCountQuery()
+  const t = await getTranslations("db.url_links")
+  return await getUrlLinksCountQuery(t("failed_to_fetch"))
 }

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getModelsCountQuery,
   getModelsQuery,
@@ -10,11 +11,13 @@ export async function getModelsRepository({
   limit = 10,
   page = 1,
 }: ModelsQuery = {}): Promise<ModelsQueryResult> {
-  return await getModelsQuery({ status, limit, page })
+  const t = await getTranslations("db.models")
+  return await getModelsQuery({ status, limit, page }, t("failed_to_fetch"))
 }
 
 export async function getModelsCountRepository({
   status = "published",
 }: Pick<ModelsQuery, "status"> = {}): Promise<number> {
-  return await getModelsCountQuery({ status })
+  const t = await getTranslations("db.models")
+  return await getModelsCountQuery({ status }, t("failed_to_fetch"))
 }

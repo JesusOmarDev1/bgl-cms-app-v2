@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getPublishedFormBlockQuery,
   type PublishedFormBlockQueryResult,
@@ -6,5 +7,6 @@ import {
 export async function getPublishedFormBlockRepository(
   id: string
 ): Promise<PublishedFormBlockQueryResult> {
-  return await getPublishedFormBlockQuery(id)
+  const t = await getTranslations("db.form_block")
+  return await getPublishedFormBlockQuery(id, t("failed_to_fetch"))
 }

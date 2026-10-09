@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -17,12 +16,14 @@ export interface BlogPostsQuery {
   page?: number
 }
 
-export async function getBlogPostsQuery(query: BlogPostsQuery) {
+export async function getBlogPostsQuery(
+  query: BlogPostsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("blog_posts")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.blog_posts")
   try {
     const posts = await directus.request(
       readItems("blog_posts", {
@@ -35,7 +36,7 @@ export async function getBlogPostsQuery(query: BlogPostsQuery) {
     )
     return posts
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getBlogPostsQuery",
       collection: "blog_posts",
@@ -46,13 +47,13 @@ export async function getBlogPostsQuery(query: BlogPostsQuery) {
 
 export async function getBlogPostsBySlugQuery(
   query: BlogPostsQuery,
-  slug: string
+  slug: string,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("blog_posts_by_slug")
   cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
-  const t = await getTranslations("db.blog_posts")
   try {
     const post = await directus.request(
       readItems("blog_posts", {
@@ -65,7 +66,7 @@ export async function getBlogPostsBySlugQuery(
     )
     return post
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getBlogPostsBySlugQuery",
       collection: "blog_posts",
@@ -75,13 +76,13 @@ export async function getBlogPostsBySlugQuery(
 }
 
 export async function getBlogPostsCountQuery(
-  query: Pick<BlogPostsQuery, "status"> = {}
+  query: Pick<BlogPostsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("blog_posts_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.blog_posts")
   try {
     const rows = await directus.request(
       aggregate("blog_posts", {
@@ -93,7 +94,7 @@ export async function getBlogPostsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getBlogPostsCountQuery",
       collection: "blog_posts",

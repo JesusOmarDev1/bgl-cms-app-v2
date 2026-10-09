@@ -65,7 +65,7 @@ const fixture = {
         required: false,
         width: 50,
         default: null,
-        sort: "",
+        sort: null,
         icon: "call",
         ...audit,
       },

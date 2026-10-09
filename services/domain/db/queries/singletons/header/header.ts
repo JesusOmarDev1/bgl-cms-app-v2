@@ -3,7 +3,6 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
 import { cacheLife, cacheTag } from "next/cache"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -11,12 +10,10 @@ import { HEADER_FIELDS } from "@/services/domain/db/queries/singletons/header/he
 import type { Schema } from "@/types/schema"
 import type { HeaderType } from "@/types/singletons/header"
 
-export async function getHeaderQuery() {
+export async function getHeaderQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("header")
   cacheLife("hours")
-  const t = await getTranslations("db.header")
-
   try {
     return await directus.request(
       readSingleton("header", {
@@ -24,7 +21,7 @@ export async function getHeaderQuery() {
       } satisfies Query<Schema, HeaderType>)
     )
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getHeaderQuery",
       collection: "header",

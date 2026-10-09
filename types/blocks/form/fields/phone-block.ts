@@ -6,7 +6,7 @@ export interface PhoneBlock {
   required: boolean
   width: number
   default: string | null
-  sort: string
+  sort: number | null
   icon: string | null
   // Audit
   date_created: "datetime"

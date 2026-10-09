@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -14,12 +13,14 @@ export interface SeoQuery {
   page?: number
 }
 
-export async function getSeoQuery(query: SeoQuery = {}) {
+export async function getSeoQuery(
+  query: SeoQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("seo")
   cacheLife("minutes")
   const { limit = 10, page = 1 } = query
-  const t = await getTranslations("db.seo")
   try {
     const items = await directus.request(
       readItems("seo", {
@@ -31,7 +32,7 @@ export async function getSeoQuery(query: SeoQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSeoQuery",
       collection: "seo",
@@ -40,11 +41,10 @@ export async function getSeoQuery(query: SeoQuery = {}) {
   }
 }
 
-export async function getSeoCountQuery() {
+export async function getSeoCountQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("seo_count")
   cacheLife("minutes")
-  const t = await getTranslations("db.seo")
   try {
     const rows = await directus.request(
       aggregate("seo", {
@@ -53,7 +53,7 @@ export async function getSeoCountQuery() {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSeoCountQuery",
       collection: "seo",

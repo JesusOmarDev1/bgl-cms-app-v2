@@ -11,8 +11,8 @@ import type { TextAreaBlock } from "@/types/blocks/form/fields/text-area-block"
 import type { TextBlock } from "@/types/blocks/form/fields/text-block"
 import type { FormBlock } from "@/types/blocks/form/form-block"
 import type { FormResponseAnswer } from "@/types/collections/form-responses"
-
-const DATETIME_LOCAL_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+import type { FormBlockFieldsCollection } from "@/types/collections/junctions/form-block-fields"
+import { DATETIME_LOCAL_REGEX } from "@/lib/validations/datetime"
 
 type ExpandedFormFieldBase = {
   id: number
@@ -34,10 +34,21 @@ export type ExpandedFormField =
     })
   | (ExpandedFormFieldBase & { collection: "phone_block"; item: PhoneBlock })
 
+const FORM_FIELD_COLLECTIONS: Record<FormBlockFieldsCollection, true> = {
+  text_block: true,
+  text_area_block: true,
+  number_block: true,
+  date_block: true,
+  email_block: true,
+  checkbox_block: true,
+  phone_block: true,
+}
+
 type FormFieldInput =
   | number
   | {
-      item: string | { identifier: string }
+      collection?: unknown
+      item?: unknown
     }
 
 function textSchema(required: boolean) {
@@ -65,12 +76,7 @@ function numberSchema(item: NumberBlock) {
 }
 
 function checkboxSchema(required: boolean) {
-  return required
-    ? v.pipe(
-        v.boolean(),
-        v.check((value) => value === true)
-      )
-    : v.boolean()
+  return required ? v.literal(true) : v.boolean()
 }
 
 function schemaFor(row: ExpandedFormField) {
@@ -98,13 +104,18 @@ export function expandedFormFields(
   fields: FormBlock["fields"] | readonly FormFieldInput[]
 ): ExpandedFormField[] {
   const rows: readonly FormFieldInput[] = fields
-  return rows.filter(
-    (
-      row
-    ): row is Exclude<FormFieldInput, number> & {
-      item: { identifier: string }
-    } => typeof row !== "number" && typeof row.item !== "string"
-  ) as ExpandedFormField[]
+  return rows.filter((row) => {
+    if (typeof row === "number") return false
+    const item = row.item
+    return (
+      typeof row.collection === "string" &&
+      Object.hasOwn(FORM_FIELD_COLLECTIONS, row.collection) &&
+      typeof item === "object" &&
+      item !== null &&
+      "identifier" in item &&
+      typeof item.identifier === "string"
+    )
+  }) as ExpandedFormField[]
 }
 
 export function buildFormValuesSchema(

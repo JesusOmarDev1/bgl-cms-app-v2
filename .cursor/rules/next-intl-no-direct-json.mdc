@@ -1,5 +1,6 @@
 ---
 description: Enforce next-intl APIs; forbid direct i18n JSON imports outside i18n bootstrap
+globs: services/domain/db/queries/**/*.ts,services/domain/db/repositories/**/*.ts
 alwaysApply: false
 ---
 
@@ -16,6 +17,8 @@ This includes logs and fallback messages. Do not read messages from raw JSON in 
 
 Exception (allowed): i18n bootstrap/config files that assemble catalogs (e.g. `i18n/request.ts`).
 
+Query files do not import `next-intl` or call `getTranslations`. The repository calls `getTranslations` and passes the string into the query.
+
 ```ts
 // BAD
 import dbMessages from "@/i18n/db/es.json"
@@ -25,4 +28,14 @@ console.error(dbMessages.db.pages.failed_to_fetch)
 import { getTranslations } from "next-intl/server"
 const t = await getTranslations("db")
 console.error(t("pages.failed_to_fetch"))
+```
+
+```ts
+// BAD — query
+import { getTranslations } from "next-intl/server"
+const t = await getTranslations("db.health")
+
+// GOOD — services/domain/db/repositories/endpoints/health.ts
+const t = await getTranslations("db.health")
+return await getHealthQuery(t("failed_to_fetch"))
 ```

@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -11,12 +10,10 @@ import type { Schema } from "@/types/schema"
 import type { WhatsappButtonType } from "@/types/singletons/whatsapp-button"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getWhatsappButtonQuery() {
+export async function getWhatsappButtonQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("whatsapp_button")
   cacheLife("hours")
-  const t = await getTranslations("db.whatsapp_button")
-
   try {
     return await directus.request(
       readSingleton("whatsapp_button", {
@@ -24,13 +21,12 @@ export async function getWhatsappButtonQuery() {
       } satisfies Query<Schema, WhatsappButtonType>)
     )
   } catch (error) {
-    const message = t("failed_to_fetch")
-    returnDirectusQueryError(error, message, {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getWhatsappButtonQuery",
       collection: "whatsapp_button",
     })
-    throw error instanceof Error ? error : new Error(message)
+    return null
   }
 }
 

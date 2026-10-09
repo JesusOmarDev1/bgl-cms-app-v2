@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getBlogPostsBySlugQuery,
   getBlogPostsCountQuery,
@@ -11,7 +12,8 @@ export async function getBlogPostsRepository({
   limit = 10,
   page = 1,
 }: BlogPostsQuery = {}): Promise<BlogPostsQueryResult> {
-  return await getBlogPostsQuery({ status, limit, page })
+  const t = await getTranslations("db.blog_posts")
+  return await getBlogPostsQuery({ status, limit, page }, t("failed_to_fetch"))
 }
 
 export async function getBlogPostBySlugRepository({
@@ -20,11 +22,17 @@ export async function getBlogPostBySlugRepository({
   page = 1,
   slug,
 }: BlogPostsQuery & { slug: string }): Promise<BlogPostsQueryResult> {
-  return await getBlogPostsBySlugQuery({ status, limit, page }, slug)
+  const t = await getTranslations("db.blog_posts")
+  return await getBlogPostsBySlugQuery(
+    { status, limit, page },
+    slug,
+    t("failed_to_fetch")
+  )
 }
 
 export async function getBlogPostsCountRepository({
   status = "published",
 }: Pick<BlogPostsQuery, "status"> = {}): Promise<number> {
-  return await getBlogPostsCountQuery({ status })
+  const t = await getTranslations("db.blog_posts")
+  return await getBlogPostsCountQuery({ status }, t("failed_to_fetch"))
 }

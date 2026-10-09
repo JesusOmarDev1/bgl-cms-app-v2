@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -17,12 +16,14 @@ export interface PagesQuery {
   page?: number
 }
 
-export async function getPagesQuery(query: PagesQuery) {
+export async function getPagesQuery(
+  query: PagesQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("pages")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.pages")
   try {
     const pages = await directus.request(
       readItems("pages", {
@@ -35,7 +36,7 @@ export async function getPagesQuery(query: PagesQuery) {
     )
     return pages
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getPagesQuery",
       collection: "pages",
@@ -44,12 +45,15 @@ export async function getPagesQuery(query: PagesQuery) {
   }
 }
 
-export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
+export async function getPagesBySlugQuery(
+  query: PagesQuery,
+  slug: string,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("pages_by_slug")
   cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
-  const t = await getTranslations("db.pages")
   try {
     const pageItem = await directus.request(
       readItems("pages", {
@@ -62,7 +66,7 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
     )
     return pageItem
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getPagesBySlugQuery",
       collection: "pages",
@@ -72,13 +76,13 @@ export async function getPagesBySlugQuery(query: PagesQuery, slug: string) {
 }
 
 export async function getPagesCountQuery(
-  query: Pick<PagesQuery, "status"> = {}
+  query: Pick<PagesQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("pages_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.pages")
   try {
     const rows = await directus.request(
       aggregate("pages", {
@@ -90,7 +94,7 @@ export async function getPagesCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getPagesCountQuery",
       collection: "pages",

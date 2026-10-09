@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface ModelsQuery {
   page?: number
 }
 
-export async function getModelsQuery(query: ModelsQuery) {
+export async function getModelsQuery(
+  query: ModelsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("models")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.models")
   try {
     const models = await directus.request(
       readItems("models", {
@@ -37,7 +38,7 @@ export async function getModelsQuery(query: ModelsQuery) {
     )
     return models
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getModelsQuery",
       collection: "models",
@@ -47,13 +48,13 @@ export async function getModelsQuery(query: ModelsQuery) {
 }
 
 export async function getModelsCountQuery(
-  query: Pick<ModelsQuery, "status"> = {}
+  query: Pick<ModelsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("models_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.models")
   try {
     const rows = await directus.request(
       aggregate("models", {
@@ -65,7 +66,7 @@ export async function getModelsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getModelsCountQuery",
       collection: "models",

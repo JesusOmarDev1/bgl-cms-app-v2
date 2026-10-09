@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -16,12 +15,14 @@ export interface TagsQuery {
   page?: number
 }
 
-export async function getTagsQuery(query: TagsQuery = {}) {
+export async function getTagsQuery(
+  query: TagsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("tags")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.tags")
   try {
     const items = await directus.request(
       readItems("tags", {
@@ -34,7 +35,7 @@ export async function getTagsQuery(query: TagsQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getTagsQuery",
       collection: "tags",
@@ -43,12 +44,14 @@ export async function getTagsQuery(query: TagsQuery = {}) {
   }
 }
 
-export async function getTagsCountQuery(query: Pick<TagsQuery, "status"> = {}) {
+export async function getTagsCountQuery(
+  query: Pick<TagsQuery, "status">,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("tags_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.tags")
   try {
     const rows = await directus.request(
       aggregate("tags", {
@@ -60,7 +63,7 @@ export async function getTagsCountQuery(query: Pick<TagsQuery, "status"> = {}) {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getTagsCountQuery",
       collection: "tags",

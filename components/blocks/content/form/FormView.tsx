@@ -203,12 +203,11 @@ export function FormView({
   )
   const values = useMemo(() => defaultValues(rows), [rows])
   const schema = useMemo(() => buildFormValuesSchema(rows), [rows])
-  const [captchaToken, setCaptchaToken] = useState("")
-  const [prevFormMessage, setPrevFormMessage] = useState(formMessage)
-  if (formMessage !== prevFormMessage) {
-    setPrevFormMessage(formMessage)
-    if (formMessage) setCaptchaToken("")
-  }
+  const [captcha, setCaptcha] = useState<{
+    token: string
+    message: string | undefined
+  }>({ token: "", message: undefined })
+  const captchaToken = captcha.message === formMessage ? captcha.token : ""
   const form = useForm({
     defaultValues: values,
     validators: {
@@ -264,9 +263,9 @@ export function FormView({
               key={formMessage ?? "idle"}
               siteKey={turnstileSiteKey}
               options={{ theme: "dark", language: "es" }}
-              onSuccess={setCaptchaToken}
-              onExpire={() => setCaptchaToken("")}
-              onError={() => setCaptchaToken("")}
+              onSuccess={(token) => setCaptcha({ token, message: formMessage })}
+              onExpire={() => setCaptcha({ token: "", message: formMessage })}
+              onError={() => setCaptcha({ token: "", message: formMessage })}
             />
           ) : null}
           {formMessage ? (

@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -14,12 +13,14 @@ export interface SubLinksQuery {
   page?: number
 }
 
-export async function getSubLinksQuery(query: SubLinksQuery = {}) {
+export async function getSubLinksQuery(
+  query: SubLinksQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("sub_links")
   cacheLife("minutes")
   const { limit = 10, page = 1 } = query
-  const t = await getTranslations("db.sub_links")
   try {
     const items = await directus.request(
       readItems("sub_links", {
@@ -31,7 +32,7 @@ export async function getSubLinksQuery(query: SubLinksQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSubLinksQuery",
       collection: "sub_links",
@@ -40,11 +41,10 @@ export async function getSubLinksQuery(query: SubLinksQuery = {}) {
   }
 }
 
-export async function getSubLinksCountQuery() {
+export async function getSubLinksCountQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("sub_links_count")
   cacheLife("minutes")
-  const t = await getTranslations("db.sub_links")
   try {
     const rows = await directus.request(
       aggregate("sub_links", {
@@ -53,7 +53,7 @@ export async function getSubLinksCountQuery() {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getSubLinksCountQuery",
       collection: "sub_links",

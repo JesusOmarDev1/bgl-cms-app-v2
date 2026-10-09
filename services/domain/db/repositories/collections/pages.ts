@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getPagesBySlugQuery,
   getPagesCountQuery,
@@ -11,7 +12,8 @@ export async function getPagesRepository({
   limit = 10,
   page = 1,
 }: PagesQuery = {}): Promise<PagesQueryResult> {
-  return await getPagesQuery({ status, limit, page })
+  const t = await getTranslations("db.pages")
+  return await getPagesQuery({ status, limit, page }, t("failed_to_fetch"))
 }
 
 export async function getPageBySlugRepository({
@@ -20,11 +22,17 @@ export async function getPageBySlugRepository({
   page = 1,
   slug,
 }: PagesQuery & { slug: string }): Promise<PagesQueryResult> {
-  return await getPagesBySlugQuery({ status, limit, page }, slug)
+  const t = await getTranslations("db.pages")
+  return await getPagesBySlugQuery(
+    { status, limit, page },
+    slug,
+    t("failed_to_fetch")
+  )
 }
 
 export async function getPagesCountRepository({
   status = "published",
 }: Pick<PagesQuery, "status"> = {}): Promise<number> {
-  return await getPagesCountQuery({ status })
+  const t = await getTranslations("db.pages")
+  return await getPagesCountQuery({ status }, t("failed_to_fetch"))
 }

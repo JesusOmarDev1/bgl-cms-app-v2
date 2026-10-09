@@ -1,7 +1,6 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -15,12 +14,14 @@ export interface RedirectsQuery {
   page?: number
 }
 
-export async function getRedirectsQuery(query: RedirectsQuery = {}) {
+export async function getRedirectsQuery(
+  query: RedirectsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("redirects")
   cacheLife("minutes")
   const { limit = 10, page = 1 } = query
-  const t = await getTranslations("db.redirects")
   try {
     const items = await directus.request(
       readItems("redirects", {
@@ -32,7 +33,7 @@ export async function getRedirectsQuery(query: RedirectsQuery = {}) {
     )
     return items
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getRedirectsQuery",
       collection: "redirects",
@@ -41,11 +42,10 @@ export async function getRedirectsQuery(query: RedirectsQuery = {}) {
   }
 }
 
-export async function getRedirectsCountQuery() {
+export async function getRedirectsCountQuery(failedToFetchMessage: string) {
   "use cache"
   cacheTag("redirects_count")
   cacheLife("minutes")
-  const t = await getTranslations("db.redirects")
   try {
     const rows = await directus.request(
       aggregate("redirects", {
@@ -54,7 +54,7 @@ export async function getRedirectsCountQuery() {
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getRedirectsCountQuery",
       collection: "redirects",

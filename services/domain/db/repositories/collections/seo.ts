@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getSeoCountQuery,
   getSeoQuery,
@@ -9,9 +10,11 @@ export async function getSeoRepository({
   limit = 10,
   page = 1,
 }: SeoQuery = {}): Promise<SeoQueryResult> {
-  return await getSeoQuery({ limit, page })
+  const t = await getTranslations("db.seo")
+  return await getSeoQuery({ limit, page }, t("failed_to_fetch"))
 }
 
 export async function getSeoCountRepository(): Promise<number> {
-  return await getSeoCountQuery()
+  const t = await getTranslations("db.seo")
+  return await getSeoCountQuery(t("failed_to_fetch"))
 }

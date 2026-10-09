@@ -2,7 +2,6 @@ import "server-only"
 
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import { getTranslations } from "next-intl/server"
 
 import directus from "@/config/directus"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
@@ -19,12 +18,14 @@ export interface ClientsQuery {
   page?: number
 }
 
-export async function getClientsQuery(query: ClientsQuery) {
+export async function getClientsQuery(
+  query: ClientsQuery,
+  failedToFetchMessage: string
+) {
   "use cache"
   cacheTag("clients")
   cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
-  const t = await getTranslations("db.clients")
   try {
     const clients = await directus.request(
       readItems("clients", {
@@ -37,7 +38,7 @@ export async function getClientsQuery(query: ClientsQuery) {
     )
     return clients
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getClientsQuery",
       collection: "clients",
@@ -47,13 +48,13 @@ export async function getClientsQuery(query: ClientsQuery) {
 }
 
 export async function getClientsCountQuery(
-  query: Pick<ClientsQuery, "status"> = {}
+  query: Pick<ClientsQuery, "status">,
+  failedToFetchMessage: string
 ) {
   "use cache"
   cacheTag("clients_count")
   cacheLife("minutes")
   const { status = "published" } = query
-  const t = await getTranslations("db.clients")
   try {
     const rows = await directus.request(
       aggregate("clients", {
@@ -65,7 +66,7 @@ export async function getClientsCountQuery(
     )
     return parseAggregateCount(rows[0]?.count)
   } catch (error) {
-    returnDirectusQueryError(error, t("failed_to_fetch"), {
+    returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
       operation: "getClientsCountQuery",
       collection: "clients",

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import {
   getSocialLinksCountQuery,
   getSocialLinksQuery,
@@ -9,9 +10,11 @@ export async function getSocialLinksRepository({
   limit = 10,
   page = 1,
 }: SocialLinksQuery = {}): Promise<SocialLinksQueryResult> {
-  return await getSocialLinksQuery({ limit, page })
+  const t = await getTranslations("db.social_links")
+  return await getSocialLinksQuery({ limit, page }, t("failed_to_fetch"))
 }
 
 export async function getSocialLinksCountRepository(): Promise<number> {
-  return await getSocialLinksCountQuery()
+  const t = await getTranslations("db.social_links")
+  return await getSocialLinksCountQuery(t("failed_to_fetch"))
 }
