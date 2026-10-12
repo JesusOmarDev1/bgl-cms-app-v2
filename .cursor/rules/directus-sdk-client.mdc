@@ -8,7 +8,7 @@ alwaysApply: false
 
 One client in `config/directus.ts`: `createDirectus<Schema>(url).with(staticToken).with(rest())`. Schema generic is required. URL = `NEXT_PUBLIC_DIRECTUS_URL`. Token = `DIRECTUS_STATIC_TOKEN`. Never `?access_token=`. No second client / `graphql()` unless explicitly requested.
 
-Fetch with `directus.request(readItems | readItem | readSingleton | ...)`. Never `ofetch`/`fetch` to `/items/*` (ofetch is only `globals.fetch` on the client). Custom paths: `customEndpoint<OutputType>({ path, method })`.
+Fetch with `directus.request(readItems | readItem | readSingleton | ...)`. The client uses native fetch, a per-request `AbortSignal.timeout`, and no client retries. Do not pass `globals.fetch`. Custom paths: `customEndpoint<OutputType>({ path, method })`.
 
 Catch API errors with `isDirectusError(error)`. This frontend is read-only: never `createItems` / `updateItems` / `deleteItems` / nested `{ create, update, delete }`. Writes live in Directus Studio.
 

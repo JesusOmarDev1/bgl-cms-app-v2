@@ -14,24 +14,27 @@ export interface PhonesQuery {
   page?: number
 }
 
+async function fetchPhones(limit: number, page: number) {
+  "use cache"
+  cacheTag("phones")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("phones", {
+      fields: PHONES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, PhoneTypes>)
+  )
+}
+
 export async function getPhonesQuery(
   query: PhonesQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("phones")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("phones", {
-        fields: PHONES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, PhoneTypes>)
-    )
-    return items
+    return await fetchPhones(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -42,17 +45,21 @@ export async function getPhonesQuery(
   }
 }
 
-export async function getPhonesCountQuery(failedToFetchMessage: string) {
+async function fetchPhonesCount() {
   "use cache"
   cacheTag("phones_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("phones", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getPhonesCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("phones", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchPhonesCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

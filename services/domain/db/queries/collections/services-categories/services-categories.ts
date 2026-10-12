@@ -15,25 +15,32 @@ export interface ServicesCategoriesQuery {
   page?: number
 }
 
-export async function getServicesCategoriesQuery(
-  query: ServicesCategoriesQuery,
-  failedToFetchMessage: string
+async function fetchServicesCategories(
+  status: StatusType,
+  limit: number,
+  page: number
 ) {
   "use cache"
   cacheTag("services_categories")
   cacheLife("minutes")
+  return directus.request(
+    readItems("services_categories", {
+      fields: SERVICES_CATEGORIES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, ServicesCategoriesTypes>)
+  )
+}
+
+export async function getServicesCategoriesQuery(
+  query: ServicesCategoriesQuery,
+  failedToFetchMessage: string
+) {
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("services_categories", {
-        fields: SERVICES_CATEGORIES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, ServicesCategoriesTypes>)
-    )
-    return items
+    return await fetchServicesCategories(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -44,24 +51,28 @@ export async function getServicesCategoriesQuery(
   }
 }
 
+async function fetchServicesCategoriesCount(status: StatusType) {
+  "use cache"
+  cacheTag("services_categories_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("services_categories", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getServicesCategoriesCountQuery(
   query: Pick<ServicesCategoriesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("services_categories_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("services_categories", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchServicesCategoriesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

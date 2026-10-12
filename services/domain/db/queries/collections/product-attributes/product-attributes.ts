@@ -18,25 +18,32 @@ export interface ProductAttributesQuery {
   page?: number
 }
 
-export async function getProductAttributesQuery(
-  query: ProductAttributesQuery,
-  failedToFetchMessage: string
+async function fetchProductAttributes(
+  status: StatusType,
+  limit: number,
+  page: number
 ) {
   "use cache"
   cacheTag("product_attributes")
   cacheLife("minutes")
+  return directus.request(
+    readItems("product_attributes", {
+      fields: PRODUCT_ATTRIBUTES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, ProductAttributesTypes>)
+  )
+}
+
+export async function getProductAttributesQuery(
+  query: ProductAttributesQuery,
+  failedToFetchMessage: string
+) {
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const productAttributes = await directus.request(
-      readItems("product_attributes", {
-        fields: PRODUCT_ATTRIBUTES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, ProductAttributesTypes>)
-    )
-    return productAttributes
+    return await fetchProductAttributes(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -47,24 +54,28 @@ export async function getProductAttributesQuery(
   }
 }
 
+async function fetchProductAttributesCount(status: StatusType) {
+  "use cache"
+  cacheTag("product_attributes_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("product_attributes", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getProductAttributesCountQuery(
   query: Pick<ProductAttributesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("product_attributes_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("product_attributes", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchProductAttributesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

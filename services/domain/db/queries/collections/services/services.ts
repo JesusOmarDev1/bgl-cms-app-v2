@@ -15,25 +15,28 @@ export interface ServicesQuery {
   page?: number
 }
 
+async function fetchServices(status: StatusType, limit: number, page: number) {
+  "use cache"
+  cacheTag("services")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("services", {
+      fields: SERVICES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, ServicesTypes>)
+  )
+}
+
 export async function getServicesQuery(
   query: ServicesQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("services")
-  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const services = await directus.request(
-      readItems("services", {
-        fields: SERVICES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, ServicesTypes>)
-    )
-    return services
+    return await fetchServices(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -44,26 +47,34 @@ export async function getServicesQuery(
   }
 }
 
+async function fetchServicesBySlug(
+  status: StatusType,
+  limit: number,
+  page: number,
+  slug: string
+) {
+  "use cache"
+  cacheTag("services_by_slug")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("services", {
+      fields: SERVICES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status }, slug: { _eq: slug } },
+    } satisfies Query<Schema, ServicesTypes>)
+  )
+}
+
 export async function getServicesBySlugQuery(
   query: ServicesQuery,
   slug: string,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("services_by_slug")
-  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   try {
-    const service = await directus.request(
-      readItems("services", {
-        fields: SERVICES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status }, slug: { _eq: slug } },
-      } satisfies Query<Schema, ServicesTypes>)
-    )
-    return service
+    return await fetchServicesBySlug(status, limit, page, slug)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -74,24 +85,28 @@ export async function getServicesBySlugQuery(
   }
 }
 
+async function fetchServicesCount(status: StatusType) {
+  "use cache"
+  cacheTag("services_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("services", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getServicesCountQuery(
   query: Pick<ServicesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("services_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("services", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchServicesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

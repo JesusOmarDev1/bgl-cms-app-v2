@@ -10,16 +10,20 @@ import type { Schema } from "@/types/schema"
 import type { SiteSettingsType } from "@/types/singletons/site-settings"
 import { SITE_SETTINGS_FIELDS } from "./site-settings.fields"
 
-export async function getSiteSettingsQuery(failedToFetchMessage: string) {
+async function fetchSiteSettings() {
   "use cache"
   cacheTag("site_settings")
   cacheLife("minutes")
+  return directus.request(
+    readSingleton("site_settings", {
+      fields: SITE_SETTINGS_FIELDS,
+    } satisfies Query<Schema, SiteSettingsType>)
+  )
+}
+
+export async function getSiteSettingsQuery(failedToFetchMessage: string) {
   try {
-    return await directus.request(
-      readSingleton("site_settings", {
-        fields: SITE_SETTINGS_FIELDS,
-      } satisfies Query<Schema, SiteSettingsType>)
-    )
+    return await fetchSiteSettings()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

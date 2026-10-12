@@ -18,25 +18,28 @@ export interface BrandsQuery {
   page?: number
 }
 
+async function fetchBrands(status: StatusType, limit: number, page: number) {
+  "use cache"
+  cacheTag("brands")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("brands", {
+      fields: BRANDS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, BrandsTypes>)
+  )
+}
+
 export async function getBrandsQuery(
   query: BrandsQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("brands")
-  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const brands = await directus.request(
-      readItems("brands", {
-        fields: BRANDS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, BrandsTypes>)
-    )
-    return brands
+    return await fetchBrands(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

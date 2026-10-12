@@ -30,7 +30,7 @@ function AccordionItem({ className, ...props }: DisclosureProps) {
   return (
     <AccordionItemPrimitive
       data-slot="accordion-item"
-      className={cn("not-last:border-b", className)}
+      className={cn(className)}
       {...props}
     />
   )

@@ -13,24 +13,27 @@ export interface EmailsQuery {
   page?: number
 }
 
+async function fetchEmails(limit: number, page: number) {
+  "use cache"
+  cacheTag("emails")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("emails", {
+      fields: EMAILS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, EmailTypes>)
+  )
+}
+
 export async function getEmailsQuery(
   query: EmailsQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("emails")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("emails", {
-        fields: EMAILS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, EmailTypes>)
-    )
-    return items
+    return await fetchEmails(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -41,17 +44,21 @@ export async function getEmailsQuery(
   }
 }
 
-export async function getEmailsCountQuery(failedToFetchMessage: string) {
+async function fetchEmailsCount() {
   "use cache"
   cacheTag("emails_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("emails", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getEmailsCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("emails", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchEmailsCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

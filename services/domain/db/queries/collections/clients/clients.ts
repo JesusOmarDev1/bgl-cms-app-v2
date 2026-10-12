@@ -18,25 +18,28 @@ export interface ClientsQuery {
   page?: number
 }
 
+async function fetchClients(status: StatusType, limit: number, page: number) {
+  "use cache"
+  cacheTag("clients")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("clients", {
+      fields: CLIENTS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, ClientsTypes>)
+  )
+}
+
 export async function getClientsQuery(
   query: ClientsQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("clients")
-  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const clients = await directus.request(
-      readItems("clients", {
-        fields: CLIENTS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, ClientsTypes>)
-    )
-    return clients
+    return await fetchClients(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -47,24 +50,28 @@ export async function getClientsQuery(
   }
 }
 
+async function fetchClientsCount(status: StatusType) {
+  "use cache"
+  cacheTag("clients_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("clients", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getClientsCountQuery(
   query: Pick<ClientsQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("clients_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("clients", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchClientsCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

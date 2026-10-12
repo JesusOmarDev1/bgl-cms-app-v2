@@ -13,24 +13,27 @@ export interface UrlLinksQuery {
   page?: number
 }
 
+async function fetchUrlLinks(limit: number, page: number) {
+  "use cache"
+  cacheTag("url_links")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("url_links", {
+      fields: URL_LINKS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, UrlLinksTypes>)
+  )
+}
+
 export async function getUrlLinksQuery(
   query: UrlLinksQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("url_links")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("url_links", {
-        fields: URL_LINKS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, UrlLinksTypes>)
-    )
-    return items
+    return await fetchUrlLinks(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -41,17 +44,21 @@ export async function getUrlLinksQuery(
   }
 }
 
-export async function getUrlLinksCountQuery(failedToFetchMessage: string) {
+async function fetchUrlLinksCount() {
   "use cache"
   cacheTag("url_links_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("url_links", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getUrlLinksCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("url_links", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchUrlLinksCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

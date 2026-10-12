@@ -10,16 +10,20 @@ import type { Schema } from "@/types/schema"
 import type { WhatsappButtonType } from "@/types/singletons/whatsapp-button"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getWhatsappButtonQuery(failedToFetchMessage: string) {
+async function fetchWhatsappButton() {
   "use cache"
   cacheTag("whatsapp_button")
   cacheLife("hours")
+  return directus.request(
+    readSingleton("whatsapp_button", {
+      fields: WHATSAPP_BUTTON_FIELDS,
+    } satisfies Query<Schema, WhatsappButtonType>)
+  )
+}
+
+export async function getWhatsappButtonQuery(failedToFetchMessage: string) {
   try {
-    return await directus.request(
-      readSingleton("whatsapp_button", {
-        fields: WHATSAPP_BUTTON_FIELDS,
-      } satisfies Query<Schema, WhatsappButtonType>)
-    )
+    return await fetchWhatsappButton()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

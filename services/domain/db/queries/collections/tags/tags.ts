@@ -15,25 +15,28 @@ export interface TagsQuery {
   page?: number
 }
 
+async function fetchTags(status: StatusType, limit: number, page: number) {
+  "use cache"
+  cacheTag("tags")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("tags", {
+      fields: TAGS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, TagTypes>)
+  )
+}
+
 export async function getTagsQuery(
   query: TagsQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("tags")
-  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("tags", {
-        fields: TAGS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, TagTypes>)
-    )
-    return items
+    return await fetchTags(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -44,24 +47,28 @@ export async function getTagsQuery(
   }
 }
 
+async function fetchTagsCount(status: StatusType) {
+  "use cache"
+  cacheTag("tags_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("tags", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getTagsCountQuery(
   query: Pick<TagsQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("tags_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("tags", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchTagsCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

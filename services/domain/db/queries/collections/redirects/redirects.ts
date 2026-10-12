@@ -14,24 +14,27 @@ export interface RedirectsQuery {
   page?: number
 }
 
+async function fetchRedirects(limit: number, page: number) {
+  "use cache"
+  cacheTag("redirects")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("redirects", {
+      fields: REDIRECTS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, RedirectsTypes>)
+  )
+}
+
 export async function getRedirectsQuery(
   query: RedirectsQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("redirects")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("redirects", {
-        fields: REDIRECTS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, RedirectsTypes>)
-    )
-    return items
+    return await fetchRedirects(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -42,17 +45,21 @@ export async function getRedirectsQuery(
   }
 }
 
-export async function getRedirectsCountQuery(failedToFetchMessage: string) {
+async function fetchRedirectsCount() {
   "use cache"
   cacheTag("redirects_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("redirects", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getRedirectsCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("redirects", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchRedirectsCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

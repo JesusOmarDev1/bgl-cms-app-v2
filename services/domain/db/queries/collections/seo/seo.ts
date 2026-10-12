@@ -13,24 +13,27 @@ export interface SeoQuery {
   page?: number
 }
 
+async function fetchSeo(limit: number, page: number) {
+  "use cache"
+  cacheTag("seo")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("seo", {
+      fields: SEO_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, SeoTypes>)
+  )
+}
+
 export async function getSeoQuery(
   query: SeoQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("seo")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("seo", {
-        fields: SEO_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, SeoTypes>)
-    )
-    return items
+    return await fetchSeo(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -41,17 +44,21 @@ export async function getSeoQuery(
   }
 }
 
-export async function getSeoCountQuery(failedToFetchMessage: string) {
+async function fetchSeoCount() {
   "use cache"
   cacheTag("seo_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("seo", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getSeoCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("seo", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchSeoCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

@@ -10,16 +10,20 @@ import { HEADER_FIELDS } from "@/services/domain/db/queries/singletons/header/he
 import type { Schema } from "@/types/schema"
 import type { HeaderType } from "@/types/singletons/header"
 
-export async function getHeaderQuery(failedToFetchMessage: string) {
+async function fetchHeader() {
   "use cache"
   cacheTag("header")
   cacheLife("hours")
+  return directus.request(
+    readSingleton("header", {
+      fields: HEADER_FIELDS,
+    } satisfies Query<Schema, HeaderType>)
+  )
+}
+
+export async function getHeaderQuery(failedToFetchMessage: string) {
   try {
-    return await directus.request(
-      readSingleton("header", {
-        fields: HEADER_FIELDS,
-      } satisfies Query<Schema, HeaderType>)
-    )
+    return await fetchHeader()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

@@ -16,25 +16,28 @@ export interface PagesQuery {
   page?: number
 }
 
+async function fetchPages(status: StatusType, limit: number, page: number) {
+  "use cache"
+  cacheTag("pages")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("pages", {
+      fields: PAGES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, PagesTypes>)
+  )
+}
+
 export async function getPagesQuery(
   query: PagesQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("pages")
-  cacheLife("minutes")
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const pages = await directus.request(
-      readItems("pages", {
-        fields: PAGES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, PagesTypes>)
-    )
-    return pages
+    return await fetchPages(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -45,26 +48,34 @@ export async function getPagesQuery(
   }
 }
 
+async function fetchPagesBySlug(
+  status: StatusType,
+  limit: number,
+  page: number,
+  slug: string
+) {
+  "use cache"
+  cacheTag("pages_by_slug")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("pages", {
+      fields: PAGES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status }, slug: { _eq: slug } },
+    } satisfies Query<Schema, PagesTypes>)
+  )
+}
+
 export async function getPagesBySlugQuery(
   query: PagesQuery,
   slug: string,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("pages_by_slug")
-  cacheLife("minutes")
   const { status = "published", limit = 1, page = 1 } = query
   try {
-    const pageItem = await directus.request(
-      readItems("pages", {
-        fields: PAGES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status }, slug: { _eq: slug } },
-      } satisfies Query<Schema, PagesTypes>)
-    )
-    return pageItem
+    return await fetchPagesBySlug(status, limit, page, slug)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -75,24 +86,28 @@ export async function getPagesBySlugQuery(
   }
 }
 
+async function fetchPagesCount(status: StatusType) {
+  "use cache"
+  cacheTag("pages_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("pages", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getPagesCountQuery(
   query: Pick<PagesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("pages_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("pages", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchPagesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

@@ -10,16 +10,20 @@ import type { Schema } from "@/types/schema"
 import type { FooterType } from "@/types/singletons/footer"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getFooterQuery(failedToFetchMessage: string) {
+async function fetchFooter() {
   "use cache"
   cacheTag("footer")
   cacheLife("hours")
+  return directus.request(
+    readSingleton("footer", {
+      fields: FOOTER_FIELDS,
+    } satisfies Query<Schema, FooterType>)
+  )
+}
+
+export async function getFooterQuery(failedToFetchMessage: string) {
   try {
-    return await directus.request(
-      readSingleton("footer", {
-        fields: FOOTER_FIELDS,
-      } satisfies Query<Schema, FooterType>)
-    )
+    return await fetchFooter()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

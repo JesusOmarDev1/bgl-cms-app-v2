@@ -13,24 +13,27 @@ export interface SocialLinksQuery {
   page?: number
 }
 
+async function fetchSocialLinks(limit: number, page: number) {
+  "use cache"
+  cacheTag("social_links")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("social_links", {
+      fields: SOCIAL_LINKS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, SocialLinksTypes>)
+  )
+}
+
 export async function getSocialLinksQuery(
   query: SocialLinksQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("social_links")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("social_links", {
-        fields: SOCIAL_LINKS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, SocialLinksTypes>)
-    )
-    return items
+    return await fetchSocialLinks(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -41,17 +44,21 @@ export async function getSocialLinksQuery(
   }
 }
 
-export async function getSocialLinksCountQuery(failedToFetchMessage: string) {
+async function fetchSocialLinksCount() {
   "use cache"
   cacheTag("social_links_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("social_links", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getSocialLinksCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("social_links", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchSocialLinksCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

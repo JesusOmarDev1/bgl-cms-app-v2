@@ -15,50 +15,15 @@ function isDirectusWarnCode(code: string): code is DirectusWarnCode {
   return (DIRECTUS_WARN_CODES as readonly string[]).includes(code)
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null
-}
-
-function readErrors(value: unknown): unknown[] | undefined {
-  if (!isRecord(value) || !Array.isArray(value.errors)) return undefined
-  return value.errors
-}
-
-function readCode(errors: unknown[]): string | undefined {
-  const first = errors[0]
-  if (!isRecord(first) || !isRecord(first.extensions)) return undefined
-  return typeof first.extensions.code === "string"
-    ? first.extensions.code
-    : undefined
-}
-
-function readRawMessage(errors: unknown[]): string | undefined {
-  const first = errors[0]
-  if (!isRecord(first)) return undefined
-  return typeof first.message === "string" ? first.message : undefined
-}
-
 function extractDirectusErrorInfo(error: unknown): {
   code?: string
   rawMessage?: string
 } {
   if (isDirectusError(error)) {
+    const apiError = error.errors[0]
     return {
-      code: error.errors[0]?.extensions.code,
-      rawMessage: error.errors[0]?.message ?? error.message,
-    }
-  }
-
-  const nested = isRecord(error) ? readErrors(error.data) : undefined
-  const top = readErrors(error)
-  const errors = nested ?? top
-
-  if (errors !== undefined) {
-    return {
-      code: readCode(errors),
-      rawMessage:
-        readRawMessage(errors) ??
-        (error instanceof Error ? error.message : undefined),
+      code: apiError?.extensions.code,
+      rawMessage: apiError?.message ?? error.message,
     }
   }
 

@@ -16,25 +16,32 @@ export interface BlogCategoriesQuery {
   page?: number
 }
 
-export async function getBlogCategoriesQuery(
-  query: BlogCategoriesQuery,
-  failedToFetchMessage: string
+async function fetchBlogCategories(
+  status: StatusType,
+  limit: number,
+  page: number
 ) {
   "use cache"
   cacheTag("blog_categories")
   cacheLife("minutes")
+  return directus.request(
+    readItems("blog_categories", {
+      fields: BLOG_CATEGORIES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, BlogCategoriesTypes>)
+  )
+}
+
+export async function getBlogCategoriesQuery(
+  query: BlogCategoriesQuery,
+  failedToFetchMessage: string
+) {
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("blog_categories", {
-        fields: BLOG_CATEGORIES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, BlogCategoriesTypes>)
-    )
-    return items
+    return await fetchBlogCategories(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -45,24 +52,28 @@ export async function getBlogCategoriesQuery(
   }
 }
 
+async function fetchBlogCategoriesCount(status: StatusType) {
+  "use cache"
+  cacheTag("blog_categories_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("blog_categories", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getBlogCategoriesCountQuery(
   query: Pick<BlogCategoriesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("blog_categories_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("blog_categories", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchBlogCategoriesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

@@ -10,25 +10,29 @@ import type { Schema } from "@/types/schema"
 import type { ServicesButtonType } from "@/types/singletons/services-button"
 import { cacheLife, cacheTag } from "next/cache"
 
-export async function getServicesButtonQuery(failedToFetchMessage: string) {
+async function fetchServicesButton() {
   "use cache"
   cacheTag("services_button")
   cacheLife("hours")
-  try {
-    return await directus.request(
-      readSingleton("services_button", {
-        fields: SERVICES_BUTTON_FIELDS,
-        deep: {
-          services: {
-            _filter: {
-              item: {
-                status: { _eq: "published" },
-              },
+  return directus.request(
+    readSingleton("services_button", {
+      fields: SERVICES_BUTTON_FIELDS,
+      deep: {
+        services: {
+          _filter: {
+            item: {
+              status: { _eq: "published" },
             },
           },
         },
-      } satisfies Query<Schema, ServicesButtonType>)
-    )
+      },
+    } satisfies Query<Schema, ServicesButtonType>)
+  )
+}
+
+export async function getServicesButtonQuery(failedToFetchMessage: string) {
+  try {
+    return await fetchServicesButton()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

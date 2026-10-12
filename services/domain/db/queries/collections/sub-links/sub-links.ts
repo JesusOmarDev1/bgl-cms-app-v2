@@ -13,24 +13,27 @@ export interface SubLinksQuery {
   page?: number
 }
 
+async function fetchSubLinks(limit: number, page: number) {
+  "use cache"
+  cacheTag("sub_links")
+  cacheLife("minutes")
+  return directus.request(
+    readItems("sub_links", {
+      fields: SUB_LINKS_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+    } satisfies Query<Schema, SubLinksTypes>)
+  )
+}
+
 export async function getSubLinksQuery(
   query: SubLinksQuery,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("sub_links")
-  cacheLife("minutes")
   const { limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("sub_links", {
-        fields: SUB_LINKS_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-      } satisfies Query<Schema, SubLinksTypes>)
-    )
-    return items
+    return await fetchSubLinks(limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -41,17 +44,21 @@ export async function getSubLinksQuery(
   }
 }
 
-export async function getSubLinksCountQuery(failedToFetchMessage: string) {
+async function fetchSubLinksCount() {
   "use cache"
   cacheTag("sub_links_count")
   cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("sub_links", {
+      aggregate: { count: "*" },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
+export async function getSubLinksCountQuery(failedToFetchMessage: string) {
   try {
-    const rows = await directus.request(
-      aggregate("sub_links", {
-        aggregate: { count: "*" },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchSubLinksCount()
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

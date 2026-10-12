@@ -16,25 +16,32 @@ export interface ManualCategoriesQuery {
   page?: number
 }
 
-export async function getManualCategoriesQuery(
-  query: ManualCategoriesQuery,
-  failedToFetchMessage: string
+async function fetchManualCategories(
+  status: StatusType,
+  limit: number,
+  page: number
 ) {
   "use cache"
   cacheTag("manual_categories")
   cacheLife("minutes")
+  return directus.request(
+    readItems("manual_categories", {
+      fields: MANUAL_CATEGORIES_FIELDS,
+      limit,
+      page,
+      sort: ["-date_created"],
+      filter: { status: { _eq: status } },
+    } satisfies Query<Schema, ManualCategoriesTypes>)
+  )
+}
+
+export async function getManualCategoriesQuery(
+  query: ManualCategoriesQuery,
+  failedToFetchMessage: string
+) {
   const { status = "published", limit = 10, page = 1 } = query
   try {
-    const items = await directus.request(
-      readItems("manual_categories", {
-        fields: MANUAL_CATEGORIES_FIELDS,
-        limit,
-        page,
-        sort: ["-date_created"],
-        filter: { status: { _eq: status } },
-      } satisfies Query<Schema, ManualCategoriesTypes>)
-    )
-    return items
+    return await fetchManualCategories(status, limit, page)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
@@ -45,24 +52,28 @@ export async function getManualCategoriesQuery(
   }
 }
 
+async function fetchManualCategoriesCount(status: StatusType) {
+  "use cache"
+  cacheTag("manual_categories_count")
+  cacheLife("minutes")
+  const rows = await directus.request(
+    aggregate("manual_categories", {
+      aggregate: { count: "*" },
+      query: {
+        filter: { status: { _eq: status } },
+      },
+    })
+  )
+  return parseAggregateCount(rows[0]?.count)
+}
+
 export async function getManualCategoriesCountQuery(
   query: Pick<ManualCategoriesQuery, "status">,
   failedToFetchMessage: string
 ) {
-  "use cache"
-  cacheTag("manual_categories_count")
-  cacheLife("minutes")
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
-      aggregate("manual_categories", {
-        aggregate: { count: "*" },
-        query: {
-          filter: { status: { _eq: status } },
-        },
-      })
-    )
-    return parseAggregateCount(rows[0]?.count)
+    return await fetchManualCategoriesCount(status)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
