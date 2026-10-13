@@ -71,9 +71,15 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
       >
         <div className="flex h-full min-h-0 flex-col">
           <SheetHeader className="shrink-0 border-b border-border p-4 pe-12">
-            <SheetTitle className="text-base font-medium uppercase">
-              Menú de navegación
-            </SheetTitle>
+            <div className="flex items-center gap-2">
+              <MaterialIcon
+                name="page_menu_ios"
+                className="text-muted-foreground"
+              />
+              <SheetTitle className="text-xl font-medium uppercase">
+                Menú de navegación
+              </SheetTitle>
+            </div>
             <SheetDescription>
               Aquí puedes encontrar todos los enlaces de navegación de la web.
             </SheetDescription>

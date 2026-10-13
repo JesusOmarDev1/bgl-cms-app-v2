@@ -43,7 +43,7 @@ export default function NotFound() {
             <div className="flex flex-col items-center">
               <StaticLogo className="aspect-auto h-32 w-auto" />
             </div>
-            <h1 className="text-center font-mono text-6xl font-semibold text-muted-foreground">
+            <h1 className="text-center font-mono text-7xl font-semibold text-muted-foreground">
               404
             </h1>
             <h2 className="text-center text-3xl font-semibold md:text-6xl">

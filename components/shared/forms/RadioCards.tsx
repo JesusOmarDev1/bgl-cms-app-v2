@@ -18,8 +18,8 @@ import type {
 } from "react"
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react"
 import type { Transition } from "motion/react"
-import { motionTokens } from "../lib/motion-tokens"
-import styles from "./radio-cards.module.css"
+import { cn } from "cn"
+import { motionTokens } from "@/lib/animation/motion-tokens"
 
 export interface RadioCardOption {
   value: string
@@ -231,7 +231,10 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
         role="radiogroup"
         aria-disabled={disabled || undefined}
         aria-required={required || undefined}
-        className={[styles.root, className].filter(Boolean).join(" ")}
+        className={cn(
+          "group/radio relative grid gap-[10px] font-[family-name:var(--font-body)] text-[length:var(--text-sm)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[var(--foreground)] data-[layout=grid]:grid-cols-[repeat(auto-fill,minmax(min(100%,var(--min-column,180px)),1fr))] data-[layout=list]:grid-cols-[minmax(0,1fr)] data-[layout=list]:gap-[8px]",
+          className
+        )}
         data-layout={layout}
         style={
           { "--min-column": `${minColumnWidth}px`, ...style } as CSSProperties
@@ -239,7 +242,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
         {...rest}
       >
         <motion.span
-          className={styles.ring}
+          className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
           style={{ x, y, width: w, height: h, opacity: o }}
           aria-hidden="true"
         />
@@ -257,7 +260,15 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
               key={option.value}
               role="radio"
               data-card={index}
-              className={styles.card}
+              className={cn(
+                "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] select-none [-webkit-tap-highlight-color:transparent] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none",
+                "group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta'] group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto]",
+                "group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta'] group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px]",
+                checked &&
+                  "bg-[color-mix(in_oklab,var(--control-on)_4%,var(--surface))]",
+                off && "cursor-not-allowed bg-[var(--surface-muted)]",
+                "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)]"
+              )}
               aria-checked={checked}
               aria-disabled={off || undefined}
               aria-labelledby={labelId}
@@ -269,9 +280,17 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
               }}
               onKeyDown={(event) => onKeyDown(event, index)}
             >
-              <span className={styles.indicator} aria-hidden="true">
+              <span
+                className={cn(
+                  "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] [grid-area:indicator] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none group-data-[layout=grid]/radio:mt-px",
+                  checked &&
+                    "border-[var(--control-on)] bg-[var(--control-on)]",
+                  off && "border-[var(--border)]"
+                )}
+                aria-hidden="true"
+              >
                 <motion.span
-                  className={styles.indicatorDot}
+                  className="size-[6px] rounded-[50%] bg-[var(--control-glyph)]"
                   initial={false}
                   animate={{ scale: checked ? 1 : 0 }}
                   transition={
@@ -279,21 +298,33 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                   }
                 />
               </span>
-              <span className={styles.body}>
-                <span id={labelId} className={styles.label}>
+              <span className="grid min-w-0 gap-[2px] [grid-area:body]">
+                <span
+                  id={labelId}
+                  className="flex min-w-0 items-center gap-[8px] font-medium group-aria-disabled/card:text-[var(--text-muted)]"
+                >
                   {option.icon && (
-                    <span className={styles.icon}>{option.icon}</span>
+                    <span className="grid size-[18px] flex-none place-items-center text-[var(--text-secondary)] group-data-checked/card:text-[var(--foreground)] [&>svg]:size-[18px]">
+                      {option.icon}
+                    </span>
                   )}
-                  <span className={styles.labelText}>{option.label}</span>
+                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {option.label}
+                  </span>
                 </span>
                 {description && (
-                  <span id={descriptionId} className={styles.description}>
+                  <span
+                    id={descriptionId}
+                    className="text-[length:var(--text-xs)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+                  >
                     {description}
                   </span>
                 )}
               </span>
               {option.meta && (
-                <span className={styles.meta}>{option.meta}</span>
+                <span className="[grid-area:meta] text-[var(--foreground)] tabular-nums whitespace-nowrap group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
+                  {option.meta}
+                </span>
               )}
             </div>
           )

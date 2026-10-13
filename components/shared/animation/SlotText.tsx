@@ -12,7 +12,7 @@ import {
   useTransform,
   useVelocity,
 } from "motion/react"
-import styles from "./slot-text.module.css"
+import { cn } from "cn"
 
 /**
  * Text and numbers that spin into their new value like slot machine reels. Every character is a reel; digits count through
@@ -44,7 +44,7 @@ const UPPER = LOWER.toUpperCase()
 /** Fast out, long soft landing, never past the target. */
 const LANDING = [0.12, 0.8, 0.16, 1] as const
 const subscribe = () => () => {}
-/** Cell pitch in em. Keep in sync with .cell in the stylesheet. */
+/** Cell pitch in em. Keep in sync with the cell height (1.6em). */
 const CELL = 1.6
 
 function useReducedFlag() {
@@ -221,20 +221,20 @@ function Reel({
 
   return (
     <motion.span
-      className={styles.slot}
+      className="relative inline-block h-[1.15em] flex-none overflow-visible"
       style={{ width }}
       data-exiting={isPresent ? undefined : ""}
     >
-      <span ref={sizer} className={styles.sizer}>
+      <span ref={sizer} className="pointer-events-none inline-block whitespace-pre invisible">
         {char === " " ? "\u00a0" : char}
       </span>
-      <span className={styles.window}>
+      <span className="absolute inset-[-.22em_-.08em] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)] [mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)]">
         <motion.span
-          className={styles.strip}
+          className="absolute top-[calc(.22em_-_.225em)] right-[.08em] left-[.08em] flex flex-col items-center will-change-transform"
           style={{ transform: y, filter: blur }}
         >
           {reel.strip.map((cell, i) => (
-            <span key={i} className={styles.cell}>
+            <span key={i} className="box-border block h-[1.6em] pt-[.225em] leading-[1.15] whitespace-pre">
               {cell === " " ? "\u00a0" : cell}
             </span>
           ))}
@@ -287,16 +287,19 @@ export function SlotText({
 
   return (
     <span
-      className={[styles.root, className].filter(Boolean).join(" ")}
+      className={cn(
+        "relative inline-block align-bottom leading-[1.15] whitespace-nowrap tabular-nums",
+        className
+      )}
       style={style}
     >
       <span
-        className={styles.srOnly}
+        className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
         aria-live={announce ? "polite" : undefined}
       >
         {text}
       </span>
-      <span className={styles.reels} aria-hidden="true">
+      <span className="inline-flex h-[1.15em] items-start" aria-hidden="true">
         <AnimatePresence initial={false}>
           {chars.map((char, i) => (
             <Reel

@@ -105,7 +105,7 @@ function DefaultLoadingItem({ index }: { index: number }) {
   return (
     <Skeleton
       aria-hidden="true"
-      className="animate-pulse rounded-2xl border border-border bg-card p-3"
+      className="rounded-2xl border border-border bg-card p-3"
       style={{ minHeight: 144 + (index % 3) * 36 }}
     >
       <Skeleton className="h-3 w-2/3 rounded-full bg-muted" />

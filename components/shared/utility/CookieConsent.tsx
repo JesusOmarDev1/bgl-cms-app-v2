@@ -25,7 +25,7 @@ import { Cookie, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { motionTokens } from "@/lib/animation/motion-tokens"
-import styles from "./cookie-consent.module.css"
+import { cn } from "cn"
 
 /** One group of cookies a visitor can allow or refuse. */
 export interface CookieCategory {
@@ -290,7 +290,10 @@ function Face({
     <motion.div
       {...rest}
       ref={ref}
-      className={[styles.face, className].filter(Boolean).join(" ")}
+      className={cn(
+        "absolute bottom-0 left-0 box-border data-[side=center]:left-1/2 data-[side=center]:[translate:-50%_0] data-[side=right]:right-0 data-[side=right]:left-auto inert:pointer-events-none",
+        className
+      )}
       style={{ width }}
       data-face={id}
       data-side={side}
@@ -543,13 +546,15 @@ export const CookieConsent = forwardRef<
     closePanel(true)
   }
 
+  const policyClass =
+    "cursor-pointer border-0 bg-transparent p-0 [font:inherit] text-[var(--foreground)] underline decoration-[color:var(--border-strong)] underline-offset-[3px] transition-[text-decoration-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:decoration-current motion-reduce:transition-none"
   const policyLink = policy ? (
     policy.href ? (
-      <a className={styles.policy} href={policy.href} onClick={policy.onClick}>
+      <a className={policyClass} href={policy.href} onClick={policy.onClick}>
         {policy.label}
       </a>
     ) : (
-      <button type="button" className={styles.policy} onClick={policy.onClick}>
+      <button type="button" className={policyClass} onClick={policy.onClick}>
         {policy.label}
       </button>
     )
@@ -560,20 +565,18 @@ export const CookieConsent = forwardRef<
   return (
     <div
       ref={layerRef}
-      className={[
-        styles.layer,
-        strategy === "absolute" ? styles.absolute : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={cn(
+        strategy === "absolute" ? "absolute z-[5]" : "fixed z-[60]",
+        "right-[16px] bottom-[16px] left-[16px] h-0 pointer-events-none font-[family-name:var(--font-body)] tracking-[var(--tracking-body)]",
+        className
+      )}
       data-position={position}
     >
       <AnimatePresence>
         {mode ? (
           <motion.div
             key="surface"
-            className={styles.surface}
+            className="pointer-events-auto absolute bottom-0 left-0 origin-bottom overflow-hidden bg-[var(--surface-raised)] text-[var(--foreground)] shadow-[0_0_0_1px_var(--border),var(--shadow-floating)] will-change-[transform,width,height]"
             style={{ x, width, height, borderRadius: radius }}
             initial={
               reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }
@@ -611,21 +614,24 @@ export const CookieConsent = forwardRef<
                   reduced={reduced}
                   onSize={onSize}
                   focusOnMount={focusTarget === "bar"}
-                  className={styles.bar}
+                  className="@container py-[10px] pr-[10px] pl-[18px]"
                   role="dialog"
                   aria-modal={false}
                   aria-label={labels.preferencesTitle}
                   aria-describedby={messageId}
                 >
                   <div
-                    className={styles.barInner}
+                    className="flex items-center gap-[var(--space-4)] group/bar data-[stack]:flex-col data-[stack]:items-stretch data-[stack]:gap-[var(--space-3)] data-[stack]:pt-[6px] data-[stack]:pr-[8px]"
                     data-stack={widths.bar < STACK_BELOW || undefined}
                   >
-                    <p id={messageId} className={styles.message}>
+                    <p
+                      id={messageId}
+                      className="m-0 min-w-0 flex-auto text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+                    >
                       {labels.message}
                       {policyLink ? <> {policyLink}</> : null}
                     </p>
-                    <div className={styles.barActions}>
+                    <div className="flex flex-none items-center gap-[6px] group-data-[stack]/bar:grid group-data-[stack]/bar:grid-cols-[auto_1fr_1fr] @max-[300px]:group-data-[stack]/bar:grid-cols-[repeat(2,minmax(0,1fr))] @max-[300px]:group-data-[stack]/bar:[&>:first-child]:col-span-full @max-[300px]:group-data-[stack]/bar:[&>:first-child]:order-1">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -662,17 +668,17 @@ export const CookieConsent = forwardRef<
                   reduced={reduced}
                   onSize={onSize}
                   focusOnMount={focusTarget === "panel"}
-                  className={styles.panel}
+                  className="@container grid gap-[var(--space-3)] p-[18px]"
                   role="dialog"
                   aria-modal={false}
                   aria-labelledby={titleId}
                   aria-describedby={descriptionId}
                   onKeyDown={onPanelKeyDown}
                 >
-                  <div className={styles.panelHead}>
+                  <div className="flex items-center justify-between gap-[var(--space-3)] -mt-[4px] -mb-[6px]">
                     <h2
                       id={titleId}
-                      className={styles.title}
+                      className="m-0 text-[length:var(--text-base)] font-medium leading-[var(--leading-body)]"
                       tabIndex={-1}
                       data-autofocus
                     >
@@ -680,38 +686,47 @@ export const CookieConsent = forwardRef<
                     </h2>
                     <button
                       type="button"
-                      className={styles.iconButton}
+                      className="inline-grid size-[32px] flex-none cursor-pointer place-items-center -mr-[8px] rounded-[50%] border-0 bg-transparent p-0 text-[var(--text-secondary)] [-webkit-tap-highlight-color:transparent] transition-[color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)] active:bg-[var(--surface-muted)] active:text-[var(--foreground)] motion-reduce:transition-none"
                       aria-label={labels.close}
                       onClick={() => closePanel(true)}
                     >
                       <X size={16} strokeWidth={1.75} aria-hidden="true" />
                     </button>
                   </div>
-                  <p id={descriptionId} className={styles.description}>
+                  <p
+                    id={descriptionId}
+                    className="m-0 text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+                  >
                     {labels.preferencesDescription}
                     {policyLink ? <> {policyLink}</> : null}
                   </p>
-                  <ul className={styles.list}>
+                  <ul className="mx-[-6px] my-0 grid max-h-[var(--cookie-consent-list-max,min(46vh,300px))] list-none overflow-y-auto overscroll-contain p-0 [scrollbar-width:thin]">
                     {categories.map((category) => {
                       const switchId = `${uid}-${category.id}`,
                         hintId = `${switchId}-hint`
                       return (
-                        <li key={category.id} className={styles.row}>
-                          <div className={styles.rowText}>
+                        <li
+                          key={category.id}
+                          className="flex items-center justify-between gap-[var(--space-4)] border-t border-solid border-[color:var(--border-subtle)] px-[6px] py-[10px] first:border-t-0"
+                        >
+                          <div className="grid min-w-0 gap-[2px]">
                             <label
                               htmlFor={category.required ? undefined : switchId}
-                              className={styles.rowLabel}
+                              className="text-[length:var(--text-sm)] font-medium leading-[var(--leading-body)] text-[var(--foreground)] [&[for]]:cursor-pointer"
                             >
                               {category.label}
                             </label>
                             {category.description ? (
-                              <p id={hintId} className={styles.rowHint}>
+                              <p
+                                id={hintId}
+                                className="m-0 text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[var(--text-muted)]"
+                              >
                                 {category.description}
                               </p>
                             ) : null}
                           </div>
                           {category.required ? (
-                            <span className={styles.always}>
+                            <span className="flex-none text-[length:var(--text-xs)] whitespace-nowrap text-[var(--text-muted)]">
                               {labels.alwaysOn}
                             </span>
                           ) : (
@@ -733,7 +748,7 @@ export const CookieConsent = forwardRef<
                       )
                     })}
                   </ul>
-                  <div className={styles.panelActions}>
+                  <div className="grid grid-cols-[1fr_1fr] gap-[6px] border-t border-solid border-[color:var(--border-subtle)] pt-[var(--space-2)] @min-[340px]:grid-cols-[auto_auto_1fr]">
                     <Button
                       size="sm"
                       variant="secondary"
@@ -750,7 +765,7 @@ export const CookieConsent = forwardRef<
                     </Button>
                     <Button
                       size="sm"
-                      className={styles.save}
+                      className="col-span-full @min-[340px]:col-auto"
                       onClick={() => choose("save")}
                       aria-describedby={`${uid}-count`}
                     >
@@ -758,7 +773,7 @@ export const CookieConsent = forwardRef<
                     </Button>
                     <span
                       id={`${uid}-count`}
-                      className={styles.srOnly}
+                      className="absolute h-px w-px overflow-hidden [clip-path:inset(50%)] whitespace-nowrap"
                     >{`${allowedCount} of ${optional.length} optional categories allowed`}</span>
                   </div>
                 </Face>
@@ -773,11 +788,11 @@ export const CookieConsent = forwardRef<
                   reduced={reduced}
                   onSize={onSize}
                   focusOnMount={focusTarget === "chip"}
-                  className={styles.chipFace}
+                  className="h-[44px]"
                 >
                   <button
                     type="button"
-                    className={styles.chip}
+                    className="grid size-[44px] cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--foreground)] [-webkit-tap-highlight-color:transparent] transition-[background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)] motion-reduce:transition-none"
                     aria-label={labels.reopen}
                     aria-haspopup="dialog"
                     data-autofocus

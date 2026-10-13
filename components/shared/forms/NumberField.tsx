@@ -23,8 +23,8 @@ import {
   type PointerEvent,
   type Ref,
 } from "react"
-import { motionTokens } from "../lib/motion-tokens"
-import styles from "./number-field.module.css"
+import { cn } from "cn"
+import { motionTokens } from "@/lib/animation/motion-tokens"
 
 /** Text shown beside the number. A function receives the value, so a unit can follow it: `n => n === 1 ? " seat" : " seats"`. */
 export type NumberFieldAffix = string | ((value: number) => string)
@@ -237,7 +237,7 @@ function Glyph({
   })
   return (
     <motion.span
-      className={styles.glyph}
+      className="absolute inset-x-0 top-[var(--feather)] bottom-[var(--feather)] text-center"
       style={{ y, opacity, filter, visibility }}
     >
       {digit}
@@ -274,7 +274,7 @@ function Wheel({
   }, [digit, direction, instant, position, reduced])
   return (
     <>
-      <span className={styles.sizer}>0</span>
+      <span className="invisible">0</span>
       {DIGITS.map((item) => (
         <Glyph key={item} position={position} digit={item} />
       ))}
@@ -300,7 +300,11 @@ function Digits({
       {partsOf(value, format).map((part) => (
         <motion.span
           key={part.key}
-          className={"digit" in part ? styles.column : styles.symbol}
+          className={
+            "digit" in part
+              ? "relative -my-[var(--feather)] inline-block overflow-x-visible overflow-y-clip [mask-image:linear-gradient(to_bottom,transparent,#000_calc(var(--feather)_*_1.5),#000_calc(100%_-_var(--feather)_*_1.5),transparent)] [mask-clip:no-clip] [mask-repeat:repeat-x] py-[var(--feather)] [--feather:.2em]"
+              : "inline-block overflow-x-clip whitespace-pre"
+          }
           custom={direction}
           variants={variants}
           initial="enter"
@@ -335,7 +339,7 @@ function AffixText({
         {[...text].map((char, index) => (
           <motion.span
             key={`${index}:${char}`}
-            className={styles.char}
+            className="inline-block overflow-x-clip whitespace-pre"
             custom={direction}
             variants={reduced ? still : slot}
             initial="enter"
@@ -416,14 +420,20 @@ function WordSlot({ word, direction }: { word: string; direction: number }) {
     return () => observer.disconnect()
   }, [reduced, width])
   return (
-    <motion.span className={styles.wordSlot} style={{ width }}>
-      <span ref={sizerRef} className={styles.wordSizer}>
+    <motion.span
+      className="relative inline-block align-top whitespace-pre"
+      style={{ width }}
+    >
+      <span
+        ref={sizerRef}
+        className="invisible absolute top-0 left-0 whitespace-pre"
+      >
         {word}
       </span>
       <AnimatePresence initial={false} mode="popLayout" custom={direction}>
         <motion.span
           key={word}
-          className={styles.word}
+          className="inline-block whitespace-pre"
           custom={direction}
           variants={reduced ? wordFade : wordRise}
           initial="enter"
@@ -448,8 +458,10 @@ function MotionText({ text }: { text: string }) {
   // Spaces live between the slots, so a word that is still opening its width never runs into the next one.
   return (
     <>
-      <span className={styles.srOnly}>{text}</span>
-      <span className={styles.words} aria-hidden="true">
+      <span className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]">
+        {text}
+      </span>
+      <span className="relative block" aria-hidden="true">
         {words.map((word, index) => (
           <Fragment key={index}>
             {index > 0 && " "}
@@ -504,7 +516,7 @@ function MessageRow({
   }, [])
   return (
     <motion.span
-      className={styles.messageSlot}
+      className="block overflow-hidden"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height, opacity: 1 }}
       exit={{
@@ -556,7 +568,7 @@ function LimitNote({
         <motion.span
           key="limit"
           id={id}
-          className={styles.limit}
+          className="flex-none text-[length:var(--text-xs)] leading-[var(--leading-body)] font-medium tracking-[var(--tracking-body)] whitespace-nowrap text-[color:var(--nf-limit)] tabular-nums"
           initial={
             reduced
               ? { opacity: 0 }
@@ -626,7 +638,25 @@ function StepButton({
   return (
     <button
       type="button"
-      className={styles.step}
+      className={cn(
+        "grid size-[var(--nf-step)] shrink-0 grow-0 basis-[var(--nf-step)] cursor-pointer touch-manipulation place-items-center rounded-[calc(var(--radius-control)_-_var(--nf-inset)_-_1px)] border-0 bg-transparent p-0 text-[color:var(--text-secondary)] select-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [-webkit-user-select:none] [transition:background-color_var(--duration-fast)_var(--ease-standard),color_var(--duration-fast)_var(--ease-standard),opacity_var(--duration-standard)_var(--ease-standard)]",
+        "hover:not-disabled:not-aria-disabled:bg-[var(--surface-muted)] hover:not-disabled:not-aria-disabled:text-[color:var(--foreground)]",
+        "focus-visible:bg-[var(--surface-muted)] focus-visible:text-[color:var(--foreground)] focus-visible:outline-none",
+        "active:not-disabled:not-aria-disabled:bg-[color-mix(in_oklab,var(--foreground)_10%,var(--surface))] active:not-disabled:not-aria-disabled:text-[color:var(--foreground)] active:not-disabled:not-aria-disabled:[transition:background-color_60ms_linear,color_60ms_linear]",
+        "data-[pressed]:not-disabled:not-aria-disabled:bg-[color-mix(in_oklab,var(--foreground)_10%,var(--surface))] data-[pressed]:not-disabled:not-aria-disabled:text-[color:var(--foreground)] data-[pressed]:not-disabled:not-aria-disabled:[transition:background-color_60ms_linear,color_60ms_linear]",
+        "aria-disabled:cursor-not-allowed aria-disabled:opacity-[.32]",
+        "disabled:cursor-not-allowed disabled:opacity-[.35]",
+        "[&_svg]:[transition:transform_var(--duration-spring)_var(--ease-spring)]",
+        "active:not-disabled:not-aria-disabled:[&_svg]:[transform:scale(.82)] active:not-disabled:not-aria-disabled:[&_svg]:[transition:transform_90ms_var(--ease-standard)]",
+        "data-[pressed]:not-disabled:not-aria-disabled:[&_svg]:[transform:scale(.82)] data-[pressed]:not-disabled:not-aria-disabled:[&_svg]:[transition:transform_90ms_var(--ease-standard)]",
+        "motion-reduce:[transition:opacity_var(--duration-instant)_linear,border-color_var(--duration-instant)_linear,background-color_var(--duration-instant)_linear]",
+        "motion-reduce:[&_svg]:transform-none motion-reduce:[&_svg]:[transition:none]",
+        "motion-reduce:active:not-disabled:not-aria-disabled:[&_svg]:transform-none motion-reduce:data-[pressed]:not-disabled:not-aria-disabled:[&_svg]:transform-none",
+        toward < 0 &&
+          "group-data-[strain=min]/control:aria-disabled:text-[color:var(--nf-limit)] group-data-[strain=min]/control:aria-disabled:opacity-60 group-data-[strain=min]/control:aria-disabled:[transition:opacity_60ms_linear,color_60ms_linear]",
+        toward > 0 &&
+          "group-data-[strain=max]/control:aria-disabled:text-[color:var(--nf-limit)] group-data-[strain=max]/control:aria-disabled:opacity-60 group-data-[strain=max]/control:aria-disabled:[transition:opacity_60ms_linear,color_60ms_linear]"
+      )}
       disabled={disabled}
       aria-controls={controls}
       aria-label={`${toward > 0 ? "Increase" : "Decrease"} ${label}`}
@@ -644,7 +674,7 @@ function StepButton({
       }}
       onContextMenu={(event) => event.preventDefault()}
     >
-      <span ref={iconRef} className={styles.icon}>
+      <span ref={iconRef} className="grid place-items-center">
         <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
       </span>
     </button>
@@ -735,7 +765,6 @@ export function NumberField({
         minimumFractionDigits: minFraction,
         maximumFractionDigits: maxFraction,
         useGrouping: grouping,
-        numberingSystem: "latn",
       }),
     [locale, minFraction, maxFraction, grouping]
   )
@@ -1059,11 +1088,14 @@ export function NumberField({
       .join(" ") || undefined
 
   return (
-    <div className={styles.field} data-size={size}>
-      <div className={styles.head}>
+    <div
+      className="group grid min-w-0 [--nf-height:var(--control-height-md)] [--nf-inset:3px] [--nf-limit:color-mix(in_oklab,var(--warning)_72%,var(--foreground))] [--nf-step:34px] [--nf-text:var(--text-base)] [--nf-width:var(--number-field-width,_196px)] data-[size=lg]:[--nf-height:var(--control-height-lg)] data-[size=lg]:[--nf-inset:4px] data-[size=lg]:[--nf-step:40px] data-[size=lg]:[--nf-text:var(--text-lg)] data-[size=lg]:[--nf-width:var(--number-field-width,_228px)] data-[size=sm]:[--nf-height:var(--control-height-sm)] data-[size=sm]:[--nf-inset:3px] data-[size=sm]:[--nf-step:28px] data-[size=sm]:[--nf-text:var(--text-sm)] data-[size=sm]:[--nf-width:var(--number-field-width,_164px)] dark:[--nf-limit:color-mix(in_oklab,var(--warning)_88%,var(--foreground))]"
+      data-size={size}
+    >
+      <div className="mb-[var(--space-2)] flex w-[min(100%,_var(--nf-width))] items-baseline justify-between gap-[var(--space-3)]">
         <label
           htmlFor={inputId}
-          className={styles.label}
+          className="min-w-0 text-[length:var(--text-sm)] leading-[var(--leading-body)] font-medium tracking-[var(--tracking-body)] text-[color:var(--foreground)] group-data-[size=sm]:text-[length:var(--text-xs)] data-[scrub]:cursor-ew-resize data-[scrub]:touch-pan-y data-[scrub]:select-none data-[scrub]:[-webkit-user-select:none]"
           data-scrub={(scrub && !disabled) || undefined}
           onPointerDown={onScrubStart}
           onPointerMove={onScrubMove}
@@ -1082,7 +1114,7 @@ export function NumberField({
       </div>
       <div
         ref={controlRef}
-        className={styles.control}
+        className="group/control flex min-h-[var(--nf-height)] w-[min(100%,_var(--nf-width))] items-center gap-[2px] rounded-[var(--radius-control)] border border-[color:var(--border)] bg-[var(--surface)] p-[var(--nf-inset)] [transition:border-color_var(--duration-fast)_var(--ease-standard),background-color_var(--duration-standard)_var(--ease-standard),opacity_var(--duration-fast)_var(--ease-standard)] group-has-[[data-scrub]:hover]:border-[color:var(--border-strong)] hover:border-[color:var(--border-strong)] has-[input:focus]:border-[color:var(--foreground)] data-[disabled]:bg-[var(--surface-muted)] data-[disabled]:opacity-50 data-[scrubbing]:border-[color:var(--foreground)] data-[warn]:border-[color-mix(in_oklab,var(--warning)_55%,var(--border))] data-[warn]:bg-[color-mix(in_oklab,var(--warning)_5%,var(--surface))] data-[warn]:hover:border-[color-mix(in_oklab,var(--warning)_55%,var(--border))] data-[warn]:has-[input:focus]:border-[color-mix(in_oklab,var(--warning)_80%,var(--border))] motion-reduce:[transition:opacity_var(--duration-instant)_linear,border-color_var(--duration-instant)_linear,background-color_var(--duration-instant)_linear]"
         data-scrubbing={scrubbing || undefined}
         data-disabled={disabled || undefined}
         data-warn={outside ? (outside > 0 ? "max" : "min") : undefined}
@@ -1098,7 +1130,7 @@ export function NumberField({
           }}
         />
         <div
-          className={styles.valueWrap}
+          className="relative flex min-w-0 flex-1 cursor-text items-center justify-center self-stretch group-data-[disabled]/control:cursor-not-allowed"
           onMouseDown={(event) => {
             if (event.target !== inputRef.current) event.preventDefault()
           }}
@@ -1111,17 +1143,17 @@ export function NumberField({
         >
           <motion.span
             ref={groupRef}
-            className={styles.value}
+            className="inline-flex items-center text-[length:var(--nf-text)] leading-[var(--leading-body)] font-medium tracking-[var(--tracking-body)] whitespace-nowrap text-[color:var(--foreground)] tabular-nums [transition:color_var(--duration-standard)_var(--ease-standard)] motion-reduce:group-data-[strain]/control:text-[color:var(--nf-limit)] motion-reduce:group-data-[strain]/control:[transition:none]"
             style={{ x, y: bumpY }}
           >
             <AffixText
               text={affixText(prefix, shown)}
               direction={direction}
-              className={styles.affix}
+              className="inline-flex font-normal text-[color:var(--text-secondary)]"
             />
-            <span className={styles.number}>
+            <span className="relative inline-grid items-center">
               <span
-                className={styles.display}
+                className="inline-flex [grid-area:1/1] data-[hidden]:invisible data-[hidden]:absolute data-[hidden]:top-0 data-[hidden]:left-0"
                 data-hidden={editing || undefined}
                 aria-hidden="true"
               >
@@ -1133,14 +1165,17 @@ export function NumberField({
                 />
               </span>
               {editing && (
-                <span className={styles.mirror} aria-hidden="true">
+                <span
+                  className="whitespace-pre [grid-area:1/1]"
+                  aria-hidden="true"
+                >
                   {draft}
                 </span>
               )}
               <input
                 ref={inputRef}
                 id={inputId}
-                className={styles.input}
+                className="absolute top-0 left-0 z-[1] m-0 h-full w-[calc(100%_+_1em)] border-0 bg-transparent p-0 text-left leading-[inherit] tracking-[inherit] text-transparent [font-variant-numeric:inherit] caret-[var(--foreground)] outline-none [font:inherit] selection:bg-[color-mix(in_oklab,var(--foreground)_16%,transparent)] selection:text-transparent focus-visible:outline-none disabled:cursor-not-allowed"
                 type="text"
                 role="spinbutton"
                 inputMode={
@@ -1175,7 +1210,7 @@ export function NumberField({
             <AffixText
               text={affixText(suffix, shown)}
               direction={direction}
-              className={styles.affix}
+              className="inline-flex font-normal text-[color:var(--text-secondary)]"
             />
           </motion.span>
         </div>
@@ -1190,8 +1225,16 @@ export function NumberField({
           }}
         />
       </div>
-      <FieldMessage id={hintId} text={description} className={styles.hint} />
-      <span className={styles.srOnly} aria-live="polite" aria-atomic="true">
+      <FieldMessage
+        id={hintId}
+        text={description}
+        className="block pt-[var(--space-2)] text-[length:var(--text-xs)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[color:var(--text-muted)] tabular-nums"
+      />
+      <span
+        className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {announcement}
       </span>
     </div>
