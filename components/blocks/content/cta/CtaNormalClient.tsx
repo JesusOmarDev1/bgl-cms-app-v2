@@ -10,7 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import { setAttr } from "@/config/visual-editing"
+import { setAttr } from "@directus/visual-editing"
 import { CtaBlock } from "@/types/blocks/content/cta-block"
 import Link from "next/link"
 
@@ -42,31 +42,28 @@ export function CtaNormalClient({ data }: { data: CtaBlock }) {
       })}
       className="rounded-2xl bg-linear-to-t from-[#9e1717] via-[#b51b1b] to-red-600 px-4 py-12 backdrop-blur-md sm:px-6 sm:py-16 lg:px-8"
     >
-      <h2 className="text-4xl font-semibold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-        {data.title}
-      </h2>
+      <h2 className="font-semibold tracking-tight">{data.title}</h2>
       <SafeHtml content={data.excerpt || ""} />
-      {data.primary_button && (
+      {(data.primary_button && data.primary_url) ||
+      (data.secondary_button && data.secondary_url) ? (
         <div className="flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4 lg:mt-14 xl:mt-16 xl:gap-6">
-          {data.primary_button ||
-            (data.primary_url && (
-              <Link href={data.primary_url || ""}>
-                <Button variant="red" size="lg">
-                  <MaterialIcon name={data.primary_icon} size={20} />
-                  {data.primary_button}
-                </Button>
-              </Link>
-            ))}
-          {data.secondary_button ||
-            (data.secondary_url && (
-              <Link href={data.secondary_url || ""}>
-                <Button variant="glass" size="lg">
-                  {data.secondary_button}
-                </Button>
-              </Link>
-            ))}
+          {data.primary_button && data.primary_url ? (
+            <Link href={data.primary_url}>
+              <Button variant="red" size="lg">
+                <MaterialIcon name={data.primary_icon} size={20} />
+                {data.primary_button}
+              </Button>
+            </Link>
+          ) : null}
+          {data.secondary_button && data.secondary_url ? (
+            <Link href={data.secondary_url}>
+              <Button variant="glass" size="lg">
+                {data.secondary_button}
+              </Button>
+            </Link>
+          ) : null}
         </div>
-      )}
+      ) : null}
     </Box>
   )
 }

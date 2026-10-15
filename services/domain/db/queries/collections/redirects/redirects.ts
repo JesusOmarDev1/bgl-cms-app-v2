@@ -12,9 +12,14 @@ import { cacheLife, cacheTag } from "next/cache"
 export interface RedirectsQuery {
   limit?: number
   page?: number
+  origin?: string
 }
 
-async function fetchRedirects(limit: number, page: number) {
+async function fetchRedirects(
+  limit: number,
+  page: number,
+  origin: string | null
+) {
   "use cache"
   cacheTag("redirects")
   cacheLife("minutes")
@@ -24,6 +29,7 @@ async function fetchRedirects(limit: number, page: number) {
       limit,
       page,
       sort: ["-date_created"],
+      ...(origin === null ? {} : { filter: { origin: { _eq: origin } } }),
     } satisfies Query<Schema, RedirectsTypes>)
   )
 }
@@ -32,9 +38,9 @@ export async function getRedirectsQuery(
   query: RedirectsQuery,
   failedToFetchMessage: string
 ) {
-  const { limit = 10, page = 1 } = query
+  const { limit = 10, page = 1, origin = null } = query
   try {
-    return await fetchRedirects(limit, page)
+    return await fetchRedirects(limit, page, origin)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

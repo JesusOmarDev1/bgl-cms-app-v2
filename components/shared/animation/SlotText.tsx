@@ -225,16 +225,22 @@ function Reel({
       style={{ width }}
       data-exiting={isPresent ? undefined : ""}
     >
-      <span ref={sizer} className="pointer-events-none inline-block whitespace-pre invisible">
+      <span
+        ref={sizer}
+        className="pointer-events-none invisible inline-block whitespace-pre"
+      >
         {char === " " ? "\u00a0" : char}
       </span>
-      <span className="absolute inset-[-.22em_-.08em] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)] [mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)]">
+      <span className="absolute inset-[-.22em_-.08em] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)]">
         <motion.span
           className="absolute top-[calc(.22em_-_.225em)] right-[.08em] left-[.08em] flex flex-col items-center will-change-transform"
           style={{ transform: y, filter: blur }}
         >
           {reel.strip.map((cell, i) => (
-            <span key={i} className="box-border block h-[1.6em] pt-[.225em] leading-[1.15] whitespace-pre">
+            <span
+              key={i}
+              className="box-border block h-[1.6em] pt-[.225em] leading-[1.15] whitespace-pre"
+            >
               {cell === " " ? "\u00a0" : cell}
             </span>
           ))}

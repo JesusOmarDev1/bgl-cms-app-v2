@@ -10,10 +10,8 @@ import {
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { MapBlock } from "@/types/blocks/content/map-block"
-import { setAttr } from "@/config/visual-editing"
+import { setAttr } from "@directus/visual-editing"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-
-const MAP_HEIGHT = "400px"
 
 export default function MapViewerClient({ data }: { data: MapBlock | null }) {
   if (!data?.id || !data.url_embed) {
@@ -42,12 +40,11 @@ export default function MapViewerClient({ data }: { data: MapBlock | null }) {
     >
       <CardContent className="flex flex-col gap-4">
         <iframe
-          src={data.url_embed || ""}
+          src={data.url_embed}
           title={data.title || "Mapa"}
-          className="absolute inset-0 h-full w-full border-0"
+          className="aspect-video min-h-80 w-full border-0"
           allowFullScreen
           loading="lazy"
-          style={{ height: MAP_HEIGHT, width: "100%" }}
         />
       </CardContent>
       <CardFooter>

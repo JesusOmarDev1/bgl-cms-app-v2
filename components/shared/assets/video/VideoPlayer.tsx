@@ -256,7 +256,7 @@ export function VideoPlayer({
     <div
       ref={containerRef}
       className={cn(
-        "group w-end-full relative rounded-2xl bg-black",
+        "group w-end-full relative overflow-hidden rounded-2xl bg-black",
         className
       )}
     >

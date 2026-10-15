@@ -1,38 +1,55 @@
 "use client"
-import { MediaBlockTypeEnum } from "@/types/enums/media-block-type"
-import { Fragment } from "react/jsx-runtime"
-import ImageViewerClient from "./ImageViewerClient"
-import PdfViewerClient from "./PdfViewerClient"
-import AudioViewerClient from "./AudioViewerClient"
-import VideoViewerClient from "./VideoViewerClient"
-import MultipleFilesViewerClient from "./MultipleFilesViewerClient"
-import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
-import { MediaBlock } from "@/types/blocks/content/media-block"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
+import type { MediaBlock } from "@/types/blocks/content/media-block"
+import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import AudioViewerClient from "./AudioViewerClient"
+import ImageViewerClient from "./ImageViewerClient"
+import MultipleFilesViewerClient from "./MultipleFilesViewerClient"
+import PdfViewerClient from "./PdfViewerClient"
+import VideoViewerClient from "./VideoViewerClient"
 
-interface MediaClientProps {
-  data: DirectusFileTypes
-  block: MediaBlock
+function expandedFile(
+  value: string | DirectusFileTypes | null
+): DirectusFileTypes | null {
+  if (!value || typeof value === "string") return null
+  return value
 }
 
-export default function MediaClient({ data, block }: MediaClientProps) {
+function expandedFiles(files: MediaBlock["files"]): DirectusFileTypes[] {
+  const list: DirectusFileTypes[] = []
+  for (const row of files) {
+    if (typeof row === "number") continue
+    const file = expandedFile(row.directus_files_id)
+    if (file) list.push(file)
+  }
+  return list
+}
+
+function MediaByType({ data }: { data: MediaBlock }) {
+  switch (data.type) {
+    case "image":
+      return <ImageViewerClient data={expandedFile(data.image)} />
+    case "video":
+      return <VideoViewerClient data={expandedFile(data.video)} />
+    case "audio":
+      return <AudioViewerClient data={expandedFile(data.audio)} />
+    case "pdf":
+      return <PdfViewerClient data={expandedFile(data.file)} />
+    case "multiple":
+      return <MultipleFilesViewerClient data={expandedFiles(data.files)} />
+  }
+}
+
+export default function MediaClient({ data }: { data: MediaBlock }) {
   return (
     <Box display="flex" orientation="vertical" gap={2}>
-      <h3>{block.title}</h3>
+      <h3>{data.title}</h3>
       <SafeHtml
         className="text-sm text-muted-foreground"
-        content={block.excerpt || ""}
+        content={data.excerpt || ""}
       />
-      {MediaBlockTypeEnum.map((type) => (
-        <Fragment key={type}>
-          {type === "image" && <ImageViewerClient data={data} />}
-          {type === "video" && <VideoViewerClient data={data} />}
-          {type === "audio" && <AudioViewerClient data={data} />}
-          {type === "pdf" && <PdfViewerClient data={data} />}
-          {type === "multiple" && <MultipleFilesViewerClient data={[data]} />}
-        </Fragment>
-      ))}
+      <MediaByType data={data} />
     </Box>
   )
 }

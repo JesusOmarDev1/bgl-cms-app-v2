@@ -759,9 +759,12 @@ export function SignaturePad({
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
       >
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div
+          className="pointer-events-none absolute inset-0"
+          aria-hidden="true"
+        >
           <X
-            className="absolute top-[72%] left-[7%] text-[color:var(--text-muted)] [translate:0_calc(-100%-6px)]"
+            className="absolute top-[72%] left-[7%] [translate:0_calc(-100%-6px)] text-[color:var(--text-muted)]"
             size={14}
             strokeWidth={1.75}
           />
@@ -775,7 +778,7 @@ export function SignaturePad({
             {showHint && (
               <motion.span
                 key="hint"
-                className="absolute top-[72%] left-1/2 text-[length:var(--text-lg)] leading-[var(--leading-body)] whitespace-nowrap text-[color:var(--text-muted)] [translate:-50%_calc(-100%-8px)]"
+                className="absolute top-[72%] left-1/2 [translate:-50%_calc(-100%-8px)] text-[length:var(--text-lg)] leading-[var(--leading-body)] whitespace-nowrap text-[color:var(--text-muted)]"
                 initial={hintHidden}
                 animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                 exit={{
@@ -975,7 +978,7 @@ export function SignaturePad({
                       ? "failed"
                       : "idle"
                 }
-                className="inline-flex [grid-area:1/1] items-center justify-center gap-[6px]"
+                className="inline-flex items-center justify-center gap-[6px] [grid-area:1/1]"
                 initial={{
                   opacity: 0,
                   y: reduced ? 0 : 4,
@@ -1011,13 +1014,13 @@ export function SignaturePad({
       </div>
       <p
         id={`${uid}-keys`}
-        className="absolute h-px w-px overflow-hidden [clip-path:inset(50%)] whitespace-nowrap"
+        className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
       >
         Press Control or Command Z to undo, add Shift to redo, and Delete to
         clear.
       </p>
       <p
-        className="absolute h-px w-px overflow-hidden [clip-path:inset(50%)] whitespace-nowrap"
+        className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
         role="status"
         aria-live="polite"
       >

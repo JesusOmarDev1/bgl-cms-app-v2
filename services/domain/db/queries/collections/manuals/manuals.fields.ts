@@ -35,7 +35,15 @@ export const MANUALS_FIELDS = [
       "collection",
       {
         item: {
-          map_block: ["*"],
+          map_block: [
+            "id",
+            "sort",
+            "title",
+            "url_embed",
+            "excerpt",
+            "date_created",
+            "date_updated",
+          ],
           content_block: [
             "id",
             "sort",
@@ -50,7 +58,22 @@ export const MANUALS_FIELDS = [
               content: [
                 "id",
                 "collection",
-                { item: { content_column_block: ["*"] } },
+                {
+                  item: {
+                    content_column_block: [
+                      "id",
+                      "content",
+                      "sort",
+                      "title",
+                      "padding",
+                      "background_color",
+                      "padding_bottom",
+                      "padding_top",
+                      "date_created",
+                      "date_updated",
+                    ],
+                  },
+                },
               ],
             },
           ],
@@ -65,7 +88,7 @@ export const MANUALS_FIELDS = [
               questions: [
                 "id",
                 "collection",
-                { item: { faq_questions: ["*"] } },
+                { item: { faq_questions: ["id", "question", "answer"] } },
               ],
             },
           ],
@@ -102,7 +125,17 @@ export const MANUALS_FIELDS = [
               ],
             },
           ],
-          qr_code_block: ["*"],
+          qr_code_block: [
+            "id",
+            "sort",
+            "title",
+            "size",
+            "alignment",
+            "url",
+            "excerpt",
+            "date_created",
+            "date_updated",
+          ],
           media_block: [
             "id",
             "title",
@@ -151,3 +184,9 @@ export const MANUALS_FIELDS = [
     ],
   },
 ] as const satisfies NonNullable<Query<Schema, ManualsTypes>["fields"]>
+
+export const MANUALS_DEEP = {
+  body: {
+    _sort: ["sort"],
+  },
+} as const satisfies NonNullable<Query<Schema, ManualsTypes>["deep"]>

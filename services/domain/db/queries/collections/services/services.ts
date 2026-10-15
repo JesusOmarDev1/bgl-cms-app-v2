@@ -7,7 +7,7 @@ import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { ServicesTypes } from "@/types/collections/services"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-import { SERVICES_FIELDS } from "./services.fields"
+import { SERVICES_DEEP, SERVICES_FIELDS } from "./services.fields"
 import { cacheLife, cacheTag } from "next/cache"
 export interface ServicesQuery {
   status?: StatusType
@@ -22,6 +22,7 @@ async function fetchServices(status: StatusType, limit: number, page: number) {
   return directus.request(
     readItems("services", {
       fields: SERVICES_FIELDS,
+      deep: SERVICES_DEEP,
       limit,
       page,
       sort: ["-date_created"],
@@ -59,6 +60,7 @@ async function fetchServicesBySlug(
   return directus.request(
     readItems("services", {
       fields: SERVICES_FIELDS,
+      deep: SERVICES_DEEP,
       limit,
       page,
       sort: ["-date_created"],

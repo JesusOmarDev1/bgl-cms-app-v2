@@ -1,5 +1,4 @@
 "use client"
-import { useMemo } from "react"
 import { QRCode } from "@/components/shared/utility/QrCode"
 import { QrCodeBlock } from "@/types/blocks/content/qr-code-block"
 import {
@@ -11,19 +10,38 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
+import { Box } from "@/components/shared/content/Box"
+import { SafeHtml } from "@/components/shared/content/SafeHtml"
+import type { QrCodeBlockAlignment } from "@/types/enums/qr-code-block-alignment"
+import type { QrCodeBlockSize } from "@/types/enums/qr-code-block-size"
+
+function qrSize(size: QrCodeBlockSize): number {
+  switch (size) {
+    case "small":
+      return 100
+    case "medium":
+      return 200
+    case "big":
+      return 300
+    default:
+      return 200
+  }
+}
+
+function qrAlign(alignment: QrCodeBlockAlignment) {
+  switch (alignment) {
+    case "left":
+      return "start" as const
+    case "right":
+      return "end" as const
+    case "center":
+      return "center" as const
+    default:
+      return "center" as const
+  }
+}
 
 export default function QrCodeClient({ data }: { data: QrCodeBlock }) {
-  const size = useMemo(() => {
-    switch (data.size) {
-      case "small":
-        return 100
-      case "medium":
-        return 200
-      case "big":
-        return 300
-    }
-  }, [data.size])
-
   if (!data.url || !data.title) {
     return (
       <Empty>
@@ -41,5 +59,19 @@ export default function QrCodeClient({ data }: { data: QrCodeBlock }) {
       </Empty>
     )
   }
-  return <QRCode data={data.url} size={size} />
+
+  return (
+    <Box
+      align={qrAlign(data.alignment)}
+      display="flex"
+      gap={2}
+      orientation="vertical"
+    >
+      <h2>{data.title}</h2>
+      {data.excerpt ? (
+        <SafeHtml content={data.excerpt} preset="compact" />
+      ) : null}
+      <QRCode data={data.url} size={qrSize(data.size)} />
+    </Box>
+  )
 }

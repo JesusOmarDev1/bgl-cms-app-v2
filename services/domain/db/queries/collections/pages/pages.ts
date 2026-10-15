@@ -23,6 +23,7 @@ async function fetchPages(status: StatusType, limit: number, page: number) {
   return directus.request(
     readItems("pages", {
       fields: PAGES_FIELDS,
+      deep: { body: { _sort: ["sort"] } },
       limit,
       page,
       sort: ["-date_created"],
@@ -60,6 +61,7 @@ async function fetchPagesBySlug(
   return directus.request(
     readItems("pages", {
       fields: PAGES_FIELDS,
+      deep: { body: { _sort: ["sort"] } },
       limit,
       page,
       sort: ["-date_created"],

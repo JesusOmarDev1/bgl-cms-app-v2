@@ -7,7 +7,7 @@ import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { BlogPostsTypes } from "@/types/collections/blog-posts"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-import { BLOG_POSTS_FIELDS } from "./blog-posts.fields"
+import { BLOG_POSTS_DEEP, BLOG_POSTS_FIELDS } from "./blog-posts.fields"
 import { cacheLife, cacheTag } from "next/cache"
 
 export interface BlogPostsQuery {
@@ -23,6 +23,7 @@ async function fetchBlogPosts(status: StatusType, limit: number, page: number) {
   return directus.request(
     readItems("blog_posts", {
       fields: BLOG_POSTS_FIELDS,
+      deep: BLOG_POSTS_DEEP,
       limit,
       page,
       sort: ["-date_created"],
@@ -60,6 +61,7 @@ async function fetchBlogPostsBySlug(
   return directus.request(
     readItems("blog_posts", {
       fields: BLOG_POSTS_FIELDS,
+      deep: BLOG_POSTS_DEEP,
       limit,
       page,
       sort: ["-date_created"],

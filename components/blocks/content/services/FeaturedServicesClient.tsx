@@ -1,0 +1,94 @@
+import { setAttr } from "@directus/visual-editing"
+import { BlockHeading } from "@/components/blocks/BlockHeading"
+import {
+  directusFileId,
+  expandedJunctions,
+  isExpanded,
+  isPublishedStatus,
+} from "@/components/blocks/directus-relation"
+import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
+import { Box } from "@/components/shared/content/Box"
+import { BoxContainer } from "@/components/shared/content/BoxLayout"
+import { SafeHtml } from "@/components/shared/content/SafeHtml"
+import type { FeaturedServicesBlock } from "@/types/blocks/content/services/featured-services-block"
+import type { FeaturedServicesBlockServicesJunction } from "@/types/collections/junctions/featured-services-block-services"
+
+function servicesOf(services: FeaturedServicesBlock["services"]) {
+  const items: {
+    id: number
+    title: string
+    excerpt: string | null
+    src: string | null
+  }[] = []
+  for (const row of expandedJunctions<FeaturedServicesBlockServicesJunction>(
+    services
+  )) {
+    if (!isExpanded(row.services_id)) continue
+    if (!isPublishedStatus(row.services_id.status)) continue
+    const src = directusFileId(row.services_id.image)
+    if (!src && !row.services_id.title && !row.services_id.excerpt) continue
+    items.push({
+      id: row.id,
+      title: row.services_id.title,
+      excerpt: row.services_id.excerpt,
+      src,
+    })
+  }
+  return items
+}
+
+export function FeaturedServicesClient({
+  data,
+}: {
+  data: FeaturedServicesBlock
+}) {
+  const services = servicesOf(data.services)
+  if (!data.title && !data.excerpt && services.length === 0) return null
+
+  return (
+    <BoxContainer>
+      <Box
+        data-directus={setAttr({
+          collection: "featured_services_block",
+          item: data.id,
+          fields: "title,excerpt,services",
+          mode: "popover",
+        })}
+        display="flex"
+        gap={3}
+        orientation="vertical"
+        paddingBottom={3}
+        paddingTop={3}
+        render={(props) => <section {...props} />}
+      >
+        <BlockHeading excerpt={data.excerpt} title={data.title} />
+        {services.map((service) => (
+          <Box
+            key={service.id}
+            align="center"
+            cols={{ base: 1, md: 2 }}
+            display="grid"
+            gap={2}
+            render={(props) => <article {...props} />}
+          >
+            {service.src ? (
+              <DirectusImage
+                alt={service.title}
+                className="w-full rounded-xl"
+                sizing="contained"
+                src={service.src}
+                variant="detail"
+              />
+            ) : null}
+            <div>
+              {service.title ? <h3>{service.title}</h3> : null}
+              {service.excerpt ? (
+                <SafeHtml content={service.excerpt} preset="compact" />
+              ) : null}
+            </div>
+          </Box>
+        ))}
+      </Box>
+    </BoxContainer>
+  )
+}

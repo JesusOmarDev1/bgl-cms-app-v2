@@ -69,7 +69,7 @@ function InputComponent({
 }) {
   return (
     <Input
-      className={cn("h-10 rounded-s-none rounded-e-lg", className)}
+      className={cn("rounded-s-none rounded-e-lg", className)}
       aria-label="Teléfono"
       ref={ref}
       {...props}

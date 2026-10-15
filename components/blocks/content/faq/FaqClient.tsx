@@ -1,23 +1,75 @@
+"use client"
+
+import { useState, type ReactNode } from "react"
+import { setAttr } from "@directus/visual-editing"
+import {
+  expandedJunctions,
+  isExpanded,
+} from "@/components/blocks/directus-relation"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { BouncyAccordion } from "@/components/shared/utility/BouncyAccordion"
-import { FaqBlock } from "@/types/blocks/faq/faq-block"
-import type { FaqQuestions } from "@/types/blocks/faq/faq-questions"
-import { setAttr } from "@directus/visual-editing"
+import { Input } from "@/components/ui/input"
+import { fuzzySearch } from "@/config/search"
+import type { FaqBlock } from "@/types/blocks/faq/faq-block"
+import type { FaqBlockQuestionsJunction } from "@/types/collections/junctions/faq-block-questions"
 
-interface FaqClientProps {
-  data: {
-    id: FaqBlock["id"]
-    title: FaqBlock["title"]
-    excerpt: FaqBlock["excerpt"]
-    questions: {
-      id: number
-      item: Pick<FaqQuestions, "id" | "question" | "answer">
-    }[]
-  }
+type FaqItem = {
+  id: string
+  question: string
+  answer: string
+  text: string
 }
 
-export function FaqClient({ data }: FaqClientProps) {
+function plainText(html: string) {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+if (plainText("<p>Hola&nbsp;<b>mundo</b></p>") !== "Hola mundo") {
+  throw new Error("faq plain text self-check failed")
+}
+
+function faqItems(questions: FaqBlock["questions"]): FaqItem[] {
+  const items: FaqItem[] = []
+  for (const row of expandedJunctions<FaqBlockQuestionsJunction>(questions)) {
+    if (typeof row.item === "string" || !isExpanded(row.item)) continue
+    if (!row.item.question) continue
+    const answer = row.item.answer ?? ""
+    items.push({
+      id: String(row.id),
+      question: row.item.question,
+      answer,
+      text: plainText(answer),
+    })
+  }
+  return items
+}
+
+export function FaqClient({ data }: { data: FaqBlock }) {
+  const items = faqItems(data.questions)
+  const [query, setQuery] = useState("")
+  const visible = fuzzySearch(items, query, {
+    keys: ["question", "text"],
+  })
+  const accordionItems: {
+    id: string
+    title: string
+    description?: ReactNode
+  }[] = visible.map((item) => ({
+    id: item.id,
+    title: item.question,
+    description: item.answer ? (
+      <SafeHtml content={item.answer} preset="compact" />
+    ) : undefined,
+  }))
+
+  if (!data.title && !data.excerpt && items.length === 0) return null
+
   return (
     <Box
       data-directus={setAttr({
@@ -30,15 +82,20 @@ export function FaqClient({ data }: FaqClientProps) {
       orientation="vertical"
       gap={2}
     >
-      <h2>{data.title}</h2>
+      {data.title ? <h2>{data.title}</h2> : null}
       <SafeHtml content={data.excerpt} preset="compact" />
-      <BouncyAccordion
-        items={data.questions.map((row) => ({
-          id: String(row.id),
-          title: row.item.question,
-          description: <SafeHtml content={row.item.answer} preset="compact" />,
-        }))}
-      />
+      {items.length > 0 ? (
+        <Input
+          aria-label="Buscar preguntas"
+          placeholder="Buscar"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      ) : null}
+      {accordionItems.length > 0 ? (
+        <BouncyAccordion items={accordionItems} />
+      ) : null}
     </Box>
   )
 }

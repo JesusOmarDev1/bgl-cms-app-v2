@@ -17,6 +17,7 @@ import { InputTextAreaClient } from "@/components/blocks/content/form/fields/Inp
 import { InputTextClient } from "@/components/blocks/content/form/fields/InputTextClient"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Box } from "@/components/shared/content/Box"
+import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { Button } from "@/components/ui/button"
 import { FieldError, FieldGroup } from "@/components/ui/field"
@@ -219,74 +220,78 @@ export function FormView({
   })
 
   return (
-    <Box display="flex" orientation="vertical" gap={2}>
-      <FormHeading data={data} />
-      {submitted ? (
-        <p role="status">{t("success")}</p>
-      ) : (
-        <form
-          aria-labelledby={`${data.id}-title`}
-          className="flex w-full flex-col gap-4"
-          noValidate
-          onSubmit={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            void form.handleSubmit()
-          }}
-        >
-          <FieldGroup className="flex-row flex-wrap items-start gap-x-0 gap-y-5">
-            {rows.map((row) => (
-              <div
-                key={row.id}
-                className="box-border min-w-0 px-1"
-                style={{ width: `${row.item.width}%` }}
-              >
-                <form.Field name={row.item.identifier}>
-                  {(field) => (
-                    <FieldControl
-                      row={row}
-                      value={field.state.value}
-                      onChange={(next) => field.handleChange(next)}
-                      onBlur={field.handleBlur}
-                      errors={toFieldErrors(
-                        field.state.meta.errors,
-                        serverFieldErrors?.[row.item.identifier]
-                      )}
-                    />
-                  )}
-                </form.Field>
-              </div>
-            ))}
-          </FieldGroup>
-          {data.captcha && turnstileSiteKey ? (
-            <Turnstile
-              key={formMessage ?? "idle"}
-              siteKey={turnstileSiteKey}
-              options={{ theme: "dark", language: "es" }}
-              onSuccess={(token) => setCaptcha({ token, message: formMessage })}
-              onExpire={() => setCaptcha({ token: "", message: formMessage })}
-              onError={() => setCaptcha({ token: "", message: formMessage })}
-            />
-          ) : null}
-          {formMessage ? (
-            <FieldError errors={[{ message: formMessage }]} />
-          ) : null}
-          <Button
-            type="submit"
-            variant="default"
-            className="self-start"
-            isDisabled={isSubmitting}
-            aria-busy={isSubmitting}
+    <BoxContainer>
+      <Box display="flex" orientation="vertical" gap={2}>
+        <FormHeading data={data} />
+        {submitted ? (
+          <p role="status">{t("success")}</p>
+        ) : (
+          <form
+            aria-labelledby={`${data.id}-title`}
+            className="flex w-full flex-col gap-4"
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              void form.handleSubmit()
+            }}
           >
-            {isSubmitting ? (
-              <span aria-hidden className="size-5">
-                <BarsRotateDots />
-              </span>
+            <FieldGroup className="flex-row flex-wrap items-start gap-x-0 gap-y-5">
+              {rows.map((row) => (
+                <div
+                  key={row.id}
+                  className="box-border min-w-0 px-1"
+                  style={{ width: `${row.item.width}%` }}
+                >
+                  <form.Field name={row.item.identifier}>
+                    {(field) => (
+                      <FieldControl
+                        row={row}
+                        value={field.state.value}
+                        onChange={(next) => field.handleChange(next)}
+                        onBlur={field.handleBlur}
+                        errors={toFieldErrors(
+                          field.state.meta.errors,
+                          serverFieldErrors?.[row.item.identifier]
+                        )}
+                      />
+                    )}
+                  </form.Field>
+                </div>
+              ))}
+            </FieldGroup>
+            {data.captcha && turnstileSiteKey ? (
+              <Turnstile
+                key={formMessage ?? "idle"}
+                siteKey={turnstileSiteKey}
+                options={{ theme: "dark", language: "es" }}
+                onSuccess={(token) =>
+                  setCaptcha({ token, message: formMessage })
+                }
+                onExpire={() => setCaptcha({ token: "", message: formMessage })}
+                onError={() => setCaptcha({ token: "", message: formMessage })}
+              />
             ) : null}
-            {isSubmitting ? t("submitting") : t("submit")}
-          </Button>
-        </form>
-      )}
-    </Box>
+            {formMessage ? (
+              <FieldError errors={[{ message: formMessage }]} />
+            ) : null}
+            <Button
+              type="submit"
+              variant="default"
+              className="self-start"
+              isDisabled={isSubmitting}
+              aria-busy={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span aria-hidden className="size-5">
+                  <BarsRotateDots />
+                </span>
+              ) : null}
+              {isSubmitting ? t("submitting") : t("submit")}
+            </Button>
+          </form>
+        )}
+      </Box>
+    </BoxContainer>
   )
 }

@@ -18,6 +18,7 @@ export type ManualsBodyCollection =
 
 export interface ManualsBodyJunction {
   id: number
+  sort: number | null
   manuals_id: string | ManualsTypes
   collection: ManualsBodyCollection
   item:

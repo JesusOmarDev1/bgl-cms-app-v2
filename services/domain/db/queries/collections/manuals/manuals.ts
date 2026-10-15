@@ -7,7 +7,7 @@ import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { ManualsTypes } from "@/types/collections/manuals"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
-import { MANUALS_FIELDS } from "./manuals.fields"
+import { MANUALS_DEEP, MANUALS_FIELDS } from "./manuals.fields"
 import { cacheLife, cacheTag } from "next/cache"
 
 export interface ManualsQuery {
@@ -23,6 +23,7 @@ async function fetchManuals(status: StatusType, limit: number, page: number) {
   return directus.request(
     readItems("manuals", {
       fields: MANUALS_FIELDS,
+      deep: MANUALS_DEEP,
       limit,
       page,
       sort: ["-date_created"],
@@ -60,6 +61,7 @@ async function fetchManualsBySlug(
   return directus.request(
     readItems("manuals", {
       fields: MANUALS_FIELDS,
+      deep: MANUALS_DEEP,
       limit,
       page,
       sort: ["-date_created"],

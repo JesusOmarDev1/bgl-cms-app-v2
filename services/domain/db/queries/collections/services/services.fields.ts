@@ -48,11 +48,40 @@ export const SERVICES_FIELDS = [
               content: [
                 "id",
                 "collection",
-                { item: { content_column_block: ["*"] } },
+                {
+                  item: {
+                    content_column_block: [
+                      "id",
+                      "content",
+                      "sort",
+                      "title",
+                      "padding",
+                      "background_color",
+                      "padding_bottom",
+                      "padding_top",
+                      "date_created",
+                      "date_updated",
+                    ],
+                  },
+                },
               ],
             },
           ],
-          cta_block: ["*"],
+          cta_block: [
+            "id",
+            "title",
+            "excerpt",
+            "variant",
+            "primary_button",
+            "secondary_button",
+            "secondary_url",
+            "primary_url",
+            "primary_icon",
+            "secondary_icon",
+            "sort",
+            "date_created",
+            "date_updated",
+          ],
           hero_block: [
             "id",
             "title",
@@ -86,7 +115,17 @@ export const SERVICES_FIELDS = [
               ],
             },
           ],
-          qr_code_block: ["*"],
+          qr_code_block: [
+            "id",
+            "sort",
+            "title",
+            "size",
+            "alignment",
+            "url",
+            "excerpt",
+            "date_created",
+            "date_updated",
+          ],
           media_block: [
             "id",
             "title",
@@ -135,3 +174,9 @@ export const SERVICES_FIELDS = [
     ],
   },
 ] as const satisfies NonNullable<Query<Schema, ServicesTypes>["fields"]>
+
+export const SERVICES_DEEP = {
+  body: {
+    _sort: ["sort"],
+  },
+} as const satisfies NonNullable<Query<Schema, ServicesTypes>["deep"]>

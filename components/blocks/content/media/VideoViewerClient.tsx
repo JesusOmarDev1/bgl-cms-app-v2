@@ -43,7 +43,7 @@ export default function VideoViewerClient({
   }
 
   return (
-    <div className="max-w-7xl min-w-full rounded-2xl">
+    <div className="w-full max-w-7xl min-w-0 rounded-2xl">
       <VideoPlayer
         className={cn(className, "relative")}
         src={getAssetUrl(data?.id) || ""}

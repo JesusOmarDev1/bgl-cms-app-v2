@@ -261,13 +261,13 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
               role="radio"
               data-card={index}
               className={cn(
-                "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] select-none [-webkit-tap-highlight-color:transparent] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none",
-                "group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta'] group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto]",
-                "group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta'] group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px]",
+                "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] select-none [-webkit-tap-highlight-color:transparent] motion-reduce:transition-none",
+                "group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta']",
+                "group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px] group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta']",
                 checked &&
                   "bg-[color-mix(in_oklab,var(--control-on)_4%,var(--surface))]",
                 off && "cursor-not-allowed bg-[var(--surface-muted)]",
-                "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)]"
+                "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)]"
               )}
               aria-checked={checked}
               aria-disabled={off || undefined}
@@ -282,7 +282,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
             >
               <span
                 className={cn(
-                  "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] [grid-area:indicator] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] motion-reduce:transition-none group-data-[layout=grid]/radio:mt-px",
+                  "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [grid-area:indicator] group-data-[layout=grid]/radio:mt-px motion-reduce:transition-none",
                   checked &&
                     "border-[var(--control-on)] bg-[var(--control-on)]",
                   off && "border-[var(--border)]"
@@ -322,7 +322,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                 )}
               </span>
               {option.meta && (
-                <span className="[grid-area:meta] text-[var(--foreground)] tabular-nums whitespace-nowrap group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
+                <span className="whitespace-nowrap text-[var(--foreground)] tabular-nums [grid-area:meta] group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
                   {option.meta}
                 </span>
               )}

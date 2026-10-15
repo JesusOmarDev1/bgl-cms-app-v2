@@ -14,12 +14,6 @@ const ENABLE_VISUAL_EDITING = isEnvFlagEnabled(
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL! as string
 
-if (!ENABLE_VISUAL_EDITING || !DIRECTUS_URL) {
-  throw new Error(
-    "You must set visual editing flag and API credentials in the environment variables"
-  )
-}
-
 export function useVisualEditing() {
   const [visualEditing, setVisualEditing] = useState(false)
   const t = useTranslations("visual-editing")

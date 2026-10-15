@@ -36,6 +36,7 @@ export type PageBodyBlockCollection =
 
 export interface PagesBodyJunction {
   id: number
+  sort: number | null
   pages_id: string | PagesTypes
   collection: PageBodyBlockCollection
   item:

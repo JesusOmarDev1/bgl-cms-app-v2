@@ -18,6 +18,7 @@ export type BlogPostsBodyCollection =
 
 export interface BlogPostsBodyJunction {
   id: number
+  sort: number | null
   blog_posts_id: string | BlogPostsTypes
   collection: BlogPostsBodyCollection
   item:

@@ -16,6 +16,7 @@ export type ServicesBodyCollection =
 
 export interface ServicesBodyJunction {
   id: number
+  sort: number | null
   services_id: string | ServicesTypes
   collection: ServicesBodyCollection
   item:
