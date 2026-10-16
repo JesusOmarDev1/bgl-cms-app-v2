@@ -24,7 +24,6 @@ export function expandedJunctions<T extends object>(rows: unknown): T[] {
   return list
 }
 
-/** Missing status (field not selected) stays visible. A real non-published status does not. */
 export function isPublishedStatus(status: unknown): boolean {
   return typeof status !== "string" || status === "published"
 }

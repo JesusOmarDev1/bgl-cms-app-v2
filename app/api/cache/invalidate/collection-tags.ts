@@ -30,88 +30,41 @@ const queryTags = {
   whatsapp_button: ["whatsapp_button"],
 } as const
 
-type CacheTag = (typeof queryTags)[keyof typeof queryTags][number]
-
-const pagesTags = [
+const contentTags = [
   "pages",
   "pages_by_slug",
-] as const satisfies readonly CacheTag[]
-const servicesTags = [
   "services",
   "services_by_slug",
-] as const satisfies readonly CacheTag[]
-const manualsTags = [
   "manuals",
   "manuals_by_slug",
-] as const satisfies readonly CacheTag[]
-const blogPostTags = [
   "blog_posts",
   "blog_posts_by_slug",
-] as const satisfies readonly CacheTag[]
-
-function keyed(
-  tags: readonly CacheTag[],
-  collections: readonly string[]
-): Record<string, readonly CacheTag[]> {
-  return Object.fromEntries(
-    collections.map((collection) => [collection, tags] as const)
-  )
-}
-
-const embeddedAll: readonly CacheTag[] = [
-  ...pagesTags,
-  ...servicesTags,
-  ...manualsTags,
-  ...blogPostTags,
-]
-const pagesServicesPosts: readonly CacheTag[] = [
-  ...pagesTags,
-  ...servicesTags,
-  ...blogPostTags,
-]
-const pagesManualsPosts: readonly CacheTag[] = [
-  ...pagesTags,
-  ...manualsTags,
-  ...blogPostTags,
-]
-const pagesManuals: readonly CacheTag[] = [...pagesTags, ...manualsTags]
-
-export const collectionCacheTags: Record<string, readonly CacheTag[]> = {
-  ...queryTags,
-  ...keyed(embeddedAll, [
-    "carousel_block",
-    "carousel_items_block",
-    "content_block",
-    "content_column_block",
-    "hero_block",
-    "media_block",
-    "qr_code_block",
-  ]),
-  ...keyed(pagesServicesPosts, ["cta_block"]),
-  ...keyed(pagesManualsPosts, ["map_block"]),
-  ...keyed(pagesManuals, ["faq_block", "faq_questions"]),
-  ...keyed(pagesTags, [
-    "brands_block",
-    "checkbox_block",
-    "clients_block",
-    "date_block",
-    "division_services_block",
-    "email_block",
-    "featured_products_block",
-    "featured_services_block",
-    "form_block",
-    "logos_clients_block",
-    "number_block",
-    "phone_block",
-    "suppliers_block",
-    "text_area_block",
-    "text_block",
-  ]),
-}
+] as const
 
 export function tagsForCollection(
   collection: string
-): readonly CacheTag[] | undefined {
-  if (!Object.hasOwn(collectionCacheTags, collection)) return undefined
-  return collectionCacheTags[collection]
+): readonly string[] | undefined {
+  if (Object.hasOwn(queryTags, collection)) {
+    return queryTags[collection as keyof typeof queryTags]
+  }
+  if (collection.endsWith("_block") || collection === "faq_questions") {
+    return contentTags
+  }
+  return undefined
 }
+
+function assertCollectionTags(): void {
+  const pages = tagsForCollection("pages")
+  if (!pages?.includes("pages_by_slug") || !pages?.includes("pages_count")) {
+    throw new Error("collection tags self-check: pages")
+  }
+  const cta = tagsForCollection("cta_block")
+  if (!cta?.includes("manuals_by_slug") || cta?.includes("pages_count")) {
+    throw new Error("collection tags self-check: cta_block")
+  }
+  if (tagsForCollection("pages_body") !== undefined) {
+    throw new Error("collection tags self-check: pages_body")
+  }
+}
+
+assertCollectionTags()

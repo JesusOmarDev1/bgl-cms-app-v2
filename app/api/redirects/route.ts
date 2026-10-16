@@ -1,21 +1,13 @@
-import { getTranslations } from "next-intl/server"
-import { NextResponse } from "next/server"
 import { getRedirectsQuery } from "@/services/domain/db/queries/collections/redirects/redirects"
+
+const headers = { "Cache-Control": "no-store" }
 
 export async function GET(request: Request) {
   const origin = new URL(request.url).searchParams.get("origin")
-  if (!origin) {
-    return NextResponse.json([], {
-      headers: { "Cache-Control": "no-store" },
-    })
-  }
-
-  const t = await getTranslations("db.redirects")
+  if (!origin) return Response.json([], { headers })
   const rows = await getRedirectsQuery(
     { origin, limit: 1, page: 1 },
-    t("failed_to_fetch")
+    "Error al obtener las redirecciones."
   )
-  return NextResponse.json(rows, {
-    headers: { "Cache-Control": "no-store" },
-  })
+  return Response.json(rows, { headers })
 }

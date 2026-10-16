@@ -10,9 +10,9 @@ export function BlockHeading({
   if (!title && !excerpt) return null
 
   return (
-    <header className="flex flex-col gap-2">
+    <section className="flex flex-col gap-2">
       {title ? <h2>{title}</h2> : null}
       {excerpt ? <SafeHtml content={excerpt} preset="compact" /> : null}
-    </header>
+    </section>
   )
 }
