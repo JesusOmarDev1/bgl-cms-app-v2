@@ -1,10 +1,3 @@
-/**
- * Proposal only, after this route is verified and you approve it: keep the
- * health schedule; replace duplicated "Cache - ..." event flows with one
- * event flow and one shared POST; retire the old flows only after a
- * side-by-side check.
- */
-
 const queryTags = {
   blog_categories: ["blog_categories", "blog_categories_count"],
   blog_posts: ["blog_posts", "blog_posts_by_slug", "blog_posts_count"],
