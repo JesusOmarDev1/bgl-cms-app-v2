@@ -1,0 +1,26 @@
+---
+description: next-intl static locale es; catalogs only assembled in i18n/request.ts
+globs: i18n/**,app/**,components/**,services/**
+alwaysApply: false
+---
+
+# next-intl
+
+This app is single-locale. `getRequestConfig` uses `locale: "es"` with no cookie.
+
+Catalogs live at `i18n/<namespace>/es.json` and already wrap the namespace key. Spread them into `messages` (do not wrap again):
+
+```ts
+messages: {
+  ...(await import(`./email-validator/${locale}.json`)).default,
+}
+```
+
+Keep `<html lang="es-MX">`. Document language (`es-MX`) and next-intl locale (`es`) may differ.
+
+Do not import `@/i18n/**/*.json` outside `i18n/request.ts`.
+
+- Client components: `useTranslations("<namespace>")`
+- Server contexts: `await getTranslations("<namespace>")` from `next-intl/server`
+
+Query files do not import `next-intl` or call `getTranslations`. The repository calls `getTranslations` and passes the string into the query.

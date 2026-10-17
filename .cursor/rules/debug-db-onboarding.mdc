@@ -1,5 +1,6 @@
 ---
 description: Debug DB onboarding convention for scalable resources
+globs: services/domain/db/debug/**/*.ts
 alwaysApply: false
 ---
 

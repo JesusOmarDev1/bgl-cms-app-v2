@@ -12,13 +12,13 @@ The discriminator is the Directus field `collection`. There is no Payload `block
 
 `contact_block` is registered but is not on any body allowlist until Directus adds it.
 
-Body rows from pages, services, manuals, and blog posts all go through the same `RenderBlocks`. Do not add a second map. Do not sort rows in JS; queries already set `deep.body._sort: ["sort"]`.
+Only `components/page/BlockPage.tsx` renders body rows through `RenderBlocks`. Service, manual, and blog field trees stay in their queries. Do not add a second map. Do not sort rows in JS; queries already set `deep.body._sort: ["sort"]`.
 
 Optional fields and missing relations render nothing.
 
 `setAttr` comes from `@directus/visual-editing`, never from `config/visual-editing.ts`.
 
-A new block that fetches its own server data uses `Name/Name.tsx`, `NameClient.tsx`, and `NameSkeleton.tsx`. Do not import the server `Name.tsx` from a client file. Blocks that only render the row already loaded on the body query do not need that fetch wrapper.
+A new block that fetches its own server data uses `Name/Name.tsx`, `NameClient.tsx`, and `NameSkeleton.tsx`. Do not import the server `Name.tsx` from a `"use client"` file. HeaderNav and FooterNav stay flat files. Blocks that only render the row already loaded on the body query do not need that fetch wrapper.
 
 ## Add a block
 

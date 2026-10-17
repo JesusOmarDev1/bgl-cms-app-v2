@@ -1,48 +1,34 @@
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import type { FeaturedServicesBlock } from "@/types/blocks/content/services/featured-services-block"
-import type { FeaturedServicesBlockServicesJunction } from "@/types/collections/junctions/featured-services-block-services"
+import type { FeaturedServicesBlockQuery } from "@/services/domain/db/queries/blocks/featured-services-block/featured-services-block.fields"
 
-function servicesOf(services: FeaturedServicesBlock["services"]) {
-  const items: {
+export function FeaturedServicesClient({
+  data,
+}: {
+  data: FeaturedServicesBlockQuery
+}) {
+  const services: {
     id: number
     title: string
     excerpt: string | null
     src: string | null
   }[] = []
-  for (const row of expandedJunctions<FeaturedServicesBlockServicesJunction>(
-    services
-  )) {
-    if (!isExpanded(row.services_id)) continue
-    if (!isPublishedStatus(row.services_id.status)) continue
-    const src = directusFileId(row.services_id.image)
-    if (!src && !row.services_id.title && !row.services_id.excerpt) continue
-    items.push({
+  for (const row of data.services ?? []) {
+    const service = row.services_id
+    if (!service || service.status !== "published") continue
+    const src = service.image?.id || null
+    if (!src && !service.title && !service.excerpt) continue
+    services.push({
       id: row.id,
-      title: row.services_id.title,
-      excerpt: row.services_id.excerpt,
+      title: service.title,
+      excerpt: service.excerpt,
       src,
     })
   }
-  return items
-}
-
-export function FeaturedServicesClient({
-  data,
-}: {
-  data: FeaturedServicesBlock
-}) {
-  const services = servicesOf(data.services)
   if (!data.title && !data.excerpt && services.length === 0) return null
 
   return (

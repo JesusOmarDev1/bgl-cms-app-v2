@@ -12,14 +12,14 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { getAssetUrl } from "@/lib/directus/asset-url"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import { PdfIcon } from "@/assets/logos/docs/pdf"
 import { formatBytes } from "@/lib/formatting/format-bytes"
 
 export default function PdfViewerClient({
   data,
 }: {
-  data: DirectusFileTypes | null
+  data: DirectusFileQuery | null
 }) {
   if (!data?.id) {
     return (

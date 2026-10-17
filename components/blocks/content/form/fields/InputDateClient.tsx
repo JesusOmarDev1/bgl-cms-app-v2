@@ -8,10 +8,10 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { formatDateValue, parseDateString } from "@/lib/formatting/format-date"
-import { DateBlock } from "@/types/blocks/form/fields/date-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputDateClientProps {
-  data: DateBlock
+  data: Extract<ExpandedFormField, { collection: "date_block" }>["item"]
   value: string
   onChange: (value: string) => void
   onBlur: () => void

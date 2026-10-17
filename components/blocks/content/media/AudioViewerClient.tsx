@@ -12,7 +12,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { getAssetUrl } from "@/lib/directus/asset-url"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import { formatBytes } from "@/lib/formatting/format-bytes"
 import { Track } from "@/lib/audio/html-audio"
 import {
@@ -30,7 +30,7 @@ import { cn } from "cn"
 export default function AudioViewerClient({
   data,
 }: {
-  data: DirectusFileTypes | null
+  data: DirectusFileQuery | null
 }) {
   if (!data?.id) {
     return (

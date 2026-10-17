@@ -34,3 +34,5 @@ export default getRequestConfig(async () => ({
 Dynamic `params` / `searchParams`: keep the page/layout sync; await the promise inside a Suspense child.
 
 Do not use `export const instant = false` unless the user explicitly asks.
+
+If `pnpm build` reports `blocking-prerender-dynamic`, use `pnpm exec next build --debug-prerender` for file:line. Apply the bundled recipe in `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`.

@@ -1,9 +1,9 @@
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { contentPaddingToBox } from "@/lib/content/content-padding"
-import type { ContentColumnBlock } from "@/types/blocks/content/html/content-column-block"
+import type { ContentColumnQuery } from "@/services/domain/db/queries/blocks/content-column-block/content-column-block.fields"
 
-export function ContentColumnClient({ data }: { data: ContentColumnBlock }) {
+export function ContentColumnClient({ data }: { data: ContentColumnQuery }) {
   const background =
     typeof data.background_color === "string"
       ? data.background_color.trim()

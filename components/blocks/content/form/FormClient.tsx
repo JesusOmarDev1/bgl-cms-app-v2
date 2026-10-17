@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl"
 import { useAction } from "next-safe-action/hooks"
 import { FormView } from "@/components/blocks/content/form/FormView"
 import { submitForm } from "@/services/domain/server/form/submit-form"
-import type { FormBlock } from "@/types/blocks/form/form-block"
+import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 
-export function FormClient({ data }: { data: FormBlock }) {
+export function FormClient({ data }: { data: FormBlockQuery }) {
   const t = useTranslations("db.form_responses")
   const action = useAction(submitForm)
   const failure =

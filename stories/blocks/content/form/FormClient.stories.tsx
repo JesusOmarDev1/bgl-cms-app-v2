@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 
 import { FormView } from "@/components/blocks/content/form/FormView"
-import type { FormBlock } from "@/types/blocks/form/form-block"
+import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 
 const formId = "550e8400-e29b-41d4-a716-446655440000"
 
@@ -22,7 +22,6 @@ const fixture = {
     {
       id: 1,
       sort: 1,
-      form_block_id: formId,
       collection: "text_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440001",
@@ -39,7 +38,6 @@ const fixture = {
     {
       id: 2,
       sort: 2,
-      form_block_id: formId,
       collection: "email_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440002",
@@ -56,7 +54,6 @@ const fixture = {
     {
       id: 3,
       sort: 3,
-      form_block_id: formId,
       collection: "phone_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440003",
@@ -73,7 +70,6 @@ const fixture = {
     {
       id: 4,
       sort: 4,
-      form_block_id: formId,
       collection: "number_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440004",
@@ -92,7 +88,6 @@ const fixture = {
     {
       id: 5,
       sort: 5,
-      form_block_id: formId,
       collection: "date_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440005",
@@ -110,7 +105,6 @@ const fixture = {
     {
       id: 6,
       sort: 6,
-      form_block_id: formId,
       collection: "date_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440008",
@@ -128,7 +122,6 @@ const fixture = {
     {
       id: 7,
       sort: 7,
-      form_block_id: formId,
       collection: "text_area_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440006",
@@ -145,7 +138,6 @@ const fixture = {
     {
       id: 8,
       sort: 8,
-      form_block_id: formId,
       collection: "checkbox_block",
       item: {
         id: "550e8400-e29b-41d4-a716-446655440007",
@@ -160,7 +152,7 @@ const fixture = {
     },
   ],
   ...audit,
-} satisfies FormBlock
+} satisfies FormBlockQuery
 
 const meta = {
   title: "Blocks/Content/Form/FormClient",

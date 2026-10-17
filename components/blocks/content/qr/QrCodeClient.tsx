@@ -1,6 +1,6 @@
 "use client"
 import { QRCode } from "@/components/shared/utility/QrCode"
-import { QrCodeBlock } from "@/types/blocks/content/qr-code-block"
+import type { QrCodeBlockQuery } from "@/services/domain/db/queries/blocks/qr-code-block/qr-code-block.fields"
 import {
   Empty,
   EmptyContent,
@@ -41,7 +41,7 @@ function qrAlign(alignment: QrCodeBlockAlignment) {
   }
 }
 
-export default function QrCodeClient({ data }: { data: QrCodeBlock }) {
+export default function QrCodeClient({ data }: { data: QrCodeBlockQuery }) {
   if (!data.url || !data.title) {
     return (
       <Empty>

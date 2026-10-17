@@ -2,10 +2,10 @@
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { TextBlock } from "@/types/blocks/form/fields/text-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputTextClientProps {
-  data: TextBlock
+  data: Extract<ExpandedFormField, { collection: "text_block" }>["item"]
   value: string
   onChange: (value: string) => void
   onBlur: () => void

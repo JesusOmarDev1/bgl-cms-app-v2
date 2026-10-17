@@ -6,10 +6,10 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field"
-import { CheckboxBlock } from "@/types/blocks/form/fields/checkbox-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputCheckboxClientProps {
-  data: CheckboxBlock
+  data: Extract<ExpandedFormField, { collection: "checkbox_block" }>["item"]
   value: boolean
   onChange: (value: boolean) => void
   onBlur: () => void

@@ -26,7 +26,7 @@ import {
   expandedFormFields,
   type ExpandedFormField,
 } from "@/lib/validations/form-values"
-import type { FormBlock } from "@/types/blocks/form/form-block"
+import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 import type { FormResponseAnswer } from "@/types/collections/form-responses"
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
@@ -78,7 +78,7 @@ function toFieldErrors(
   return errors.length > 0 ? errors : undefined
 }
 
-function FormHeading({ data }: { data: FormBlock }) {
+function FormHeading({ data }: { data: FormBlockQuery }) {
   return (
     <>
       <h2 id={`${data.id}-title`} className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export function FormView({
   formMessage,
   serverFieldErrors,
 }: {
-  data: FormBlock
+  data: FormBlockQuery
   onSubmit: (values: FormResponseAnswer, captchaToken: string) => void
   isSubmitting?: boolean
   submitted?: boolean

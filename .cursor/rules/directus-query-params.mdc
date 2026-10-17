@@ -14,7 +14,7 @@ Always set `limit`. Never `limit: -1`. Do not mix `page` and `offset`. `page` st
 
 `deep` nested params use `_` (`_filter`, `_sort`, `_limit`). No `fields` or `deep` inside `deep`. `alias` cannot be relational (`author.name`) and is poorly typed with `deep` — do not rely on it.
 
-`json()` is not a filter — use `_json`. Counts: `aggregate()`, not improvised `count`. If using `*.*`, set `backlink: false`.
+Counts: `aggregate()`, not improvised `count`. If using `*.*`, set `backlink: false`.
 
 ```ts
 // BAD

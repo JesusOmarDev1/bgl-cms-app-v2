@@ -2,17 +2,12 @@
 
 import { useState, type ReactNode } from "react"
 import { setAttr } from "@directus/visual-editing"
-import {
-  expandedJunctions,
-  isExpanded,
-} from "@/components/blocks/directus-relation"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { BouncyAccordion } from "@/components/shared/utility/BouncyAccordion"
 import { Input } from "@/components/ui/input"
 import { fuzzySearch } from "@/config/search"
-import type { FaqBlock } from "@/types/blocks/faq/faq-block"
-import type { FaqBlockQuestionsJunction } from "@/types/collections/junctions/faq-block-questions"
+import type { FaqBlockQuery } from "@/services/domain/db/queries/blocks/faq-block/faq-block.fields"
 
 type FaqItem = {
   id: string
@@ -34,11 +29,10 @@ if (plainText("<p>Hola&nbsp;<b>mundo</b></p>") !== "Hola mundo") {
   throw new Error("faq plain text self-check failed")
 }
 
-function faqItems(questions: FaqBlock["questions"]): FaqItem[] {
+export function FaqClient({ data }: { data: FaqBlockQuery }) {
   const items: FaqItem[] = []
-  for (const row of expandedJunctions<FaqBlockQuestionsJunction>(questions)) {
-    if (typeof row.item === "string" || !isExpanded(row.item)) continue
-    if (!row.item.question) continue
+  for (const row of data.questions ?? []) {
+    if (!row.item?.question) continue
     const answer = row.item.answer ?? ""
     items.push({
       id: String(row.id),
@@ -47,11 +41,6 @@ function faqItems(questions: FaqBlock["questions"]): FaqItem[] {
       text: plainText(answer),
     })
   }
-  return items
-}
-
-export function FaqClient({ data }: { data: FaqBlock }) {
-  const items = faqItems(data.questions)
   const [query, setQuery] = useState("")
   const visible = fuzzySearch(items, query, {
     keys: ["question", "text"],

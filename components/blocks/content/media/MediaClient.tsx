@@ -1,47 +1,41 @@
 "use client"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import type { MediaBlock } from "@/types/blocks/content/media-block"
-import type { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
+import type { MediaBlockQuery } from "@/services/domain/db/queries/blocks/media-block/media-block.fields"
 import AudioViewerClient from "./AudioViewerClient"
 import ImageViewerClient from "./ImageViewerClient"
 import MultipleFilesViewerClient from "./MultipleFilesViewerClient"
 import PdfViewerClient from "./PdfViewerClient"
 import VideoViewerClient from "./VideoViewerClient"
 
-function expandedFile(
-  value: string | DirectusFileTypes | null
-): DirectusFileTypes | null {
-  if (!value || typeof value === "string") return null
-  return value
-}
-
-function expandedFiles(files: MediaBlock["files"]): DirectusFileTypes[] {
-  const list: DirectusFileTypes[] = []
-  for (const row of files) {
-    if (typeof row === "number") continue
-    const file = expandedFile(row.directus_files_id)
-    if (file) list.push(file)
+export default function MediaClient({ data }: { data: MediaBlockQuery }) {
+  const files: DirectusFileQuery[] = []
+  if (data.type === "multiple") {
+    for (const row of data.files ?? []) {
+      if (row.directus_files_id) files.push(row.directus_files_id)
+    }
   }
-  return list
-}
 
-function MediaByType({ data }: { data: MediaBlock }) {
+  let viewer
   switch (data.type) {
     case "image":
-      return <ImageViewerClient data={expandedFile(data.image)} />
+      viewer = <ImageViewerClient data={data.image} />
+      break
     case "video":
-      return <VideoViewerClient data={expandedFile(data.video)} />
+      viewer = <VideoViewerClient data={data.video} />
+      break
     case "audio":
-      return <AudioViewerClient data={expandedFile(data.audio)} />
+      viewer = <AudioViewerClient data={data.audio} />
+      break
     case "pdf":
-      return <PdfViewerClient data={expandedFile(data.file)} />
+      viewer = <PdfViewerClient data={data.file} />
+      break
     case "multiple":
-      return <MultipleFilesViewerClient data={expandedFiles(data.files)} />
+      viewer = <MultipleFilesViewerClient data={files} />
+      break
   }
-}
 
-export default function MediaClient({ data }: { data: MediaBlock }) {
   return (
     <Box display="flex" orientation="vertical" gap={2}>
       <h3>{data.title}</h3>
@@ -49,7 +43,7 @@ export default function MediaClient({ data }: { data: MediaBlock }) {
         className="text-sm text-muted-foreground"
         content={data.excerpt || ""}
       />
-      <MediaByType data={data} />
+      {viewer}
     </Box>
   )
 }

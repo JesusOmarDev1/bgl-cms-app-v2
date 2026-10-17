@@ -1,11 +1,5 @@
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -16,39 +10,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { FeaturedProductsBlock } from "@/types/blocks/content/featured-products-block"
-import type { FeaturedProductsBlockProductsJunction } from "@/types/collections/junctions/featured-products-block-products"
+import type { FeaturedProductsBlockQuery } from "@/services/domain/db/queries/blocks/featured-products-block/featured-products-block.fields"
 
-function productsOf(products: FeaturedProductsBlock["products"]) {
-  const items: {
+export function FeaturedProductsClient({
+  data,
+}: {
+  data: FeaturedProductsBlockQuery
+}) {
+  const products: {
     id: number
     title: string
     excerpt: string | null
     src: string | null
   }[] = []
-  for (const row of expandedJunctions<FeaturedProductsBlockProductsJunction>(
-    products
-  )) {
-    if (!isExpanded(row.products_id)) continue
-    if (!isPublishedStatus(row.products_id.status)) continue
-    const src = directusFileId(row.products_id.image)
-    if (!src && !row.products_id.title && !row.products_id.excerpt) continue
-    items.push({
+  for (const row of data.products ?? []) {
+    const product = row.products_id
+    if (!product || product.status !== "published") continue
+    const src = product.image?.id || null
+    if (!src && !product.title && !product.excerpt) continue
+    products.push({
       id: row.id,
-      title: row.products_id.title,
-      excerpt: row.products_id.excerpt,
+      title: product.title,
+      excerpt: product.excerpt,
       src,
     })
   }
-  return items
-}
-
-export function FeaturedProductsClient({
-  data,
-}: {
-  data: FeaturedProductsBlock
-}) {
-  const products = productsOf(data.products)
   if (!data.title && !data.excerpt && products.length === 0) return null
 
   return (

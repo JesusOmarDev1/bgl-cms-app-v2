@@ -1,40 +1,28 @@
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { Card } from "@/components/ui/card"
-import type { DivisionServicesBlock } from "@/types/blocks/content/services/division-services-block"
-import type { DivisionServicesBlockDivisionServicesJunction } from "@/types/collections/junctions/division-services-block-division-services"
-
-function divisionsOf(rows: DivisionServicesBlock["division_services"]) {
-  const items: { id: number; title: string; src: string | null }[] = []
-  for (const row of expandedJunctions<DivisionServicesBlockDivisionServicesJunction>(
-    rows
-  )) {
-    if (!isExpanded(row.division_services_id)) continue
-    const src = directusFileId(row.division_services_id.image)
-    if (!src && !row.division_services_id.title) continue
-    items.push({
-      id: row.id,
-      title: row.division_services_id.title,
-      src,
-    })
-  }
-  return items
-}
+import type { DivisionServicesBlockQuery } from "@/services/domain/db/queries/blocks/division-services-block/division-services-block.fields"
 
 export function DivisionServicesClient({
   data,
 }: {
-  data: DivisionServicesBlock
+  data: DivisionServicesBlockQuery
 }) {
-  const divisions = divisionsOf(data.division_services)
+  const divisions: { id: number; title: string; src: string | null }[] = []
+  for (const row of data.division_services ?? []) {
+    const division = row.division_services_id
+    if (!division) continue
+    const src = division.image?.id || null
+    if (!src && !division.title) continue
+    divisions.push({
+      id: row.id,
+      title: division.title,
+      src,
+    })
+  }
   if (!data.title && !data.excerpt && divisions.length === 0) return null
 
   return (

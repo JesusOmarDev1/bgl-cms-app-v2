@@ -1,45 +1,31 @@
 import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
-import type { LogosClientsBlock } from "@/types/blocks/content/logos-clients-block"
-import type { LogosClientsBlockClientsJunction } from "@/types/collections/junctions/logos-clients-block-clients"
+import type { LogosClientsBlockQuery } from "@/services/domain/db/queries/blocks/logos-clients-block/logos-clients-block.fields"
 
-function logosOf(clients: LogosClientsBlock["clients"]) {
+export function LogosClientsClient({ data }: { data: LogosClientsBlockQuery }) {
   const logos: {
     id: number
     src: string
     name: string
     website: string | null
   }[] = []
-  for (const row of expandedJunctions<LogosClientsBlockClientsJunction>(
-    clients
-  )) {
-    if (!isExpanded(row.clients_id)) continue
-    if (!isPublishedStatus(row.clients_id.status)) continue
-    if (row.clients_id.active === false) continue
-    const src = directusFileId(row.clients_id.logo)
+  for (const row of data.clients ?? []) {
+    const client = row.clients_id
+    if (!client || client.status !== "published") continue
+    if (client.active === false) continue
+    const src = client.logo?.id
     if (!src) continue
     logos.push({
       id: row.id,
       src,
-      name: row.clients_id.name,
-      website: row.clients_id.website,
+      name: client.name,
+      website: client.website,
     })
   }
-  return logos
-}
-
-export function LogosClientsClient({ data }: { data: LogosClientsBlock }) {
-  const logos = logosOf(data.clients)
   if (!data.title && !data.excerpt && logos.length === 0) return null
 
   return (

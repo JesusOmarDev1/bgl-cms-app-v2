@@ -9,11 +9,15 @@ import {
 } from "@/components/ui/empty"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { MapBlock } from "@/types/blocks/content/map-block"
+import type { MapBlockQuery } from "@/services/domain/db/queries/blocks/map-block/map-block.fields"
 import { setAttr } from "@directus/visual-editing"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 
-export default function MapViewerClient({ data }: { data: MapBlock | null }) {
+export default function MapViewerClient({
+  data,
+}: {
+  data: MapBlockQuery | null
+}) {
   if (!data?.id || !data.url_embed) {
     return (
       <Empty>

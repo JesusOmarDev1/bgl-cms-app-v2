@@ -1,6 +1,7 @@
 ---
 description: pnpm allowBuilds must be booleans, never stub strings
-alwaysApply: true
+globs: pnpm-workspace.yaml
+alwaysApply: false
 ---
 
 # pnpm allowBuilds
@@ -22,4 +23,3 @@ allowBuilds:
 - `@parcel/watcher` — `next dev` file watching
 - `sharp` and `unrs-resolver` stay `true`; `msw` stays `false`
 - Edit `pnpm-workspace.yaml`, then `pnpm i`. Do not use the interactive TUI `pnpm approve-builds`.
-- Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.

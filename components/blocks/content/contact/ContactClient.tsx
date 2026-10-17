@@ -3,51 +3,35 @@
 import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  expandedJunctions,
-  isExpanded,
-} from "@/components/blocks/directus-relation"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Box } from "@/components/shared/content/Box"
 import { CopyButton } from "@/components/shared/content/CopyButton"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { splitEmail } from "@/lib/formatting/split-email"
-import type { ContactBlock } from "@/types/blocks/content/contact-block"
-import type { ContactBlockEmailsJunction } from "@/types/collections/junctions/contact-block-emails"
-import type { ContactBlockPhonesJunction } from "@/types/collections/junctions/contact-block-phones"
+import type { ContactBlockQuery } from "@/services/domain/db/queries/blocks/contact-block/contact-block.fields"
 import { ContactPositionLabel } from "@/types/enums/contact-position"
 
-function phonesOf(phones: ContactBlock["phones"]) {
-  const rows: { id: number; phone: string; label: string | null }[] = []
-  for (const row of expandedJunctions<ContactBlockPhonesJunction>(phones)) {
-    if (!isExpanded(row.phones_id)) continue
-    if (!row.phones_id.phone) continue
-    rows.push({
+export function ContactClient({ data }: { data: ContactBlockQuery }) {
+  const phones: { id: number; phone: string; label: string | null }[] = []
+  for (const row of data.phones ?? []) {
+    if (!row.phones_id?.phone) continue
+    phones.push({
       id: row.id,
       phone: row.phones_id.phone,
       label: ContactPositionLabel[row.phones_id.position] ?? null,
     })
   }
-  return rows
-}
 
-function emailsOf(emails: ContactBlock["emails"]) {
-  const rows: { id: number; email: string; label: string | null }[] = []
-  for (const row of expandedJunctions<ContactBlockEmailsJunction>(emails)) {
-    if (!isExpanded(row.emails_id)) continue
-    if (!row.emails_id.email) continue
-    rows.push({
+  const emails: { id: number; email: string; label: string | null }[] = []
+  for (const row of data.emails ?? []) {
+    if (!row.emails_id?.email) continue
+    emails.push({
       id: row.id,
       email: row.emails_id.email,
       label: ContactPositionLabel[row.emails_id.position] ?? null,
     })
   }
-  return rows
-}
 
-export function ContactClient({ data }: { data: ContactBlock }) {
-  const phones = phonesOf(data.phones)
-  const emails = emailsOf(data.emails)
   if (
     !data.title &&
     !data.excerpt &&

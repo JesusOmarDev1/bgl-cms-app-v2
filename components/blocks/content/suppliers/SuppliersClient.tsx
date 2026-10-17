@@ -1,12 +1,6 @@
 import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -17,36 +11,28 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import type { SuppliersBlock } from "@/types/blocks/content/suppliers-block"
-import type { SuppliersBlockSuppliersJunction } from "@/types/collections/junctions/suppliers-block-suppliers"
+import type { SuppliersBlockQuery } from "@/services/domain/db/queries/blocks/suppliers-block/suppliers-block.fields"
 
-function logosOf(suppliers: SuppliersBlock["suppliers"]) {
+export function SuppliersClient({ data }: { data: SuppliersBlockQuery }) {
   const logos: {
     id: number
     src: string
     name: string
     website: string | null
   }[] = []
-  for (const row of expandedJunctions<SuppliersBlockSuppliersJunction>(
-    suppliers
-  )) {
-    if (!isExpanded(row.item)) continue
-    if (!isPublishedStatus(row.item.status)) continue
-    if (row.item.active === false) continue
-    const src = directusFileId(row.item.logo)
+  for (const row of data.suppliers ?? []) {
+    const supplier = row.item
+    if (!supplier || supplier.status !== "published") continue
+    if (supplier.active === false) continue
+    const src = supplier.logo?.id
     if (!src) continue
     logos.push({
       id: row.id,
       src,
-      name: row.item.name,
-      website: row.item.website,
+      name: supplier.name,
+      website: supplier.website,
     })
   }
-  return logos
-}
-
-export function SuppliersClient({ data }: { data: SuppliersBlock }) {
-  const logos = logosOf(data.suppliers)
   if (!data.title && !data.excerpt && logos.length === 0) return null
 
   return (

@@ -2,10 +2,10 @@
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { NumberBlock } from "@/types/blocks/form/fields/number-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputNumberClientProps {
-  data: NumberBlock
+  data: Extract<ExpandedFormField, { collection: "number_block" }>["item"]
   value: number | null
   onChange: (value: number | null) => void
   onBlur: () => void

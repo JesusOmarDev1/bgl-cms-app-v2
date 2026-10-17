@@ -2,10 +2,10 @@
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { PhoneInput } from "@/components/shared/forms/PhoneInput"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { PhoneBlock } from "@/types/blocks/form/fields/phone-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputPhoneClientProps {
-  data: PhoneBlock
+  data: Extract<ExpandedFormField, { collection: "phone_block" }>["item"]
   value: string
   onChange: (value: string) => void
   onBlur: () => void

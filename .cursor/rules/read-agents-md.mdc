@@ -10,3 +10,4 @@ Read `AGENTS.md` for setup and check commands.
 - Plan first. Do not edit until the plan is approved.
 - No `any`. No `@ts-ignore`.
 - Commit or push only when asked.
+- Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.

@@ -11,10 +11,10 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { setAttr } from "@directus/visual-editing"
-import { CtaBlock } from "@/types/blocks/content/cta-block"
+import type { CtaBlockQuery } from "@/services/domain/db/queries/blocks/cta-block/cta-block.fields"
 import Link from "next/link"
 
-export function CtaNormalClient({ data }: { data: CtaBlock }) {
+export function CtaNormalClient({ data }: { data: CtaBlockQuery }) {
   if (!data.id) {
     return (
       <Empty>

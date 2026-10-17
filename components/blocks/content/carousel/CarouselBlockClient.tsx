@@ -1,10 +1,5 @@
 import { setAttr } from "@directus/visual-editing"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-} from "@/components/blocks/directus-relation"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -15,23 +10,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import type { CarouselItemsBlock } from "@/types/blocks/carousel/carousel-items-block"
-import type { CarouselBlock } from "@/types/blocks/carousel/carousel-block"
-import type { CarouselBlockItemsJunction } from "@/types/collections/junctions/carousel-block-items"
+import type { CarouselBlockQuery } from "@/services/domain/db/queries/blocks/carousel-block/carousel-block.fields"
 
-function slidesOf(items: CarouselBlock["items"]): CarouselItemsBlock[] {
-  const slides: CarouselItemsBlock[] = []
-  for (const row of expandedJunctions<CarouselBlockItemsJunction>(items)) {
-    if (row.collection !== "carousel_items_block") continue
-    if (!isExpanded(row.item)) continue
-    if (!directusFileId(row.item.image)) continue
-    slides.push(row.item)
-  }
-  return slides
-}
-
-export function CarouselBlockClient({ data }: { data: CarouselBlock }) {
-  const slides = slidesOf(data.items)
+export function CarouselBlockClient({ data }: { data: CarouselBlockQuery }) {
+  const slides = (data.items ?? []).filter((row) => row.item?.image?.id)
   if (!data.title && !data.excerpt && slides.length === 0) return null
 
   return (
@@ -54,28 +36,24 @@ export function CarouselBlockClient({ data }: { data: CarouselBlock }) {
         {slides.length > 0 ? (
           <Carousel className="px-12">
             <CarouselContent>
-              {slides.map((slide) => {
-                const src = directusFileId(slide.image)
-                if (!src) return null
-                return (
-                  <CarouselItem key={slide.id}>
-                    <figure>
-                      <DirectusImage
-                        alt={slide.title || ""}
-                        className="w-full rounded-xl"
-                        sizing="contained"
-                        src={src}
-                        variant="hero"
-                      />
-                      {slide.title ? (
-                        <figcaption className="mt-2 text-sm text-muted-foreground">
-                          {slide.title}
-                        </figcaption>
-                      ) : null}
-                    </figure>
-                  </CarouselItem>
-                )
-              })}
+              {slides.map((row) => (
+                <CarouselItem key={row.item.id}>
+                  <figure>
+                    <DirectusImage
+                      alt={row.item.title || ""}
+                      className="w-full rounded-xl"
+                      sizing="contained"
+                      src={row.item.image?.id ?? ""}
+                      variant="hero"
+                    />
+                    {row.item.title ? (
+                      <figcaption className="mt-2 text-sm text-muted-foreground">
+                        {row.item.title}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                </CarouselItem>
+              ))}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />

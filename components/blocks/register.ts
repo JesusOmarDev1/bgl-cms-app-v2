@@ -33,13 +33,47 @@ import { FeaturedServicesClient } from "@/components/blocks/content/services/Fea
 import { FeaturedServicesSkeleton } from "@/components/blocks/content/services/FeaturedServicesSkeleton"
 import { SuppliersClient } from "@/components/blocks/content/suppliers/SuppliersClient"
 import { SuppliersSkeleton } from "@/components/blocks/content/suppliers/SuppliersSkeleton"
-import type {
-  BodyBlockData,
-  GlobalBodyBlockCollection,
-} from "@/types/collections/junctions/body-blocks"
+import type { BrandsBlockQuery } from "@/services/domain/db/queries/blocks/brands-block/brands-block.fields"
+import type { CarouselBlockQuery } from "@/services/domain/db/queries/blocks/carousel-block/carousel-block.fields"
+import type { ClientsBlockQuery } from "@/services/domain/db/queries/blocks/clients-block/clients-block.fields"
+import type { ContactBlockQuery } from "@/services/domain/db/queries/blocks/contact-block/contact-block.fields"
+import type { ContentBlockQuery } from "@/services/domain/db/queries/blocks/content-block/content-block.fields"
+import type { CtaBlockQuery } from "@/services/domain/db/queries/blocks/cta-block/cta-block.fields"
+import type { DivisionServicesBlockQuery } from "@/services/domain/db/queries/blocks/division-services-block/division-services-block.fields"
+import type { FaqBlockQuery } from "@/services/domain/db/queries/blocks/faq-block/faq-block.fields"
+import type { FeaturedProductsBlockQuery } from "@/services/domain/db/queries/blocks/featured-products-block/featured-products-block.fields"
+import type { FeaturedServicesBlockQuery } from "@/services/domain/db/queries/blocks/featured-services-block/featured-services-block.fields"
+import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
+import type { HeroBlockQuery } from "@/services/domain/db/queries/blocks/hero-block/hero-block.fields"
+import type { LogosClientsBlockQuery } from "@/services/domain/db/queries/blocks/logos-clients-block/logos-clients-block.fields"
+import type { MapBlockQuery } from "@/services/domain/db/queries/blocks/map-block/map-block.fields"
+import type { MediaBlockQuery } from "@/services/domain/db/queries/blocks/media-block/media-block.fields"
+import type { QrCodeBlockQuery } from "@/services/domain/db/queries/blocks/qr-code-block/qr-code-block.fields"
+import type { SuppliersBlockQuery } from "@/services/domain/db/queries/blocks/suppliers-block/suppliers-block.fields"
+import type { GlobalBodyBlockCollection } from "@/types/collections/junctions/body-blocks"
+
+type BodyBlockQueryByCollection = {
+  faq_block: FaqBlockQuery
+  map_block: MapBlockQuery
+  content_block: ContentBlockQuery
+  cta_block: CtaBlockQuery
+  form_block: FormBlockQuery
+  hero_block: HeroBlockQuery
+  qr_code_block: QrCodeBlockQuery
+  media_block: MediaBlockQuery
+  carousel_block: CarouselBlockQuery
+  clients_block: ClientsBlockQuery
+  suppliers_block: SuppliersBlockQuery
+  brands_block: BrandsBlockQuery
+  featured_services_block: FeaturedServicesBlockQuery
+  featured_products_block: FeaturedProductsBlockQuery
+  logos_clients_block: LogosClientsBlockQuery
+  division_services_block: DivisionServicesBlockQuery
+  contact_block: ContactBlockQuery
+}
 
 export type BlockRegistryEntry<K extends GlobalBodyBlockCollection> = {
-  Component: ComponentType<{ data: BodyBlockData<K> }>
+  Component: ComponentType<{ data: BodyBlockQueryByCollection[K] }>
   Skeleton: ComponentType
 }
 
@@ -47,7 +81,7 @@ export type BlockRegistry = {
   [K in GlobalBodyBlockCollection]: BlockRegistryEntry<K>
 }
 
-export const blockRegistry = {
+export const blockRegistry: BlockRegistry = {
   faq_block: { Component: FaqClient, Skeleton: FaqSkeleton },
   map_block: { Component: MapViewerClient, Skeleton: MapSkeleton },
   content_block: { Component: ContentBlockClient, Skeleton: ContentSkeleton },
@@ -83,4 +117,4 @@ export const blockRegistry = {
     Skeleton: DivisionServicesSkeleton,
   },
   contact_block: { Component: ContactClient, Skeleton: ContactSkeleton },
-} satisfies BlockRegistry
+}

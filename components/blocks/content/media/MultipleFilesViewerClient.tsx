@@ -1,13 +1,13 @@
 "use client"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import GenericViewerClient from "./GenericViewerClient"
 import { formatBytes } from "@/lib/formatting/format-bytes"
 
 export default function MultipleFilesViewerClient({
   data,
 }: {
-  data: DirectusFileTypes[] | null
+  data: DirectusFileQuery[] | null
 }) {
   return (
     <Card>

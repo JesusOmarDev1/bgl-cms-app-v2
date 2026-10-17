@@ -11,30 +11,11 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@/components/ui/empty"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
-import type { BrandsBlock } from "@/types/blocks/content/brands-block"
-import type { BrandsBlockBrandsJunction } from "@/types/collections/junctions/brands-block-brands"
+import type { BrandsBlockQuery } from "@/services/domain/db/queries/blocks/brands-block/brands-block.fields"
 import { setAttr } from "@directus/visual-editing"
 
-function brandLogos(brands: BrandsBlock["brands"]) {
-  const logos: { id: number; src: string; title: string }[] = []
-  for (const row of expandedJunctions<BrandsBlockBrandsJunction>(brands)) {
-    if (!isExpanded(row.brands_id)) continue
-    if (!isPublishedStatus(row.brands_id.status)) continue
-    const src = directusFileId(row.brands_id.logo)
-    if (!src) continue
-    logos.push({ id: row.id, src, title: row.brands_id.title })
-  }
-  return logos
-}
-
-export function CarouselBrandsClient({ data }: { data: BrandsBlock | null }) {
-  if (!data?.id) {
+export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
+  if (!data.id) {
     return (
       <Empty>
         <EmptyHeader>
@@ -50,7 +31,14 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlock | null }) {
     )
   }
 
-  const logos = brandLogos(data.brands)
+  const logos: { id: number; src: string; title: string }[] = []
+  for (const row of data.brands ?? []) {
+    const brand = row.brands_id
+    if (!brand || brand.status !== "published") continue
+    const src = brand.logo?.id
+    if (!src) continue
+    logos.push({ id: row.id, src, title: brand.title })
+  }
 
   return (
     <div className="h-fit w-full overflow-hidden">

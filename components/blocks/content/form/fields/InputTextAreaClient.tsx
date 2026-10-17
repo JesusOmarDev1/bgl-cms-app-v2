@@ -7,10 +7,10 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { TextAreaBlock } from "@/types/blocks/form/fields/text-area-block"
+import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputTextAreaClientProps {
-  data: TextAreaBlock
+  data: Extract<ExpandedFormField, { collection: "text_area_block" }>["item"]
   value: string
   onChange: (value: string) => void
   onBlur: () => void

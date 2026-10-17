@@ -8,13 +8,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
-import { DirectusFileTypes } from "@/types/shared/directus/directus-file"
+import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import { cn } from "cn"
 import { VideoPlayer } from "@/components/shared/assets/video/VideoPlayer"
 import { getAssetUrl } from "@/lib/directus/asset-url"
 
 interface VideoViewerClientProps {
-  data: DirectusFileTypes | null
+  data: DirectusFileQuery | null
   className?: string
   ambientBlur?: number
   ambientIntensity?: number

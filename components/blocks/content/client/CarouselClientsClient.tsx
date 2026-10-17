@@ -11,31 +11,11 @@ import {
   EmptyDescription,
   EmptyHeader,
 } from "@/components/ui/empty"
-import {
-  directusFileId,
-  expandedJunctions,
-  isExpanded,
-  isPublishedStatus,
-} from "@/components/blocks/directus-relation"
-import type { ClientsBlock } from "@/types/blocks/content/clients-block"
-import type { ClientsBlockClientsJunction } from "@/types/collections/junctions/clients-block-clients"
+import type { ClientsBlockQuery } from "@/services/domain/db/queries/blocks/clients-block/clients-block.fields"
 import { setAttr } from "@directus/visual-editing"
 
-function clientLogos(clients: ClientsBlock["clients"]) {
-  const logos: { id: number; src: string; name: string }[] = []
-  for (const row of expandedJunctions<ClientsBlockClientsJunction>(clients)) {
-    if (!isExpanded(row.item)) continue
-    if (!isPublishedStatus(row.item.status)) continue
-    if (row.item.active === false) continue
-    const src = directusFileId(row.item.logo)
-    if (!src) continue
-    logos.push({ id: row.id, src, name: row.item.name })
-  }
-  return logos
-}
-
-export function CarouselClientsClient({ data }: { data: ClientsBlock | null }) {
-  if (!data?.id) {
+export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
+  if (!data.id) {
     return (
       <Empty>
         <EmptyHeader>
@@ -53,7 +33,15 @@ export function CarouselClientsClient({ data }: { data: ClientsBlock | null }) {
     )
   }
 
-  const logos = clientLogos(data.clients)
+  const logos: { id: number; src: string; name: string }[] = []
+  for (const row of data.clients ?? []) {
+    const client = row.item
+    if (!client || client.status !== "published") continue
+    if (client.active === false) continue
+    const src = client.logo?.id
+    if (!src) continue
+    logos.push({ id: row.id, src, name: client.name })
+  }
 
   return (
     <div className="h-fit w-full overflow-hidden">

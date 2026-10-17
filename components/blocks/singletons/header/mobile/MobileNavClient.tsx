@@ -91,7 +91,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
             <Accordion className="w-full pb-4">
               {data.url_links?.map((link) => {
                 const item = link.item
-                if (item == null || typeof item === "string") return null
+                if (item == null) return null
 
                 if (item.type === "dropdown") {
                   return (

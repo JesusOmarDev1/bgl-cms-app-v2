@@ -3,7 +3,7 @@ import "server-only"
 import { readItem, type Query } from "@directus/sdk"
 import directus from "@/config/directus"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
-import { FORM_BLOCK_FIELDS } from "@/services/domain/db/queries/collections/pages/pages.fields"
+import { FORM_BLOCK_FIELDS } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 import type { FormBlock } from "@/types/blocks/form/form-block"
 import type { Schema } from "@/types/schema"
 
