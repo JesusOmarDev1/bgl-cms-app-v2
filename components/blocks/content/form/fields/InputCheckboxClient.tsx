@@ -35,13 +35,14 @@ export function InputCheckboxClient({
         isInvalid={invalid}
         onChange={onChange}
         onBlur={onBlur}
+        className={invalid ? "t-input is-error" : undefined}
       />
       <FieldContent>
         <FieldLabel htmlFor={data.identifier}>
           {data.label}{" "}
           {data.required ? <span className="text-red-500">*</span> : null}
         </FieldLabel>
-        <FieldError errors={errors} />
+        <FieldError className="t-error-msg" errors={errors} />
       </FieldContent>
     </Field>
   )

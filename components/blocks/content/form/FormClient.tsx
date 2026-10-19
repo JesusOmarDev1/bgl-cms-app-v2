@@ -1,10 +1,19 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useTranslations } from "next-intl"
 import { useAction } from "next-safe-action/hooks"
-import { FormView } from "@/components/blocks/content/form/FormView"
+import { FormSkeleton } from "@/components/blocks/content/form/FormSkeleton"
 import { submitForm } from "@/services/domain/server/form/submit-form"
 import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
+
+const FormView = dynamic(
+  () =>
+    import("@/components/blocks/content/form/FormView").then(
+      (mod) => mod.FormView
+    ),
+  { loading: () => <FormSkeleton /> }
+)
 
 export function FormClient({ data }: { data: FormBlockQuery }) {
   const t = useTranslations("db.form_responses")

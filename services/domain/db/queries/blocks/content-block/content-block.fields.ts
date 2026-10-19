@@ -9,6 +9,7 @@ export const CONTENT_BLOCK_FIELDS = [
   "title",
   "layout",
   "padding",
+  "padding_inline",
   "padding_top",
   "padding_bottom",
   "date_created",

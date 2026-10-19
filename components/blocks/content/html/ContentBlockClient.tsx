@@ -16,7 +16,7 @@ export function ContentBlockClient({ data }: { data: ContentBlockQuery }) {
       data-directus={setAttr({
         collection: "content_block",
         item: data.id,
-        fields: "title,layout,padding,padding_top,padding_bottom,content",
+        fields: "title,layout,padding,padding_inline,padding_top,padding_bottom,content",
         mode: "popover",
       })}
       display="flex"
@@ -24,10 +24,10 @@ export function ContentBlockClient({ data }: { data: ContentBlockQuery }) {
       orientation="vertical"
       padding={contentPaddingToBox(data.padding)}
       paddingBottom={contentPaddingToBox(data.padding_bottom)}
+      paddingInline={contentPaddingToBox(data.padding_inline)}
       paddingTop={contentPaddingToBox(data.padding_top)}
       render={(props) => <section {...props} />}
     >
-      <BlockHeading title={data.title} />
       {columns.length > 0 ? (
         <Box
           cols={count === 1 ? 1 : { base: 1, md: count }}
@@ -43,5 +43,5 @@ export function ContentBlockClient({ data }: { data: ContentBlockQuery }) {
   )
 
   if (data.padding === "full_width") return section
-  return <BoxContainer>{section}</BoxContainer>
+  return <BoxContainer paddingInline={0}>{section}</BoxContainer>
 }

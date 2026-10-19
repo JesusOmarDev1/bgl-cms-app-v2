@@ -24,7 +24,7 @@ import {
   type Ref,
 } from "react"
 import { cn } from "cn"
-import { motionTokens } from "@/lib/animation/motion-tokens"
+import { motionTokens } from "@/lib/animation/motion/motion-tokens"
 
 /** Text shown beside the number. A function receives the value, so a unit can follow it: `n => n === 1 ? " seat" : " seats"`. */
 export type NumberFieldAffix = string | ((value: number) => string)

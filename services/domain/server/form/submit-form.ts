@@ -4,10 +4,7 @@ import { getTranslations } from "next-intl/server"
 import * as v from "valibot"
 import { actionClient } from "@/lib/server/safe-action"
 import { verifyTurnstile } from "@/lib/security/turnstile"
-import {
-  buildFormValuesSchema,
-  expandedFormFields,
-} from "@/lib/validations/form-values"
+import { buildFormValuesSchema } from "@/lib/validations/form-values"
 import { UUID_REGEX } from "@/lib/validations/uuid"
 import { getPublishedFormBlockRepository } from "@/services/domain/db/repositories/collections/form-block"
 import { createFormResponseRepository } from "@/services/domain/db/repositories/collections/form-responses"
@@ -59,12 +56,26 @@ export const submitForm = actionClient
       return { ok: false, message: t("captcha_failed") }
     }
 
-    const fields = expandedFormFields(form.fields)
+    const fields = form.fields
     if (fields.length === 0) {
       return { ok: false, message: t("not_found") }
     }
 
-    const parsed = v.safeParse(buildFormValuesSchema(fields), values)
+    const parsed = v.safeParse(
+      buildFormValuesSchema(fields, {
+        required: t("required"),
+        maxLength: t("max_length", { max: 255 }),
+        email: t("email"),
+        phone: t("phone"),
+        date: t("date"),
+        datetime: t("datetime"),
+        number: t("number"),
+        checkbox: t("checkbox"),
+        minValue: (min) => t("min_value", { min }),
+        maxValue: (max) => t("max_value", { max }),
+      }),
+      values
+    )
     if (!parsed.success) {
       return {
         ok: false,

@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/command"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "cn"
 
 type PhoneInputProps = Omit<
@@ -92,7 +91,6 @@ const CountrySelect = ({
   options: countryList,
   onChange,
 }: CountrySelectProps) => {
-  const scrollAreaRef = React.useRef<HTMLDivElement>(null)
   const [searchValue, setSearchValue] = React.useState("")
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -131,38 +129,33 @@ const CountrySelect = ({
             value={searchValue}
             onChange={(e) => {
               const value = e.target.value
+              const menu = e.currentTarget
+                .closest("[data-slot=command]")
+                ?.querySelector("[data-slot=command-list]")
               setSearchValue(value)
-              setTimeout(() => {
-                if (scrollAreaRef.current) {
-                  const viewportElement = scrollAreaRef.current.querySelector(
-                    "[data-radix-scroll-area-viewport]"
-                  )
-                  if (viewportElement) {
-                    viewportElement.scrollTop = 0
-                  }
-                }
-              }, 0)
+              if (menu instanceof HTMLElement) menu.scrollTop = 0
             }}
             placeholder="Buscar pais..."
           />
-          <CommandList>
-            <ScrollArea ref={scrollAreaRef} className="h-72">
+          <CommandList
+            renderEmptyState={() => (
               <CommandEmpty>No hay resultados.</CommandEmpty>
-              <CommandGroup>
-                {countryList.map(({ value, label }) =>
-                  value ? (
-                    <CountrySelectOption
-                      key={value}
-                      country={value}
-                      countryName={label}
-                      selectedCountry={selectedCountry}
-                      onChange={onChange}
-                      onSelectComplete={() => setIsOpen(false)}
-                    />
-                  ) : null
-                )}
-              </CommandGroup>
-            </ScrollArea>
+            )}
+          >
+            <CommandGroup>
+              {countryList.map(({ value, label }) =>
+                value ? (
+                  <CountrySelectOption
+                    key={value}
+                    country={value}
+                    countryName={label}
+                    selectedCountry={selectedCountry}
+                    onChange={onChange}
+                    onSelectComplete={() => setIsOpen(false)}
+                  />
+                ) : null
+              )}
+            </CommandGroup>
           </CommandList>
         </Command>
       </Popover>
@@ -189,13 +182,18 @@ const CountrySelectOption = ({
   }
 
   return (
-    <CommandItem className="gap-2 text-muted-foreground" onClick={handleSelect}>
+    <CommandItem
+      id={country}
+      textValue={countryName}
+      className="gap-2 text-muted-foreground"
+      onAction={handleSelect}
+    >
       <FlagComponent country={country} countryName={countryName} />
       <span className="flex-1 text-sm">{countryName}</span>
-      <span className="text-sm dark:text-black">{`+${RPNInput.getCountryCallingCode(country)}`}</span>
+      <span className="text-sm">{`+${RPNInput.getCountryCallingCode(country)}`}</span>
       <MaterialIcon
         name="check_circle"
-        className={`ml-auto ${country === selectedCountry ? "opacity-100" : "opacity-0"}`}
+        className={`ml-auto text-primary ${country === selectedCountry ? "opacity-100" : "opacity-0"}`}
       />
     </CommandItem>
   )

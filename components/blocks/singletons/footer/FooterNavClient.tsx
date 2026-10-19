@@ -81,7 +81,7 @@ function FooterNavLink({
       className="flex items-center gap-2 text-white/80 hover:text-white"
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
-      <MaterialIcon name={icon ?? ""} className="text-muted-foreground" />
+      <MaterialIcon name={icon ?? ""} />
       {title}
     </Link>
   )
@@ -288,31 +288,19 @@ export function FooterNavClient({
             <div className="flex-1">
               <div className="flex flex-col flex-wrap gap-3 lg:flex-row lg:gap-10">
                 <div className="flex items-center gap-2">
-                  <MaterialIcon
-                    name="schedule"
-                    size={18}
-                    className="text-muted-foreground"
-                  />
+                  <MaterialIcon name="schedule" size={18} />
                   <span className="font-medium text-white/80 hover:text-white lg:text-xl">
                     Lunes a Viernes: 8:00 - 17:00
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MaterialIcon
-                    name="schedule"
-                    size={18}
-                    className="text-muted-foreground"
-                  />
+                  <MaterialIcon name="schedule" size={18} />
                   <span className="font-medium text-white/80 hover:text-white lg:text-xl">
                     Sábado: 8:00 - 13:00
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MaterialIcon
-                    name="schedule"
-                    size={18}
-                    className="text-muted-foreground"
-                  />
+                  <MaterialIcon name="schedule" size={18} />
                   <span className="font-medium text-white/80 hover:text-white lg:text-xl">
                     Domingo: Cerrado
                   </span>
@@ -399,7 +387,6 @@ export function FooterNavClient({
             </div>
           )}
 
-          <Separator className="mt-0.5 mb-4" orientation="horizontal" />
           <div className="flex flex-col items-center gap-4">
             <FooterCopyright />
             <FooterCompanyLetters />

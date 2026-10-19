@@ -72,10 +72,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
         <div className="flex h-full min-h-0 flex-col">
           <SheetHeader className="shrink-0 border-b border-border p-4 pe-12">
             <div className="flex items-center gap-2">
-              <MaterialIcon
-                name="page_menu_ios"
-                className="text-muted-foreground"
-              />
+              <MaterialIcon name="page_menu_ios" />
               <SheetTitle className="text-xl font-medium uppercase">
                 Menú de navegación
               </SheetTitle>
@@ -98,10 +95,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                     <AccordionItem key={link.id} id={String(link.id)}>
                       <AccordionTrigger className="flex items-center px-2.5 text-base hover:bg-muted hover:text-foreground hover:no-underline">
                         <span className="flex items-center gap-2">
-                          <MaterialIcon
-                            className="text-muted-foreground"
-                            name={item.icon ?? ""}
-                          />
+                          <MaterialIcon name={item.icon ?? ""} />
                           {item.title}
                         </span>
                       </AccordionTrigger>
@@ -117,7 +111,6 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                               className="flex items-center gap-2 rounded-lg px-2.5 py-2.5 text-sm text-foreground no-underline! hover:bg-muted"
                             >
                               <MaterialIcon
-                                className="text-muted-foreground"
                                 name={sub.sub_links_id.icon ?? ""}
                               />
                               {sub.sub_links_id.title}
@@ -140,10 +133,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                     onClick={close}
                     className="flex items-center gap-2 rounded-lg px-2.5 py-2.5 text-base font-medium text-foreground no-underline hover:bg-muted"
                   >
-                    <MaterialIcon
-                      className="text-muted-foreground"
-                      name={item.icon ?? ""}
-                    />
+                    <MaterialIcon name={item.icon ?? ""} />
                     {item.title}
                   </Link>
                 )
@@ -151,10 +141,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
               <AccordionItem id="legal">
                 <AccordionTrigger className="flex items-center px-2.5 text-base hover:bg-muted hover:text-foreground hover:no-underline">
                   <span className="flex items-center gap-2">
-                    <MaterialIcon
-                      className="text-muted-foreground"
-                      name="cases"
-                    />
+                    <MaterialIcon name="cases" />
                     Legal
                   </span>
                 </AccordionTrigger>
@@ -169,10 +156,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                         onClick={close}
                         className="flex items-center gap-2 rounded-lg px-2.5 py-2.5 text-sm text-foreground no-underline! hover:bg-muted"
                       >
-                        <MaterialIcon
-                          className="text-muted-foreground"
-                          name={link.icon ?? ""}
-                        />
+                        <MaterialIcon name={link.icon ?? ""} />
                         {link.title}
                       </Link>
                     )

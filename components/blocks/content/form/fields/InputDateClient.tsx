@@ -51,6 +51,7 @@ export function InputDateClient({
           value={value}
           onBlur={onBlur}
           onChange={(event) => onChange(event.target.value)}
+          className={invalid ? "t-input is-error" : undefined}
         />
       ) : (
         <DatePicker
@@ -67,11 +68,12 @@ export function InputDateClient({
             placeholder="Selecciona una fecha"
             locale="es-ES"
             onBlur={onBlur}
+            className={invalid ? "t-input is-error" : undefined}
           />
           <DatePickerContent />
         </DatePicker>
       )}
-      <FieldError errors={errors} />
+      <FieldError className="t-error-msg" errors={errors} />
     </Field>
   )
 }

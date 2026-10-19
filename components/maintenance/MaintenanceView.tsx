@@ -45,7 +45,7 @@ export function MaintenanceView({
             />
           </CardContent>
           <CardFooter className="flex items-center gap-2 px-7">
-            <MaterialIcon name="build" className="text-muted-foreground" />
+            <MaterialIcon name="build" />
             <p className="text-muted-foreground">{helperText}</p>
           </CardFooter>
         </Card>

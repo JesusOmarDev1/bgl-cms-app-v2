@@ -8,6 +8,7 @@ import meilisearch from "@/config/meilisearch"
 import { searchLimiter } from "@/config/rate-limiter"
 import { actionClient } from "@/lib/server/safe-action"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
+import { sanitizeHtmlFields } from "@/lib/formatting/sanitize"
 import { TEXT_REGEX } from "@/lib/validations/text"
 
 const searchSchema = v.object({
@@ -61,7 +62,7 @@ export const searchAction = actionClient
           ],
         })
 
-      return results.hits
+      return results.hits.map((hit) => sanitizeHtmlFields(hit))
     } catch (error) {
       console.error(error)
       throw new Error(t("unknown_error"), { cause: error })

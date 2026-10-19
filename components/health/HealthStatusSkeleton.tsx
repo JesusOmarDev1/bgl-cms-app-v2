@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 export function HealthStatusSkeleton() {
   return (
-    <Card className="w-full max-w-xl" aria-hidden="true">
+    <Card className="w-full max-w-7xl" aria-hidden="true">
       <CardHeader>
         <Skeleton className="h-5 w-40" />
       </CardHeader>

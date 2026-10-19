@@ -837,10 +837,7 @@ function renderTrackMedia(
     </Avatar>
   ) : (
     <div className="flex size-10 items-center justify-center rounded-full bg-muted">
-      <MaterialIcon
-        className="size-4 text-muted-foreground"
-        name="music_note"
-      />
+      <MaterialIcon className="size-4" name="music_note" />
     </div>
   )
 

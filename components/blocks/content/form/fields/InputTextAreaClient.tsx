@@ -32,7 +32,7 @@ export function InputTextAreaClient({
         {data.label}{" "}
         {data.required ? <span className="text-red-500">*</span> : null}
       </FieldLabel>
-      <InputGroup>
+      <InputGroup className={invalid ? "t-input is-error" : undefined}>
         <InputGroupTextarea
           id={data.identifier}
           name={data.identifier}
@@ -42,7 +42,7 @@ export function InputTextAreaClient({
           placeholder={`Ingresa tu ${data.label}`}
           rows={4}
           aria-invalid={invalid || undefined}
-          maxLength={255}
+          maxLength={500}
           required={data.required}
           aria-label={data.label}
           autoComplete="off"
@@ -51,11 +51,11 @@ export function InputTextAreaClient({
         />
         <InputGroupAddon align="block-end">
           <InputGroupText className="tabular-nums">
-            {value.length} / 255 caracteres
+            {value.length} / 500 caracteres
           </InputGroupText>
         </InputGroupAddon>
       </InputGroup>
-      <FieldError errors={errors} />
+      <FieldError className="t-error-msg" errors={errors} />
     </Field>
   )
 }

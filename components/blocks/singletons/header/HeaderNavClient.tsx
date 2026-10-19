@@ -126,10 +126,7 @@ export function HeaderNavClient({
                     return (
                       <NavigationMenuItem key={link.id}>
                         <NavigationMenuTrigger className="flex items-center gap-1.5 text-sm xl:text-base">
-                          <MaterialIcon
-                            className="text-muted-foreground"
-                            name={item.icon ?? ""}
-                          />
+                          <MaterialIcon name={item.icon ?? ""} />
                           {title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent className="flex min-w-3xs flex-col gap-1.5">
@@ -149,7 +146,6 @@ export function HeaderNavClient({
                                     className="flex items-center gap-1.5"
                                   >
                                     <MaterialIcon
-                                      className="text-muted-foreground"
                                       name={sub.sub_links_id.icon ?? ""}
                                     />
                                     {sub.sub_links_id.title}
@@ -179,10 +175,7 @@ export function HeaderNavClient({
                             title={title}
                             className="flex items-center gap-1.5"
                           >
-                            <MaterialIcon
-                              className="text-muted-foreground"
-                              name={item.icon ?? ""}
-                            />
+                            <MaterialIcon name={item.icon ?? ""} />
                             {title}
                           </Link>
                         }
@@ -192,10 +185,7 @@ export function HeaderNavClient({
                 })}
               <NavigationMenuItem key="legal">
                 <NavigationMenuTrigger className="flex items-center gap-2 text-sm xl:text-base">
-                  <MaterialIcon
-                    className="text-muted-foreground"
-                    name="cases"
-                  />
+                  <MaterialIcon name="cases" />
                   <span>Legal</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="flex min-w-3xs flex-col gap-1.5">
@@ -210,10 +200,7 @@ export function HeaderNavClient({
                           "flex w-full justify-start text-sm xl:text-base"
                         )}
                       >
-                        <MaterialIcon
-                          className="text-muted-foreground"
-                          name={link.icon ?? ""}
-                        />
+                        <MaterialIcon name={link.icon ?? ""} />
                         {link.title}
                       </NavigationMenuLink>
                     </NavigationMenuItem>
@@ -238,6 +225,7 @@ export function HeaderNavClient({
                 name={data.primary_icon ?? ""}
                 size={16}
                 data-icon="inline-end"
+                className="text-primary"
               />
             </LinkButton>
           ) : null}
@@ -252,6 +240,7 @@ export function HeaderNavClient({
               <MaterialIcon
                 name={data.secondary_icon ?? ""}
                 size={16}
+                className="text-foreground"
                 data-icon="inline-end"
               />
             </LinkButton>

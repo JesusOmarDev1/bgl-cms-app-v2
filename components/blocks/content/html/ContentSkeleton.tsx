@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function ContentSkeleton() {
   return (
-    <BoxContainer aria-hidden="true">
+    <BoxContainer aria-hidden="true" paddingInline={0}>
       <Box
         display="flex"
         orientation="vertical"

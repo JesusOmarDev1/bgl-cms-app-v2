@@ -163,11 +163,7 @@ function PaletteStatusPanel({
       <Empty className="border-none bg-transparent py-6">
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <MaterialIcon
-              name={copy.icon}
-              size={18}
-              className="text-muted-foreground"
-            />
+            <MaterialIcon name={copy.icon} size={18} />
           </EmptyMedia>
           <EmptyTitle className="text-sm font-medium">{copy.title}</EmptyTitle>
           <EmptyDescription className="text-xs">
@@ -309,11 +305,7 @@ function CommandPaletteSearchField({
       {status === "loading" ? (
         <Spinner className="h-4 w-4 text-muted-foreground" />
       ) : (
-        <MaterialIcon
-          name="search"
-          size={16}
-          className="text-muted-foreground"
-        />
+        <MaterialIcon name="search" size={16} />
       )}
       <input
         ref={inputRef}

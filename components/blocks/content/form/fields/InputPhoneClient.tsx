@@ -39,9 +39,9 @@ export function InputPhoneClient({
         value={value}
         onBlur={onBlur}
         onChange={onChange}
-        className="w-full"
+        className={invalid ? "t-input is-error w-full" : "w-full"}
       />
-      <FieldError errors={errors} />
+      <FieldError className="t-error-msg" errors={errors} />
     </Field>
   )
 }

@@ -24,7 +24,7 @@ import type { Transition, Variants } from "motion/react"
 import { Cookie, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { motionTokens } from "@/lib/animation/motion-tokens"
+import { motionTokens } from "@/lib/animation/motion/motion-tokens"
 import { cn } from "cn"
 
 /** One group of cookies a visitor can allow or refuse. */

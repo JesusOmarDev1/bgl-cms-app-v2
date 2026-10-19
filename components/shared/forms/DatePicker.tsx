@@ -644,11 +644,7 @@ function DatePickerTrigger({
         if (!event.defaultPrevented) ctx.setOpen(!ctx.open)
       }}
     >
-      <MaterialIcon
-        name="calendar_today"
-        size={14}
-        className="shrink-0 text-muted-foreground"
-      />
+      <MaterialIcon name="calendar_today" size={14} className="shrink-0" />
       <span data-slot="date-picker-trigger-label" className="flex-1 truncate">
         {triggerLabel}
       </span>

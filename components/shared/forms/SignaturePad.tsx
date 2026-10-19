@@ -31,7 +31,7 @@ import {
   X,
 } from "lucide-react"
 import { cn } from "cn"
-import { motionTokens } from "@/lib/animation/motion-tokens"
+import { motionTokens } from "@/lib/animation/motion/motion-tokens"
 
 /** A sampled point: position in pad units, pen pressure between 0 and 1 (or -1 when the device has none), and ms since the stroke began. */
 export interface InkPoint {

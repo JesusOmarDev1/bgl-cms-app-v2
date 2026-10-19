@@ -19,7 +19,7 @@ import type {
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react"
 import type { Transition } from "motion/react"
 import { cn } from "cn"
-import { motionTokens } from "@/lib/animation/motion-tokens"
+import { motionTokens } from "@/lib/animation/motion/motion-tokens"
 
 export interface RadioCardOption {
   value: string

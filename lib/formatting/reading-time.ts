@@ -1,4 +1,4 @@
-import { htmlToText } from "@/lib/formatting/sanitize"
+import { htmlToText } from "@/lib/formatting/html-to-text"
 import { readingTime as calculateReadingTime } from "reading-time-estimator"
 
 export type ReadingTimeResult = {

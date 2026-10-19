@@ -6,13 +6,12 @@ export function CtaSkeleton() {
     <Box
       aria-hidden="true"
       className="rounded-2xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8"
-      display="flex"
-      orientation="vertical"
-      gap={2}
     >
-      <Skeleton className="h-16 w-4/5 md:h-24" />
+      <Skeleton className="h-[37.5px] w-4/5" />
       <Skeleton className="h-6 w-2/3" />
-      <Skeleton className="mt-6 h-10 w-40" />
+      <div className="flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4 lg:mt-14 xl:mt-16 xl:gap-6">
+        <Skeleton className="h-9 w-40" />
+      </div>
     </Box>
   )
 }

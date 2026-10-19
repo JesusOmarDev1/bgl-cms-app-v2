@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
 import { useTranslations } from "next-intl"
@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button"
 import { FieldError, FieldGroup } from "@/components/ui/field"
 import {
   buildFormValuesSchema,
-  expandedFormFields,
   type ExpandedFormField,
 } from "@/lib/validations/form-values"
 import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
@@ -82,7 +81,9 @@ function FormHeading({ data }: { data: FormBlockQuery }) {
   return (
     <>
       <h2 id={`${data.id}-title`} className="flex items-center gap-2">
-        {data.icon ? <MaterialIcon name={data.icon} /> : null}
+        {data.icon ? (
+          <MaterialIcon className="text-muted-foreground" name={data.icon} />
+        ) : null}
         {data.title}
       </h2>
       <SafeHtml content={data.excerpt ?? undefined} preset="compact" />
@@ -195,7 +196,7 @@ export function FormView({
   const t = useTranslations("db.form_responses")
   const rows = useMemo(
     () =>
-      expandedFormFields(data.fields).sort(
+      [...data.fields].sort(
         (a, b) =>
           (a.sort ?? Number.MAX_SAFE_INTEGER) -
           (b.sort ?? Number.MAX_SAFE_INTEGER)
@@ -203,12 +204,29 @@ export function FormView({
     [data.fields]
   )
   const values = useMemo(() => defaultValues(rows), [rows])
-  const schema = useMemo(() => buildFormValuesSchema(rows), [rows])
+  const schema = useMemo(
+    () =>
+      buildFormValuesSchema(rows, {
+        required: t("required"),
+        maxLength: t("max_length", { max: 255 }),
+        email: t("email"),
+        phone: t("phone"),
+        date: t("date"),
+        datetime: t("datetime"),
+        number: t("number"),
+        checkbox: t("checkbox"),
+        minValue: (min) => t("min_value", { min }),
+        maxValue: (max) => t("max_value", { max }),
+      }),
+    [rows, t]
+  )
   const [captcha, setCaptcha] = useState<{
     token: string
     message: string | undefined
   }>({ token: "", message: undefined })
   const captchaToken = captcha.message === formMessage ? captcha.token : ""
+  const formRef = useRef<HTMLFormElement>(null)
+  const [shakeTick, setShakeTick] = useState(0)
   const form = useForm({
     defaultValues: values,
     validators: {
@@ -219,6 +237,54 @@ export function FormView({
     },
   })
 
+  useEffect(() => {
+    const root = formRef.current
+    if (!root) return
+    const nodes = Array.from(
+      root.querySelectorAll<HTMLElement>(".t-input.is-error")
+    )
+    if (nodes.length === 0) return
+
+    const styles = getComputedStyle(document.documentElement)
+    const ms = (name: string, fallback: number) => {
+      const value = Number.parseFloat(styles.getPropertyValue(name))
+      return Number.isFinite(value) ? value : fallback
+    }
+    const shakeMs = ms("--shake-dur-a", 80) * 2 + ms("--shake-dur-b", 60) * 2
+
+    for (const node of nodes) {
+      node.classList.remove("is-shaking")
+      void node.offsetWidth
+      node.classList.add("is-shaking")
+    }
+
+    const timer = window.setTimeout(() => {
+      for (const node of nodes) node.classList.remove("is-shaking")
+    }, shakeMs + 20)
+
+    return () => window.clearTimeout(timer)
+  }, [shakeTick, serverFieldErrors])
+
+  const queueSubmit = () => {
+    // Previous form-level issues stay on the fields and block the next schema
+    // run. Clear them so this submit validates again.
+    for (const row of rows) {
+      form.setFieldMeta(row.item.identifier, (prev) => ({
+        ...prev,
+        errorMap: {
+          ...prev.errorMap,
+          onSubmit: undefined,
+        },
+      }))
+    }
+    void form
+      .handleSubmit()
+      .catch(() => undefined)
+      .finally(() => {
+        setShakeTick((tick) => tick + 1)
+      })
+  }
+
   return (
     <BoxContainer>
       <Box display="flex" orientation="vertical" gap={2}>
@@ -227,37 +293,44 @@ export function FormView({
           <p role="status">{t("success")}</p>
         ) : (
           <form
+            ref={formRef}
             aria-labelledby={`${data.id}-title`}
             className="flex w-full flex-col gap-4"
             noValidate
             onSubmit={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              void form.handleSubmit()
+              queueSubmit()
             }}
           >
             <FieldGroup className="flex-row flex-wrap items-start gap-x-0 gap-y-5">
               {rows.map((row) => (
-                <div
-                  key={row.id}
-                  className="box-border min-w-0 px-1"
-                  style={{ width: `${row.item.width}%` }}
-                >
-                  <form.Field name={row.item.identifier}>
-                    {(field) => (
-                      <FieldControl
-                        row={row}
-                        value={field.state.value}
-                        onChange={(next) => field.handleChange(next)}
-                        onBlur={field.handleBlur}
-                        errors={toFieldErrors(
-                          field.state.meta.errors,
-                          serverFieldErrors?.[row.item.identifier]
-                        )}
-                      />
-                    )}
-                  </form.Field>
-                </div>
+                <form.Field key={row.id} name={row.item.identifier}>
+                  {(field) => {
+                    const errors = toFieldErrors(
+                      field.state.meta.errors,
+                      serverFieldErrors?.[row.item.identifier]
+                    )
+                    return (
+                      <div
+                        className={
+                          errors
+                            ? "t-input-wrap is-error box-border min-w-0 px-1"
+                            : "t-input-wrap box-border min-w-0 px-1"
+                        }
+                        style={{ width: `${row.item.width}%` }}
+                      >
+                        <FieldControl
+                          row={row}
+                          value={field.state.value}
+                          onChange={(next) => field.handleChange(next)}
+                          onBlur={field.handleBlur}
+                          errors={errors}
+                        />
+                      </div>
+                    )
+                  }}
+                </form.Field>
               ))}
             </FieldGroup>
             {data.captcha && turnstileSiteKey ? (

@@ -209,11 +209,7 @@ export function SearchBarClient({
             )}
             onClick={() => handleOpenChange(true)}
           >
-            <MaterialIcon
-              name="search"
-              size={16}
-              className="me-2 shrink-0 text-muted-foreground/80"
-            />
+            <MaterialIcon name="search" size={16} className="me-2 shrink-0" />
             <span className="flex w-full items-center justify-between">
               <span className="font-normal text-muted-foreground/70">
                 {loading ? "Buscando..." : "Buscar..."}

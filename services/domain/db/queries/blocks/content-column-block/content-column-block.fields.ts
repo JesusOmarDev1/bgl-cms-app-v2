@@ -8,6 +8,7 @@ export const CONTENT_COLUMN_BLOCK_FIELDS = [
   "sort",
   "title",
   "padding",
+  "padding_inline",
   "background_color",
   "padding_bottom",
   "padding_top",

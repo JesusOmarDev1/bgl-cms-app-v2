@@ -112,7 +112,17 @@
       "failed_to_submit": "No se pudo enviar el formulario.",
       "success": "Recibimos tu información. Gracias.",
       "submit": "Enviar",
-      "submitting": "Enviando"
+      "submitting": "Enviando",
+      "required": "Completa este campo.",
+      "max_length": "Máximo {max} caracteres.",
+      "email": "Ingresa un correo válido.",
+      "phone": "Ingresa un teléfono válido.",
+      "date": "Ingresa una fecha válida.",
+      "datetime": "Ingresa una fecha y hora válidas.",
+      "number": "Ingresa un número.",
+      "min_value": "El mínimo es {min}.",
+      "max_value": "El máximo es {max}.",
+      "checkbox": "Acepta para continuar."
     },
     "form_block": {
       "failed_to_fetch": "Error al obtener el formulario."

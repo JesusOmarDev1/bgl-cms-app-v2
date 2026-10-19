@@ -40,8 +40,9 @@ export function InputEmailClient({
         value={value}
         onBlur={onBlur}
         onChange={(event) => onChange(event.target.value)}
+        className={invalid ? "t-input is-error" : undefined}
       />
-      <FieldError errors={errors} />
+      <FieldError className="t-error-msg" errors={errors} />
     </Field>
   )
 }

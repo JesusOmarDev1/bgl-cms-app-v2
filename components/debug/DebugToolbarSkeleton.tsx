@@ -5,14 +5,14 @@ export function DebugToolbarSkeleton() {
   return (
     <Box
       aria-hidden="true"
-      className="sticky top-0 z-10 rounded-xl border border-border/60 bg-card shadow-sm"
+      className="top-0 z-10 rounded-xl border border-border/60 bg-card shadow-sm"
       display="flex"
       orientation="vertical"
-      padding={1}
+      padding={2}
       gap={0.75}
     >
       <Box display="flex" orientation="vertical" gap={0.25}>
-        <Skeleton className="h-7 w-40" />
+        <Skeleton className="h-9 w-40" />
         <Skeleton className="h-4 w-72 max-w-full" />
       </Box>
       <Box

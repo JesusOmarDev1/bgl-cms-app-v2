@@ -1,6 +1,7 @@
 import { Suspense, type ReactElement } from "react"
 import { blockRegistry } from "@/components/blocks/register"
 import { Box } from "@/components/shared/content/Box"
+import { sanitizeHtmlFields } from "@/lib/formatting/sanitize"
 import type { PagesQueryResult } from "@/services/domain/db/queries/collections/pages/pages"
 
 type PageBody = NonNullable<PagesQueryResult[number]["body"]>
@@ -14,7 +15,7 @@ function BlockSlot({ row }: { row: PageRow }) {
   const View = Component as (props: { data: PageRow["item"] }) => ReactElement
   return (
     <Suspense fallback={<Skeleton />}>
-      <View data={row.item} />
+      <View data={sanitizeHtmlFields(row.item)} />
     </Suspense>
   )
 }

@@ -10,6 +10,7 @@ export interface ContentBlock {
   title: string
   layout: ContentBlockLayout
   padding: ContentBlockPadding
+  padding_inline: ContentBlockPadding
   padding_top: ContentEdgePadding
   padding_bottom: ContentEdgePadding
   content: number[] | ContentBlockContentJunction[]

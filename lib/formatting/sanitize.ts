@@ -1,8 +1,5 @@
 /**
- * Isomorphic HTML sanitization utility.
- *
- * Uses DOMPurify (via isomorphic-dompurify) for reliable, safe sanitization
- * across server and client runtimes.
+ * Server HTML sanitization for CMS strings before they reach a client component.
  */
 import DOMPurify from "isomorphic-dompurify"
 
@@ -87,62 +84,43 @@ export function sanitizeHtml(dirty: string): string {
   })
 }
 
-/**
- * Convert an HTML string to plain text.
- *
- * Strips all tags AND decodes HTML entities (`&aacute;` → `á`, `&#241;` → `ñ`, etc.)
- * using the browser's DOMParser. Falls back to regex stripping on the server.
- *
- * @param html - Raw HTML string (e.g. from Directus rich text fields)
- * @returns Plain text string
- */
-export function htmlToText(html: string): string {
-  if (!html) return ""
+const HTML_KEYS = new Set(["excerpt", "answer", "content", "address"])
 
-  if (typeof DOMParser !== "undefined") {
-    const doc = new DOMParser().parseFromString(html, "text/html")
-    return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim()
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function sanitizeHtmlFieldsUnchecked<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeHtmlFieldsUnchecked(item)) as T
   }
+  if (!isRecord(value)) return value
+  const out: Record<string, unknown> = {}
+  for (const [key, child] of Object.entries(value)) {
+    out[key] =
+      HTML_KEYS.has(key) && typeof child === "string"
+        ? sanitizeHtml(child)
+        : sanitizeHtmlFieldsUnchecked(child)
+  }
+  return out as T
+}
 
-  // SSR fallback: strip tags + decode common named entities
-  return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;|&apos;/g, "'")
-    .replace(/&aacute;/gi, "á")
-    .replace(/&eacute;/gi, "é")
-    .replace(/&iacute;/gi, "í")
-    .replace(/&oacute;/gi, "ó")
-    .replace(/&uacute;/gi, "ú")
-    .replace(/&Aacute;/gi, "Á")
-    .replace(/&Eacute;/gi, "É")
-    .replace(/&Iacute;/gi, "Í")
-    .replace(/&Oacute;/gi, "Ó")
-    .replace(/&Uacute;/gi, "Ú")
-    .replace(/&ntilde;/gi, "ñ")
-    .replace(/&Ntilde;/gi, "Ñ")
-    .replace(/&uuml;/gi, "ü")
-    .replace(/&Uuml;/gi, "Ü")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&iquest;/gi, "¿")
-    .replace(/&iexcl;/gi, "¡")
-    .replace(/&ordf;/gi, "ª")
-    .replace(/&ordm;/gi, "º")
-    .replace(/&mdash;/gi, "—")
-    .replace(/&ndash;/gi, "–")
-    .replace(/&bull;/gi, "•")
-    .replace(/&hellip;/gi, "…")
-    .replace(/&laquo;/gi, "«")
-    .replace(/&raquo;/gi, "»")
-    .replace(/&middot;/gi, "·")
-    .replace(/&sect;/gi, "§")
-    .replace(/&copy;/gi, "©")
-    .replace(/&reg;/gi, "®")
-    .replace(/&deg;/gi, "°")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/\s+/g, " ")
-    .trim()
+let selfChecked = false
+
+export function sanitizeHtmlFields<T>(value: T): T {
+  if (!selfChecked) {
+    selfChecked = true
+    const sample = sanitizeHtmlFieldsUnchecked({
+      title: "<script>",
+      excerpt: "<script>x</script><p>ok</p>",
+    })
+    if (
+      sample.title !== "<script>" ||
+      sample.excerpt.includes("<script") ||
+      !sample.excerpt.includes("ok")
+    ) {
+      throw new Error("sanitize html fields self-check failed")
+    }
+  }
+  return sanitizeHtmlFieldsUnchecked(value)
 }

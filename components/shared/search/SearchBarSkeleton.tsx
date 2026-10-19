@@ -6,7 +6,7 @@ export function SearchBarSkeleton({ className }: { className?: string }) {
     <Skeleton
       aria-hidden
       className={cn(
-        "size-11 rounded-full lg:h-11 lg:w-48 lg:rounded-3xl",
+        "size-10 rounded-full min-[1366px]:h-11 min-[1366px]:w-32 min-[1366px]:rounded-3xl 2xl:w-44",
         className
       )}
     />

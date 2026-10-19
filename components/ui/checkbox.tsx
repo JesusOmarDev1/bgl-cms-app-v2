@@ -28,7 +28,7 @@ function Checkbox({ className, children, ...props }: CheckboxProps) {
               className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
             >
               {(isSelected || isIndeterminate) && (
-                <MaterialIcon name="check" size={14} />
+                <MaterialIcon className="text-secondary" name="check_small" />
               )}
             </span>
             {children}

@@ -29,8 +29,8 @@ type MaterialIconProps = Omit<
 export const MaterialIcon = ({
   name,
   size = 20,
-  fill = 0,
-  weight = 300,
+  fill = 1,
+  weight = 500,
   className,
   style,
   ...rest
@@ -41,7 +41,7 @@ export const MaterialIcon = ({
     <span
       className={cn(
         "material-symbols-rounded",
-        "inline-flex shrink-0 items-center justify-center leading-none transition-opacity",
+        "inline-flex shrink-0 items-center justify-center leading-none text-muted-foreground transition-opacity group-data-[invalid=true]/field:text-destructive",
         className
       )}
       style={{

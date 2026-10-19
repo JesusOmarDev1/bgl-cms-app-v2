@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { setSecurityHeaders } from "@/config/headers"
-import { matchRedirect, type RedirectRecord } from "@/lib/redirects"
+import { matchRedirect, type RedirectRecord } from "@/lib/formatting/redirects"
 
 function websiteOrigin(): string | null {
   const raw = process.env.NEXT_PUBLIC_WEBSITE_URL

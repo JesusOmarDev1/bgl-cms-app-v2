@@ -15,9 +15,9 @@ export function LogosClientsSkeleton() {
       >
         <Skeleton className="h-8 w-1/3" />
         <div className="flex justify-center gap-8">
-          <Skeleton className="h-16 w-28" />
-          <Skeleton className="h-16 w-28" />
-          <Skeleton className="h-16 w-28" />
+          <Skeleton className="size-20" />
+          <Skeleton className="size-20" />
+          <Skeleton className="size-20" />
         </div>
       </Box>
     </BoxContainer>

@@ -1,5 +1,4 @@
 import type { ElementType, HTMLAttributes } from "react"
-import { sanitizeHtml } from "@/lib/formatting/sanitize"
 import { injectHeadingIds } from "@/lib/directus/anchor-injector"
 import { cn } from "cn"
 
@@ -34,8 +33,7 @@ export function SafeHtml({
   }
 
   const processed = richAnchors ? injectHeadingIds(content) : content
-  const sanitized = sanitizeHtml(processed)
-  const withTableWrappers = sanitized
+  const withTableWrappers = processed
     .replace(/<table\b/gi, '<div class="typeset-scroll"><table')
     .replace(/<\/table\s*>/gi, "</table></div>")
 

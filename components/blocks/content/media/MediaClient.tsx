@@ -1,13 +1,59 @@
 "use client"
+import dynamic from "next/dynamic"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import type { MediaBlockQuery } from "@/services/domain/db/queries/blocks/media-block/media-block.fields"
-import AudioViewerClient from "./AudioViewerClient"
-import ImageViewerClient from "./ImageViewerClient"
-import MultipleFilesViewerClient from "./MultipleFilesViewerClient"
-import PdfViewerClient from "./PdfViewerClient"
-import VideoViewerClient from "./VideoViewerClient"
+
+const ImageViewerClient = dynamic(() => import("./ImageViewerClient"), {
+  loading: () => (
+    <Card aria-hidden="true">
+      <CardContent className="flex flex-col gap-4">
+        <Skeleton className="size-[100px]" />
+      </CardContent>
+      <CardFooter />
+    </Card>
+  ),
+})
+const VideoViewerClient = dynamic(() => import("./VideoViewerClient"), {
+  loading: () => (
+    <Skeleton
+      aria-hidden="true"
+      className="aspect-video w-full max-w-7xl min-w-0 rounded-2xl"
+    />
+  ),
+})
+const AudioViewerClient = dynamic(() => import("./AudioViewerClient"), {
+  loading: () => (
+    <Card aria-hidden="true" className="px-2 py-4">
+      <CardContent className="px-2" />
+      <CardFooter />
+    </Card>
+  ),
+})
+const PdfViewerClient = dynamic(() => import("./PdfViewerClient"), {
+  loading: () => (
+    <Card aria-hidden="true">
+      <CardContent className="flex flex-col gap-4">
+        <Skeleton className="h-150 w-full rounded-md" />
+      </CardContent>
+      <CardFooter />
+    </Card>
+  ),
+})
+const MultipleFilesViewerClient = dynamic(
+  () => import("./MultipleFilesViewerClient"),
+  {
+    loading: () => (
+      <Card aria-hidden="true">
+        <CardContent className="flex flex-col flex-wrap gap-4" />
+        <CardFooter />
+      </Card>
+    ),
+  }
+)
 
 export default function MediaClient({ data }: { data: MediaBlockQuery }) {
   const files: DirectusFileQuery[] = []

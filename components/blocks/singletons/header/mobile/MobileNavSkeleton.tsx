@@ -4,7 +4,7 @@ export function MobileNavSkeleton() {
   return (
     <Skeleton
       aria-hidden="true"
-      className="size-8 shrink-0 rounded-lg min-[1366px]:hidden"
+      className="size-10 shrink-0 rounded-full min-[1366px]:hidden"
     />
   )
 }

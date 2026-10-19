@@ -1,5 +1,5 @@
 import { slugify } from "@/lib/formatting/slugify"
-import { htmlToText } from "@/lib/formatting/sanitize"
+import { htmlToText } from "@/lib/formatting/html-to-text"
 
 export type InjectOptions = {
   /** Heading levels to inject IDs into. Default: ["h1","h2","h3","h4"] */

@@ -9,7 +9,7 @@ import {
 
 export function NetworkStatusSkeleton() {
   return (
-    <Card className="w-full max-w-xl" aria-hidden="true">
+    <Card className="w-full max-w-7xl" aria-hidden="true">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <Skeleton className="size-6" />

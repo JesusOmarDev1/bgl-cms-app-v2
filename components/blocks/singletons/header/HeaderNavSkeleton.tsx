@@ -11,17 +11,17 @@ export function HeaderNavSkeleton() {
         <div className="flex min-w-0 items-center gap-4">
           <Skeleton className="size-20 rounded-full" />
           <div className="hidden items-center gap-2.5 min-[1366px]:flex">
-            <Skeleton className="h-10 w-28" />
-            <Skeleton className="h-10 w-28" />
-            <Skeleton className="h-10 w-28" />
-            <Skeleton className="h-10 w-28" />
-            <Skeleton className="h-10 w-28" />
-            <Skeleton className="h-10 w-28" />
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-28" />
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           <SearchBarSkeleton />
-          <Skeleton className="hidden size-10 min-[1366px]:flex" />
+          <Skeleton className="hidden size-8 min-[1366px]:flex" />
           <Skeleton className="hidden h-10 w-28 rounded-full min-[1366px]:flex" />
           <Skeleton className="size-10 min-[1366px]:hidden" />
         </div>

@@ -49,8 +49,9 @@ export function InputNumberClient({
           const next = event.target.valueAsNumber
           onChange(Number.isNaN(next) ? null : next)
         }}
+        className={invalid ? "t-input is-error" : undefined}
       />
-      <FieldError errors={errors} />
+      <FieldError className="t-error-msg" errors={errors} />
     </Field>
   )
 }
