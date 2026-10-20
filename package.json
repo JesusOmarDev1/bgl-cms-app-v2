@@ -45,6 +45,7 @@
     "cn": "^0.2.6",
     "date-fns": "^4.4.0",
     "deep-email-validator": "^0.1.27",
+    "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "es-toolkit": "^1.52.0",
     "eslint-plugin-react-doctor": "^0.9.12",
