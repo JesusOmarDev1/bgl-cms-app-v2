@@ -1,10 +1,9 @@
-import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 import type { HeroBlockQuery } from "@/services/domain/db/queries/blocks/hero-block/hero-block.fields"
 
 export function HeroSimple({ data }: { data: HeroBlockQuery }) {
@@ -53,20 +52,16 @@ export function HeroSimple({ data }: { data: HeroBlockQuery }) {
           {primary || secondary ? (
             <div className="flex flex-col gap-3 sm:flex-row">
               {primary ? (
-                <Link href={primary.href}>
-                  <Button size="lg" variant="red">
-                    <MaterialIcon name={primary.icon} size={20} />
-                    {primary.label}
-                  </Button>
-                </Link>
+                <LinkButton href={primary.href} size="lg" variant="red">
+                  <MaterialIcon name={primary.icon} size={20} />
+                  {primary.label}
+                </LinkButton>
               ) : null}
               {secondary ? (
-                <Link href={secondary.href}>
-                  <Button size="lg" variant="glass">
-                    <MaterialIcon name={secondary.icon} size={20} />
-                    {secondary.label}
-                  </Button>
-                </Link>
+                <LinkButton href={secondary.href} size="lg" variant="glass">
+                  <MaterialIcon name={secondary.icon} size={20} />
+                  {secondary.label}
+                </LinkButton>
               ) : null}
             </div>
           ) : null}

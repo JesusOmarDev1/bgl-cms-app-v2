@@ -1,11 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 import type { HeroBlockQuery } from "@/services/domain/db/queries/blocks/hero-block/hero-block.fields"
 import {
   Empty,
@@ -15,12 +14,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
-import Autoplay from "embla-carousel-autoplay"
+import { Marquee } from "@/components/shared/content/Marquee"
 import { Box } from "@/components/shared/content/Box"
 
 export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
@@ -42,21 +36,30 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
 
   return (
     <Box
-      display="flex"
-      orientation="vertical"
-      justify="center"
       align="center"
       className="relative h-dvh w-full"
+      data-directus={setAttr({
+        collection: "hero_block",
+        item: data.id,
+        fields:
+          "title,excerpt,variant,image,images,brands,primary_button,primary_url,primary_icon,secondary_button,secondary_url,secondary_icon",
+        mode: "popover",
+      })}
+      display="flex"
+      justify="center"
+      orientation="vertical"
+      render={(props) => <section {...props} />}
     >
       <Box
-        className="relative z-10"
+        align="center"
+        className="relative z-10 w-full"
         display="flex"
         gap={2}
         orientation="vertical"
       >
-        <div className="flex max-w-7xl flex-col items-center justify-center gap-4 text-center">
+        <div className="flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 text-center text-balance">
           {data.title ? (
-            <h1 className="text-8xl font-semibold tracking-tight drop-shadow-2xl">
+            <h1 className="w-full text-4xl font-semibold tracking-tight drop-shadow-2xl sm:text-5xl md:text-7xl lg:text-8xl">
               {data.title}
             </h1>
           ) : null}
@@ -70,55 +73,52 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
           {data.primary_button || data.secondary_button ? (
             <div className="flex flex-col gap-3 sm:flex-row">
               {data.primary_button ? (
-                <Link href={data.primary_url ?? ""}>
-                  <Button size="lg" variant="red">
-                    <MaterialIcon
-                      className="text-primary"
-                      name={data.primary_icon ?? ""}
-                      size={20}
-                    />
-                    {data.primary_button}
-                  </Button>
-                </Link>
+                <LinkButton
+                  href={data.primary_url ?? ""}
+                  size="lg"
+                  variant="red"
+                >
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.primary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.primary_button}
+                </LinkButton>
               ) : null}
               {data.secondary_button ? (
-                <Link href={data.secondary_url ?? ""}>
-                  <Button size="lg" variant="glass">
-                    <MaterialIcon
-                      className="text-primary"
-                      name={data.secondary_icon ?? ""}
-                      size={20}
-                    />
-                    {data.secondary_button}
-                  </Button>
-                </Link>
+                <LinkButton
+                  href={data.secondary_url ?? ""}
+                  size="lg"
+                  variant="glass"
+                >
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.secondary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.secondary_button}
+                </LinkButton>
               ) : null}
             </div>
           ) : null}
         </div>
       </Box>
-      <Carousel
-        className="absolute inset-0 -z-10 h-dvh w-full"
-        plugins={[
-          Autoplay({
-            delay: 2000,
-            playOnInit: true,
-          }),
-        ]}
+      <Marquee
+        className="absolute inset-0 -z-10 h-full w-full mask-b-from-50% opacity-30"
+        variant="fade"
       >
-        <CarouselContent className="relative max-h-dvh w-full mask-b-from-50%">
-          {(data.images ?? []).map((row) => (
-            <CarouselItem key={row.id}>
-              <DirectusImage
-                alt={row.directus_files_id.title ?? ""}
-                sizing="auto"
-                src={row.directus_files_id.id}
-                variant="hero"
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+        {(data.images ?? []).map((row) => (
+          <DirectusImage
+            key={row.id}
+            alt={row.directus_files_id.title ?? ""}
+            className="size-full"
+            sizing="fill"
+            src={row.directus_files_id.id}
+            variant="hero"
+          />
+        ))}
+      </Marquee>
     </Box>
   )
 }

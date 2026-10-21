@@ -1,11 +1,10 @@
-import Link from "next/link"
 import { setAttr } from "@directus/visual-editing"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 import type { HeroBlockQuery } from "@/services/domain/db/queries/blocks/hero-block/hero-block.fields"
 import {
   Empty,
@@ -61,23 +60,24 @@ export function HeroBottomImage({ data }: { data: HeroBlockQuery }) {
             {data.primary_button || data.secondary_button ? (
               <div className="flex flex-col gap-3 sm:flex-row">
                 {data.primary_button ? (
-                  <Link href={data.primary_url ?? ""}>
-                    <Button size="lg" variant="red">
-                      <MaterialIcon name={data.primary_icon ?? ""} size={20} />
-                      {data.primary_button}
-                    </Button>
-                  </Link>
+                  <LinkButton
+                    href={data.primary_url ?? ""}
+                    size="lg"
+                    variant="red"
+                  >
+                    <MaterialIcon name={data.primary_icon ?? ""} size={20} />
+                    {data.primary_button}
+                  </LinkButton>
                 ) : null}
                 {data.secondary_button ? (
-                  <Link href={data.secondary_url ?? ""}>
-                    <Button size="lg" variant="glass">
-                      <MaterialIcon
-                        name={data.secondary_icon ?? ""}
-                        size={20}
-                      />
-                      {data.secondary_button}
-                    </Button>
-                  </Link>
+                  <LinkButton
+                    href={data.secondary_url ?? ""}
+                    size="lg"
+                    variant="glass"
+                  >
+                    <MaterialIcon name={data.secondary_icon ?? ""} size={20} />
+                    {data.secondary_button}
+                  </LinkButton>
                 ) : null}
               </div>
             ) : null}

@@ -1,7 +1,7 @@
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
-import { Button } from "@/components/ui/button"
+import { LinkButton } from "@/components/ui/button"
 import {
   Empty,
   EmptyContent,
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/empty"
 import { setAttr } from "@directus/visual-editing"
 import type { CtaBlockQuery } from "@/services/domain/db/queries/blocks/cta-block/cta-block.fields"
-import Link from "next/link"
 
 export function CtaNormalClient({ data }: { data: CtaBlockQuery }) {
   if (!data.id) {
@@ -48,19 +47,15 @@ export function CtaNormalClient({ data }: { data: CtaBlockQuery }) {
       (data.secondary_button && data.secondary_url) ? (
         <div className="flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4 lg:mt-14 xl:mt-16 xl:gap-6">
           {data.primary_button && data.primary_url ? (
-            <Link href={data.primary_url}>
-              <Button variant="red" size="lg">
-                <MaterialIcon name={data.primary_icon} size={20} />
-                {data.primary_button}
-              </Button>
-            </Link>
+            <LinkButton href={data.primary_url} variant="red" size="lg">
+              <MaterialIcon name={data.primary_icon} size={20} />
+              {data.primary_button}
+            </LinkButton>
           ) : null}
           {data.secondary_button && data.secondary_url ? (
-            <Link href={data.secondary_url}>
-              <Button variant="glass" size="lg">
-                {data.secondary_button}
-              </Button>
-            </Link>
+            <LinkButton href={data.secondary_url} variant="glass" size="lg">
+              {data.secondary_button}
+            </LinkButton>
           ) : null}
         </div>
       ) : null}

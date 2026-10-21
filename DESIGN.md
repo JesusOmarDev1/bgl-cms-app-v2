@@ -59,15 +59,15 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.caption}"
     rounded: "{rounded.lg}"
-    height: 32px
-    padding: 10px
+    height: 40px
+    padding: 16px
   button-brand:
     backgroundColor: "{colors.brand}"
     textColor: "#ffffff"
     typography: "{typography.caption}"
     rounded: "{rounded.lg}"
-    height: 32px
-    padding: 10px
+    height: 40px
+    padding: 16px
   card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"

@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button, LinkButton } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   SheetContent,
@@ -15,7 +15,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { cn } from "cn"
 import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/header/header"
 import Link from "next/link"
 import { Fragment, useState } from "react"
@@ -167,30 +166,28 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
           </ScrollArea>
           <div className="mt-auto flex shrink-0 flex-col gap-4 border-t border-border p-4">
             {data.primary_button && data.primary_url ? (
-              <Link
+              <LinkButton
                 href={data.primary_url}
                 onClick={close}
-                className={cn(
-                  buttonVariants({ variant: "red", size: "xl" }),
-                  "w-full rounded-full"
-                )}
+                variant="red"
+                size="xl"
+                className="w-full rounded-full"
               >
                 {data.primary_button}
                 <MaterialIcon name={data.primary_icon ?? ""} size={16} />
-              </Link>
+              </LinkButton>
             ) : null}
             {data.secondary_button && data.secondary_url ? (
-              <Link
+              <LinkButton
                 href={data.secondary_url}
                 onClick={close}
-                className={cn(
-                  buttonVariants({ variant: "secondary", size: "xl" }),
-                  "w-full rounded-full"
-                )}
+                variant="secondary"
+                size="xl"
+                className="w-full rounded-full"
               >
                 {data.secondary_button}
                 <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
-              </Link>
+              </LinkButton>
             ) : null}
             {data.social_links && data.social_links.length > 0 ? (
               <div className="flex flex-col items-center justify-center gap-3">
@@ -200,20 +197,19 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                 <div className="flex flex-wrap gap-2">
                   {data.social_links.map((social) => {
                     return (
-                      <Link
+                      <LinkButton
                         key={social.id}
                         href={social.item.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={social.item.title}
                         title={social.item.title}
-                        className={cn(
-                          buttonVariants({ variant: "ghost", size: "icon-xl" }),
-                          "rounded-full"
-                        )}
+                        variant="ghost"
+                        size="icon-xl"
+                        className="rounded-full"
                       >
                         <SocialIcon type={social.item.type} />
-                      </Link>
+                      </LinkButton>
                     )
                   })}
                 </div>

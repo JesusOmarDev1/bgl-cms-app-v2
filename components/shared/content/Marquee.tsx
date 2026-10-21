@@ -1,6 +1,7 @@
 import { Children, type ComponentPropsWithoutRef } from "react"
 import { cn } from "cn"
 import { MarqueeAppear } from "@/components/shared/content/MarqueeAppear"
+import { MarqueeFade } from "@/components/shared/content/MarqueeFade"
 
 interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
   /**
@@ -45,10 +46,11 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
   /**
    * Animation variant.
    * - "default": continuous CSS marquee scroll
-   * - "appear": column-based cycling with fade-in/fade-out
+   * - "appear": column-based cycling with blur-in
+   * - "fade": one child at a time, full-bleed crossfade
    * @default "default"
    */
-  variant?: "default" | "appear"
+  variant?: "default" | "appear" | "fade"
   /**
    * Number of columns for the "appear" variant.
    * @default 4
@@ -122,6 +124,17 @@ export function Marquee({
       >
         {children}
       </MarqueeAppear>
+    )
+  }
+
+  if (variant === "fade") {
+    return (
+      <MarqueeFade
+        className={props.className}
+        pauseOnHover={props.pauseOnHover}
+      >
+        {children}
+      </MarqueeFade>
     )
   }
 

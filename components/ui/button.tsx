@@ -2,17 +2,16 @@
 
 import type * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import Link from "next/link"
 import {
   Button as ButtonPrimitive,
-  Link as LinkPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
-  type LinkProps as LinkPrimitiveProps,
 } from "react-aria-components"
 
 import { cn } from "cn"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,transform] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:scale-[0.96] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -37,20 +36,20 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
-        xl: "h-10 gap-1.5 px-2.5 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
+          "h-10 gap-1.5 px-4 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
+        xs: "h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-9 gap-1 rounded-[min(var(--radius-md),12px)] px-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-3.5",
+        lg: "h-11 gap-1.5 px-4 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
+        xl: "h-12 gap-1.5 px-5 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
         "2xl":
-          "h-12 gap-1.5 px-2.5 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
-        icon: "size-8",
+          "h-14 gap-1.5 px-6 has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2",
+        icon: "size-10",
         "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+          "size-8 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
         "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
-        "icon-xl": "size-10",
+          "size-9 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
+        "icon-lg": "size-11",
+        "icon-xl": "size-12",
       },
     },
     defaultVariants: {
@@ -77,6 +76,7 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      data-effect={effect}
       className={cn(buttonVariants({ variant, size, effect, className }))}
       {...props}
     />
@@ -88,18 +88,34 @@ function LinkButton({
   variant = "default",
   size = "default",
   effect = "default",
+  isDisabled = false,
+  onClick,
+  tabIndex,
   ...props
-}: Omit<LinkPrimitiveProps, "className"> &
+}: Omit<React.ComponentProps<typeof Link>, "className"> &
   VariantProps<typeof buttonVariants> & {
     className?: string
+    isDisabled?: boolean
   }) {
   return (
-    <LinkPrimitive
+    <Link
       data-slot="button"
       data-variant={variant}
       data-size={size}
       data-effect={effect}
-      className={cn(buttonVariants({ variant, size, effect, className }))}
+      aria-disabled={isDisabled || undefined}
+      tabIndex={isDisabled ? -1 : tabIndex}
+      className={cn(
+        buttonVariants({ variant, size, effect, className }),
+        isDisabled && "pointer-events-none opacity-50"
+      )}
+      onClick={(event) => {
+        if (isDisabled) {
+          event.preventDefault()
+          return
+        }
+        onClick?.(event)
+      }}
       {...props}
     />
   )
