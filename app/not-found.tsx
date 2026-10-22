@@ -56,12 +56,17 @@ export default function NotFound() {
             cotizar un producto.
           </p>
           <div className="flex flex-col justify-center gap-4 md:flex-row">
-            <LinkButton href="/inicio" size="lg">
-              <MaterialIcon name="arrow_back" data-icon="inline-start" />
+            <LinkButton href="/inicio">
+              <MaterialIcon
+                className="text-current"
+                name="arrow_back"
+                data-icon="inline-start"
+              />
               Volver a la página de inicio
             </LinkButton>
-            <LinkButton href="/cotizar" variant="red" size="lg">
+            <LinkButton href="/cotizar" variant="red">
               <MaterialIcon
+                className="text-foreground"
                 name="shopping_bag_speed"
                 data-icon="inline-start"
               />
@@ -72,8 +77,12 @@ export default function NotFound() {
             Si tienes alguna pregunta, no dudes en contactar con nuestro equipo
             de soporte técnico.
           </p>
-          <LinkButton href="/soporte" size="lg" variant="secondary">
-            <MaterialIcon name="support_agent" data-icon="inline-start" />
+          <LinkButton href="/soporte" variant="secondary">
+            <MaterialIcon
+              className="text-foreground"
+              name="support_agent"
+              data-icon="inline-start"
+            />
             Contactar soporte tecnico
           </LinkButton>
         </div>

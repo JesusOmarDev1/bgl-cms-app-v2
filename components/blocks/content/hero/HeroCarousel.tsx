@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/empty"
 import { Marquee } from "@/components/shared/content/Marquee"
 import { Box } from "@/components/shared/content/Box"
+import { BoxContainer } from "@/components/shared/content/BoxLayout"
 
 export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
   if (!data.images?.length) {
@@ -50,7 +51,7 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
       orientation="vertical"
       render={(props) => <section {...props} />}
     >
-      <Box
+      <BoxContainer
         align="center"
         className="relative z-10 w-full"
         display="flex"
@@ -73,11 +74,7 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
           {data.primary_button || data.secondary_button ? (
             <div className="flex flex-col gap-3 sm:flex-row">
               {data.primary_button ? (
-                <LinkButton
-                  href={data.primary_url ?? ""}
-                  size="lg"
-                  variant="red"
-                >
+                <LinkButton href={data.primary_url ?? ""} variant="red">
                   <MaterialIcon
                     className="text-primary"
                     name={data.primary_icon ?? ""}
@@ -87,11 +84,7 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
                 </LinkButton>
               ) : null}
               {data.secondary_button ? (
-                <LinkButton
-                  href={data.secondary_url ?? ""}
-                  size="lg"
-                  variant="glass"
-                >
+                <LinkButton href={data.secondary_url ?? ""} variant="glass">
                   <MaterialIcon
                     className="text-primary"
                     name={data.secondary_icon ?? ""}
@@ -103,9 +96,9 @@ export function HeroCarousel({ data }: { data: HeroBlockQuery }) {
             </div>
           ) : null}
         </div>
-      </Box>
+      </BoxContainer>
       <Marquee
-        className="absolute inset-0 -z-10 h-full w-full mask-b-from-50% opacity-30"
+        className="absolute inset-0 -z-10 h-full w-full mask-b-from-80% opacity-40"
         variant="fade"
       >
         {(data.images ?? []).map((row) => (

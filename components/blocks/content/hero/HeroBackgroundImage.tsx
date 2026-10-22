@@ -1,8 +1,8 @@
+"use client"
+
 import { setAttr } from "@directus/visual-editing"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
-import { Box } from "@/components/shared/content/Box"
-import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { LinkButton } from "@/components/ui/button"
 import type { HeroBlockQuery } from "@/services/domain/db/queries/blocks/hero-block/hero-block.fields"
@@ -14,6 +14,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
+import { Box } from "@/components/shared/content/Box"
+import { BoxContainer } from "@/components/shared/content/BoxLayout"
 
 export function HeroBackgroundImage({ data }: { data: HeroBlockQuery }) {
   if (!data.id) {
@@ -34,65 +36,76 @@ export function HeroBackgroundImage({ data }: { data: HeroBlockQuery }) {
 
   return (
     <Box
-      className="relative min-h-[28rem] overflow-hidden"
+      align="center"
+      className="relative h-dvh w-full"
       data-directus={setAttr({
         collection: "hero_block",
         item: data.id,
-        fields: "title,excerpt,variant,image,primary_button,primary_url",
+        fields:
+          "title,excerpt,variant,image,images,brands,primary_button,primary_url,primary_icon,secondary_button,secondary_url,secondary_icon",
         mode: "popover",
       })}
+      display="flex"
+      justify="center"
+      orientation="vertical"
       render={(props) => <section {...props} />}
     >
-      {data.image?.id ? (
+      <BoxContainer
+        align="center"
+        className="relative z-10 w-full"
+        display="flex"
+        gap={2}
+        orientation="vertical"
+      >
+        <div className="flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 text-center text-balance">
+          {data.title ? (
+            <h1 className="w-full text-4xl font-semibold tracking-tight drop-shadow-2xl sm:text-5xl md:text-7xl lg:text-8xl">
+              {data.title}
+            </h1>
+          ) : null}
+          {data.excerpt ? (
+            <SafeHtml
+              className="text-lg text-muted-foreground drop-shadow-2xl"
+              content={data.excerpt}
+              preset="compact"
+            />
+          ) : null}
+          {data.primary_button || data.secondary_button ? (
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {data.primary_button ? (
+                <LinkButton href={data.primary_url ?? ""} variant="red">
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.primary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.primary_button}
+                </LinkButton>
+              ) : null}
+              {data.secondary_button ? (
+                <LinkButton href={data.secondary_url ?? ""} variant="glass">
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.secondary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.secondary_button}
+                </LinkButton>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </BoxContainer>
+      <div className="absolute inset-0 -z-10 h-full w-full mask-b-from-80% opacity-40">
         <DirectusImage
-          alt=""
-          className="absolute inset-0 size-full"
+          key={data.image?.id}
+          alt={data.image?.title ?? ""}
+          className="size-full"
           sizing="fill"
-          src={data.image.id}
+          src={data.image?.id}
           variant="hero"
         />
-      ) : null}
-      <div className="absolute inset-0 bg-background/60" />
-      <BoxContainer
-        align="end"
-        className="relative z-10 min-h-[28rem]"
-        display="flex"
-      >
-        <Box paddingBottom={3} paddingTop={3}>
-          <div className="flex max-w-3xl flex-col gap-4">
-            {data.title ? (
-              <h1 className="font-semibold tracking-tight">{data.title}</h1>
-            ) : null}
-            {data.excerpt ? (
-              <SafeHtml content={data.excerpt} preset="compact" />
-            ) : null}
-            {data.primary_button || data.secondary_button ? (
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {data.primary_button ? (
-                  <LinkButton
-                    href={data.primary_url ?? ""}
-                    size="lg"
-                    variant="red"
-                  >
-                    <MaterialIcon name={data.primary_icon ?? ""} size={20} />
-                    {data.primary_button}
-                  </LinkButton>
-                ) : null}
-                {data.secondary_button ? (
-                  <LinkButton
-                    href={data.secondary_url ?? ""}
-                    size="lg"
-                    variant="glass"
-                  >
-                    <MaterialIcon name={data.secondary_icon ?? ""} size={20} />
-                    {data.secondary_button}
-                  </LinkButton>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </Box>
-      </BoxContainer>
+      </div>
     </Box>
   )
 }

@@ -176,7 +176,7 @@ export function SearchBarClient({
         {statusAnnouncement}
       </div>
       {showIcon ? (
-        <BorderBeam size="md" colorVariant="colorful">
+        <BorderBeam size="md" colorVariant="mono">
           <Button
             variant="glass"
             size="icon-xl"
@@ -196,7 +196,7 @@ export function SearchBarClient({
       ) : null}
 
       {showDefault ? (
-        <BorderBeam size="line" colorVariant="colorful">
+        <BorderBeam size="line" colorVariant="mono">
           <button
             type="button"
             aria-label="Buscar"

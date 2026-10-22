@@ -40,6 +40,8 @@ export function HeroBesideImage({
 
   return (
     <Box
+      className="w-full lg:h-dvh"
+      cols={{ base: 1, lg: 2 }}
       data-directus={setAttr({
         collection: "hero_block",
         item: data.id,
@@ -47,67 +49,75 @@ export function HeroBesideImage({
           "title,excerpt,variant,image,images,brands,primary_button,primary_url,primary_icon,secondary_button,secondary_url,secondary_icon",
         mode: "popover",
       })}
-      display="flex"
-      gap={3}
-      orientation="vertical"
-      paddingBottom={3}
-      paddingTop={3}
+      display="grid"
       render={(props) => <section {...props} />}
     >
-      <BoxContainer>
-        <Box align="center" cols={{ base: 1, md: 2 }} display="grid" gap={3}>
-          {side === "left" && data.image?.id ? (
-            <DirectusImage
-              alt={data.title ?? ""}
-              className="w-full rounded-xl"
-              sizing="contained"
-              src={data.image.id}
-              variant="hero"
+      <BoxContainer
+        className={
+          side === "left" ? "pt-28 lg:order-2 lg:pt-0" : "pt-28 lg:pt-0"
+        }
+        display="flex"
+        justify="center"
+        orientation="vertical"
+      >
+        <div className="flex w-full max-w-7xl flex-col items-start gap-4 px-4 text-balance">
+          {data.title ? (
+            <h1 className="w-full text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+              {data.title}
+            </h1>
+          ) : null}
+          {data.excerpt ? (
+            <SafeHtml
+              className="text-lg text-muted-foreground"
+              content={data.excerpt}
+              preset="compact"
             />
           ) : null}
-          <div className="flex max-w-3xl flex-col gap-4">
-            {data.title ? (
-              <h1 className="font-semibold tracking-tight">{data.title}</h1>
-            ) : null}
-            {data.excerpt ? (
-              <SafeHtml content={data.excerpt} preset="compact" />
-            ) : null}
-            {data.primary_button || data.secondary_button ? (
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {data.primary_button ? (
-                  <LinkButton
-                    href={data.primary_url ?? ""}
-                    size="lg"
-                    variant="red"
-                  >
-                    <MaterialIcon name={data.primary_icon ?? ""} size={20} />
-                    {data.primary_button}
-                  </LinkButton>
-                ) : null}
-                {data.secondary_button ? (
-                  <LinkButton
-                    href={data.secondary_url ?? ""}
-                    size="lg"
-                    variant="glass"
-                  >
-                    <MaterialIcon name={data.secondary_icon ?? ""} size={20} />
-                    {data.secondary_button}
-                  </LinkButton>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-          {side === "right" && data.image?.id ? (
-            <DirectusImage
-              alt={data.title ?? ""}
-              className="w-full rounded-xl"
-              sizing="contained"
-              src={data.image.id}
-              variant="hero"
-            />
+          {data.primary_button || data.secondary_button ? (
+            <div className="flex flex-col gap-3 sm:flex-row">
+              {data.primary_button ? (
+                <LinkButton href={data.primary_url ?? ""} variant="red">
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.primary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.primary_button}
+                </LinkButton>
+              ) : null}
+              {data.secondary_button ? (
+                <LinkButton href={data.secondary_url ?? ""} variant="glass">
+                  <MaterialIcon
+                    className="text-primary"
+                    name={data.secondary_icon ?? ""}
+                    size={20}
+                  />
+                  {data.secondary_button}
+                </LinkButton>
+              ) : null}
+            </div>
           ) : null}
-        </Box>
+        </div>
       </BoxContainer>
+      <div
+        className={
+          side === "left"
+            ? "relative min-h-72 lg:order-1 lg:h-full"
+            : "relative min-h-72 lg:h-full"
+        }
+      >
+        <div className="absolute inset-0">
+          <DirectusImage
+            key={data.image?.id}
+            alt={data.image?.title ?? ""}
+            className="size-full"
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            sizing="fill"
+            src={data.image?.id}
+            variant="hero"
+          />
+        </div>
+      </div>
     </Box>
   )
 }

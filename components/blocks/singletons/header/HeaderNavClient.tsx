@@ -103,7 +103,13 @@ export function HeaderNavClient({
                 variant="logo"
               />
             ) : (
-              <StaticLogo />
+              <Link
+                href="/"
+                aria-label="Logo de BGL Básculas Industriales"
+                title="Logo de BGL Básculas Industriales"
+              >
+                <StaticLogo />
+              </Link>
             )}
           </Link>
           <NavigationMenu
@@ -217,7 +223,6 @@ export function HeaderNavClient({
             <LinkButton
               href={data.primary_url ?? ""}
               variant="red"
-              size="xl"
               className="hidden rounded-full min-[1366px]:flex"
             >
               {data.primary_button}
@@ -233,7 +238,6 @@ export function HeaderNavClient({
             <LinkButton
               href={data.secondary_url ?? ""}
               variant="outline"
-              size="xl"
               className="hidden rounded-full min-[1366px]:flex"
             >
               {data.secondary_button}

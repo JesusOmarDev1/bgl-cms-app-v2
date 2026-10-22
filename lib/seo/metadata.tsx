@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import type { SeoTypes } from "@/types/collections/seo"
 
 export interface MetadataProps {
   title: string
@@ -59,8 +58,10 @@ export interface MetadataProps {
 
 const BASE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? ""
 const SITE_NAME = "BGL BASCULAS INDUSTRIALES"
-const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
 
+/**
+ * Creates the base metadata for the page.
+ */
 export const metadata = ({
   title,
   description,
@@ -72,7 +73,10 @@ export const metadata = ({
   openGraph,
   twitter,
 }: MetadataProps): Metadata => ({
-  title: title || "Pagina sin titulo",
+  title: {
+    default: title || "Pagina sin titulo",
+    template: `%s · ${SITE_NAME}`,
+  },
   metadataBase: metadataBase
     ? new URL(decodeURIComponent(String(metadataBase)))
     : new URL(decodeURIComponent(String(BASE_URL))),
@@ -180,70 +184,9 @@ export const metadata = ({
   assets: [`${BASE_URL}/pwa`, `${BASE_URL}/static`],
 })
 
-function isSeoTypes(value: unknown): value is SeoTypes {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return false
-  }
-  if (!("title" in value) || typeof value.title !== "string") return false
-  if (!("description" in value) || typeof value.description !== "string") {
-    return false
-  }
-  return true
-}
-
-function keywordList(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) return undefined
-  const words: string[] = []
-  for (const item of value) {
-    if (typeof item === "string" && item.trim()) words.push(item)
-  }
-  return words.length > 0 ? words : undefined
-}
-
-function pageCanonical(slug: string, canonical: string | null | undefined) {
-  if (canonical && canonical.trim()) return canonical
-  const base = (process.env.NEXT_PUBLIC_WEBSITE_URL ?? "").replace(/\/$/, "")
-  const path = `/${slug}`
-  return base ? `${base}${path}` : path
-}
-
-export function metadataFromPage(
-  page: {
-    title?: string | null
-    excerpt?: string | null
-    seo: unknown
-  },
-  slug: string
-): Metadata {
-  const seo = isSeoTypes(page.seo) ? page.seo : null
-  const title = seo?.title.trim() || page.title?.trim() || "Inicio"
-  const description = seo?.description.trim() || page.excerpt?.trim() || title
-  const canonical = pageCanonical(slug, seo?.canonical)
-  const noIndex = seo?.no_index === true
-  const noFollow = seo?.no_follow === true
-
-  return metadata({
-    title,
-    description,
-    keywords: keywordList(seo?.keywords),
-    canonical,
-    robots: {
-      index: !noIndex,
-      follow: !noFollow,
-      googleBot: {
-        index: !noIndex,
-        follow: !noFollow,
-      },
-    },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      url: canonical,
-    },
-  })
-}
-
+/**
+ * Creates the base metadata for the layout page.
+ */
 export function createRootMetadata(): Metadata {
   return {
     ...metadata({
@@ -257,7 +200,7 @@ export function createRootMetadata(): Metadata {
     }),
     title: {
       default: SITE_NAME,
-      template: TITLE_TEMPLATE,
+      template: `%s · ${SITE_NAME}`,
     },
   }
 }
