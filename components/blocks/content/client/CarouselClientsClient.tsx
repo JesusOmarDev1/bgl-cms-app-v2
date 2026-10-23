@@ -1,4 +1,5 @@
 "use client"
+
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
@@ -46,7 +47,7 @@ export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
   return (
     <div className="h-fit w-full overflow-hidden">
       <div className="mx-auto w-full max-w-7xl">
-        <div className="my-14 flex flex-col gap-6 px-4 text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+        <div className="my-14 flex flex-col gap-6 px-4 text-center text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl">
           <span
             className="text-red-500"
             data-directus={setAttr({
@@ -59,16 +60,19 @@ export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
             {data.title}
           </span>
           {data.excerpt ? (
-            <SafeHtml content={data.excerpt} preset="compact" />
+            <SafeHtml
+              content={data.excerpt}
+              className="text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl"
+            />
           ) : null}
         </div>
       </div>
       <Marquee
         className="z-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
         pauseOnHover
-        rows={1}
-        repeat={3}
-        rowGap="0.5rem"
+        rows={2}
+        repeat={2}
+        rowGap="1rem"
       >
         {logos.map((logo) => (
           <DirectusImage
@@ -77,6 +81,7 @@ export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
             alt={logo.name}
             title={logo.name}
             variant="logo"
+            className="grayscale"
           />
         ))}
       </Marquee>

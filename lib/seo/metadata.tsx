@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { WEBSITE_URL as BASE_URL } from "@/lib/env/constants"
 
 export interface MetadataProps {
   title: string
@@ -56,7 +57,6 @@ export interface MetadataProps {
   }
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? ""
 const SITE_NAME = "BGL BASCULAS INDUSTRIALES"
 
 /**

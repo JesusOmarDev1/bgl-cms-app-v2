@@ -42,6 +42,7 @@ const CopyButton = ({ content, className, ...props }: CopyButtonProps) => {
         <MaterialIcon
           size={18}
           name="content_copy"
+          fill={0}
           className="animate-in duration-200 zoom-in-50"
         />
       )}

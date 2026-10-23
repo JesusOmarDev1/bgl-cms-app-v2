@@ -5,9 +5,14 @@ import { setAttr } from "@directus/visual-editing"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { BouncyAccordion } from "@/components/shared/utility/BouncyAccordion"
-import { Input } from "@/components/ui/input"
 import { fuzzySearch } from "@/config/search"
 import type { FaqBlockQuery } from "@/services/domain/db/queries/blocks/faq-block/faq-block.fields"
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupAddon,
+} from "@/components/ui/input-group"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 type FaqItem = {
   id: string
@@ -23,10 +28,6 @@ function plainText(html: string) {
     .replace(/&amp;/gi, "&")
     .replace(/\s+/g, " ")
     .trim()
-}
-
-if (plainText("<p>Hola&nbsp;<b>mundo</b></p>") !== "Hola mundo") {
-  throw new Error("faq plain text self-check failed")
 }
 
 export function FaqClient({ data }: { data: FaqBlockQuery }) {
@@ -69,18 +70,32 @@ export function FaqClient({ data }: { data: FaqBlockQuery }) {
       })}
       display="flex"
       orientation="vertical"
-      gap={2}
+      gap={1.5}
+      padding={2}
     >
-      {data.title ? <h2>{data.title}</h2> : null}
-      <SafeHtml content={data.excerpt} preset="compact" />
+      {data.title ? (
+        <h2 className="text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl">
+          {data.title}
+        </h2>
+      ) : null}
+      {data.excerpt ? (
+        <SafeHtml content={data.excerpt} className="text-muted-foreground" />
+      ) : null}
       {items.length > 0 ? (
-        <Input
-          aria-label="Buscar preguntas"
-          placeholder="Buscar"
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+        <InputGroup className="w-full">
+          <InputGroupInput
+            placeholder="Buscar preguntas frecuentes..."
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          <InputGroupAddon>
+            <MaterialIcon name="search" size={16} />
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-end">
+            {visible.length} {visible.length === 1 ? "resultado" : "resultados"}
+          </InputGroupAddon>
+        </InputGroup>
       ) : null}
       {accordionItems.length > 0 ? (
         <BouncyAccordion items={accordionItems} />

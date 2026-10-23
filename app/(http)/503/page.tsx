@@ -1,15 +1,14 @@
 import { getTranslations } from "next-intl/server"
 import { MaintenanceView } from "@/components/maintenance/MaintenanceView"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? ""
+import { WEBSITE_URL } from "@/lib/env/constants"
 
 export const metadata = createMetadata({
   title: "Servicio no disponible",
   description:
     "Demasiadas solicitudes en este momento. Espera un momento e inténtalo de nuevo.",
   keywords: ["503", "unavailable", "rate limit"],
-  canonical: `${BASE_URL}/503`,
+  canonical: `${WEBSITE_URL}/503`,
   robots: {
     index: false,
     follow: false,

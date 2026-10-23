@@ -63,14 +63,14 @@ export function HeroSimple({ data }: { data: HeroBlockQuery }) {
         <Card>
           <CardContent className="flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 text-center text-balance">
             {data.title ? (
-              <CardTitle className="w-full text-4xl font-semibold tracking-tight drop-shadow-2xl sm:text-5xl md:text-7xl lg:text-8xl">
+              <CardTitle className="w-full text-4xl font-semibold tracking-tight text-shadow-2xs sm:text-5xl md:text-7xl lg:text-8xl">
                 {data.title}
               </CardTitle>
             ) : null}
             {data.excerpt ? (
               <CardDescription>
                 <SafeHtml
-                  className="text-lg text-muted-foreground drop-shadow-2xl"
+                  className="text-lg text-muted-foreground text-shadow-2xs"
                   content={data.excerpt}
                   preset="compact"
                 />

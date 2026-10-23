@@ -68,7 +68,7 @@ function InputComponent({
 }) {
   return (
     <Input
-      className={cn("rounded-s-none rounded-e-lg", className)}
+      className={cn("h-8 rounded-s-none rounded-e-lg", className)}
       aria-label="Teléfono"
       ref={ref}
       {...props}
@@ -107,7 +107,7 @@ const CountrySelect = ({
       <Button
         type="button"
         variant="outline"
-        className="flex gap-1 rounded-s-lg rounded-e-none border-r-0 border-border bg-muted px-3 focus:z-10"
+        className="flex h-8 gap-1 rounded-s-lg rounded-e-none border-r-0 border-border bg-muted px-3 focus:z-10"
         isDisabled={disabled}
         aria-label="Seleccionar país"
       >

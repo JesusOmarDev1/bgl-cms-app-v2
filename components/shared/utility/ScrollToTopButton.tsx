@@ -48,7 +48,7 @@ export function ScrollToTopButton({
       )}
       size={"icon"}
     >
-      <MaterialIcon name="arrow_upward" size={24} />
+      <MaterialIcon name="arrow_upward" size={24} className="text-foreground" />
     </Button>
   )
 }

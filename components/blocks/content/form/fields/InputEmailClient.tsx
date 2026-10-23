@@ -31,7 +31,7 @@ export function InputEmailClient({
         id={data.identifier}
         name={data.identifier}
         type="email"
-        placeholder={`Ingresa tu ${data.label}`}
+        placeholder={`Ingresa tu ${data.label}...`}
         inputMode="email"
         aria-label={data.label}
         aria-invalid={invalid || undefined}

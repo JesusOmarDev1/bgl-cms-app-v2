@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState } from "react"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
 import { useTranslations } from "next-intl"
 import { BarsRotateDots } from "@/assets/loaders/BarsRotateDots"
+import { FormState } from "@/components/blocks/content/form/FormState"
 import { InputCheckboxClient } from "@/components/blocks/content/form/fields/InputCheckboxClient"
 import {
   dateFieldDefault,
@@ -21,14 +22,13 @@ import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { Button } from "@/components/ui/button"
 import { FieldError, FieldGroup } from "@/components/ui/field"
+import { TURNSTILE_SITE_KEY as turnstileSiteKey } from "@/lib/env/constants"
 import {
   buildFormValuesSchema,
   type ExpandedFormField,
 } from "@/lib/validations/form-values"
 import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 import type { FormResponseAnswer } from "@/types/collections/form-responses"
-
-const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 function defaultValue(row: ExpandedFormField): FormResponseAnswer[string] {
   switch (row.collection) {
@@ -79,15 +79,25 @@ function toFieldErrors(
 
 function FormHeading({ data }: { data: FormBlockQuery }) {
   return (
-    <>
-      <h2 id={`${data.id}-title`} className="flex items-center gap-2">
+    <Box display="flex" orientation="vertical" gap={1}>
+      <h2
+        id={`${data.id}-title`}
+        className="flex items-center gap-2 text-2xl font-semibold lg:text-4xl"
+      >
         {data.icon ? (
-          <MaterialIcon className="text-muted-foreground" name={data.icon} />
+          <MaterialIcon
+            className="text-muted-foreground"
+            name={data.icon}
+            size={24}
+          />
         ) : null}
         {data.title}
       </h2>
-      <SafeHtml content={data.excerpt ?? undefined} preset="compact" />
-    </>
+      <SafeHtml
+        content={data.excerpt ?? undefined}
+        className="text-muted-foreground"
+      />
+    </Box>
   )
 }
 
@@ -288,81 +298,107 @@ export function FormView({
   return (
     <BoxContainer>
       <Box display="flex" orientation="vertical" gap={2}>
-        <FormHeading data={data} />
         {submitted ? (
-          <p role="status">{t("success")}</p>
+          <FormState message={t("success")} />
         ) : (
-          <form
-            ref={formRef}
-            aria-labelledby={`${data.id}-title`}
-            className="flex w-full flex-col gap-4"
-            noValidate
-            onSubmit={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              queueSubmit()
-            }}
-          >
-            <FieldGroup className="flex-row flex-wrap items-start gap-x-0 gap-y-5">
-              {rows.map((row) => (
-                <form.Field key={row.id} name={row.item.identifier}>
-                  {(field) => {
-                    const errors = toFieldErrors(
-                      field.state.meta.errors,
-                      serverFieldErrors?.[row.item.identifier]
-                    )
-                    return (
-                      <div
-                        className={
-                          errors
-                            ? "t-input-wrap is-error box-border min-w-0 px-1"
-                            : "t-input-wrap box-border min-w-0 px-1"
-                        }
-                        style={{ width: `${row.item.width}%` }}
-                      >
-                        <FieldControl
-                          row={row}
-                          value={field.state.value}
-                          onChange={(next) => field.handleChange(next)}
-                          onBlur={field.handleBlur}
-                          errors={errors}
-                        />
-                      </div>
-                    )
-                  }}
-                </form.Field>
-              ))}
-            </FieldGroup>
-            {data.captcha && turnstileSiteKey ? (
-              <Turnstile
-                key={formMessage ?? "idle"}
-                siteKey={turnstileSiteKey}
-                options={{ theme: "dark", language: "es" }}
-                onSuccess={(token) =>
-                  setCaptcha({ token, message: formMessage })
-                }
-                onExpire={() => setCaptcha({ token: "", message: formMessage })}
-                onError={() => setCaptcha({ token: "", message: formMessage })}
-              />
-            ) : null}
-            {formMessage ? (
-              <FieldError errors={[{ message: formMessage }]} />
-            ) : null}
-            <Button
-              type="submit"
-              variant="default"
-              className="self-start"
-              isDisabled={isSubmitting}
-              aria-busy={isSubmitting}
+          <Fragment>
+            <FormHeading data={data} />
+            <form
+              ref={formRef}
+              aria-labelledby={`${data.id}-title`}
+              className="flex w-full flex-col gap-4"
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                queueSubmit()
+              }}
             >
-              {isSubmitting ? (
-                <span aria-hidden className="size-5">
-                  <BarsRotateDots />
-                </span>
+              <FieldGroup className="flex-row flex-wrap items-start gap-x-0 gap-y-5">
+                {rows.map((row) => (
+                  <form.Field key={row.id} name={row.item.identifier}>
+                    {(field) => {
+                      const errors = toFieldErrors(
+                        field.state.meta.errors,
+                        serverFieldErrors?.[row.item.identifier]
+                      )
+                      return (
+                        <div
+                          className={
+                            errors
+                              ? "t-input-wrap is-error box-border w-full min-w-0 px-1 @3xl/field-group:w-(--field-width)"
+                              : "t-input-wrap box-border w-full min-w-0 px-1 @3xl/field-group:w-(--field-width)"
+                          }
+                          style={{
+                            ["--field-width" as string]: `${row.item.width}%`,
+                          }}
+                        >
+                          <FieldControl
+                            row={row}
+                            value={field.state.value}
+                            onChange={(next) => field.handleChange(next)}
+                            onBlur={field.handleBlur}
+                            errors={errors}
+                          />
+                        </div>
+                      )
+                    }}
+                  </form.Field>
+                ))}
+              </FieldGroup>
+              {data.captcha && turnstileSiteKey ? (
+                <Turnstile
+                  key={formMessage ?? "idle"}
+                  siteKey={turnstileSiteKey}
+                  options={{ theme: "dark", language: "es" }}
+                  onSuccess={(token) =>
+                    setCaptcha({ token, message: formMessage })
+                  }
+                  onExpire={() =>
+                    setCaptcha({ token: "", message: formMessage })
+                  }
+                  onError={() =>
+                    setCaptcha({ token: "", message: formMessage })
+                  }
+                />
               ) : null}
-              {isSubmitting ? t("submitting") : t("submit")}
-            </Button>
-          </form>
+              {formMessage ? (
+                <FieldError errors={[{ message: formMessage }]} />
+              ) : null}
+              <div className="flex gap-4">
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="self-start"
+                  isDisabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                >
+                  {!isSubmitting && !submitted ? (
+                    <MaterialIcon name="send" className="text-accent" />
+                  ) : null}
+                  {isSubmitting ? (
+                    <span aria-hidden className="size-5">
+                      <BarsRotateDots />
+                    </span>
+                  ) : null}
+                  {isSubmitting ? t("submitting") : t("submit")}
+                </Button>
+                <Button
+                  type="reset"
+                  variant="outline"
+                  className="self-start"
+                  isDisabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                  onClick={() => {
+                    form.reset()
+                  }}
+                >
+                  <MaterialIcon name="mop" className="text-primary" />
+                  {t("reset")}
+                </Button>
+              </div>
+            </form>
+          </Fragment>
         )}
       </Box>
     </BoxContainer>

@@ -31,7 +31,7 @@ export function InputNumberClient({
         id={data.identifier}
         name={data.identifier}
         type="number"
-        placeholder={`Ingresa tu ${data.label}`}
+        placeholder={`Ingresa tu ${data.label}...`}
         inputMode="numeric"
         aria-label={data.label}
         aria-invalid={invalid || undefined}

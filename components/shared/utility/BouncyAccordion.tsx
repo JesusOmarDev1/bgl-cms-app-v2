@@ -262,7 +262,7 @@ function BouncyAccordionRow({
           ) : null}
           <span
             className={cn(
-              "min-w-0 flex-1 truncate text-[15px] font-medium text-foreground",
+              "line-clamp-1 min-w-0 flex-1 truncate text-[15px] font-semibold text-foreground",
               classNames?.title
             )}
           >

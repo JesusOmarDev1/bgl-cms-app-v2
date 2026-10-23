@@ -4,14 +4,13 @@ import { getSiteSettingsRepository } from "@/services/domain/db/repositories/sin
 import { Suspense } from "react"
 import { MaintenanceViewSkeleton } from "@/components/maintenance/MaintenanceViewSkeleton"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? ""
+import { WEBSITE_URL } from "@/lib/env/constants"
 
 export const metadata = createMetadata({
   title: "Pagina de mantenimiento",
   description: "Esta pagina es para fines de mantenimiento del sitio web.",
   keywords: ["maintenance", "maintenance page", "maintenance mode"],
-  canonical: `${BASE_URL}/maintenance`,
+  canonical: `${WEBSITE_URL}/maintenance`,
   openGraph: {
     title: "Pagina de mantenimiento",
     description: "Esta pagina es para fines de mantenimiento del sitio web.",

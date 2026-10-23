@@ -7,32 +7,56 @@
 @import "./animations.css";
 
 /* Box rem/grid responsive prefixes — keep in sync with spacing/grid maps in components/shared/content/Box.tsx */
-@source inline("{sm:,md:,lg:,xl:,2xl:}{p,pt,pb,px,m,mt,mb,mx,gap}-{0,1,2,3,4,6,8,12,16}");
-@source inline("{sm:,md:,lg:,xl:,2xl:}{grid-cols,grid-rows}-{1,2,3,4,5,6,7,8,9,10,11,12}");
+@source inline(
+  "{sm:,md:,lg:,xl:,2xl:}{p,pt,pb,px,m,mt,mb,mx,gap}-{0,1,2,3,4,6,8,12,16}"
+);
+@source inline(
+  "{sm:,md:,lg:,xl:,2xl:}{grid-cols,grid-rows}-{1,2,3,4,5,6,7,8,9,10,11,12}"
+);
 
 @theme {
   --animate-marquee: marquee var(--duration, 80s) linear infinite;
-  --animate-marquee-vertical: marquee-vertical var(--duration, 80s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 80s) linear
+    infinite;
 
   @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(-100% - var(--gap))); }
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
   }
   @keyframes marquee-vertical {
-    from { transform: translateY(0); }
-    to { transform: translateY(calc(-100% - var(--gap))); }
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
   }
   @keyframes skeleton-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.52; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.52;
+    }
   }
   @keyframes rise {
-    from { transform: translateY(0.62em); }
+    from {
+      transform: translateY(0.62em);
+    }
   }
   @keyframes fade {
-    from { opacity: 0; }
+    from {
+      opacity: 0;
+    }
   }
   @keyframes focus {
-    from { filter: blur(var(--reveal-blur, 4px)); }
+    from {
+      filter: blur(var(--reveal-blur, 4px));
+    }
   }
 }

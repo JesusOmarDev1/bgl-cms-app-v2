@@ -72,7 +72,7 @@ function NavigationMenuTrigger({
       {children}{" "}
       <MaterialIcon
         name="expand_more"
-        size={12}
+        size={16}
         className="relative top-px ml-1 transition duration-300 group-data-popup-open/navigation-menu-trigger:rotate-180 group-data-open/navigation-menu-trigger:rotate-180"
       />
     </NavigationMenuPrimitive.Trigger>

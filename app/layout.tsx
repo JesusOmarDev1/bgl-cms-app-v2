@@ -5,6 +5,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import { QueryProvider } from "@/providers/QueryProvider"
 import { Toaster } from "@/components/ui/sonner"
+import { GA_MEASUREMENT_ID } from "@/lib/env/constants"
 import { preloadResources } from "@/lib/seo/preload-resources"
 import { createRootMetadata } from "@/lib/seo/metadata"
 import { cn } from "cn"
@@ -28,8 +29,6 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
   width: "device-width",
 }
-
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ""
 
 export default function RootLayout({
   children,

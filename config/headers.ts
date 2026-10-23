@@ -1,9 +1,8 @@
 import { CSP_DIRECTIVES } from "./csp"
 import { isEnvFlagEnabled } from "@/lib/browser/env"
+import { ENABLE_VISUAL_EDITING } from "@/lib/env/constants"
 
-const isVisualEditingEnabled = isEnvFlagEnabled(
-  process.env.NEXT_PUBLIC_ENABLE_VISUAL_EDITING
-)
+const isVisualEditingEnabled = isEnvFlagEnabled(ENABLE_VISUAL_EDITING)
 
 export function setSecurityHeaders(response: Response): void {
   if (process.env.NODE_ENV === "production") {

@@ -34,7 +34,6 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
   const logos: { id: number; src: string; title: string }[] = []
   for (const row of data.brands ?? []) {
     const brand = row.brands_id
-    if (!brand || brand.status !== "published") continue
     const src = brand.logo?.id
     if (!src) continue
     logos.push({ id: row.id, src, title: brand.title })
@@ -43,7 +42,7 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
   return (
     <div className="h-fit w-full overflow-hidden">
       <div className="mx-auto w-full max-w-7xl">
-        <div className="my-14 flex flex-col gap-6 px-4 text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+        <div className="my-14 flex flex-col gap-6 px-4 text-center text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl">
           <span
             className="text-red-500"
             data-directus={setAttr({
@@ -56,16 +55,19 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
             {data.title}
           </span>
           {data.excerpt ? (
-            <SafeHtml content={data.excerpt} preset="compact" />
+            <SafeHtml
+              content={data.excerpt}
+              className="text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl"
+            />
           ) : null}
         </div>
       </div>
       <Marquee
         className="z-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
         pauseOnHover
-        rows={1}
+        rows={2}
         repeat={3}
-        rowGap="0.5rem"
+        rowGap="1rem"
       >
         {logos.map((logo) => (
           <DirectusImage

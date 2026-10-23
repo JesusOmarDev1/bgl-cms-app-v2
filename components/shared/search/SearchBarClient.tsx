@@ -190,7 +190,7 @@ export function SearchBarClient({
             )}
             onClick={() => handleOpenChange(true)}
           >
-            <MaterialIcon name="search" size={20} />
+            <MaterialIcon name="search" size={20} className="text-foreground" />
           </Button>
         </BorderBeam>
       ) : null}

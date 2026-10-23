@@ -1,7 +1,7 @@
 import "server-only"
 import Redis from "ioredis"
+import { REDIS_URL } from "@/lib/env/constants"
 
-const REDIS_URL = process.env.REDIS_URL
 if (!REDIS_URL) {
   throw new Error("You must set REDIS_URL in the environment variables")
 }

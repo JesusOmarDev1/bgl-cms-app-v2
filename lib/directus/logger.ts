@@ -1,4 +1,5 @@
 import "server-only"
+import { DIRECTUS_LOG_LEVEL } from "@/lib/env/constants"
 import { LogLevelEnum, type LogLevel } from "@/types/enums/log-level"
 import type { LogContext } from "@/types/shared/logger/log-context"
 import type { Logger } from "@/types/shared/logger/logger"
@@ -23,7 +24,7 @@ function isLogLevel(value: string): value is LogLevel {
 
 /** Resolve `DIRECTUS_LOG_LEVEL`; invalid or missing values fall back to `warn`. */
 function resolveDirectusLogLevel(
-  raw: string | undefined = process.env.DIRECTUS_LOG_LEVEL
+  raw: string | undefined = DIRECTUS_LOG_LEVEL
 ): LogLevel {
   if (raw !== undefined && isLogLevel(raw)) return raw
   return "warn"

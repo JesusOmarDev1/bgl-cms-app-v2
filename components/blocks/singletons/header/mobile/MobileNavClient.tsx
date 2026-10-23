@@ -60,7 +60,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
         aria-label="Abrir menú"
         onPress={() => setOpen(true)}
       >
-        <MaterialIcon name="right_panel_open" />
+        <MaterialIcon name="right_panel_open" className="text-foreground" />
       </Button>
       <SheetContent
         side="right"

@@ -38,7 +38,7 @@ export function RenderBlocks({
     <Box
       className="w-full min-w-0"
       display="flex"
-      gap={4}
+      gap={2}
       orientation="vertical"
     >
       {nodes}

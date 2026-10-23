@@ -113,6 +113,7 @@
       "success": "Recibimos tu información. Gracias.",
       "submit": "Enviar",
       "submitting": "Enviando",
+      "reset": "Limpiar formulario",
       "required": "Completa este campo.",
       "max_length": "Máximo {max} caracteres.",
       "email": "Ingresa un correo válido.",

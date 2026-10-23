@@ -9,7 +9,7 @@
       "unreachable": "Inalcanzable"
     },
     "indicator": {
-      "operational": "Operativo",
+      "operational": "En línea",
       "degraded": "Degradado",
       "partial-outage": "Interrupcion parcial",
       "major-outage": "Caida mayor",

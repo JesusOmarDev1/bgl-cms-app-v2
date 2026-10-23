@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { WEBSITE_URL as BASE_URL } from "@/lib/env/constants"
 import { getBlogPostsRepository } from "@/services/domain/db/repositories/collections/blog-posts"
 import { getManualsRepository } from "@/services/domain/db/repositories/collections/manuals"
 import { getPagesRepository } from "@/services/domain/db/repositories/collections/pages"
@@ -35,8 +36,6 @@ type SitemapSource = {
   prefix: string
   entries: () => Promise<MetadataRoute.Sitemap>
 }
-
-const BASE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL ?? ""
 
 function isIndexed(seo: SitemapSeo | undefined): boolean {
   if (seo?.exclude === true || seo?.no_index === true) return false
@@ -94,15 +93,15 @@ export const sitemapRegistry = {
     entries: async () =>
       collectionEntries(await getPagesRepository({ limit: SITEMAP_LIMIT }), ""),
   },
-  servicios: {
-    prefix: "servicios",
+  services: {
+    prefix: "services",
     entries: async () =>
       collectionEntries(
         await getServicesRepository({ limit: SITEMAP_LIMIT }),
         "/servicios"
       ),
   },
-  blog: {
+  posts: {
     prefix: "blog",
     entries: async () =>
       collectionEntries(
@@ -110,16 +109,16 @@ export const sitemapRegistry = {
         "/blog"
       ),
   },
-  producto: {
-    prefix: "producto",
+  products: {
+    prefix: "products",
     entries: async () =>
       collectionEntries(
         await getProductsRepository({ limit: SITEMAP_LIMIT }),
         "/tienda/producto"
       ),
   },
-  manuales: {
-    prefix: "manuales",
+  manuals: {
+    prefix: "manuals",
     entries: async () =>
       collectionEntries(
         await getManualsRepository({ limit: SITEMAP_LIMIT }),

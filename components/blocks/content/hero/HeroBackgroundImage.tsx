@@ -59,13 +59,13 @@ export function HeroBackgroundImage({ data }: { data: HeroBlockQuery }) {
       >
         <div className="flex w-full max-w-7xl flex-col items-center justify-center gap-4 px-4 text-center text-balance">
           {data.title ? (
-            <h1 className="w-full text-4xl font-semibold tracking-tight drop-shadow-2xl sm:text-5xl md:text-7xl lg:text-8xl">
+            <h1 className="w-full text-4xl font-semibold tracking-tight text-shadow-2xs sm:text-5xl md:text-7xl lg:text-8xl">
               {data.title}
             </h1>
           ) : null}
           {data.excerpt ? (
             <SafeHtml
-              className="text-lg text-muted-foreground drop-shadow-2xl"
+              className="text-lg text-muted-foreground text-shadow-2xs"
               content={data.excerpt}
               preset="compact"
             />
@@ -96,7 +96,7 @@ export function HeroBackgroundImage({ data }: { data: HeroBlockQuery }) {
           ) : null}
         </div>
       </BoxContainer>
-      <div className="absolute inset-0 -z-10 h-full w-full mask-b-from-80% opacity-40">
+      <div className="absolute inset-0 -z-10 h-full w-full mask-b-from-60% opacity-40">
         <DirectusImage
           key={data.image?.id}
           alt={data.image?.title ?? ""}

@@ -16,7 +16,8 @@ export function ContentBlockClient({ data }: { data: ContentBlockQuery }) {
       data-directus={setAttr({
         collection: "content_block",
         item: data.id,
-        fields: "title,layout,padding,padding_inline,padding_top,padding_bottom,content",
+        fields:
+          "title,layout,padding,padding_inline,padding_top,padding_bottom,content",
         mode: "popover",
       })}
       display="flex"

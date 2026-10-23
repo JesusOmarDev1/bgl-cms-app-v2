@@ -1,6 +1,7 @@
 import "server-only"
 
 import type { TurnstileServerValidationResponse } from "@marsidev/react-turnstile"
+import { TURNSTILE_SECRET_KEY, TURNSTILE_VERIFY_URL } from "@/lib/env/constants"
 
 function isTurnstileSuccess(
   value: unknown
@@ -14,8 +15,8 @@ function isTurnstileSuccess(
 }
 
 export async function verifyTurnstile(token: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY
-  const url = process.env.NEXT_PUBLIC_SITEVERIFY_URL
+  const secret = TURNSTILE_SECRET_KEY
+  const url = TURNSTILE_VERIFY_URL
   const responseToken = token.trim()
   if (!secret || !url || responseToken === "") return false
 

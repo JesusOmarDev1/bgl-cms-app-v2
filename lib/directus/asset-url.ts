@@ -1,3 +1,5 @@
+import { DIRECTUS_URL } from "@/lib/env/constants"
+
 export type DirectusAssetFit = "cover" | "contain" | "inside" | "outside"
 
 /**
@@ -8,7 +10,7 @@ export function getAssetUrl(
   assetId: string,
   transforms?: { fit?: DirectusAssetFit }
 ): string | null {
-  const base = process.env.NEXT_PUBLIC_DIRECTUS_URL
+  const base = DIRECTUS_URL
   if (!base) return null
 
   try {

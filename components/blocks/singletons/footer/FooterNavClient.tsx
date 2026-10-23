@@ -17,7 +17,6 @@ import {
   ContactPositionLabel,
 } from "@/types/enums/contact-position"
 import { splitEmail } from "@/lib/formatting/split-email"
-import { Separator } from "@/components/ui/separator"
 import { SocialIcon } from "@/components/shared/content/SocialIcon"
 import { FooterCopyright } from "./FooterCopyright"
 import { FooterCompanyLetters } from "./FooterCompanyLetters"

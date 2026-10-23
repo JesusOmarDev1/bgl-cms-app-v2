@@ -3,8 +3,8 @@ import { BlockHeading } from "@/components/blocks/BlockHeading"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
-import { Card } from "@/components/ui/card"
 import type { DivisionServicesBlockQuery } from "@/services/domain/db/queries/blocks/division-services-block/division-services-block.fields"
+import Link from "next/link"
 
 export function DivisionServicesClient({
   data,
@@ -53,15 +53,19 @@ export function DivisionServicesClient({
             {divisions.map((division) =>
               division.src ? (
                 <li key={division.id} className="min-w-0">
-                  <Card className="h-full">
+                  <Link
+                    href="/servicios"
+                    title={division.title}
+                    aria-label={division.title}
+                  >
                     <DirectusImage
                       alt={division.title}
-                      className="w-full"
+                      className="w-full rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:mask-b-from-60%"
                       sizing="contained"
                       src={division.src}
                       variant="card"
                     />
-                  </Card>
+                  </Link>
                 </li>
               ) : null
             )}

@@ -32,6 +32,7 @@ export function InputPhoneClient({
         name={data.identifier}
         aria-label={data.label}
         aria-invalid={invalid || undefined}
+        placeholder={`Ingresa tu ${data.label}...`}
         required={data.required}
         defaultCountry="MX"
         inputMode="tel"

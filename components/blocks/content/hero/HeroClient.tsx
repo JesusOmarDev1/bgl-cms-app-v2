@@ -11,6 +11,12 @@ const HeroCarousel = dynamic(
   { loading: () => <HeroSkeleton /> }
 )
 
+const HeroCarouselWithLogos = dynamic(
+  () =>
+    import("./HeroCarouselWithLogos").then((mod) => mod.HeroCarouselWithLogos),
+  { loading: () => <HeroSkeleton /> }
+)
+
 export function HeroClient({ data }: { data: HeroBlockQuery }) {
   switch (data.variant) {
     case "simple":
@@ -24,8 +30,9 @@ export function HeroClient({ data }: { data: HeroBlockQuery }) {
     case "bottom_to_img":
       return <HeroBottomImage data={data} />
     case "carousel":
-    case "carousel_with_logos":
       return <HeroCarousel data={data} />
+    case "carousel_with_logos":
+      return <HeroCarouselWithLogos data={data} />
     default:
       return null
   }

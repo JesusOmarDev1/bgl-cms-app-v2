@@ -1,8 +1,7 @@
 import { preconnect, prefetchDNS } from "react-dom"
+import { DIRECTUS_URL, MEILISEARCH_HOST } from "@/lib/env/constants"
 
 const GOOGLE_MAPS_EMBED_URL = "https://www.google.com/maps/embed"
-const MEILISEARCH_URL = process.env.NEXT_PUBLIC_MEILISEARCH_HOST ?? ""
-const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL ?? ""
 
 function preconnectOrigin(href: string, crossOrigin?: "anonymous") {
   if (!href) return
@@ -15,7 +14,7 @@ function preconnectOrigin(href: string, crossOrigin?: "anonymous") {
 
 export function preloadResources(): void {
   preconnectOrigin(GOOGLE_MAPS_EMBED_URL)
-  preconnectOrigin(MEILISEARCH_URL, "anonymous")
+  preconnectOrigin(MEILISEARCH_HOST, "anonymous")
   preconnectOrigin(DIRECTUS_URL, "anonymous")
   if (DIRECTUS_URL) prefetchDNS(DIRECTUS_URL)
 }

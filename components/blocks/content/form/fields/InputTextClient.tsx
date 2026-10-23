@@ -31,7 +31,7 @@ export function InputTextClient({
         id={data.identifier}
         name={data.identifier}
         type="text"
-        placeholder={`Ingresa tu ${data.label}`}
+        placeholder={`Ingresa tu ${data.label}...`}
         inputMode="text"
         aria-label={data.label}
         aria-invalid={invalid || undefined}

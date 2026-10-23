@@ -39,15 +39,15 @@ export function InputTextAreaClient({
           value={value}
           onBlur={onBlur}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={`Ingresa tu ${data.label}`}
-          rows={4}
+          placeholder={`Ingresa tu ${data.label}...`}
+          rows={5}
           aria-invalid={invalid || undefined}
           maxLength={500}
           required={data.required}
           aria-label={data.label}
           autoComplete="off"
           inputMode="text"
-          className="min-h-16 w-full resize-y"
+          className="min-h-20 w-full resize-y"
         />
         <InputGroupAddon align="block-end">
           <InputGroupText className="tabular-nums">

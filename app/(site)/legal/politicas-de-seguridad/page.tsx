@@ -5,13 +5,12 @@ import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer
 import { Fragment } from "react/jsx-runtime"
 import Link from "next/link"
 import { splitEmail } from "@/lib/formatting/split-email"
-
-const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
+import { WEBSITE_URL } from "@/lib/env/constants"
 
 export const metadata = createMetadata({
   title: "Políticas de Seguridad",
   description: "Políticas de Seguridad de BGL Básculas Industriales.",
-  canonical: `${BASE_URL}/legal/politicas-de-seguridad`,
+  canonical: `${WEBSITE_URL}/legal/politicas-de-seguridad`,
   openGraph: {
     title: "Políticas de Seguridad",
     description: "Políticas de Seguridad de BGL Básculas Industriales.",

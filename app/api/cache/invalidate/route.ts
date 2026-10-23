@@ -1,6 +1,7 @@
 import "server-only"
 import { createHash, timingSafeEqual } from "node:crypto"
 import { revalidateTag } from "next/cache"
+import { WEBHOOK_SECRET } from "@/lib/env/constants"
 import { tagsForCollection } from "./collection-tags"
 
 function json(body: Record<string, unknown>, status: number) {
@@ -21,7 +22,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export async function POST(request: Request) {
-  const expected = process.env.WEBHOOK_SECRET
+  const expected = WEBHOOK_SECRET
   const provided = request.headers.get("x-webhook-secret")
   if (!expected || !provided || !secretsMatch(provided, expected)) {
     return json({ error: "unauthorized" }, 401)

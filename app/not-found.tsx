@@ -4,13 +4,12 @@ import { Fragment } from "react/jsx-runtime"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
 import { LinkButton } from "@/components/ui/button"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
-
-const BASE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL as string) || ""
+import { WEBSITE_URL } from "@/lib/env/constants"
 
 export const metadata = createMetadata({
   title: "Página no encontrada",
   description: "Página no encontrada de BGL Básculas Industriales.",
-  canonical: `${BASE_URL}/not-found`,
+  canonical: `${WEBSITE_URL}/not-found`,
   openGraph: {
     title: "Página no encontrada",
     description: "Página no encontrada de BGL Básculas Industriales.",

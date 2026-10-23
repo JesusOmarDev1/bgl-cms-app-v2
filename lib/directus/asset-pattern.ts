@@ -1,7 +1,10 @@
 import type { RemotePattern } from "next/dist/shared/lib/image-config"
+// Relative on purpose: next.config's SWC hook rewrites `@/` from the repo root,
+// so a nested `@/` import fails module resolution during typegen and build.
+import { DIRECTUS_URL } from "../env/constants"
 
 export function assetsRemotePatterns(): RemotePattern[] {
-  const raw = process.env.NEXT_PUBLIC_DIRECTUS_URL
+  const raw = DIRECTUS_URL
   if (!raw) return []
 
   try {
