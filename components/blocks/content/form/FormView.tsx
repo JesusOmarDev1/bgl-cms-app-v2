@@ -22,9 +22,13 @@ import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
 import { Button } from "@/components/ui/button"
 import { FieldError, FieldGroup } from "@/components/ui/field"
-import { TURNSTILE_SITE_KEY as turnstileSiteKey } from "@/lib/env/constants"
+import {
+  TURNSTILE_FORM_ACTION,
+  TURNSTILE_SITE_KEY as turnstileSiteKey,
+} from "@/lib/env/constants"
 import {
   buildFormValuesSchema,
+  FORM_VALUE_MAX_LENGTH,
   type ExpandedFormField,
 } from "@/lib/validations/form-values"
 import type { FormBlockQuery } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
@@ -218,7 +222,7 @@ export function FormView({
     () =>
       buildFormValuesSchema(rows, {
         required: t("required"),
-        maxLength: t("max_length", { max: 255 }),
+        maxLength: t("max_length", { max: FORM_VALUE_MAX_LENGTH }),
         email: t("email"),
         phone: t("phone"),
         date: t("date"),
@@ -350,7 +354,11 @@ export function FormView({
                 <Turnstile
                   key={formMessage ?? "idle"}
                   siteKey={turnstileSiteKey}
-                  options={{ theme: "dark", language: "es" }}
+                  options={{
+                    theme: "dark",
+                    language: "es",
+                    action: TURNSTILE_FORM_ACTION,
+                  }}
                   onSuccess={(token) =>
                     setCaptcha({ token, message: formMessage })
                   }

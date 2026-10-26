@@ -1,10 +1,15 @@
 "use server"
 
+import { headers } from "next/headers"
 import { getTranslations } from "next-intl/server"
 import * as v from "valibot"
 import { actionClient } from "@/lib/server/safe-action"
 import { verifyTurnstile } from "@/lib/security/turnstile"
-import { buildFormValuesSchema } from "@/lib/validations/form-values"
+import {
+  buildFormValuesSchema,
+  FORM_VALUE_MAX_LENGTH,
+} from "@/lib/validations/form-values"
+import { formLimiter } from "@/config/rate-limiter"
 import { UUID_REGEX } from "@/lib/validations/uuid"
 import { getPublishedFormBlockRepository } from "@/services/domain/db/repositories/collections/form-block"
 import { createFormResponseRepository } from "@/services/domain/db/repositories/collections/form-responses"
@@ -46,6 +51,21 @@ export const submitForm = actionClient
   .action(async ({ parsedInput }): Promise<SubmitFormData> => {
     const { formId, captchaToken, values } = parsedInput
     const t = await getTranslations("db.form_responses")
+    const forwarded = (await headers()).get("x-forwarded-for")
+    const clientIp = forwarded
+      ?.trim()
+      .toLowerCase()
+      .replace(/^::ffff:/, "")
+    if (!clientIp || clientIp.includes(",")) {
+      console.warn("[form] rate limited")
+      return { ok: false, message: t("rate_limited") }
+    }
+    try {
+      await formLimiter.consume(clientIp)
+    } catch {
+      console.warn("[form] rate limited")
+      return { ok: false, message: t("rate_limited") }
+    }
     const form = await getPublishedFormBlockRepository(formId)
 
     if (!form) {
@@ -64,7 +84,7 @@ export const submitForm = actionClient
     const parsed = v.safeParse(
       buildFormValuesSchema(fields, {
         required: t("required"),
-        maxLength: t("max_length", { max: 255 }),
+        maxLength: t("max_length", { max: FORM_VALUE_MAX_LENGTH }),
         email: t("email"),
         phone: t("phone"),
         date: t("date"),

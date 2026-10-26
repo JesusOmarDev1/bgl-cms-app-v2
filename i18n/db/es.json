@@ -108,6 +108,7 @@
       "failed_to_create": "Error al crear la respuesta del formulario.",
       "not_found": "No se encontró el formulario.",
       "captcha_failed": "No se pudo verificar el captcha.",
+      "rate_limited": "Demasiados intentos. Intenta de nuevo en 5 minutos.",
       "invalid": "Revisa los campos del formulario.",
       "failed_to_submit": "No se pudo enviar el formulario.",
       "success": "Recibimos tu información. Gracias.",

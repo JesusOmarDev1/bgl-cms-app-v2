@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { BlockPage } from "@/components/page/BlockPage"
 import { BlockPageSkeleton } from "@/components/page/BlockPageSkeleton"
 import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
+import { RecordBlockPage } from "@/components/page/BlockPage"
 
 const HOME_PAGE_SLUG = "inicio"
 
@@ -25,7 +25,10 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <Suspense fallback={<BlockPageSkeleton />}>
-      <BlockPage slug={HOME_PAGE_SLUG} />
+      <RecordBlockPage
+        params={Promise.resolve({ slug: HOME_PAGE_SLUG })}
+        load={getPageBySlugRepository}
+      />
     </Suspense>
   )
 }

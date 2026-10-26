@@ -7,7 +7,10 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group"
-import type { ExpandedFormField } from "@/lib/validations/form-values"
+import {
+  FORM_VALUE_MAX_LENGTH,
+  type ExpandedFormField,
+} from "@/lib/validations/form-values"
 
 interface InputTextAreaClientProps {
   data: Extract<ExpandedFormField, { collection: "text_area_block" }>["item"]
@@ -42,7 +45,7 @@ export function InputTextAreaClient({
           placeholder={`Ingresa tu ${data.label}...`}
           rows={5}
           aria-invalid={invalid || undefined}
-          maxLength={500}
+          maxLength={FORM_VALUE_MAX_LENGTH}
           required={data.required}
           aria-label={data.label}
           autoComplete="off"
@@ -51,7 +54,7 @@ export function InputTextAreaClient({
         />
         <InputGroupAddon align="block-end">
           <InputGroupText className="tabular-nums">
-            {value.length} / 500 caracteres
+            {value.length} / {FORM_VALUE_MAX_LENGTH} caracteres
           </InputGroupText>
         </InputGroupAddon>
       </InputGroup>

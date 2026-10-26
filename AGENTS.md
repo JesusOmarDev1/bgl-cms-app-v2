@@ -15,6 +15,10 @@ Before finishing a code change: `pnpm pre-deploy`.
 
 Read [DESIGN.md](DESIGN.md) before any UI change. The site is forced dark. Brand red (`#e7000b`) is the `red` button variant and text selection only. Use components in `components/ui`.
 
+# Rule dispatcher
+
+Before editing, read `.cursor/rules/*.mdc` and apply every rule with `alwaysApply: true`, plus every rule whose frontmatter `globs` matches any file you intend to change. If a Cursor rule conflicts with this file, `AGENTS.md` wins.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

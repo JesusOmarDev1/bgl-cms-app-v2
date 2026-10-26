@@ -1,0 +1,31 @@
+prefix_rule(
+    pattern = [["npm", "npm.cmd"]],
+    decision = "forbidden",
+    justification = "Use pnpm.",
+    match = ["npm install", "npm.cmd run dev"],
+    not_match = ["pnpm install", "pnpm i"],
+)
+
+prefix_rule(
+    pattern = [["npx", "npx.cmd"]],
+    decision = "forbidden",
+    justification = "Use pnpx.",
+    match = ["npx next", "npx.cmd next"],
+    not_match = ["pnpx next", "pnpm i"],
+)
+
+prefix_rule(
+    pattern = [["curl", "curl.exe"]],
+    decision = "forbidden",
+    justification = "Do not use curl.",
+    match = ["curl https://example.com", "curl.exe https://example.com"],
+    not_match = ["pnpm i"],
+)
+
+prefix_rule(
+    pattern = [["pnpm", "pnpm.cmd"], "approve-builds"],
+    decision = "forbidden",
+    justification = "Set allowBuilds booleans in pnpm-workspace.yaml, then pnpm i.",
+    match = ["pnpm approve-builds", "pnpm.cmd approve-builds"],
+    not_match = ["pnpm i", "pnpm install"],
+)

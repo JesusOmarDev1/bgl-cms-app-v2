@@ -1,4 +1,5 @@
 import * as v from "valibot"
+import { parseDateString } from "@/lib/formatting/format-date"
 import { DATE_REGEX } from "@/lib/validations/date"
 import { DATETIME_LOCAL_REGEX } from "@/lib/validations/datetime"
 import { EMAIL_REGEX } from "@/lib/validations/email"
@@ -13,7 +14,7 @@ type NumberFormField = Extract<
   { collection: "number_block" }
 >["item"]
 
-const TEXT_MAX_LENGTH = 255
+export const FORM_VALUE_MAX_LENGTH = 255
 
 export type FormFieldMessages = {
   required: string
@@ -33,29 +34,35 @@ function textSchema(required: boolean, messages: FormFieldMessages) {
     ? v.pipe(
         v.string(),
         v.minLength(1, messages.required),
-        v.maxLength(TEXT_MAX_LENGTH, messages.maxLength)
+        v.maxLength(FORM_VALUE_MAX_LENGTH, messages.maxLength)
       )
-    : v.pipe(v.string(), v.maxLength(TEXT_MAX_LENGTH, messages.maxLength))
+    : v.pipe(v.string(), v.maxLength(FORM_VALUE_MAX_LENGTH, messages.maxLength))
 }
 
 function patternSchema(
   required: boolean,
   pattern: RegExp,
   format: string,
-  requiredMessage: string
+  requiredMessage: string,
+  maxLengthMessage: string
 ) {
-  const matched = v.pipe(v.string(), v.regex(pattern, format))
+  const matched = v.pipe(
+    v.string(),
+    v.maxLength(FORM_VALUE_MAX_LENGTH, maxLengthMessage),
+    v.regex(pattern, format)
+  )
   return required
     ? v.pipe(
         v.string(),
         v.minLength(1, requiredMessage),
+        v.maxLength(FORM_VALUE_MAX_LENGTH, maxLengthMessage),
         v.regex(pattern, format)
       )
     : v.union([v.literal(""), matched])
 }
 
 function numberSchema(item: NumberFormField, messages: FormFieldMessages) {
-  const base = v.number(messages.number)
+  const base = v.pipe(v.number(messages.number), v.finite(messages.number))
   const bounded =
     item.min != null && item.max != null
       ? v.pipe(
@@ -86,27 +93,42 @@ function schemaFor(row: ExpandedFormField, messages: FormFieldMessages) {
         row.item.required,
         EMAIL_REGEX,
         messages.email,
-        messages.required
+        messages.required,
+        messages.maxLength
       )
     case "phone_block":
       return patternSchema(
         row.item.required,
         TELEPHONE_REGEX,
         messages.phone,
-        messages.required
+        messages.required,
+        messages.maxLength
       )
     case "number_block":
       return numberSchema(row.item, messages)
     case "date_block":
-      return patternSchema(
-        row.item.required,
-        row.item.hours ? DATETIME_LOCAL_REGEX : DATE_REGEX,
-        row.item.hours ? messages.datetime : messages.date,
-        messages.required
-      )
+      return dateSchema(row.item.required, row.item.hours, messages)
     case "checkbox_block":
       return checkboxSchema(row.item.required, messages.checkbox)
   }
+}
+
+function dateSchema(
+  required: boolean,
+  hours: boolean,
+  messages: FormFieldMessages
+) {
+  const pattern = hours ? DATETIME_LOCAL_REGEX : DATE_REGEX
+  const format = hours ? messages.datetime : messages.date
+  const matched = v.pipe(
+    v.string(),
+    v.maxLength(FORM_VALUE_MAX_LENGTH, messages.maxLength),
+    v.regex(pattern, format),
+    v.check((value) => parseDateString(value) !== undefined, format)
+  )
+  return required
+    ? v.pipe(v.string(), v.minLength(1, messages.required), matched)
+    : v.union([v.literal(""), matched])
 }
 
 export function buildFormValuesSchema(

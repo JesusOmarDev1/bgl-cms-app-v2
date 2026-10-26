@@ -17,10 +17,12 @@ Response security headers have one writer. [proxy.ts](proxy.ts) calls `setSecuri
 - `Strict-Transport-Security` is set only when `NODE_ENV` is `production`.
 - With visual editing off, responses include `X-Frame-Options: DENY` and `Cross-Origin-Opener-Policy: same-origin`.
 
-[config/arcjet.ts](config/arcjet.ts) runs Arcjet shield, bot detection, and a filter that denies VPN, Tor, curl, and empty user agents.
+[config/arcjet.ts](config/arcjet.ts) defines Arcjet shield, bot detection, and a filter that denies VPN, Tor, curl, and empty user agents, but no runtime `protect()` call currently enforces those rules.
 
 Cloudflare Turnstile keys live in [.env.example](.env.example) (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`). [config/csp.ts](config/csp.ts) allows `https://challenges.cloudflare.com`.
 
 Search is limited by [config/rate-limiter.ts](config/rate-limiter.ts): Redis (`searchLimiter`) with an in-memory `insuranceLimiter` when Redis errors.
+
+Form submissions are limited by `formLimiter` to 5 attempts per trusted client IP per 60 seconds, with a 5-minute block after the limit. It uses Redis with the in-memory insurance limiter and fails closed when neither limiter can decide.
 
 Secrets stay in `.env`. Copy [.env.example](.env.example). Do not commit `.env`.

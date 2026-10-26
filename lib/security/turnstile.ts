@@ -1,7 +1,11 @@
 import "server-only"
 
 import type { TurnstileServerValidationResponse } from "@marsidev/react-turnstile"
-import { TURNSTILE_SECRET_KEY, TURNSTILE_VERIFY_URL } from "@/lib/env/constants"
+import {
+  TURNSTILE_FORM_ACTION,
+  TURNSTILE_SECRET_KEY,
+  TURNSTILE_VERIFY_URL,
+} from "@/lib/env/constants"
 
 function isTurnstileSuccess(
   value: unknown
@@ -10,7 +14,9 @@ function isTurnstileSuccess(
     typeof value === "object" &&
     value !== null &&
     "success" in value &&
-    value.success === true
+    value.success === true &&
+    "action" in value &&
+    value.action === TURNSTILE_FORM_ACTION
   )
 }
 
@@ -25,6 +31,7 @@ export async function verifyTurnstile(token: string): Promise<boolean> {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ secret, response: responseToken }),
+      signal: AbortSignal.timeout(5_000),
     })
     if (!response.ok) return false
     const payload: unknown = await response.json()

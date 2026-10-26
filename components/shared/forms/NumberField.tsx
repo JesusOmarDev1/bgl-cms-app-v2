@@ -503,37 +503,19 @@ function MessageRow({
   className?: string
 }) {
   const reduced = useReducedMotion()
-  const copyRef = useRef<HTMLSpanElement>(null)
-  const [height, setHeight] = useState<number | "auto">("auto")
-  useLayoutEffect(() => {
-    const node = copyRef.current
-    if (!node || typeof ResizeObserver === "undefined") return
-    const observer = new ResizeObserver(([entry]) =>
-      setHeight(entry?.borderBoxSize?.[0]?.blockSize ?? node.offsetHeight)
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
   return (
     <motion.span
       className="block overflow-hidden"
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height, opacity: 1 }}
+      layout={!reduced}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{
-        height: 0,
         opacity: 0,
-        transition: reduced
-          ? { duration: 0 }
-          : { height: spring.smooth, opacity: { duration: duration.instant } },
+        transition: { duration: reduced ? 0 : duration.instant },
       }}
-      transition={
-        reduced
-          ? { duration: 0 }
-          : { height: spring.smooth, opacity: { duration: duration.fast } }
-      }
+      transition={{ duration: reduced ? 0 : duration.fast }}
     >
       <motion.span
-        ref={copyRef}
         id={id}
         className={className}
         initial={

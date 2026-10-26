@@ -13,6 +13,7 @@ export const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""
 export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY ?? ""
 export const TURNSTILE_VERIFY_URL = process.env.NEXT_PUBLIC_SITEVERIFY_URL ?? ""
+export const TURNSTILE_FORM_ACTION = "submit_form"
 
 // ARCJET API SECURITY
 export const ARCJET_KEY = process.env.ARCJET_KEY ?? ""

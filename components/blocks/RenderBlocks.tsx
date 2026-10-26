@@ -2,35 +2,57 @@ import { Suspense, type ReactElement } from "react"
 import { blockRegistry } from "@/components/blocks/register"
 import { Box } from "@/components/shared/content/Box"
 import { sanitizeHtmlFields } from "@/lib/formatting/sanitize"
-import type { PagesQueryResult } from "@/services/domain/db/queries/collections/pages/pages"
 
-type PageBody = NonNullable<PagesQueryResult[number]["body"]>
-type PageRow = PageBody[number]
+export type BlockBody =
+  | readonly {
+      id: number
+      collection: string
+      item: unknown
+    }[]
+  | null
+  | undefined
 
-function BlockSlot({ row }: { row: PageRow }) {
-  const { Component, Skeleton } = blockRegistry[row.collection]
-  // M2A rows are a discriminated union. Indexing the registry with that
-  // union loses the collection/item pair, so the view is read back as the
-  // row's own item instead of the schema block.
-  const View = Component as (props: { data: PageRow["item"] }) => ReactElement
+type RegistryCollection = keyof typeof blockRegistry
+
+function isRegistryCollection(
+  collection: string
+): collection is RegistryCollection {
+  return Object.hasOwn(blockRegistry, collection)
+}
+
+if (
+  !isRegistryCollection("hero_block") ||
+  isRegistryCollection("not_a_block")
+) {
+  throw new Error("registry collection self-check failed")
+}
+
+function BlockSlot({
+  collection,
+  item,
+}: {
+  collection: RegistryCollection
+  item: unknown
+}) {
+  const { Component, Skeleton } = blockRegistry[collection]
+  // Indexing the registry with the collection union loses the item pair.
+  const View = Component as (props: { data: unknown }) => ReactElement
   return (
     <Suspense fallback={<Skeleton />}>
-      <View data={sanitizeHtmlFields(row.item)} />
+      <View data={sanitizeHtmlFields(item)} />
     </Suspense>
   )
 }
 
-export function RenderBlocks({
-  blocks,
-}: {
-  blocks: PageBody | null | undefined
-}) {
+export function RenderBlocks({ blocks }: { blocks: BlockBody }) {
   if (!blocks || blocks.length === 0) return null
 
   const nodes: ReactElement[] = []
   for (const row of blocks) {
-    if (!Object.hasOwn(blockRegistry, row.collection)) continue
-    nodes.push(<BlockSlot key={row.id} row={row} />)
+    if (!isRegistryCollection(row.collection)) continue
+    nodes.push(
+      <BlockSlot key={row.id} collection={row.collection} item={row.item} />
+    )
   }
 
   if (nodes.length === 0) return null

@@ -12,7 +12,7 @@ The discriminator is the Directus field `collection`. There is no Payload `block
 
 `contact_block` is registered but is not on any body allowlist until Directus adds it.
 
-Only `components/page/BlockPage.tsx` renders body rows through `RenderBlocks`. Service, manual, and blog field trees stay in their queries. Do not add a second map. Do not sort rows in JS; queries already set `deep.body._sort: ["sort"]`.
+`BlockPage` and `RecordBlockPage` in `components/page/BlockPage.tsx` render body rows through `RenderBlocks`. Service, manual, and blog field trees stay in their queries. Do not add a second map. Do not sort rows in JS; queries already set `deep.body._sort: ["sort"]`.
 
 Optional fields and missing relations render nothing.
 

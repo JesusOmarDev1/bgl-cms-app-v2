@@ -1,6 +1,6 @@
 import { connection } from "next/server"
 import { notFound } from "next/navigation"
-import { RenderBlocks } from "@/components/blocks/RenderBlocks"
+import { RenderBlocks, type BlockBody } from "@/components/blocks/RenderBlocks"
 import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
 import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
 
@@ -30,6 +30,33 @@ function expectOverlay(body: unknown, expected: boolean) {
   }
 }
 
+function isBlockRow(
+  value: unknown
+): value is { id: number; collection: string; item: unknown } {
+  return (
+    isRecord(value) &&
+    typeof value.id === "number" &&
+    typeof value.collection === "string" &&
+    "item" in value
+  )
+}
+
+function toBlockBody(value: unknown): BlockBody {
+  if (!Array.isArray(value)) return null
+  const rows: { id: number; collection: string; item: unknown }[] = []
+  for (const entry of value) {
+    if (isBlockRow(entry)) rows.push(entry)
+  }
+  return rows
+}
+
+function expectBlockBody(value: unknown, count: number) {
+  const body = toBlockBody(value)
+  if ((body?.length ?? 0) !== count) {
+    throw new Error("block body self-check failed")
+  }
+}
+
 expectOverlay(undefined, false)
 expectOverlay([4], false)
 expectOverlay([{ collection: "hero_block", item: "uuid" }], false)
@@ -49,25 +76,43 @@ expectOverlay(
   [{ collection: "hero_block", item: { variant: "carousel_with_logos" } }],
   true
 )
+expectBlockBody(undefined, 0)
+expectBlockBody([4], 0)
+expectBlockBody([{ collection: "hero_block", item: {} }], 0)
+expectBlockBody(
+  [{ id: 1, collection: "hero_block", item: { variant: "simple" } }],
+  1
+)
 
-export async function BlockPage({ slug, params }: BlockPageProps) {
+export function BlockPageShell({ body }: { body: BlockBody }) {
+  return (
+    <>
+      {isOverlayHero(body) ? null : <HeaderSpacer />}
+      <RenderBlocks blocks={body} />
+    </>
+  )
+}
+
+export async function RecordBlockPage({
+  slug,
+  params,
+  load,
+}: BlockPageProps & {
+  load: (args: { slug: string }) => Promise<readonly { body: unknown }[]>
+}) {
   let resolved = slug
   if (!resolved && params) {
     resolved = (await params).slug
   }
   if (!resolved) notFound()
 
-  const pages = await getPageBySlugRepository({ slug: resolved })
-  const page = pages[0]
-  if (!page) notFound()
+  const rows = await load({ slug: resolved })
+  const row = rows[0]
+  if (!row) notFound()
 
+  const body = toBlockBody(row.body)
   // DOMPurify reads the clock while sanitizing CMS HTML. Postpone that render.
   await connection()
 
-  return (
-    <>
-      {isOverlayHero(page.body) ? null : <HeaderSpacer />}
-      <RenderBlocks blocks={page.body} />
-    </>
-  )
+  return <BlockPageShell body={body} />
 }

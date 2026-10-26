@@ -1,10 +1,11 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { BlockPage } from "@/components/page/BlockPage"
+import { RecordBlockPage } from "@/components/page/BlockPage"
 import { BlockPageSkeleton } from "@/components/page/BlockPageSkeleton"
 import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
+import { getManualBySlugRepository } from "@/services/domain/db/repositories/collections/manuals"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -31,7 +32,7 @@ export async function generateMetadata({
 export default function Page({ params }: PageProps) {
   return (
     <Suspense fallback={<BlockPageSkeleton />}>
-      <BlockPage params={params} />
+      <RecordBlockPage params={params} load={getPageBySlugRepository} />
     </Suspense>
   )
 }

@@ -20,9 +20,6 @@ const nextConfig: NextConfig = {
     agentFeedback: true,
     agentUpgrade: "security",
     turbopackGc: true,
-    serverActions: {
-      bodySizeLimit: "5mb",
-    },
   },
 }
 
