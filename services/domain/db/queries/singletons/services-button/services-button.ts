@@ -17,15 +17,6 @@ async function fetchServicesButton() {
   return directus.request(
     readSingleton("services_button", {
       fields: SERVICES_BUTTON_FIELDS,
-      deep: {
-        services: {
-          _filter: {
-            item: {
-              status: { _eq: "published" },
-            },
-          },
-        },
-      },
     } satisfies Query<Schema, ServicesButtonType>)
   )
 }

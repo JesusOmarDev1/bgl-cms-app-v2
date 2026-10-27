@@ -104,13 +104,14 @@ export function DirectusImage({
 
   const resolvedWidth = width ?? config.defaultSize.w
   const resolvedHeight = height ?? config.defaultSize.h
-  const resolvedSizes = sizes ?? (sizing === "auto" ? undefined : config.sizes)
+  const resolvedSizes =
+    sizes ?? (sizing === "auto" && !config.fluid ? undefined : config.sizes)
   const resolvedQuality = quality ?? config.quality
 
   const wrapperClassName = cn(
     "overflow-hidden",
     sizing === "fill" && "relative",
-    sizing === "auto" && "shrink-0",
+    sizing === "auto" && (config.fluid ? "w-full" : "shrink-0"),
     className
   )
 
@@ -124,7 +125,8 @@ export function DirectusImage({
     objectFit: config.objectFit,
     ...(sizing === "auto" && {
       aspectRatio: `${resolvedWidth} / ${resolvedHeight}`,
-      width: resolvedWidth,
+      width: config.fluid ? "100%" : resolvedWidth,
+      maxWidth: config.fluid ? resolvedWidth : undefined,
       height: "auto",
     }),
     ...(sizing === "fill" &&

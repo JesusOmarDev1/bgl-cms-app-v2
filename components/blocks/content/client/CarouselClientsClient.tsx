@@ -34,16 +34,6 @@ export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
     )
   }
 
-  const logos: { id: number; src: string; name: string }[] = []
-  for (const row of data.clients ?? []) {
-    const client = row.item
-    if (!client || client.status !== "published") continue
-    if (client.active === false) continue
-    const src = client.logo?.id
-    if (!src) continue
-    logos.push({ id: row.id, src, name: client.name })
-  }
-
   return (
     <div className="h-fit w-full overflow-hidden">
       <div className="mx-auto w-full max-w-7xl">
@@ -74,16 +64,21 @@ export function CarouselClientsClient({ data }: { data: ClientsBlockQuery }) {
         repeat={2}
         rowGap="1rem"
       >
-        {logos.map((logo) => (
-          <DirectusImage
-            key={logo.id}
-            src={logo.src}
-            alt={logo.name}
-            title={logo.name}
-            variant="logo"
-            className="grayscale"
-          />
-        ))}
+        {data.clients?.map((row) => {
+          const src = row.item?.logo?.id
+          if (!src) return null
+          const name = row.item?.name ?? ""
+          return (
+            <DirectusImage
+              key={row.id}
+              src={src}
+              alt={name}
+              title={name}
+              variant="logo"
+              className="grayscale"
+            />
+          )
+        })}
       </Marquee>
       <div className="relative -mt-5 h-24 w-full overflow-hidden [mask-image:radial-gradient(50%_50%,white,transparent)] [-webkit-mask-image:radial-gradient(50%_50%,white,transparent)] lg:-mt-8 lg:h-36">
         <div className="absolute inset-0 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_bottom_center,#ed1d1d,transparent_70%)] before:opacity-35" />

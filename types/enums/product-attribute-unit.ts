@@ -15,5 +15,6 @@ export const ProductAttributeUnitEnum = [
   "seconds",
   "minutes",
   "hours",
+  "none",
 ] as const
 export type ProductAttributeUnit = (typeof ProductAttributeUnitEnum)[number]

@@ -120,7 +120,7 @@ export function HeroCarouselWithLogos({ data }: { data: HeroBlockQuery }) {
                 />
               </Box>
               <Marquee
-                className="max-w-xs mask-r-from-90% mask-l-from-90% md:max-w-md lg:max-w-lg"
+                className="max-w-2xs mask-r-from-90% mask-l-from-90% md:max-w-md"
                 repeat={2}
               >
                 {data.brands?.map((row) => (

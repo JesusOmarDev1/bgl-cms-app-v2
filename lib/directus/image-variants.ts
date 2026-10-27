@@ -5,6 +5,8 @@ import { placeholderDetail } from "@/assets/placeholders/detail"
 import { placeholderHero } from "@/assets/placeholders/hero"
 import { placeholderLg } from "@/assets/placeholders/lg"
 import { placeholderLogo } from "@/assets/placeholders/logo"
+import { placeholderLogoLg } from "@/assets/placeholders/logo-lg"
+import { placeholderLogoMd } from "@/assets/placeholders/logo-md"
 import { placeholderMd } from "@/assets/placeholders/md"
 import { placeholderOriginal } from "@/assets/placeholders/original"
 import { placeholderSm } from "@/assets/placeholders/sm"
@@ -33,6 +35,8 @@ export type DirectusImageVariant =
   | "square"
   | "hero"
   | "logo"
+  | "logo-md"
+  | "logo-lg"
   | "thumbnail"
   | "original"
   | "xs"
@@ -56,9 +60,10 @@ type VariantConfig = {
   defaultSize: { w: number; h: number }
   sizes: string
   quality: DirectusImageQuality
+  fluid?: boolean
 }
 
-export const VARIANT_CONFIG = {
+export const VARIANT_CONFIG: Record<DirectusImageVariant, VariantConfig> = {
   card: {
     ratio: 4 / 5,
     placeholder: dataImagePlaceholder(placeholderCard),
@@ -103,6 +108,27 @@ export const VARIANT_CONFIG = {
     defaultSize: { w: 80, h: 80 },
     sizes: px(80),
     quality: 80,
+  },
+  "logo-md": {
+    ratio: 1,
+    placeholder: dataImagePlaceholder(placeholderLogoMd),
+    objectFit: "contain",
+    fit: "contain",
+    defaultSize: { w: 160, h: 160 },
+    sizes: "(max-width: 768px) 40vw, 160px",
+    quality: 80,
+    fluid: true,
+  },
+  "logo-lg": {
+    ratio: 1,
+    placeholder: dataImagePlaceholder(placeholderLogoLg),
+    objectFit: "contain",
+    fit: "contain",
+    defaultSize: { w: 320, h: 320 },
+    sizes:
+      "(max-width: 639px) 90vw, (max-width: 767px) 45vw, (max-width: 1023px) 30vw, 200px",
+    quality: 80,
+    fluid: true,
   },
   thumbnail: {
     ratio: 1 / 1,
@@ -194,4 +220,4 @@ export const VARIANT_CONFIG = {
     sizes: "2560px",
     quality: 80,
   },
-} satisfies Record<DirectusImageVariant, VariantConfig>
+}

@@ -17,10 +17,8 @@ export const CLIENTS_BLOCK_FIELDS = [
         item: {
           clients: [
             "id",
-            "status",
             "name",
             "website",
-            "active",
             "slug",
             { logo: ["*"] },
             "date_created",

@@ -14,26 +14,8 @@ import {
 import type { SuppliersBlockQuery } from "@/services/domain/db/queries/blocks/suppliers-block/suppliers-block.fields"
 
 export function SuppliersClient({ data }: { data: SuppliersBlockQuery }) {
-  const logos: {
-    id: number
-    src: string
-    name: string
-    website: string | null
-  }[] = []
-  for (const row of data.suppliers ?? []) {
-    const supplier = row.item
-    if (!supplier || supplier.status !== "published") continue
-    if (supplier.active === false) continue
-    const src = supplier.logo?.id
-    if (!src) continue
-    logos.push({
-      id: row.id,
-      src,
-      name: supplier.name,
-      website: supplier.website,
-    })
-  }
-  if (!data.title && !data.excerpt && logos.length === 0) return null
+  const hasLogo = data.suppliers?.some((row) => row.item?.logo?.id)
+  if (!data.title && !data.excerpt && !hasLogo) return null
 
   return (
     <BoxContainer>
@@ -52,26 +34,27 @@ export function SuppliersClient({ data }: { data: SuppliersBlockQuery }) {
         render={(props) => <section {...props} />}
       >
         <BlockHeading excerpt={data.excerpt} title={data.title} />
-        {logos.length > 0 ? (
+        {hasLogo ? (
           <Carousel className="px-12">
             <CarouselContent>
-              {logos.map((logo) => {
+              {data.suppliers?.map((row) => {
+                const src = row.item?.logo?.id
+                if (!src) return null
+                const name = row.item?.name ?? ""
+                const website = row.item?.website
                 const image = (
                   <DirectusImage
-                    alt={logo.name}
-                    src={logo.src}
-                    title={logo.name}
+                    alt={name}
+                    src={src}
+                    title={name}
                     variant="logo"
                   />
                 )
                 return (
-                  <CarouselItem
-                    key={logo.id}
-                    className="basis-1/2 md:basis-1/4"
-                  >
+                  <CarouselItem key={row.id} className="basis-1/2 md:basis-1/4">
                     <div className="flex justify-center">
-                      {logo.website ? (
-                        <Link href={logo.website} aria-label={logo.name}>
+                      {website ? (
+                        <Link href={website} aria-label={name}>
                           {image}
                         </Link>
                       ) : (

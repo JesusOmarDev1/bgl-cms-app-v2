@@ -7,26 +7,8 @@ import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import type { LogosClientsBlockQuery } from "@/services/domain/db/queries/blocks/logos-clients-block/logos-clients-block.fields"
 
 export function LogosClientsClient({ data }: { data: LogosClientsBlockQuery }) {
-  const logos: {
-    id: number
-    src: string
-    name: string
-    website: string | null
-  }[] = []
-  for (const row of data.clients ?? []) {
-    const client = row.clients_id
-    if (!client || client.status !== "published") continue
-    if (client.active === false) continue
-    const src = client.logo?.id
-    if (!src) continue
-    logos.push({
-      id: row.id,
-      src,
-      name: client.name,
-      website: client.website,
-    })
-  }
-  if (!data.title && !data.excerpt && logos.length === 0) return null
+  const hasLogo = data.clients?.some((row) => row.clients_id.logo?.id)
+  if (!data.title && !data.excerpt && !hasLogo) return null
 
   return (
     <BoxContainer>
@@ -45,24 +27,29 @@ export function LogosClientsClient({ data }: { data: LogosClientsBlockQuery }) {
         render={(props) => <section {...props} />}
       >
         <BlockHeading excerpt={data.excerpt} title={data.title} />
-        {logos.length > 0 ? (
-          <ul className="grid w-full min-w-0 grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {logos.map((logo) => {
+        {hasLogo ? (
+          <ul className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+            {data.clients?.map((row) => {
+              const src = row.clients_id.logo?.id
+              if (!src) return null
               const image = (
                 <DirectusImage
-                  alt={logo.name}
-                  src={logo.src}
-                  title={logo.name}
-                  variant="logo"
+                  alt={row.clients_id.name}
+                  src={src}
+                  title={row.clients_id.name}
+                  variant="logo-lg"
                 />
               )
               return (
                 <li
-                  key={logo.id}
+                  key={row.id}
                   className="flex min-w-0 items-center justify-center"
                 >
-                  {logo.website ? (
-                    <Link href={logo.website} aria-label={logo.name}>
+                  {row.clients_id.website ? (
+                    <Link
+                      href={row.clients_id.website}
+                      aria-label={row.clients_id.name}
+                    >
                       {image}
                     </Link>
                   ) : (

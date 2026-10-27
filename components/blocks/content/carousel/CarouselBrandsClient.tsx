@@ -31,14 +31,6 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
     )
   }
 
-  const logos: { id: number; src: string; title: string }[] = []
-  for (const row of data.brands ?? []) {
-    const brand = row.brands_id
-    const src = brand.logo?.id
-    if (!src) continue
-    logos.push({ id: row.id, src, title: brand.title })
-  }
-
   return (
     <div className="h-fit w-full overflow-hidden">
       <div className="mx-auto w-full max-w-7xl">
@@ -69,15 +61,19 @@ export function CarouselBrandsClient({ data }: { data: BrandsBlockQuery }) {
         repeat={3}
         rowGap="1rem"
       >
-        {logos.map((logo) => (
-          <DirectusImage
-            key={logo.id}
-            src={logo.src}
-            alt={logo.title}
-            title={logo.title}
-            variant="logo"
-          />
-        ))}
+        {data.brands?.map((row) => {
+          const src = row.brands_id.logo?.id
+          if (!src) return null
+          return (
+            <DirectusImage
+              key={row.id}
+              src={src}
+              alt={row.brands_id.title}
+              title={row.brands_id.title}
+              variant="logo"
+            />
+          )
+        })}
       </Marquee>
       <div className="relative -mt-5 h-24 w-full overflow-hidden [mask-image:radial-gradient(50%_50%,white,transparent)] [-webkit-mask-image:radial-gradient(50%_50%,white,transparent)] lg:-mt-8 lg:h-36">
         <div className="absolute inset-0 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_bottom_center,#ed1d1d,transparent_70%)] before:opacity-35" />

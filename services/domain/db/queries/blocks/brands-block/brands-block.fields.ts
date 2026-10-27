@@ -19,7 +19,6 @@ export const BRANDS_BLOCK_FIELDS = [
           "excerpt",
           { logo: ["*"] },
           "slug",
-          "status",
           "date_created",
           "date_updated",
         ],

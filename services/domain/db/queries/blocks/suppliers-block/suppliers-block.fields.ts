@@ -18,8 +18,6 @@ export const SUPPLIERS_BLOCK_FIELDS = [
           suppliers: [
             "id",
             "name",
-            "status",
-            "active",
             "website",
             "slug",
             { logo: ["*"] },

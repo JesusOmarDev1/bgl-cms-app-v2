@@ -15,10 +15,8 @@ export const LOGOS_CLIENTS_BLOCK_FIELDS = [
       {
         clients_id: [
           "id",
-          "status",
           "name",
           "website",
-          "active",
           "slug",
           { logo: ["*"] },
           "date_created",
