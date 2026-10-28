@@ -66,7 +66,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
         side="right"
         isOpen={open}
         onOpenChange={setOpen}
-        className="gap-0 overflow-hidden bg-background p-0 sm:max-w-md"
+        className="w-full gap-0 overflow-hidden bg-background p-0"
       >
         <div className="flex h-full min-h-0 flex-col">
           <SheetHeader className="shrink-0 border-b border-border p-4 pe-12">

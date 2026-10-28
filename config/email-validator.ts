@@ -1,5 +1,5 @@
 import { validate as deepValidate } from "deep-email-validator"
-import emailValidatorMessages from "@/i18n/email-validator/es.json"
+import emailValidatorMessages from "@/i18n/messages/es/email-validator.json"
 
 export async function validateEmail(
   email: string

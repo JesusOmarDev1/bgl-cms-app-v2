@@ -1,4 +1,5 @@
 import { setAttr } from "@directus/visual-editing"
+import Link from "next/link"
 import { BlockHeading } from "@/components/blocks/BlockHeading"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
@@ -22,6 +23,7 @@ export function FeaturedProductsClient({
     title: string
     excerpt: string | null
     src: string | null
+    slug: string | null
   }[] = []
   for (const row of data.products ?? []) {
     const product = row.products_id
@@ -33,6 +35,7 @@ export function FeaturedProductsClient({
       title: product.title,
       excerpt: product.excerpt,
       src,
+      slug: product.slug,
     })
   }
   if (!data.title && !data.excerpt && products.length === 0) return null
@@ -62,8 +65,8 @@ export function FeaturedProductsClient({
             gap={2}
             render={(props) => <ul {...props} />}
           >
-            {products.map((product) => (
-              <li key={product.id} className="min-w-0">
+            {products.map((product) => {
+              const card = (
                 <Card className="h-full">
                   {product.src ? (
                     <DirectusImage
@@ -85,8 +88,22 @@ export function FeaturedProductsClient({
                     ) : null}
                   </CardHeader>
                 </Card>
-              </li>
-            ))}
+              )
+              return (
+                <li key={product.id} className="min-w-0">
+                  {product.slug ? (
+                    <Link
+                      className="block h-full rounded-xl focus-visible:ring-3 focus-visible:ring-ring/50"
+                      href={`/tienda/producto/${product.slug}`}
+                    >
+                      {card}
+                    </Link>
+                  ) : (
+                    card
+                  )}
+                </li>
+              )
+            })}
           </Box>
         ) : null}
       </Box>

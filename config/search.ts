@@ -1,5 +1,5 @@
 import Fuse, { type FuseOptionKey } from "fuse.js"
-import searchMessages from "@/i18n/search/es.json"
+import searchMessages from "@/i18n/messages/es/search.json"
 
 export interface FuseSearchOptions<T> {
   keys: FuseOptionKey<T>[]

@@ -1,0 +1,11 @@
+{
+  "manuals": {
+    "title": "Manuales",
+    "intro": "Consulta los manuales publicados y encuéntralos por categoría.",
+    "back_home": "Regresar a inicio",
+    "search_label": "Buscar manuales",
+    "search_placeholder": "Buscar por nombre o extracto...",
+    "empty_catalog": "Todavía no hay manuales publicados.",
+    "no_matches": "Ningún manual coincide con la búsqueda."
+  }
+}

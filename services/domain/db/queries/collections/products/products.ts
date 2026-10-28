@@ -25,6 +25,15 @@ async function fetchProducts(status: StatusType, limit: number, page: number) {
   return directus.request(
     readItems("products", {
       fields: PRODUCTS_FIELDS,
+      deep: {
+        related_products: {
+          _filter: {
+            related_products_id: {
+              status: { _eq: status },
+            },
+          },
+        },
+      },
       limit,
       page,
       sort: ["-date_created"],
@@ -62,6 +71,15 @@ async function fetchProductsBySlug(
   return directus.request(
     readItems("products", {
       fields: PRODUCTS_FIELDS,
+      deep: {
+        related_products: {
+          _filter: {
+            related_products_id: {
+              status: { _eq: status },
+            },
+          },
+        },
+      },
       limit,
       page,
       sort: ["-date_created"],

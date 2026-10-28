@@ -79,7 +79,7 @@ export function WhatsappBtnClient({
           role="status"
           aria-hidden={!open}
           className={cn(
-            "absolute end-0 bottom-full mb-2 w-64",
+            "absolute end-0 bottom-full mb-2 w-72",
             open
               ? "animate-in zoom-in-95 fade-in"
               : "pointer-events-none invisible"
@@ -93,25 +93,27 @@ export function WhatsappBtnClient({
             orientation="horizontal"
           >
             <MaterialIcon name="info" size={16} />
-            {title ? <AlertTitle>{title}</AlertTitle> : null}
+            {title ? (
+              <AlertTitle className="text-lg font-bold">{title}</AlertTitle>
+            ) : null}
           </Box>
           {message ? (
             <AlertDescription>
-              <SafeHtml content={message} unstyled />
+              <SafeHtml content={message} unstyled className="text-sm" />
             </AlertDescription>
           ) : null}
         </Alert>
       ) : null}
       <LinkButton
         href={data.url}
+        title={data.tooltip_title || "Chat en WhatsApp"}
         variant="secondary"
-        size="icon-xl"
         target="_blank"
         rel="noopener noreferrer"
         aria-label={title}
-        className="bg-green-500 hover:bg-green-600"
+        className="size-16 rounded-full bg-green-500 hover:bg-green-600"
       >
-        <WhatsAppIcon className="size-6" />
+        <WhatsAppIcon className="size-8" />
       </LinkButton>
     </div>
   )

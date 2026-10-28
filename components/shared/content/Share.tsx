@@ -19,6 +19,7 @@ interface ShareProps {
     | "outline"
     | "link"
     | "destructive"
+    | "red"
     | null
   successMessage?: string
   errorMessage?: string
@@ -79,7 +80,11 @@ export default function Share({
         isDisabled={disabled}
         variant={variant}
       >
-        <MaterialIcon name="share" data-icon="inline-start" />
+        <MaterialIcon
+          name="share"
+          data-icon="inline-start"
+          className="text-foreground"
+        />
         {t("share")}
       </Button>
     </>

@@ -1,4 +1,5 @@
 "use client"
+import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { Box } from "@/components/shared/content/Box"
 import { SafeHtml } from "@/components/shared/content/SafeHtml"
@@ -26,13 +27,19 @@ export function ServicesBtnClient({
 }) {
   return (
     <Drawer showSwipeHandle>
-      <DrawerTrigger className={className} render={<Button variant="red" />}>
+      <DrawerTrigger
+        className={className}
+        render={
+          <Button variant="red" size="xl" className="text-xl font-semibold" />
+        }
+      >
+        <MaterialIcon name="menu" className="text-foreground" />
         {data.title}
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{data.title}</DrawerTitle>
-          <DrawerDescription>
+          <DrawerDescription render={<Box />}>
             <SafeHtml content={data.excerpt ?? ""} />
           </DrawerDescription>
         </DrawerHeader>
@@ -41,7 +48,7 @@ export function ServicesBtnClient({
             {data.services?.map((service) => (
               <li key={service.id}>
                 <Link
-                  href={`/services/${service.item?.slug}`}
+                  href={`/servicios/${service.item?.slug}`}
                   title={service.item?.title}
                   aria-label={service.item?.title}
                 >
@@ -62,10 +69,14 @@ export function ServicesBtnClient({
                       className="rounded-xl"
                     />
                     <Box display="flex" gap={0.5} orientation="vertical">
-                      <h3 className="text-lg font-bold">
+                      <h3 className="text-xl font-bold lg:text-2xl">
                         {service.item?.title}
                       </h3>
-                      <SafeHtml content={service.item?.excerpt ?? ""} />
+                      <SafeHtml
+                        content={service.item?.excerpt ?? ""}
+                        unstyled
+                        className="line-clamp-1 text-sm text-muted-foreground md:line-clamp-2 lg:line-clamp-none"
+                      />
                     </Box>
                   </Box>
                 </Link>

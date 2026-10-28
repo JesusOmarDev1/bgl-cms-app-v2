@@ -1,0 +1,13 @@
+{
+  "catalog": {
+    "category_label": "Categoría",
+    "category_placeholder": "Buscar por categoría...",
+    "category_all": "Todas las categorías",
+    "sort_label": "Ordenar",
+    "sort_newest": "Más recientes",
+    "sort_oldest": "Más antiguos",
+    "sort_az": "A-Z",
+    "sort_za": "Z-A",
+    "clear_filters": "Limpiar filtros"
+  }
+}

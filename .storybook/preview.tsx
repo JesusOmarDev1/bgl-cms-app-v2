@@ -4,8 +4,8 @@ import { NextIntlClientProvider } from "next-intl"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { themes, ensure } from "storybook/theming"
 import { geist, geistMono } from "@/lib/fonts/geist"
-import dbMessages from "@/i18n/db/es.json"
-import storybookMessages from "@/i18n/storybook/es.json"
+import dbMessages from "@/i18n/messages/es/db.json"
+import storybookMessages from "@/i18n/messages/es/storybook.json"
 
 type StoryTheme = "light" | "dark"
 

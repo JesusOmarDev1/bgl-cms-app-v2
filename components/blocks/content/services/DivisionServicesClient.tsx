@@ -44,7 +44,7 @@ export function DivisionServicesClient({
         {divisions.length > 0 ? (
           <Box
             className="list-none"
-            cols={{ base: 1, sm: 2, lg: 3 }}
+            cols={{ base: 1, sm: 2 }}
             display="grid"
             gap={2}
             render={(props) => <ul {...props} />}
@@ -54,7 +54,7 @@ export function DivisionServicesClient({
                 <li key={division.id} className="min-w-0">
                   <DirectusImage
                     alt={division.title}
-                    className="w-full rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:mask-b-from-60%"
+                    className="w-full rounded-2xl transition-transform duration-300 ease-in-out hover:cursor-pointer hover:mask-b-from-60%"
                     sizing="contained"
                     src={division.src}
                     variant="card"

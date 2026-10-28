@@ -1,0 +1,50 @@
+{
+  "products": {
+    "title": "Productos",
+    "intro": "Explora el catálogo por tipo de equipo, categoría y disponibilidad. Encuentra la solución de pesaje ideal para tu negocio.",
+    "back_home": "Regresar a inicio",
+    "back_to_store": "Regresar a tienda",
+    "search_label": "Buscar productos",
+    "search_placeholder": "Buscar por nombre o descripción...",
+    "empty_catalog": "Todavía no hay productos publicados.",
+    "no_matches": "Ningún producto coincide con la búsqueda.",
+    "brand_model": "Marca: {brand} Modelo: {model}",
+    "brand": "Marca: {brand}",
+    "model": "Modelo: {model}",
+    "related": "Productos relacionados",
+    "gallery": "Galería del producto",
+    "previous_image": "Imagen anterior",
+    "next_image": "Imagen siguiente",
+    "thumbnail": "Miniatura {index}",
+    "groups": {
+      "general": "General",
+      "specs": "Especificaciones",
+      "functions": "Funciones",
+      "others": "Otros"
+    },
+    "equipment": {
+      "scale": "Báscula",
+      "consumables": "Consumibles",
+      "indicator": "Indicador",
+      "labeling_indicator": "Indicador etiquetador"
+    },
+    "units": {
+      "kilograms": "kg",
+      "grams": "g",
+      "pounds": "lb",
+      "milligrams": "mg",
+      "micrograms": "µg",
+      "nanograms": "ng",
+      "liters": "L",
+      "gallons": "gal",
+      "meters": "m",
+      "centimeters": "cm",
+      "amperes": "A",
+      "volts": "V",
+      "kelvins": "K",
+      "seconds": "s",
+      "minutes": "min",
+      "hours": "h"
+    }
+  }
+}
