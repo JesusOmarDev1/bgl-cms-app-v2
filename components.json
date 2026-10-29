@@ -32,6 +32,7 @@
     "@ncdai": "https://chanhdai.com/r/{name}.json",
     "@componentry": "https://componentry.fun/r/{name}.json",
     "@pdfcn": "https://pdfcn.dev/r/{name}.json",
-    "@uiarc": "https://uiarc.dev/r/{name}.json"
+    "@uiarc": "https://uiarc.dev/r/{name}.json",
+    "@efferd": "https://efferd.com/r/{name}.json"
   }
 }

@@ -51,6 +51,39 @@ export async function getRedirectsQuery(
   }
 }
 
+async function fetchRedirectIndex() {
+  "use cache"
+  cacheTag("redirects")
+  cacheLife("minutes")
+
+  const rows: { id: string; origin: string; destiny: string; http_code: string }[] = []
+  for (let page = 1; ; page++) {
+    const batch = await directus.request(
+      readItems("redirects", {
+        fields: ["id", "origin", "destiny", "http_code"],
+        limit: 200,
+        page,
+        sort: ["-date_created", "id"],
+      } satisfies Query<Schema, RedirectsTypes>)
+    )
+    rows.push(...batch)
+    if (batch.length < 200) return rows
+  }
+}
+
+export async function getRedirectIndexQuery(failedToFetchMessage: string) {
+  try {
+    return await fetchRedirectIndex()
+  } catch (error) {
+    returnDirectusQueryError(error, failedToFetchMessage, {
+      component: "db.queries",
+      operation: "getRedirectIndexQuery",
+      collection: "redirects",
+    })
+    throw error
+  }
+}
+
 async function fetchRedirectsCount() {
   "use cache"
   cacheTag("redirects_count")

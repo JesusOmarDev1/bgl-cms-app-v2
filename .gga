@@ -22,7 +22,7 @@
 #   PROVIDER="github:deepseek-r1"
 #   PROVIDER="minimax"
 #   PROVIDER="minimax:MiniMax-M3"
-PROVIDER="claude"
+PROVIDER="codex:gpt-6-luna"
 
 # File patterns to include in review (comma-separated)
 # Default: * (all files)
@@ -62,4 +62,4 @@ TIMEOUT="300"
 
 # Base branch for --pr-mode (auto-detects main/master/develop if empty)
 # Default: auto-detect
-# PR_BASE_BRANCH="main"
+PR_BASE_BRANCH="main"

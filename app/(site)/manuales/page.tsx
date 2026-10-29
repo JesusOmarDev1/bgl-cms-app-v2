@@ -40,6 +40,7 @@ function toManualCard(row: ManualsQueryResult[number]): ManualCardData {
     dateCreated: row.date_created,
     categorySlug: trimmed(row.manual_category?.slug),
     categoryTitle: trimmed(row.manual_category?.title),
+    categoryIcon: trimmed(row.manual_category?.icon),
     slug: trimmed(row.slug),
     imageId: row.image?.id ?? null,
   }

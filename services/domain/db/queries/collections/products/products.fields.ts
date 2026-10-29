@@ -3,6 +3,27 @@ import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fie
 import type { ProductsTypes } from "@/types/collections/products"
 import type { Schema } from "@/types/schema"
 
+export const PRODUCT_CATALOG_FIELDS = [
+  "id",
+  "slug",
+  "title",
+  "excerpt",
+  "description",
+  "date_created",
+  { image: ["id"] },
+  { brand: ["title"] },
+  { model: ["title"] },
+  { product_category: ["id", "title", "slug", "icon"] },
+] as const satisfies NonNullable<Query<Schema, ProductsTypes>["fields"]>
+
+export const PRODUCT_CATALOG_CATEGORY_FIELDS = [
+  "id",
+  "slug",
+  { parent: ["id"] },
+] as const satisfies NonNullable<
+  Query<Schema, "product_categories">["fields"]
+>
+
 export const PRODUCTS_FIELDS = [
   "id",
   "slug",

@@ -13,17 +13,7 @@ import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { GoBackBtn } from "@/components/shared/content/GoBackBtn"
 import { WEBSITE_URL } from "@/lib/env/constants"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
-import type { ProductsQueryResult } from "@/services/domain/db/queries/collections/products/products"
-import {
-  getProductsCountRepository,
-  getProductsRepository,
-} from "@/services/domain/db/repositories/collections/products"
-
-async function loadCatalogProducts(): Promise<ProductsQueryResult> {
-  const count = await getProductsCountRepository()
-  if (count <= 0) return []
-  return getProductsRepository({ limit: count })
-}
+import { getProductCatalogRepository } from "@/services/domain/db/repositories/collections/products"
 
 async function ProductCatalog({
   products,
@@ -32,15 +22,23 @@ async function ProductCatalog({
   noMatches,
   clearLabel,
 }: {
-  products: Promise<ProductsQueryResult>
+  products: ReturnType<typeof getProductCatalogRepository>
   labels: CatalogLabels
   emptyCatalog: string
   noMatches: string
   clearLabel: string
 }) {
-  const rows = await products
+  const { products: rows, categoryAncestors } = await products
   await connection()
-  const items = rows.map((row) => toProductCard(row))
+  const items = rows.map((row) => {
+    const card = toProductCard(row)
+    return {
+      ...card,
+      categoryAncestors: row.product_category
+        ? categoryAncestors[row.product_category.id] ?? []
+        : [],
+    }
+  })
 
   return (
     <ProductCatalogClients

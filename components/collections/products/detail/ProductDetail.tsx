@@ -191,7 +191,7 @@ export async function ProductDetail({
       >
         <GoBackBtn href="/tienda">{t("back_to_store")}</GoBackBtn>
         <Breadcrumb>
-          <BreadcrumbList className="min-w-0 flex-nowrap">
+          <BreadcrumbList className="min-w-0 flex-nowrap text-base">
             <BreadcrumbItem className="shrink-0">
               <BreadcrumbLink href="/tienda">{t("title")}</BreadcrumbLink>
             </BreadcrumbItem>
@@ -222,7 +222,7 @@ export async function ProductDetail({
           <ProductGallery images={galleryImages(product)} />
           <Box display="flex" gap={1} orientation="vertical">
             {kicker.length > 0 ? (
-              <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="text-lg font-medium tracking-wide text-muted-foreground uppercase">
                 {kicker.join(" | ")}
               </p>
             ) : null}

@@ -36,7 +36,9 @@ export function ProductAttributes({
           id={group.id}
           key={group.id}
         >
-          <AccordionTrigger>{group.label}</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">
+            {group.label}
+          </AccordionTrigger>
           <AccordionContent>
             <ul className="divide-y divide-border">
               {group.items.map((item) => (

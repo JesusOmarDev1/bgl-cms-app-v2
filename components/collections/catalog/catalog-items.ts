@@ -4,6 +4,33 @@ export const CATALOG_SORTS = ["newest", "oldest", "a-z", "z-a"] as const
 
 export type CatalogSort = (typeof CATALOG_SORTS)[number]
 
+export type CatalogCategoryPath = {
+  id: string
+  slug: string | null
+  parentId: string | null
+}
+
+export function getCatalogCategoryAncestors(
+  categories: readonly CatalogCategoryPath[]
+): Record<string, string[]> {
+  const byId = new Map(categories.map((category) => [category.id, category]))
+  return Object.fromEntries(
+    categories.map((category) => {
+      const ancestors: string[] = []
+      const seen = new Set([category.id])
+      let parentId = category.parentId
+      while (parentId && !seen.has(parentId)) {
+        seen.add(parentId)
+        const parent = byId.get(parentId)
+        if (!parent) break
+        if (parent.slug) ancestors.push(parent.slug)
+        parentId = parent.parentId
+      }
+      return [category.id, ancestors]
+    })
+  )
+}
+
 export type CatalogItem = {
   id: string
   title: string
@@ -12,11 +39,18 @@ export type CatalogItem = {
   dateCreated: string
   categorySlug: string | null
   categoryTitle: string | null
+  categoryIcon?: string | null
+  categoryAncestors?: readonly string[]
 }
 
 type CatalogFields = Pick<
   CatalogItem,
-  "title" | "excerpt" | "description" | "dateCreated" | "categorySlug"
+  | "title"
+  | "excerpt"
+  | "description"
+  | "dateCreated"
+  | "categorySlug"
+  | "categoryAncestors"
 >
 
 export function sortCatalogProducts<T extends CatalogFields>(
@@ -43,7 +77,11 @@ export function filterCatalogProducts<T extends CatalogFields>(
   sort: CatalogSort
 ): T[] {
   const scoped = category
-    ? products.filter((product) => product.categorySlug === category)
+    ? products.filter(
+        (product) =>
+          product.categorySlug === category ||
+          product.categoryAncestors?.includes(category)
+      )
     : [...products]
   const searched = fuzzySearch(scoped, query, {
     keys: ["title", "excerpt", "description"],

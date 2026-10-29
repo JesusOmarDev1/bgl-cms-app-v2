@@ -165,7 +165,14 @@ function PaletteStatusPanel({
           <EmptyMedia variant="icon">
             <MaterialIcon name={copy.icon} size={18} />
           </EmptyMedia>
-          <EmptyTitle className="text-sm font-medium">{copy.title}</EmptyTitle>
+          <EmptyTitle
+            className={cn(
+              "text-sm font-medium",
+              status === "prompt" && "text-base md:text-base"
+            )}
+          >
+            {copy.title}
+          </EmptyTitle>
           <EmptyDescription className="text-xs">
             {copy.description}
           </EmptyDescription>

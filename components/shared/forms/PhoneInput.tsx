@@ -93,6 +93,14 @@ const CountrySelect = ({
 }: CountrySelectProps) => {
   const [searchValue, setSearchValue] = React.useState("")
   const [isOpen, setIsOpen] = React.useState(false)
+  const countries = React.useMemo(
+    () =>
+      countryList.filter(
+        (entry): entry is CountryEntry & { value: RPNInput.Country } =>
+          entry.value !== undefined
+      ),
+    [countryList]
+  )
 
   return (
     <PopoverTrigger
@@ -138,64 +146,34 @@ const CountrySelect = ({
             placeholder="Buscar pais..."
           />
           <CommandList
+            selectionMode="single"
+            disallowEmptySelection
+            selectedKeys={[selectedCountry]}
+            onAction={(key) => {
+              onChange(key as RPNInput.Country)
+              setIsOpen(false)
+            }}
             renderEmptyState={() => (
               <CommandEmpty>No hay resultados.</CommandEmpty>
             )}
           >
-            <CommandGroup>
-              {countryList.map(({ value, label }) =>
-                value ? (
-                  <CountrySelectOption
-                    key={value}
-                    country={value}
-                    countryName={label}
-                    selectedCountry={selectedCountry}
-                    onChange={onChange}
-                    onSelectComplete={() => setIsOpen(false)}
-                  />
-                ) : null
+            <CommandGroup items={countries}>
+              {({ value, label }) => (
+                <CommandItem
+                  id={value}
+                  textValue={label}
+                  className="gap-2 text-muted-foreground data-selected:bg-transparent data-selected:data-focused:bg-muted [&>.material-symbols-rounded]:text-primary data-selected:[&>.material-symbols-rounded]:opacity-100"
+                >
+                  <FlagComponent country={value} countryName={label} />
+                  <span className="flex-1 text-sm">{label}</span>
+                  <span className="text-sm">{`+${RPNInput.getCountryCallingCode(value)}`}</span>
+                </CommandItem>
               )}
             </CommandGroup>
           </CommandList>
         </Command>
       </Popover>
     </PopoverTrigger>
-  )
-}
-
-interface CountrySelectOptionProps extends RPNInput.FlagProps {
-  selectedCountry: RPNInput.Country
-  onChange: (country: RPNInput.Country) => void
-  onSelectComplete: () => void
-}
-
-const CountrySelectOption = ({
-  country,
-  countryName,
-  selectedCountry,
-  onChange,
-  onSelectComplete,
-}: CountrySelectOptionProps) => {
-  const handleSelect = () => {
-    onChange(country)
-    onSelectComplete()
-  }
-
-  return (
-    <CommandItem
-      id={country}
-      textValue={countryName}
-      className="gap-2 text-muted-foreground"
-      onAction={handleSelect}
-    >
-      <FlagComponent country={country} countryName={countryName} />
-      <span className="flex-1 text-sm">{countryName}</span>
-      <span className="text-sm">{`+${RPNInput.getCountryCallingCode(country)}`}</span>
-      <MaterialIcon
-        name="check_circle"
-        className={`ml-auto text-primary ${country === selectedCountry ? "opacity-100" : "opacity-0"}`}
-      />
-    </CommandItem>
   )
 }
 

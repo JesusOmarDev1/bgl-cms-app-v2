@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const line = brandLine(t, product.brand, product.model)
   const href = product.slug ? `/tienda/producto/${product.slug}` : null
   const card = (
-    <Card className="h-full">
+    <Card className="h-full pt-0 transition-colors hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40">
       {product.imageId ? (
         <DirectusImage
           alt={product.title}
@@ -52,13 +52,11 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       ) : null}
       <CardHeader>
         {product.title ? (
-          <CardTitle className="text-xl md:text-2xl lg:text-2xl">
+          <CardTitle className="text-2xl md:text-3xl">
             {product.title}
           </CardTitle>
         ) : null}
-        {line ? (
-          <p className="text-sm text-muted-foreground">{line}</p>
-        ) : null}
+        {line ? <p className="text-sm text-muted-foreground">{line}</p> : null}
         {product.excerpt ? (
           <CardDescription>
             <SafeHtml

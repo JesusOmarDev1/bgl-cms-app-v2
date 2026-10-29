@@ -66,7 +66,7 @@ export function SearchBarClient({
   const seqRef = useRef(0)
   const timerRef = useRef(0)
 
-  const { mutateAsync, reset, isPending, error } = useMutation(
+  const { mutateAsync, reset, error } = useMutation(
     mutationOptions(searchAction, { retry: false })
   )
 
@@ -91,14 +91,15 @@ export function SearchBarClient({
   }
 
   const handleQueryChange = (value: string) => {
+    seqRef.current += 1
+    reset()
     setQuery(value)
     clearTimer()
+    setHits([])
+    setHasError(false)
+    setWaiting(false)
     const trimmed = value.trim()
     if (trimmed.length < MIN_QUERY_LENGTH) {
-      seqRef.current += 1
-      setHits([])
-      setHasError(false)
-      setWaiting(false)
       return
     }
     if (trimmed.length > MAX_QUERY_LENGTH) return
@@ -144,7 +145,7 @@ export function SearchBarClient({
     })
   }
 
-  const loading = waiting || isPending
+  const loading = waiting
   const status = resolvePanelStatus({
     queryLength: query.trim().length,
     loading,

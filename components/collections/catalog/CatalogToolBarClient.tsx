@@ -3,6 +3,7 @@
 import { useMemo } from "react"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
+import { useDebounceFn } from "@/hooks/useDebounceFn"
 import type { CatalogItem } from "@/components/collections/catalog/catalog-items"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,22 +38,34 @@ export type CatalogLabels = {
 export function CatalogToolBarClient({
   items,
   labels,
+  shallow = true,
+  paginated = false,
 }: {
   items: readonly CatalogItem[]
   labels: CatalogLabels
+  shallow?: boolean
+  paginated?: boolean
 }) {
   const { q, setQ, cat, setCat, sort, setSort, clearFilters } =
-    useCatalogParams()
+    useCatalogParams(shallow, paginated)
+  const commitQuery = useMemo(
+    () => (value: string) => void setQ(value || null),
+    [setQ]
+  )
+  const queryDebounce = useDebounceFn(commitQuery, 500)
   const categories = useMemo(() => {
-    const seen = new Map<string, string>()
+    const seen = new Map<string, { title: string; icon: string | null }>()
     for (const item of items) {
       if (!item.categorySlug || !item.categoryTitle) continue
       if (!seen.has(item.categorySlug)) {
-        seen.set(item.categorySlug, item.categoryTitle)
+        seen.set(item.categorySlug, {
+          title: item.categoryTitle,
+          icon: item.categoryIcon ?? null,
+        })
       }
     }
     return [...seen.entries()]
-      .map(([slug, title]) => ({ slug, title }))
+      .map(([slug, { title, icon }]) => ({ slug, title, icon }))
       .sort((a, b) =>
         a.title.localeCompare(b.title, "es", { sensitivity: "base" })
       )
@@ -77,10 +90,7 @@ export function CatalogToolBarClient({
         placeholder={labels.category.placeholder}
         selectedKey={selectedCategory}
       >
-        <SelectTrigger
-          aria-label={labels.category.label}
-          className="w-full"
-        >
+        <SelectTrigger aria-label={labels.category.label} className="w-full">
           <MaterialIcon
             className="text-muted-foreground"
             name="category"
@@ -90,7 +100,10 @@ export function CatalogToolBarClient({
         </SelectTrigger>
         <SelectContent>
           <SelectItem id="all" textValue={labels.category.all}>
-            {labels.category.all}
+            <span className="flex items-center gap-2">
+              <MaterialIcon aria-hidden name="category" size={16} />
+              {labels.category.all}
+            </span>
           </SelectItem>
           {categories.map((category) => (
             <SelectItem
@@ -98,7 +111,14 @@ export function CatalogToolBarClient({
               key={category.slug}
               textValue={category.title}
             >
-              {category.title}
+              <span className="flex items-center gap-2">
+                <MaterialIcon
+                  aria-hidden
+                  name={category.icon || "category"}
+                  size={16}
+                />
+                {category.title}
+              </span>
             </SelectItem>
           ))}
         </SelectContent>
@@ -114,11 +134,15 @@ export function CatalogToolBarClient({
           className="ps-8"
           onChange={(event) => {
             const value = event?.target.value ?? ""
-            void setQ(value.length > 0 ? value : null)
+            if (!value) {
+              queryDebounce.cancel()
+              void setQ(null)
+            } else queryDebounce.run(value)
           }}
           placeholder={labels.search.placeholder}
           type="search"
-          value={q}
+          defaultValue={q}
+          key={q}
         />
       </div>
       <Select
@@ -160,7 +184,13 @@ export function CatalogToolBarClient({
         </SelectContent>
       </Select>
       {filtersActive ? (
-        <Button onPress={clearFilters} variant="ghost">
+        <Button
+          onPress={() => {
+            queryDebounce.cancel()
+            clearFilters()
+          }}
+          variant="ghost"
+        >
           {labels.clear}
         </Button>
       ) : null}

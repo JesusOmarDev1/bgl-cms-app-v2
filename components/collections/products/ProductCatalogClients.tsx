@@ -21,13 +21,21 @@ export function ProductCatalogClients({
 }) {
   return (
     <>
-      <CatalogToolBarClient items={items} labels={labels} />
+      <CatalogToolBarClient
+        items={items}
+        labels={labels}
+        paginated
+        shallow={false}
+      />
       <CatalogBodyClient
         clearLabel={clearLabel}
         emptyCatalog={emptyCatalog}
         items={items}
         noMatches={noMatches}
+        pageSize={24}
+        paginated
         renderItem={(item) => <ProductCard product={item} />}
+        shallow={false}
       />
     </>
   )

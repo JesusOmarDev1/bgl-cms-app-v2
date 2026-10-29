@@ -1,13 +1,19 @@
 import "server-only"
 
-import type { Query } from "@directus/sdk"
+import type { ApplyQueryFields, Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
 import directus from "@/config/directus"
+import { getCatalogCategoryAncestors } from "@/components/collections/catalog/catalog-items"
 import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
-import { PRODUCTS_FIELDS } from "@/services/domain/db/queries/collections/products/products.fields"
+import {
+  PRODUCT_CATALOG_CATEGORY_FIELDS,
+  PRODUCT_CATALOG_FIELDS,
+  PRODUCTS_FIELDS,
+} from "@/services/domain/db/queries/collections/products/products.fields"
 import type { ProductsTypes } from "@/types/collections/products"
+import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { cacheLife, cacheTag } from "next/cache"
@@ -16,6 +22,73 @@ export interface ProductsQuery {
   status?: StatusType
   limit?: number
   page?: number
+}
+
+const CATALOG_BATCH_SIZE = 200
+type ProductCatalogRow = ApplyQueryFields<
+  Schema,
+  ProductsTypes,
+  typeof PRODUCT_CATALOG_FIELDS
+>
+type ProductCategoryCatalogRow = ApplyQueryFields<
+  Schema,
+  ProductCategoriesTypes,
+  typeof PRODUCT_CATALOG_CATEGORY_FIELDS
+>
+
+async function fetchCatalogProducts() {
+  "use cache"
+  cacheTag("products", "product_categories")
+  cacheLife("minutes")
+
+  const products: ProductCatalogRow[] = []
+  const categoryRows: ProductCategoryCatalogRow[] = []
+  for (let page = 1; ; page += 1) {
+    const batch = await directus.request(
+      readItems("products", {
+        fields: PRODUCT_CATALOG_FIELDS,
+        limit: CATALOG_BATCH_SIZE,
+        page,
+        sort: ["-date_created", "id"],
+        filter: { status: { _eq: "published" } },
+      } satisfies Query<Schema, ProductsTypes>)
+    )
+    products.push(...batch)
+    if (batch.length < CATALOG_BATCH_SIZE) break
+  }
+  for (let page = 1; ; page += 1) {
+    const batch = await directus.request(
+      readItems("product_categories", {
+        fields: PRODUCT_CATALOG_CATEGORY_FIELDS,
+        limit: CATALOG_BATCH_SIZE,
+        page,
+        filter: { status: { _eq: "published" } },
+      } satisfies Query<Schema, ProductCategoriesTypes>)
+    )
+    categoryRows.push(...batch)
+    if (batch.length < CATALOG_BATCH_SIZE) break
+  }
+  const categoryAncestors = getCatalogCategoryAncestors(
+    categoryRows.map((category) => ({
+      id: category.id,
+      slug: category.slug,
+      parentId: category.parent?.id ?? null,
+    }))
+  )
+  return { products, categoryAncestors }
+}
+
+export async function getProductCatalogQuery(failedToFetchMessage: string) {
+  try {
+    return await fetchCatalogProducts()
+  } catch (error) {
+    returnDirectusQueryError(error, failedToFetchMessage, {
+      component: "db.queries",
+      operation: "getProductCatalogQuery",
+      collection: "products",
+    })
+    throw error
+  }
 }
 
 async function fetchProducts(status: StatusType, limit: number, page: number) {
@@ -102,7 +175,7 @@ export async function getProductsBySlugQuery(
       operation: "getProductsBySlugQuery",
       collection: "products",
     })
-    return []
+    throw error
   }
 }
 

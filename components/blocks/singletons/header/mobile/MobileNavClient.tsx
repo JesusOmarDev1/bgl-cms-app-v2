@@ -174,7 +174,11 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                 className="w-full rounded-full"
               >
                 {data.primary_button}
-                <MaterialIcon name={data.primary_icon ?? ""} size={16} />
+                <MaterialIcon
+                  name={data.primary_icon ?? ""}
+                  size={16}
+                  className="text-primary"
+                />
               </LinkButton>
             ) : null}
             {data.secondary_button && data.secondary_url ? (
@@ -186,7 +190,11 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                 className="w-full rounded-full"
               >
                 {data.secondary_button}
-                <MaterialIcon name={data.secondary_icon ?? ""} size={16} />
+                <MaterialIcon
+                  name={data.secondary_icon ?? ""}
+                  size={16}
+                  className="text-foreground"
+                />
               </LinkButton>
             ) : null}
             {data.social_links && data.social_links.length > 0 ? (
