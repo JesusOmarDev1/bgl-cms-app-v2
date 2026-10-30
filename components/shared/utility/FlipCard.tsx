@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { cn } from "cn"
 import {
   LazyMotion,
@@ -140,7 +141,7 @@ function FlipCard({
 
   return (
     <m.article
-      className="absolute inset-x-0 top-0 aspect-[3/4] will-change-transform sm:aspect-[1.76/1]"
+      className="absolute inset-x-0 top-0 aspect-[3/4] sm:aspect-[1.76/1]"
       style={{
         y: exitY,
         rotateX,
@@ -182,11 +183,14 @@ function FlipCard({
         </div>
 
         <div className="relative m-[clamp(10px,1.2vw,18px)] min-h-[180px] overflow-hidden rounded-[clamp(12px,1.4vw,22px)] sm:ms-0">
-          <img
+          <Image
             src={item.image}
             alt={item.imageAlt}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(min-width: 640px) 430px, 100vw"
+            className="object-cover"
             loading={index < 2 ? "eager" : "lazy"}
+            unoptimized={!item.image.startsWith("https://images.unsplash.com/photo-")}
             draggable={false}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />

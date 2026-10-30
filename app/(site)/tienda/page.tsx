@@ -35,7 +35,7 @@ async function ProductCatalog({
     return {
       ...card,
       categoryAncestors: row.product_category
-        ? categoryAncestors[row.product_category.id] ?? []
+        ? (categoryAncestors[row.product_category.id] ?? [])
         : [],
     }
   })
@@ -52,7 +52,7 @@ async function ProductCatalog({
 }
 
 async function Catalog() {
-  const products = loadCatalogProducts()
+  const products = getProductCatalogRepository()
   const t = await getTranslations("products")
   const catalog = await getTranslations("catalog")
   const labels: CatalogLabels = {

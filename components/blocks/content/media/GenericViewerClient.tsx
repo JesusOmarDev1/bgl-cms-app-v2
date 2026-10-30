@@ -23,30 +23,26 @@ import {
 } from "@/components/ui/attachment"
 import { FileType, getFileType } from "@/components/shared/content/FileType"
 
-export default function GenericViewerClient({
-  data,
-}: {
-  data: DirectusFileQuery | null
-}) {
-  if (!data?.id) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <FileType
-              type={getFileType(data?.filename_download || data?.type || "")}
-              className="size-full"
-            />
-          </EmptyMedia>
-        </EmptyHeader>
-        <EmptyContent>
-          <EmptyTitle>No se encontró el archivo</EmptyTitle>
-          <EmptyDescription>El archivo que buscas no existe.</EmptyDescription>
-        </EmptyContent>
-      </Empty>
-    )
-  }
+function MissingFile({ data }: { data: DirectusFileQuery | null }) {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FileType
+            type={getFileType(data?.filename_download || data?.type || "")}
+            className="size-full"
+          />
+        </EmptyMedia>
+      </EmptyHeader>
+      <EmptyContent>
+        <EmptyTitle>No se encontró el archivo</EmptyTitle>
+        <EmptyDescription>El archivo que buscas no existe.</EmptyDescription>
+      </EmptyContent>
+    </Empty>
+  )
+}
 
+function FileDownloadCard({ data }: { data: DirectusFileQuery }) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
@@ -107,4 +103,13 @@ export default function GenericViewerClient({
       </CardFooter>
     </Card>
   )
+}
+
+export default function GenericViewerClient({
+  data,
+}: {
+  data: DirectusFileQuery | null
+}) {
+  if (!data?.id) return <MissingFile data={data} />
+  return <FileDownloadCard data={data} />
 }

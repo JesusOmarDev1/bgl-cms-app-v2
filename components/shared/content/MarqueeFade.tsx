@@ -2,6 +2,7 @@
 
 import {
   Children,
+  isValidElement,
   useEffect,
   useRef,
   useState,
@@ -38,6 +39,13 @@ export function MarqueeFade({
   className,
 }: MarqueeFadeProps) {
   const slides = Children.toArray(children)
+  const slideKeys = new Map<string, number>()
+  const keys = slides.map((slide) => {
+    const identity = isValidElement(slide) ? slide.key : String(slide)
+    const occurrence = slideKeys.get(identity ?? "") ?? 0
+    slideKeys.set(identity ?? "", occurrence + 1)
+    return `${identity ?? ""}:${occurrence}`
+  })
   const slideCount = slides.length
   const containerRef = useRef<HTMLDivElement>(null)
   const [isInView, setIsInView] = useState(true)
@@ -91,7 +99,7 @@ export function MarqueeFade({
             "absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
             index === active ? "opacity-100" : "opacity-0"
           )}
-          key={index}
+          key={keys[index]}
         >
           {slide}
         </div>

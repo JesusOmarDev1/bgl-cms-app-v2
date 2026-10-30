@@ -1,9 +1,33 @@
 {
-  "title": "Cookies",
-  "description": "El almacenamiento cookie es esencial permite el funcionamiento del sitio y el seguimiento de los afiliados. Con tu permiso, también podemos habilitar funciones de análisis y medición de marketing.",
-  "accept": "Aceptar",
-  "reject": "Rechazar",
-  "manage": "Gestionar",
-  "learnMore": "Más información",
-  "close": "Cerrar"
+  "cookies": {
+    "title": "Preferencias de cookies",
+    "description": "El almacenamiento de cookies es esencial para el funcionamiento del sitio. Con tu permiso, también podemos habilitar funciones de análisis y medición de marketing.",
+    "notice": "Usamos cookies necesarias para que el sitio funcione. Si aceptás, también usaremos cookies de análisis para entender cómo se utiliza el sitio.",
+    "alwaysOn": "Siempre activas",
+    "save": "Guardar preferencias",
+    "customize": "Personalizar preferencias",
+    "categories": {
+      "necessary": {
+        "label": "Necesarias",
+        "description": "Permiten que el sitio funcione y no se pueden desactivar."
+      },
+      "preferences": {
+        "label": "Preferencias",
+        "description": "Recuerdan opciones como el idioma y la configuración del sitio."
+      },
+      "analytics": {
+        "label": "Analítica",
+        "description": "Nos ayudan a entender cómo se utiliza el sitio."
+      },
+      "marketing": {
+        "label": "Marketing",
+        "description": "Permiten medir campañas y personalizar publicidad."
+      }
+    },
+    "manage": "Configurar cookies",
+    "accept": "Aceptar todo",
+    "reject": "Rechazar todo",
+    "learnMore": "Más información",
+    "close": "Cerrar"
+  }
 }

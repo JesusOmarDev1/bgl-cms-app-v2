@@ -41,7 +41,7 @@ export function VideoPlayerProgress({
           onSkip(-5)
         }
       }}
-      className="group/progress relative h-4 w-full cursor-pointer rounded-full bg-white/20 transition-all"
+      className="group/progress relative h-4 w-full cursor-pointer rounded-full bg-white/20 transition-colors"
       role="slider"
       aria-label="Seek"
       aria-valuemin={0}
@@ -57,7 +57,7 @@ export function VideoPlayerProgress({
 
       {/* Progress indicator */}
       <div
-        className="absolute inset-y-0 left-0 h-4 rounded-full bg-gradient-to-r from-red-600 to-red-400 transition-all"
+        className="absolute inset-y-0 left-0 h-4 rounded-full bg-gradient-to-r from-red-600 to-red-400 transition-[width]"
         style={{ width: `${(currentTime / duration) * 100}%` }}
       />
 

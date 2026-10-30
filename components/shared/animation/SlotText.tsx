@@ -4,14 +4,16 @@ import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react"
 import type { CSSProperties } from "react"
 import {
   AnimatePresence,
+  LazyMotion,
   animate,
-  motion,
+  domAnimation,
   useMotionValue,
   usePresence,
   useReducedMotion,
   useTransform,
   useVelocity,
 } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "cn"
 
 /**
@@ -220,7 +222,7 @@ function Reel({
   }, [isPresent, safeToRemove, width, reduced])
 
   return (
-    <motion.span
+    <m.span
       className="relative inline-block h-[1.15em] flex-none overflow-visible"
       style={{ width }}
       data-exiting={isPresent ? undefined : ""}
@@ -232,8 +234,8 @@ function Reel({
         {char === " " ? "\u00a0" : char}
       </span>
       <span className="absolute inset-[-.22em_-.08em] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_.24em,black_calc(100%_-_.24em),transparent)]">
-        <motion.span
-          className="absolute top-[calc(.22em_-_.225em)] right-[.08em] left-[.08em] flex flex-col items-center will-change-transform"
+        <m.span
+          className="absolute top-[calc(.22em_-_.225em)] right-[.08em] left-[.08em] flex flex-col items-center"
           style={{ transform: y, filter: blur }}
         >
           {reel.strip.map((cell, i) => (
@@ -244,9 +246,9 @@ function Reel({
               {cell === " " ? "\u00a0" : cell}
             </span>
           ))}
-        </motion.span>
+        </m.span>
       </span>
-    </motion.span>
+    </m.span>
   )
 }
 
@@ -292,37 +294,39 @@ export function SlotText({
   }
 
   return (
-    <span
-      className={cn(
-        "relative inline-block align-bottom leading-[1.15] whitespace-nowrap tabular-nums",
-        className
-      )}
-      style={style}
-    >
+    <LazyMotion features={domAnimation}>
       <span
-        className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
-        aria-live={announce ? "polite" : undefined}
+        className={cn(
+          "relative inline-block align-bottom leading-[1.15] whitespace-nowrap tabular-nums",
+          className
+        )}
+        style={style}
       >
-        {text}
+        <span
+          className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
+          aria-live={announce ? "polite" : undefined}
+        >
+          {text}
+        </span>
+        <span className="inline-flex h-[1.15em] items-start" aria-hidden="true">
+          <AnimatePresence initial={false}>
+            {chars.map((char, i) => (
+              <Reel
+                key={keyOf(i)}
+                char={char}
+                order={i}
+                entering={!initialKeys.has(keyOf(i))}
+                rising={trend.rising}
+                duration={duration}
+                stagger={stagger}
+                spins={spins}
+                reduced={reduced}
+              />
+            ))}
+          </AnimatePresence>
+        </span>
       </span>
-      <span className="inline-flex h-[1.15em] items-start" aria-hidden="true">
-        <AnimatePresence initial={false}>
-          {chars.map((char, i) => (
-            <Reel
-              key={keyOf(i)}
-              char={char}
-              order={i}
-              entering={!initialKeys.has(keyOf(i))}
-              rising={trend.rising}
-              duration={duration}
-              stagger={stagger}
-              spins={spins}
-              reduced={reduced}
-            />
-          ))}
-        </AnimatePresence>
-      </span>
-    </span>
+    </LazyMotion>
   )
 }
 

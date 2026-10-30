@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     qualities: [55, 60, 65, 70, 75, 80],
-    remotePatterns: assetsRemotePatterns(),
+    remotePatterns: [...assetsRemotePatterns()],
     formats: ["image/avif", "image/webp"],
   },
   experimental: {

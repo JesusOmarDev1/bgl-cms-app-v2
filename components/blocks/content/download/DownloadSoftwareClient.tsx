@@ -1,4 +1,5 @@
 import { Download, Monitor, Smartphone, Tablet } from "lucide-react"
+import Image from "next/image"
 import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
@@ -105,10 +106,12 @@ const Download2 = ({
               {platforms.ios?.description}
             </p>
             <a href={platforms.ios?.url} className="mx-auto block w-fit">
-              <img
+              <Image
                 src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/badges/appstore.png"
                 alt="Download on the App Store"
-                className="h-10"
+                width={160}
+                height={48}
+                className="h-10 w-auto"
               />
             </a>
           </div>
@@ -125,10 +128,12 @@ const Download2 = ({
               {platforms.android?.description}
             </p>
             <a href={platforms.android?.url} className="mx-auto block w-fit">
-              <img
+              <Image
                 src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/badges/googleplay.png"
                 alt="Get it on Google Play"
-                className="h-10"
+                width={160}
+                height={48}
+                className="h-10 w-auto"
               />
             </a>
           </div>

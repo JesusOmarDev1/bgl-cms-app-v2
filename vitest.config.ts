@@ -21,7 +21,11 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["lib/**/*.test.ts", "services/**/*.test.ts"],
+          include: [
+            "lib/**/*.test.ts",
+            "services/**/*.test.ts",
+            "components/collections/catalog/**/*.test.ts",
+          ],
         },
       },
       {

@@ -663,6 +663,79 @@ function StepButton({
   )
 }
 
+function handleNumberFieldKeyDown(
+  event: KeyboardEvent<HTMLInputElement>,
+  options: {
+    largeStep?: number
+    step: number
+    editing: boolean
+    min: number
+    max: number
+    startHold: (toward: 1 | -1, amount: number, source: Source) => void
+    commitValue: (next: number, source: Source) => boolean
+    selectNext: { current: boolean }
+    commitDraft: () => void
+    captureShift: () => void
+    setEditing: (editing: boolean) => void
+    clearUnder: () => void
+    editStart: { current: number }
+  }
+) {
+  const {
+    largeStep,
+    step,
+    editing,
+    min,
+    max,
+    startHold,
+    commitValue,
+    selectNext,
+    commitDraft,
+    captureShift,
+    setEditing,
+    clearUnder,
+    editStart,
+  } = options
+  const large = largeStep ?? step * 10
+  const move = (
+    {
+      ArrowUp: [1, event.shiftKey ? large : step],
+      ArrowDown: [-1, event.shiftKey ? large : step],
+      PageUp: [1, large],
+      PageDown: [-1, large],
+    } as Record<string, [1 | -1, number]>
+  )[event.key]
+  if (move) {
+    event.preventDefault()
+    if (!event.repeat) startHold(move[0], move[1], "key")
+    return
+  }
+  if (
+    !editing &&
+    ((event.key === "Home" && Number.isFinite(min)) ||
+      (event.key === "End" && max < Number.MAX_SAFE_INTEGER))
+  ) {
+    event.preventDefault()
+    commitValue(event.key === "Home" ? min : max, "key")
+    return
+  }
+  if (event.key === "Enter") {
+    event.preventDefault()
+    if (editing) {
+      selectNext.current = true
+      commitDraft()
+    } else event.currentTarget.select()
+  }
+  if (event.key === "Escape" && editing) {
+    event.preventDefault()
+    captureShift()
+    setEditing(false)
+    clearUnder()
+    selectNext.current = true
+    commitValue(editStart.current, "type")
+  }
+}
+
 /**
  * A bounded number with odometer digits. Buttons and arrow keys repeat and speed up while held, PageUp and PageDown take
  * large steps, Home and End jump to the limits, and `scrub` lets the label be dragged. Typing edits a plain draft that
@@ -933,45 +1006,21 @@ export function NumberField({
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    const large = largeStep ?? step * 10
-    const move = (
-      {
-        ArrowUp: [1, event.shiftKey ? large : step],
-        ArrowDown: [-1, event.shiftKey ? large : step],
-        PageUp: [1, large],
-        PageDown: [-1, large],
-      } as Record<string, [1 | -1, number]>
-    )[event.key]
-    if (move) {
-      event.preventDefault()
-      if (!event.repeat) startHold(move[0], move[1], "key")
-      return
-    }
-    // Home and End reach the limits; while a draft is open they move the caret as in any text field.
-    if (
-      !editing &&
-      ((event.key === "Home" && Number.isFinite(min)) ||
-        (event.key === "End" && max < Number.MAX_SAFE_INTEGER))
-    ) {
-      event.preventDefault()
-      commitValue(event.key === "Home" ? min : max, "key")
-      return
-    }
-    if (event.key === "Enter") {
-      event.preventDefault()
-      if (editing) {
-        selectNext.current = true
-        commitDraft()
-      } else event.currentTarget.select()
-    }
-    if (event.key === "Escape" && editing) {
-      event.preventDefault()
-      captureShift()
-      setEditing(false)
-      clearUnder()
-      selectNext.current = true
-      commitValue(editStart.current, "type")
-    }
+    handleNumberFieldKeyDown(event, {
+      largeStep,
+      step,
+      editing,
+      min,
+      max,
+      startHold,
+      commitValue,
+      selectNext,
+      commitDraft,
+      captureShift,
+      setEditing,
+      clearUnder,
+      editStart,
+    })
   }
   function onChange(text: string) {
     const allowed = new RegExp(
@@ -1111,7 +1160,8 @@ export function NumberField({
             nudge(-1, 1, "button")
           }}
         />
-        <div
+        <label
+          htmlFor={inputId}
           className="relative flex min-w-0 flex-1 cursor-text items-center justify-center self-stretch group-data-[disabled]/control:cursor-not-allowed"
           onMouseDown={(event) => {
             if (event.target !== inputRef.current) event.preventDefault()
@@ -1195,7 +1245,7 @@ export function NumberField({
               className="inline-flex font-normal text-[color:var(--text-secondary)]"
             />
           </motion.span>
-        </div>
+        </label>
         <StepButton
           {...stepper(1)}
           iconRef={plusIcon}

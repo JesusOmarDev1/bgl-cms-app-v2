@@ -14,6 +14,122 @@ export interface CpuArchitectureSvgProps {
   animateMarkers?: boolean
 }
 
+const LIGHTS = [
+  { color: "blue", className: "cpu-line-1" },
+  { color: "yellow", className: "cpu-line-2" },
+  { color: "pinkish", className: "cpu-line-3" },
+  { color: "white", className: "cpu-line-4" },
+  { color: "green", className: "cpu-line-5" },
+  { color: "orange", className: "cpu-line-6" },
+  { color: "cyan", className: "cpu-line-7" },
+  { color: "rose", className: "cpu-line-8" },
+] as const
+
+function CpuLights() {
+  return (
+    <>
+      {LIGHTS.map(({ color, className }, index) => (
+        <g key={color} mask={`url(#cpu-mask-${index + 1})`}>
+          <circle
+            className={`cpu-architecture ${className}`}
+            cx="0"
+            cy="0"
+            r="8"
+            fill={`url(#cpu-${color}-grad)`}
+          />
+        </g>
+      ))}
+    </>
+  )
+}
+
+function CpuCore({
+  showCpuConnections,
+  animateText,
+  text,
+}: Pick<
+  CpuArchitectureSvgProps,
+  "showCpuConnections" | "animateText" | "text"
+>) {
+  return (
+    <g>
+      {showCpuConnections && (
+        <g fill="url(#cpu-connection-gradient)">
+          <rect x="93" y="37" width="2.5" height="5" rx="0.7" />
+          <rect x="104" y="37" width="2.5" height="5" rx="0.7" />
+          <rect
+            x="116.3"
+            y="44"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(90 116.25 45.5)"
+          />
+          <rect
+            x="122.8"
+            y="44"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(90 116.25 45.5)"
+          />
+          <rect
+            x="104"
+            y="16"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(180 105.25 39.5)"
+          />
+          <rect
+            x="114.5"
+            y="16"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(180 105.25 39.5)"
+          />
+          <rect
+            x="80"
+            y="-13.6"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(270 115.25 19.5)"
+          />
+          <rect
+            x="87"
+            y="-13.6"
+            width="2.5"
+            height="5"
+            rx="0.7"
+            transform="rotate(270 115.25 19.5)"
+          />
+        </g>
+      )}
+      <rect
+        x="85"
+        y="40"
+        width="30"
+        height="20"
+        rx="2"
+        fill="#181818"
+        filter="url(#cpu-light-shadow)"
+      />
+      <text
+        x="92"
+        y="52.5"
+        fontSize="7"
+        fill={animateText ? "url(#cpu-text-gradient)" : "white"}
+        fontWeight="600"
+        letterSpacing="0.05em"
+      >
+        {text}
+      </text>
+    </g>
+  )
+}
+
 export default function CpuArchitecture({
   className,
   width = "100%",
@@ -84,165 +200,12 @@ export default function CpuArchitecture({
         )}
       </g>
 
-      {/* 1. Blue Light */}
-      <g mask="url(#cpu-mask-1)">
-        <circle
-          className="cpu-architecture cpu-line-1"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-blue-grad)"
-        />
-      </g>
-      {/* 2. Yellow Light */}
-      <g mask="url(#cpu-mask-2)">
-        <circle
-          className="cpu-architecture cpu-line-2"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-yellow-grad)"
-        />
-      </g>
-      {/* 3. Pinkish Light */}
-      <g mask="url(#cpu-mask-3)">
-        <circle
-          className="cpu-architecture cpu-line-3"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-pinkish-grad)"
-        />
-      </g>
-      {/* 4. White Light */}
-      <g mask="url(#cpu-mask-4)">
-        <circle
-          className="cpu-architecture cpu-line-4"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-white-grad)"
-        />
-      </g>
-      {/* 5. Green Light */}
-      <g mask="url(#cpu-mask-5)">
-        <circle
-          className="cpu-architecture cpu-line-5"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-green-grad)"
-        />
-      </g>
-      {/* 6. Orange Light */}
-      <g mask="url(#cpu-mask-6)">
-        <circle
-          className="cpu-architecture cpu-line-6"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-orange-grad)"
-        />
-      </g>
-      {/* 7. Cyan Light */}
-      <g mask="url(#cpu-mask-7)">
-        <circle
-          className="cpu-architecture cpu-line-7"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-cyan-grad)"
-        />
-      </g>
-      {/* 8. Rose Light */}
-      <g mask="url(#cpu-mask-8)">
-        <circle
-          className="cpu-architecture cpu-line-8"
-          cx="0"
-          cy="0"
-          r="8"
-          fill="url(#cpu-rose-grad)"
-        />
-      </g>
-      {/* CPU Box */}
-      <g>
-        {/* Cpu connections */}
-        {showCpuConnections && (
-          <g fill="url(#cpu-connection-gradient)">
-            <rect x="93" y="37" width="2.5" height="5" rx="0.7" />
-            <rect x="104" y="37" width="2.5" height="5" rx="0.7" />
-            <rect
-              x="116.3"
-              y="44"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(90 116.25 45.5)"
-            />
-            <rect
-              x="122.8"
-              y="44"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(90 116.25 45.5)"
-            />
-            <rect
-              x="104"
-              y="16"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(180 105.25 39.5)"
-            />
-            <rect
-              x="114.5"
-              y="16"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(180 105.25 39.5)"
-            />
-            <rect
-              x="80"
-              y="-13.6"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(270 115.25 19.5)"
-            />
-            <rect
-              x="87"
-              y="-13.6"
-              width="2.5"
-              height="5"
-              rx="0.7"
-              transform="rotate(270 115.25 19.5)"
-            />
-          </g>
-        )}
-        {/* Main CPU Rectangle */}
-        <rect
-          x="85"
-          y="40"
-          width="30"
-          height="20"
-          rx="2"
-          fill="#181818"
-          filter="url(#cpu-light-shadow)"
-        />
-        {/* CPU Text */}
-        <text
-          x="92"
-          y="52.5"
-          fontSize="7"
-          fill={animateText ? "url(#cpu-text-gradient)" : "white"}
-          fontWeight="600"
-          letterSpacing="0.05em"
-        >
-          {text}
-        </text>
-      </g>
+      <CpuLights />
+      <CpuCore
+        showCpuConnections={showCpuConnections}
+        animateText={animateText}
+        text={text}
+      />
       {/* Masks */}
       <defs>
         <mask id="cpu-mask-1">
