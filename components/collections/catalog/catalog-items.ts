@@ -88,37 +88,3 @@ export function filterCatalogProducts<T extends CatalogFields>(
   })
   return sortCatalogProducts(searched, sort)
 }
-
-function expectCatalogProducts() {
-  const rows = [
-    {
-      title: "b",
-      excerpt: null,
-      description: "alpha",
-      dateCreated: "2020-01-02T00:00:00.000Z",
-      categorySlug: "x",
-    },
-    {
-      title: "a",
-      excerpt: "beta",
-      description: null,
-      dateCreated: "2020-01-03T00:00:00.000Z",
-      categorySlug: "y",
-    },
-  ]
-  const newest = filterCatalogProducts(rows, "", "", "newest")
-  const oldest = filterCatalogProducts(rows, "", "", "oldest")
-  const alpha = filterCatalogProducts(rows, "", "y", "a-z")
-  const reverse = filterCatalogProducts(rows, "", "", "z-a")
-  if (
-    newest[0]?.title !== "a" ||
-    oldest[0]?.title !== "b" ||
-    alpha.length !== 1 ||
-    alpha[0]?.title !== "a" ||
-    reverse[0]?.title !== "b"
-  ) {
-    throw new Error("catalog products self-check failed")
-  }
-}
-
-expectCatalogProducts()

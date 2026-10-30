@@ -12,7 +12,7 @@ import {
 } from "@/components/collections/catalog/catalog-items"
 
 const queryOptions = (shallow: boolean) => ({
-  history: "replace",
+  history: "replace" as const,
   scroll: false,
   shallow,
 })

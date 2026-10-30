@@ -15,6 +15,51 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 
+function MissingHero() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <MaterialIcon name="web" />
+        </EmptyMedia>
+      </EmptyHeader>
+      <EmptyContent>
+        <EmptyTitle>No se encontró el bloque</EmptyTitle>
+        <EmptyDescription>Intentalo de nuevo mas tarde.</EmptyDescription>
+      </EmptyContent>
+    </Empty>
+  )
+}
+
+function HeroActions({ data }: { data: HeroBlockQuery }) {
+  if (!data.primary_button && !data.secondary_button) return null
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      {data.primary_button ? (
+        <LinkButton href={data.primary_url ?? ""} variant="red">
+          <MaterialIcon
+            className="text-primary"
+            name={data.primary_icon ?? ""}
+            size={20}
+          />
+          {data.primary_button}
+        </LinkButton>
+      ) : null}
+      {data.secondary_button ? (
+        <LinkButton href={data.secondary_url ?? ""} variant="glass">
+          <MaterialIcon
+            className="text-primary"
+            name={data.secondary_icon ?? ""}
+            size={20}
+          />
+          {data.secondary_button}
+        </LinkButton>
+      ) : null}
+    </div>
+  )
+}
+
 export function HeroBesideImage({
   data,
   side,
@@ -22,21 +67,7 @@ export function HeroBesideImage({
   data: HeroBlockQuery
   side: "left" | "right"
 }) {
-  if (!data.id) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <MaterialIcon name="web" />
-          </EmptyMedia>
-        </EmptyHeader>
-        <EmptyContent>
-          <EmptyTitle>No se encontró el bloque</EmptyTitle>
-          <EmptyDescription>Intentalo de nuevo mas tarde.</EmptyDescription>
-        </EmptyContent>
-      </Empty>
-    )
-  }
+  if (!data.id) return <MissingHero />
 
   return (
     <Box
@@ -73,30 +104,7 @@ export function HeroBesideImage({
               preset="compact"
             />
           ) : null}
-          {data.primary_button || data.secondary_button ? (
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {data.primary_button ? (
-                <LinkButton href={data.primary_url ?? ""} variant="red">
-                  <MaterialIcon
-                    className="text-primary"
-                    name={data.primary_icon ?? ""}
-                    size={20}
-                  />
-                  {data.primary_button}
-                </LinkButton>
-              ) : null}
-              {data.secondary_button ? (
-                <LinkButton href={data.secondary_url ?? ""} variant="glass">
-                  <MaterialIcon
-                    className="text-primary"
-                    name={data.secondary_icon ?? ""}
-                    size={20}
-                  />
-                  {data.secondary_button}
-                </LinkButton>
-              ) : null}
-            </div>
-          ) : null}
+          <HeroActions data={data} />
         </div>
       </BoxContainer>
       <div

@@ -41,6 +41,219 @@ interface VideoPlayerControlsProps {
   formatTime: (time: number) => string
 }
 
+function CaptionControl({
+  tracks,
+  currentCaption,
+  activeDialog,
+  onCaptionChange,
+  onSetActiveDialog,
+}: Pick<
+  VideoPlayerControlsProps,
+  "tracks" | "currentCaption" | "activeDialog" | "onCaptionChange" | "onSetActiveDialog"
+>) {
+  if (!tracks.length) return null
+  return (
+    <div className="relative flex items-center">
+      <VideoPlayerTooltip label="Subtítulos (C)">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            if (tracks.length === 1 && tracks[0]) {
+              onCaptionChange(currentCaption ? null : tracks[0].srcLang)
+            } else {
+              onSetActiveDialog(activeDialog === "captions" ? null : "captions")
+            }
+          }}
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+            currentCaption
+              ? "bg-foreground/30 hover:bg-foreground/40"
+              : "hover:bg-white/20"
+          }`}
+          aria-label="Captions"
+        >
+          <MaterialIcon
+            name="closed_caption"
+            size={20}
+            className="text-white"
+          />
+        </Button>
+      </VideoPlayerTooltip>
+      {activeDialog === "captions" && tracks.length > 1 && (
+        <div className="absolute right-0 bottom-full z-50 mb-2 min-w-40 animate-in rounded-lg border border-white/10 bg-black/95 p-3 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
+          <p className="mb-2 text-xs font-semibold text-white uppercase opacity-70">
+            Subtítulos
+          </p>
+          <div className="space-y-1">
+            <button
+              onClick={() => {
+                onCaptionChange(null)
+                onSetActiveDialog(null)
+              }}
+              className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
+                !currentCaption
+                  ? "bg-foreground text-white"
+                  : "text-white/70 hover:bg-white/10"
+              }`}
+            >
+              Off
+            </button>
+            {tracks.map((track) => (
+              <button
+                key={track.srcLang}
+                onClick={() => {
+                  onCaptionChange(track.srcLang)
+                  onSetActiveDialog(null)
+                }}
+                className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
+                  currentCaption === track.srcLang
+                    ? "bg-foreground text-white"
+                    : "text-white/70 hover:bg-white/10"
+                }`}
+              >
+                {track.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SettingsControl({
+  activeDialog,
+  availableQualities,
+  quality,
+  speed,
+  onSetActiveDialog,
+  onQualityChange,
+  onSpeedChange,
+}: Pick<
+  VideoPlayerControlsProps,
+  | "activeDialog"
+  | "availableQualities"
+  | "quality"
+  | "speed"
+  | "onSetActiveDialog"
+  | "onQualityChange"
+  | "onSpeedChange"
+>) {
+  return (
+    <div className="relative hidden items-center lg:flex">
+      <VideoPlayerTooltip label="Ajustes">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            onSetActiveDialog(activeDialog === "settings" ? null : "settings")
+          }
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+            activeDialog === "settings"
+              ? "bg-foreground/30"
+              : "hover:bg-white/20"
+          }`}
+          aria-label="Settings"
+        >
+          <MaterialIcon name="settings" size={20} className="text-white" />
+        </Button>
+      </VideoPlayerTooltip>
+      {activeDialog === "settings" && (
+        <div className="absolute right-0 bottom-full z-50 mb-2 min-w-40 animate-in rounded-lg border border-white/10 bg-black/30 p-3 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
+          {availableQualities.length > 1 && (
+            <div className="mb-3">
+              <p className="mb-2 text-xs font-semibold text-white uppercase opacity-70">
+                Calidad
+              </p>
+              <div className="space-y-1">
+                {availableQualities.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => onQualityChange(option)}
+                    className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
+                      quality === option
+                        ? "bg-foreground text-white"
+                        : "text-white/70 hover:bg-white/10"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col items-center justify-center">
+            <p className="font-semibold text-white">Velocidad</p>
+            <div className="space-y-1">
+              {[0.5, 0.75, 1, 1.25, 1.5, 2].map((option) => (
+                <button
+                  key={option}
+                  onClick={() => onSpeedChange(option)}
+                  className={`w-full rounded-2xl px-2 py-1 text-sm transition-colors ${
+                    speed === option
+                      ? "bg-foreground text-black"
+                      : "text-white/70 hover:bg-white/10"
+                  }`}
+                >
+                  {option}x
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function OptionsControl({
+  activeDialog,
+  isLooping,
+  onSetActiveDialog,
+  onToggleLoop,
+}: Pick<
+  VideoPlayerControlsProps,
+  "activeDialog" | "isLooping" | "onSetActiveDialog" | "onToggleLoop"
+>) {
+  return (
+    <div className="relative hidden items-center lg:flex">
+      <VideoPlayerTooltip label="Mas opciones">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            onSetActiveDialog(activeDialog === "options" ? null : "options")
+          }
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+            activeDialog === "options"
+              ? "bg-foreground/30"
+              : "hover:bg-white/20"
+          }`}
+          aria-label="More options"
+        >
+          <MaterialIcon name="more_vert" size={20} className="text-white" />
+        </Button>
+      </VideoPlayerTooltip>
+      {activeDialog === "options" && (
+        <div className="absolute right-0 bottom-full z-50 mb-2 min-w-48 animate-in rounded-2xl border border-white/10 bg-black/50 p-2 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
+          <Button
+            variant="ghost"
+            onClick={onToggleLoop}
+            className={`flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors ${
+              isLooping
+                ? "bg-foreground/30 text-white"
+                : "text-white hover:bg-white/10"
+            }`}
+          >
+            <MaterialIcon name="repeat" />
+            Repetir
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function VideoPlayerControls({
   isPlaying,
   currentTime,
@@ -92,7 +305,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={onTogglePlay}
-              className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+              className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
               aria-label="Play/Pause"
             >
               {isPlaying ? (
@@ -117,7 +330,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={() => onSkip(-10)}
-              className="hidden items-center justify-center rounded-full p-2 transition-all hover:bg-white/20 lg:flex"
+              className="hidden items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20 lg:flex"
               aria-label="Skip back 10 seconds"
             >
               <MaterialIcon name="replay_10" size={20} className="text-white" />
@@ -130,7 +343,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={() => onSkip(10)}
-              className="hidden items-center justify-center rounded-full p-2 transition-all hover:bg-white/20 lg:flex"
+              className="hidden items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20 lg:flex"
               aria-label="Skip forward 10 seconds"
             >
               <MaterialIcon
@@ -148,7 +361,7 @@ export function VideoPlayerControls({
                 variant="ghost"
                 size="icon"
                 onClick={onPrevVideo}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Previous video"
               >
                 <MaterialIcon
@@ -167,7 +380,7 @@ export function VideoPlayerControls({
                 variant="ghost"
                 size="icon"
                 onClick={onNextVideo}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Next video"
               >
                 <MaterialIcon
@@ -190,7 +403,7 @@ export function VideoPlayerControls({
                 onMouseEnter={() => setShowVolumeSlider(true)}
                 onMouseLeave={() => setShowVolumeSlider(false)}
                 onClick={onToggleMute}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Mute/Unmute"
               >
                 {isMuted ? (
@@ -241,77 +454,13 @@ export function VideoPlayerControls({
 
         {/* Right Controls */}
         <div className="flex items-center gap-1">
-          {/* Captions */}
-          {tracks.length > 0 && (
-            <div className="relative flex items-center">
-              <VideoPlayerTooltip label="Subtítulos (C)">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    if (tracks.length === 1 && tracks[0]) {
-                      onCaptionChange(currentCaption ? null : tracks[0].srcLang)
-                    } else {
-                      onSetActiveDialog(
-                        activeDialog === "captions" ? null : "captions"
-                      )
-                    }
-                  }}
-                  className={`flex items-center justify-center rounded-full p-2 transition-all ${
-                    currentCaption
-                      ? "bg-foreground/30 hover:bg-foreground/40"
-                      : "hover:bg-white/20"
-                  }`}
-                  aria-label="Captions"
-                >
-                  <MaterialIcon
-                    name="closed_caption"
-                    size={20}
-                    className="text-white"
-                  />
-                </Button>
-              </VideoPlayerTooltip>
-
-              {activeDialog === "captions" && tracks.length > 1 && (
-                <div className="absolute right-0 bottom-full z-50 mb-2 min-w-40 animate-in rounded-lg border border-white/10 bg-black/95 p-3 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
-                  <p className="mb-2 text-xs font-semibold text-white uppercase opacity-70">
-                    Subtítulos
-                  </p>
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => {
-                        onCaptionChange(null)
-                        onSetActiveDialog(null)
-                      }}
-                      className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
-                        !currentCaption
-                          ? "bg-foreground text-white"
-                          : "text-white/70 hover:bg-white/10"
-                      }`}
-                    >
-                      Off
-                    </button>
-                    {tracks.map((track) => (
-                      <button
-                        key={track.srcLang}
-                        onClick={() => {
-                          onCaptionChange(track.srcLang)
-                          onSetActiveDialog(null)
-                        }}
-                        className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
-                          currentCaption === track.srcLang
-                            ? "bg-foreground text-white"
-                            : "text-white/70 hover:bg-white/10"
-                        }`}
-                      >
-                        {track.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <CaptionControl
+            tracks={tracks}
+            currentCaption={currentCaption}
+            activeDialog={activeDialog}
+            onCaptionChange={onCaptionChange}
+            onSetActiveDialog={onSetActiveDialog}
+          />
 
           {/* Picture-in-Picture */}
           <VideoPlayerTooltip label="Imagen dentro de imagen (P)">
@@ -334,125 +483,22 @@ export function VideoPlayerControls({
             </Button>
           </VideoPlayerTooltip>
 
-          {/* Settings */}
-          <div className="relative hidden items-center lg:flex">
-            <VideoPlayerTooltip label="Ajustes">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  onSetActiveDialog(
-                    activeDialog === "settings" ? null : "settings"
-                  )
-                }
-                className={`flex items-center justify-center rounded-full p-2 transition-all ${
-                  activeDialog === "settings"
-                    ? "bg-foreground/30"
-                    : "hover:bg-white/20"
-                }`}
-                aria-label="Settings"
-              >
-                <MaterialIcon
-                  name="settings"
-                  size={20}
-                  className="text-white"
-                />
-              </Button>
-            </VideoPlayerTooltip>
+          <SettingsControl
+            activeDialog={activeDialog}
+            availableQualities={availableQualities}
+            quality={quality}
+            speed={speed}
+            onSetActiveDialog={onSetActiveDialog}
+            onQualityChange={onQualityChange}
+            onSpeedChange={onSpeedChange}
+          />
 
-            {activeDialog === "settings" && (
-              <div className="absolute right-0 bottom-full z-50 mb-2 min-w-40 animate-in rounded-lg border border-white/10 bg-black/30 p-3 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
-                {/* Quality Selection */}
-                {availableQualities.length > 1 && (
-                  <div className="mb-3">
-                    <p className="mb-2 text-xs font-semibold text-white uppercase opacity-70">
-                      Calidad
-                    </p>
-                    <div className="space-y-1">
-                      {availableQualities.map((q) => (
-                        <button
-                          key={q}
-                          onClick={() => onQualityChange(q)}
-                          className={`w-full rounded px-2 py-1 text-left text-sm transition-colors ${
-                            quality === q
-                              ? "bg-foreground text-white"
-                              : "text-white/70 hover:bg-white/10"
-                          }`}
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Speed Selection */}
-                <div className="flex flex-col items-center justify-center">
-                  <p className="font-semibold text-white">Velocidad</p>
-                  <div className="space-y-1">
-                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => onSpeedChange(s)}
-                        className={`w-full rounded-2xl px-2 py-1 text-sm transition-colors ${
-                          speed === s
-                            ? "bg-foreground text-black"
-                            : "text-white/70 hover:bg-white/10"
-                        }`}
-                      >
-                        {s}x
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* More Options */}
-          <div className="relative hidden items-center lg:flex">
-            <VideoPlayerTooltip label="Mas opciones">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  onSetActiveDialog(
-                    activeDialog === "options" ? null : "options"
-                  )
-                }
-                className={`flex items-center justify-center rounded-full p-2 transition-all ${
-                  activeDialog === "options"
-                    ? "bg-foreground/30"
-                    : "hover:bg-white/20"
-                }`}
-                aria-label="More options"
-              >
-                <MaterialIcon
-                  name="more_vert"
-                  size={20}
-                  className="text-white"
-                />
-              </Button>
-            </VideoPlayerTooltip>
-
-            {activeDialog === "options" && (
-              <div className="absolute right-0 bottom-full z-50 mb-2 min-w-48 animate-in rounded-2xl border border-white/10 bg-black/50 p-2 backdrop-blur-sm duration-150 fade-in slide-in-from-bottom-1">
-                {/* Loop */}
-                <Button
-                  variant="ghost"
-                  onClick={() => onToggleLoop()}
-                  className={`flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors ${
-                    isLooping
-                      ? "bg-foreground/30 text-white"
-                      : "text-white hover:bg-white/10"
-                  }`}
-                >
-                  <MaterialIcon name="repeat" />
-                  Repetir
-                </Button>
-              </div>
-            )}
-          </div>
+          <OptionsControl
+            activeDialog={activeDialog}
+            isLooping={isLooping}
+            onSetActiveDialog={onSetActiveDialog}
+            onToggleLoop={onToggleLoop}
+          />
 
           {/* Fullscreen */}
           <VideoPlayerTooltip
@@ -466,7 +512,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={onFullscreen}
-              className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+              className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
               aria-label="Fullscreen"
             >
               {isFullscreen ? (

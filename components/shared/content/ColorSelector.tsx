@@ -1,7 +1,13 @@
 "use client"
 // beui.dev/components/motion/color-selector
 
-import { LayoutGroup, motion, useReducedMotion } from "motion/react"
+import {
+  LayoutGroup,
+  LazyMotion,
+  domMax,
+  useReducedMotion,
+} from "motion/react"
+import * as m from "motion/react-m"
 import {
   createContext,
   useContext,
@@ -68,14 +74,16 @@ export function ColorSelector({
         form,
       }}
     >
-      <fieldset
-        {...props}
-        disabled={disabled}
-        form={form}
-        className={cn("min-w-0 border-0 p-0", className)}
-      >
-        <LayoutGroup id={id}>{children}</LayoutGroup>
-      </fieldset>
+      <LazyMotion features={domMax}>
+        <fieldset
+          {...props}
+          disabled={disabled}
+          form={form}
+          className={cn("min-w-0 border-0 p-0", className)}
+        >
+          <LayoutGroup id={id}>{children}</LayoutGroup>
+        </fieldset>
+      </LazyMotion>
     </ColorSelectorContext.Provider>
   )
 }
@@ -148,7 +156,7 @@ export function ColorSelectorItem({
   const selected = context.value === value
   const unavailable = disabled || context.disabled
   return (
-    <motion.label
+    <m.label
       tabIndex={-1}
       whileTap={reduce || unavailable ? undefined : { scale: 0.94 }}
       transition={SPRING_PRESS}
@@ -183,7 +191,7 @@ export function ColorSelectorItem({
         )}
       >
         {selected && (
-          <motion.span
+          <m.span
             layoutId={reduce ? undefined : "color-selection"}
             initial={false}
             transition={SPRING_LAYOUT}
@@ -198,6 +206,6 @@ export function ColorSelectorItem({
           style={{ backgroundColor: color }}
         />
       </span>
-    </motion.label>
+    </m.label>
   )
 }

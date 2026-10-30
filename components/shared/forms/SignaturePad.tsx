@@ -12,6 +12,7 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
   ReactNode,
+  Ref,
 } from "react"
 import {
   AnimatePresence,
@@ -19,7 +20,7 @@ import {
   motion,
   useReducedMotion,
 } from "motion/react"
-import type { Transition } from "motion/react"
+import type { TargetAndTransition, Transition } from "motion/react"
 import {
   Check,
   Download,
@@ -381,6 +382,8 @@ interface History {
   fresh: string | null
 }
 type Saved = null | "png" | "svg" | "failed"
+type ReplayState = { at: number; offsets: number[] }
+type LiveStroke = { id: number; stroke: InkStroke; stamp: number }
 
 const { spring, duration, ease, blur } = motionTokens
 const subscribe = () => () => {}
@@ -393,175 +396,83 @@ function useReducedFlag() {
   return !!useReducedMotion() && hydrated
 }
 
-export function SignaturePad({
-  signer,
-  hint = "Sign here",
-  defaultColor = "black",
-  defaultWidth = "medium",
-  onChange,
-  fileName = "signature",
-  label = "Signature pad",
-  className,
-}: SignaturePadProps) {
-  const uid = useId().replace(/[^a-zA-Z0-9-]/g, "")
-  const reduced = useReducedFlag()
-  const [history, setHistory] = useState<History>({
-    past: [],
-    present: [],
-    future: [],
-    fresh: null,
-  })
-  const [color, setColor] = useState<InkColor>(defaultColor)
-  const [width, setWidth] = useState<InkWidth>(defaultWidth)
-  const [drawing, setDrawing] = useState(false)
-  const [wiping, setWiping] = useState(false)
-  const [replay, setReplay] = useState<{
-    at: number
-    offsets: number[]
-  } | null>(null)
-  const [saved, setSaved] = useState<Saved>(null)
-  const [status, setStatus] = useState("")
-
-  const padRef = useRef<HTMLDivElement>(null)
-  const inkRef = useRef<HTMLDivElement>(null)
-  const liveRef = useRef<SVGPathElement>(null)
-  const live = useRef<{ id: number; stroke: InkStroke; stamp: number } | null>(
-    null
-  )
-  const replayFrame = useRef(0)
-  const savedTimer = useRef(0)
-  const wipeAnimation = useRef<{
-    stop: () => void
-    complete: () => void
-  } | null>(null)
-  const counter = useRef(0)
-  const onChangeRef = useRef(onChange)
-  useEffect(() => {
-    onChangeRef.current = onChange
-  })
-
-  const strokes = history.present
-  const empty = strokes.length === 0
-  const replaying = replay !== null
-
-  useEffect(() => {
-    onChangeRef.current?.(strokes)
-  }, [strokes])
-  useEffect(
-    () => () => {
-      cancelAnimationFrame(replayFrame.current)
-      window.clearTimeout(savedTimer.current)
-    },
-    []
-  )
-
-  const commit = useCallback(
-    (next: InkStroke[], fresh: string | null = null) => {
-      setHistory((current) => ({
-        past: [...current.past, current.present].slice(-60),
-        present: next,
-        future: [],
-        fresh,
-      }))
-    },
-    []
-  )
-
-  const stopReplay = useCallback(() => {
-    cancelAnimationFrame(replayFrame.current)
-    setReplay(null)
-  }, [])
-  /** A wipe in flight completes at once, so whatever comes next starts from a clear pad. */
-  const settleWipe = useCallback(() => {
-    wipeAnimation.current?.complete()
-  }, [])
-
-  function toPad(event: { clientX: number; clientY: number }) {
-    const box = padRef.current!.getBoundingClientRect()
-    return {
-      x: ((event.clientX - box.left) / box.width) * PAD_WIDTH,
-      y: ((event.clientY - box.top) / box.height) * PAD_HEIGHT,
-    }
+async function saveSignatureFile(
+  kind: "png" | "svg",
+  strokes: InkStroke[],
+  fileName: string,
+  empty: boolean,
+  savedTimer: { current: number },
+  setSaved: (saved: Saved) => void,
+  setStatus: (status: string) => void
+) {
+  if (empty) return
+  window.clearTimeout(savedTimer.current)
+  try {
+    const blob =
+      kind === "svg"
+        ? new Blob([signatureToSvg(strokes)], { type: "image/svg+xml" })
+        : await signatureToPng(strokes)
+    download(blob, `${fileName}.${kind}`)
+    setSaved(kind)
+    setStatus(`Saved ${fileName}.${kind}`)
+  } catch {
+    setSaved("failed")
+    setStatus("Export failed. Try again.")
   }
+  savedTimer.current = window.setTimeout(() => setSaved(null), 1800)
+}
 
-  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (live.current || (event.pointerType === "mouse" && event.button !== 0))
-      return
-    event.preventDefault()
-    settleWipe()
-    if (replaying) stopReplay()
-    padRef.current?.focus({ preventScroll: true })
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const { x, y } = toPad(event)
-    const now = event.nativeEvent.timeStamp
-    counter.current += 1
-    const pen = event.pointerType === "pen" && event.pressure > 0
-    live.current = {
-      id: event.pointerId,
-      stamp: event.nativeEvent.timeStamp,
-      stroke: {
-        id: `${uid}-${counter.current}`,
-        color,
-        width,
-        at: now,
-        points: [{ x, y, p: pen ? event.pressure : -1, t: 0 }],
-      },
-    }
-    setDrawing(true)
-    paintLive()
-  }
-  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    const current = live.current
-    if (!current || current.id !== event.pointerId) return
-    const samples =
-      typeof event.nativeEvent.getCoalescedEvents === "function"
-        ? event.nativeEvent.getCoalescedEvents()
-        : []
-    const list = samples.length ? samples : [event.nativeEvent]
-    for (const sample of list) {
-      const { x, y } = toPad(sample)
-      const pen = sample.pointerType === "pen" && sample.pressure > 0
-      current.stroke.points.push({
-        x,
-        y,
-        p: pen ? sample.pressure : -1,
-        t: Math.max(
-          current.stroke.points[current.stroke.points.length - 1]!.t,
-          sample.timeStamp - current.stamp
-        ),
-      })
-    }
-    paintLive()
-  }
-  function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    const current = live.current
-    if (!current || current.id !== event.pointerId) return
-    live.current = null
-    commit([...strokes, current.stroke], current.stroke.id)
-    liveRef.current?.setAttribute("d", "")
-    setDrawing(false)
-    setStatus(`Stroke added. ${strokes.length + 1} in the signature.`)
-  }
-  function paintLive() {
-    const current = live.current
-    if (!current || !liveRef.current) return
-    liveRef.current.setAttribute(
-      "d",
-      outlineToPath(
-        getStrokeOutline(
-          current.stroke.points,
-          strokeOptions(current.stroke, false)
-        )
-      )
-    )
-  }
-
-  function undo() {
-    if (!history.past.length || live.current) return
-    settleWipe()
+function toggleSignatureReplay(
+  replaying: boolean,
+  empty: boolean,
+  live: { current: LiveStroke | null },
+  strokes: InkStroke[],
+  replayFrame: { current: number },
+  settleWipe: () => void,
+  stopReplay: () => void,
+  setReplay: (replay: ReplayState | null) => void,
+  setStatus: (status: string) => void
+) {
+  if (replaying) {
     stopReplay()
-    setHistory((current) =>
-      current.past.length
+    setStatus("Replay stopped")
+    return
+  }
+  if (empty || live.current) return
+  settleWipe()
+  const { offsets, speed, total } = getReplayTimeline(strokes)
+  const begin = performance.now()
+  const tick = (now: number) => {
+    const at = (now - begin) * speed
+    if (at >= total) {
+      setReplay(null)
+      setStatus("Replay finished")
+      return
+    }
+    setReplay({ at, offsets })
+    replayFrame.current = requestAnimationFrame(tick)
+  }
+  setReplay({ at: 0, offsets })
+  setStatus("Replaying signature")
+  replayFrame.current = requestAnimationFrame(tick)
+}
+
+function restoreSignatureHistory(
+  action: "undo" | "redo",
+  history: History,
+  live: { current: LiveStroke | null },
+  settleWipe: () => void,
+  stopReplay: () => void,
+  setHistory: (update: (current: History) => History) => void,
+  setStatus: (status: string) => void
+) {
+  if ((action === "undo" ? !history.past.length : !history.future.length) || live.current)
+    return
+  settleWipe()
+  stopReplay()
+  setHistory((current) =>
+    action === "undo"
+      ? current.past.length
         ? {
             past: current.past.slice(0, -1),
             present: current.past[current.past.length - 1]!,
@@ -569,15 +480,7 @@ export function SignaturePad({
             fresh: null,
           }
         : current
-    )
-    setStatus("Undone")
-  }
-  function redo() {
-    if (!history.future.length || live.current) return
-    settleWipe()
-    stopReplay()
-    setHistory((current) =>
-      current.future.length
+      : current.future.length
         ? {
             past: [...current.past, current.present],
             present: current.future[0]!,
@@ -585,293 +488,422 @@ export function SignaturePad({
             fresh: null,
           }
         : current
-    )
-    setStatus("Redone")
-  }
+  )
+  setStatus(action === "undo" ? "Undone" : "Redone")
+}
 
-  function clear() {
-    if (empty || wiping || live.current) return
-    stopReplay()
-    const node = inkRef.current
-    const finish = () => {
-      wipeAnimation.current = null
-      commit([])
-      setWiping(false)
-      setStatus("Signature cleared. Undo brings it back.")
-      // Lift the clip only once the wiped strokes have left, so they never flash back for a frame.
-      if (node)
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => {
-            node.style.clipPath = ""
-          })
-        )
-    }
-    if (!node || reduced) {
-      finish()
-      return
-    }
-    setWiping(true)
-    // The ink is cut away behind a squeegee edge that sweeps across the pad; the edge itself is drawn by the sweep element.
-    const controls = animate(
-      node,
-      { clipPath: ["inset(0% 0% 0% 0%)", "inset(0% 0% 0% 100%)"] },
-      { duration: 0.56, ease: [...ease.inOut] }
-    )
-    wipeAnimation.current = {
-      stop: () => controls.stop(),
-      complete: () => {
-        controls.complete()
-      },
-    }
-    controls.then(finish)
-  }
+function finishSignatureStroke(
+  event: ReactPointerEvent<HTMLDivElement>,
+  live: { current: LiveStroke | null },
+  strokes: InkStroke[],
+  livePath: { current: SVGPathElement | null },
+  commit: (strokes: InkStroke[], fresh?: string | null) => void,
+  setDrawing: (drawing: boolean) => void,
+  setStatus: (status: string) => void
+) {
+  const current = live.current
+  if (!current || current.id !== event.pointerId) return
+  live.current = null
+  commit([...strokes, current.stroke], current.stroke.id)
+  livePath.current?.setAttribute("d", "")
+  setDrawing(false)
+  setStatus(`Stroke added. ${strokes.length + 1} in the signature.`)
+}
 
-  function toggleReplay() {
-    if (replaying) {
-      stopReplay()
-      setStatus("Replay stopped")
-      return
-    }
-    if (empty || live.current) return
-    settleWipe()
-    // Build a timeline: each stroke keeps its own rhythm, and pauses between strokes are capped so the replay never stalls.
-    const offsets: number[] = []
-    let cursor = 0
-    strokes.forEach((stroke, index) => {
-      if (index > 0) {
-        const previous = strokes[index - 1]!
-        const gap =
-          stroke.at -
-          (previous.at + previous.points[previous.points.length - 1]!.t)
-        cursor += Math.min(260, Math.max(90, gap))
-      }
-      offsets.push(cursor)
-      cursor += stroke.points[stroke.points.length - 1]!.t
+function appendPointerSamples(
+  event: ReactPointerEvent<HTMLDivElement>,
+  current: LiveStroke,
+  toPad: (point: { clientX: number; clientY: number }) => { x: number; y: number },
+  paintLive: () => void
+) {
+  const samples =
+    typeof event.nativeEvent.getCoalescedEvents === "function"
+      ? event.nativeEvent.getCoalescedEvents()
+      : []
+  const list = samples.length ? samples : [event.nativeEvent]
+  for (const sample of list) {
+    const { x, y } = toPad(sample)
+    const pen = sample.pointerType === "pen" && sample.pressure > 0
+    current.stroke.points.push({
+      x,
+      y,
+      p: pen ? sample.pressure : -1,
+      t: Math.max(
+        current.stroke.points[current.stroke.points.length - 1]!.t,
+        sample.timeStamp - current.stamp
+      ),
     })
-    const speed = Math.max(1, cursor / 3200)
-    const total = cursor + 120
-    const begin = performance.now()
-    const tick = (now: number) => {
-      const at = (now - begin) * speed
-      if (at >= total) {
-        setReplay(null)
-        setStatus("Replay finished")
-        return
-      }
-      setReplay({ at, offsets })
-      replayFrame.current = requestAnimationFrame(tick)
-    }
-    setReplay({ at: 0, offsets })
-    setStatus("Replaying signature")
-    replayFrame.current = requestAnimationFrame(tick)
   }
-  async function save(kind: "png" | "svg") {
-    if (empty) return
-    window.clearTimeout(savedTimer.current)
-    try {
-      const blob =
-        kind === "svg"
-          ? new Blob([signatureToSvg(strokes)], { type: "image/svg+xml" })
-          : await signatureToPng(strokes)
-      download(blob, `${fileName}.${kind}`)
-      setSaved(kind)
-      setStatus(`Saved ${fileName}.${kind}`)
-    } catch {
-      setSaved("failed")
-      setStatus("Export failed. Try again.")
-    }
-    savedTimer.current = window.setTimeout(() => setSaved(null), 1800)
-  }
+  paintLive()
+}
 
-  function onKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    const mod = event.metaKey || event.ctrlKey
-    const key = event.key.toLowerCase()
-    if (mod && key === "z") {
-      event.preventDefault()
-      if (event.shiftKey) redo()
-      else undo()
-    } else if (mod && key === "y") {
-      event.preventDefault()
-      redo()
-    } else if (
-      !mod &&
-      (event.key === "Delete" || event.key === "Backspace") &&
-      event.currentTarget === event.target
-    ) {
-      event.preventDefault()
-      clear()
-    } else if (event.key === "Escape" && replaying) {
-      stopReplay()
-    }
+function startSignatureStroke(
+  event: ReactPointerEvent<HTMLDivElement>,
+  options: {
+    live: { current: LiveStroke | null }
+    counter: { current: number }
+    pad: { current: HTMLDivElement | null }
+    uid: string
+    color: InkColor
+    width: InkWidth
+    replaying: boolean
+    toPad: (point: { clientX: number; clientY: number }) => { x: number; y: number }
+    settleWipe: () => void
+    stopReplay: () => void
+    setDrawing: (drawing: boolean) => void
+    paintLive: () => void
   }
+) {
+  const {
+    live,
+    counter,
+    pad,
+    uid,
+    color,
+    width,
+    replaying,
+    toPad,
+    settleWipe,
+    stopReplay,
+    setDrawing,
+    paintLive,
+  } = options
+  if (live.current || (event.pointerType === "mouse" && event.button !== 0))
+    return
+  event.preventDefault()
+  settleWipe()
+  if (replaying) stopReplay()
+  pad.current?.focus({ preventScroll: true })
+  event.currentTarget.setPointerCapture(event.pointerId)
+  const { x, y } = toPad(event)
+  const now = event.nativeEvent.timeStamp
+  counter.current += 1
+  const pen = event.pointerType === "pen" && event.pressure > 0
+  live.current = {
+    id: event.pointerId,
+    stamp: event.nativeEvent.timeStamp,
+    stroke: {
+      id: `${uid}-${counter.current}`,
+      color,
+      width,
+      at: now,
+      points: [{ x, y, p: pen ? event.pressure : -1, t: 0 }],
+    },
+  }
+  setDrawing(true)
+  paintLive()
+}
 
-  // During replay each stroke shows only the part drawn so far, and the nib rides its newest point.
-  let nib: InkPoint | null = null,
-    nibColor: InkColor = color
-  const visible: { stroke: InkStroke; d: string | null }[] = []
-  for (let index = 0; index < strokes.length; index++) {
-    const stroke = strokes[index]!
-    if (replay === null) {
-      visible.push({ stroke, d: null })
-      continue
+function handleSignatureKey(
+  event: ReactKeyboardEvent<HTMLDivElement>,
+  replaying: boolean,
+  actions: {
+    undo: () => void
+    redo: () => void
+    clear: () => void
+    stopReplay: () => void
+  }
+) {
+  const mod = event.metaKey || event.ctrlKey
+  const key = event.key.toLowerCase()
+  if (mod && key === "z") {
+    event.preventDefault()
+    if (event.shiftKey) actions.redo()
+    else actions.undo()
+  } else if (mod && key === "y") {
+    event.preventDefault()
+    actions.redo()
+  } else if (
+    !mod &&
+    (event.key === "Delete" || event.key === "Backspace") &&
+    event.currentTarget === event.target
+  ) {
+    event.preventDefault()
+    actions.clear()
+  } else if (event.key === "Escape" && replaying) {
+    actions.stopReplay()
+  }
+}
+
+function getReplayTimeline(strokes: InkStroke[]) {
+  const offsets: number[] = []
+  let cursor = 0
+  strokes.forEach((stroke, index) => {
+    if (index > 0) {
+      const previous = strokes[index - 1]!
+      const gap =
+        stroke.at -
+        (previous.at + previous.points[previous.points.length - 1]!.t)
+      cursor += Math.min(260, Math.max(90, gap))
     }
+    offsets.push(cursor)
+    cursor += stroke.points[stroke.points.length - 1]!.t
+  })
+  return { offsets, speed: Math.max(1, cursor / 3200), total: cursor + 120 }
+}
+
+function getSignaturePresentation(
+  empty: boolean,
+  drawing: boolean,
+  wiping: boolean,
+  reduced: boolean
+) {
+  return {
+    showHint: empty && !drawing && !wiping,
+    hintHidden: reduced
+      ? { opacity: 0 }
+      : { opacity: 0, y: 6, scale: 0.97, filter: `blur(${blur.soft}px)` },
+    transition: reduced ? { duration: duration.instant } : spring.snappy,
+  }
+}
+
+function getVisibleStrokes(
+  strokes: InkStroke[],
+  replay: ReplayState | null,
+  color: InkColor
+) {
+  let nib: InkPoint | null = null
+  let nibColor = color
+  const visible = strokes.map((stroke, index) => {
+    if (replay === null) return { stroke, d: null }
     const local = replay.at - (replay.offsets[index] ?? 0)
     const lastT = stroke.points[stroke.points.length - 1]!.t
-    if (local < 0) {
-      visible.push({ stroke, d: "" })
-      continue
-    }
-    if (local >= lastT) {
-      visible.push({ stroke, d: null })
-      continue
-    }
+    if (local < 0) return { stroke, d: "" }
+    if (local >= lastT) return { stroke, d: null }
     nib =
       stroke.points.findLast((point) => point.t <= local) ?? stroke.points[0]!
     nibColor = stroke.color
-    visible.push({ stroke, d: strokePath(stroke, local) })
-  }
-  const showHint = empty && !drawing && !wiping
-  const hintHidden = reduced
-    ? { opacity: 0 }
-    : { opacity: 0, y: 6, scale: 0.97, filter: `blur(${blur.soft}px)` }
-  const t: Transition = reduced ? { duration: duration.instant } : spring.snappy
+    return { stroke, d: strokePath(stroke, local) }
+  })
+  return { visible, nib: nib as InkPoint | null, nibColor }
+}
 
+interface VisibleStroke {
+  stroke: InkStroke
+  d: string | null
+}
+
+interface SignatureSurfaceProps {
+  padRef: Ref<HTMLDivElement>
+  inkRef: Ref<HTMLDivElement>
+  liveRef: Ref<SVGPathElement>
+  label: string
+  count: number
+  empty: boolean
+  drawing: boolean
+  wiping: boolean
+  signer?: string
+  hint: string
+  hintHidden: TargetAndTransition
+  showHint: boolean
+  reduced: boolean
+  uid: string
+  onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => void
+  onPointerMove: (event: ReactPointerEvent<HTMLDivElement>) => void
+  onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => void
+  onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+  visible: VisibleStroke[]
+  fresh: string | null
+  color: InkColor
+  width: InkWidth
+  nib: InkPoint | null
+  nibColor: InkColor
+}
+
+function SignatureSurface({
+  padRef,
+  inkRef,
+  liveRef,
+  label,
+  count,
+  empty,
+  drawing,
+  wiping,
+  signer,
+  hint,
+  hintHidden,
+  showHint,
+  reduced,
+  uid,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onKeyDown,
+  visible,
+  fresh,
+  color,
+  width,
+  nib,
+  nibColor,
+}: SignatureSurfaceProps) {
   return (
     <div
-      className={cn(
-        "grid w-full min-w-0 gap-[10px] font-[family-name:var(--font-body)] tracking-[var(--tracking-body)] [--ink-black:var(--foreground)] [--ink-blue:oklch(46%_.17_262)] [--ink-violet:oklch(49%_.2_292)] dark:[--ink-blue:oklch(76%_.12_258)] dark:[--ink-violet:oklch(77%_.13_295)]",
-        className
-      )}
-      data-ink={color}
+      ref={padRef}
+      className="relative isolate aspect-[600/260] cursor-crosshair touch-none overflow-hidden rounded-[var(--radius-panel)] border border-[color:var(--border)] bg-[var(--surface)] select-none [-webkit-user-select:none] [transition:border-color_var(--duration-fast)_var(--ease-standard)] data-[drawing]:border-[color:var(--border-strong)]"
+      tabIndex={0}
+      role="img"
+      aria-roledescription="signature pad"
+      aria-label={`${label}. ${empty ? "Empty." : `${count} ${count === 1 ? "stroke" : "strokes"}.`} Draw with a pointer, pen, or finger.`}
+      aria-describedby={`${uid}-keys`}
+      data-drawing={drawing ? "" : undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onKeyDown={onKeyDown}
     >
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <X
+          className="absolute top-[72%] left-[7%] [translate:0_calc(-100%-6px)] text-[color:var(--text-muted)]"
+          size={14}
+          strokeWidth={1.75}
+        />
+        <span className="absolute top-[72%] right-[7%] left-[7%] [border-top:1.5px_dashed_var(--border-strong)]" />
+        {signer && (
+          <span className="absolute top-[calc(72%+8px)] left-[7%] text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[color:var(--text-muted)]">
+            {signer}
+          </span>
+        )}
+        <AnimatePresence initial={false}>
+          {showHint && (
+            <motion.span
+              key="hint"
+              className="absolute top-[72%] left-1/2 [translate:-50%_calc(-100%-8px)] text-[length:var(--text-lg)] leading-[var(--leading-body)] whitespace-nowrap text-[color:var(--text-muted)]"
+              initial={hintHidden}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{
+                ...hintHidden,
+                transition: {
+                  duration: duration.fast,
+                  ease: [...ease.standard],
+                },
+              }}
+              transition={
+                reduced
+                  ? { duration: duration.instant }
+                  : { duration: duration.standard, ease: [...ease.enter] }
+              }
+            >
+              {hint}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
       <div
-        ref={padRef}
-        className="relative isolate aspect-[600/260] cursor-crosshair touch-none overflow-hidden rounded-[var(--radius-panel)] border border-[color:var(--border)] bg-[var(--surface)] select-none [-webkit-user-select:none] [transition:border-color_var(--duration-fast)_var(--ease-standard)] data-[drawing]:border-[color:var(--border-strong)]"
-        tabIndex={0}
-        role="img"
-        aria-roledescription="signature pad"
-        aria-label={`${label}. ${empty ? "Empty." : `${strokes.length} ${strokes.length === 1 ? "stroke" : "strokes"}.`} Draw with a pointer, pen, or finger.`}
-        aria-describedby={`${uid}-keys`}
-        data-drawing={drawing ? "" : undefined}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onKeyDown={onKeyDown}
+        ref={inkRef}
+        className="pointer-events-none absolute inset-0 [&_svg]:block [&_svg]:h-full [&_svg]:w-full [&_svg]:overflow-visible"
       >
-        <div
-          className="pointer-events-none absolute inset-0"
+        <svg
+          viewBox={`0 0 ${PAD_WIDTH} ${PAD_HEIGHT}`}
+          preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <X
-            className="absolute top-[72%] left-[7%] [translate:0_calc(-100%-6px)] text-[color:var(--text-muted)]"
-            size={14}
-            strokeWidth={1.75}
-          />
-          <span className="absolute top-[72%] right-[7%] left-[7%] [border-top:1.5px_dashed_var(--border-strong)]" />
-          {signer && (
-            <span className="absolute top-[calc(72%+8px)] left-[7%] text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[color:var(--text-muted)]">
-              {signer}
-            </span>
-          )}
           <AnimatePresence initial={false}>
-            {showHint && (
-              <motion.span
-                key="hint"
-                className="absolute top-[72%] left-1/2 [translate:-50%_calc(-100%-8px)] text-[length:var(--text-lg)] leading-[var(--leading-body)] whitespace-nowrap text-[color:var(--text-muted)]"
-                initial={hintHidden}
-                animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            {visible.map(({ stroke, d }) => (
+              <motion.path
+                key={stroke.id}
+                className="fill-[var(--ink-black)] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
+                data-color={stroke.color}
+                d={d ?? strokePath(stroke)}
+                initial={fresh === stroke.id ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{
-                  ...hintHidden,
+                  opacity: 0,
                   transition: {
-                    duration: duration.fast,
+                    duration: wiping ? 0 : duration.standard,
                     ease: [...ease.standard],
                   },
                 }}
-                transition={
-                  reduced
-                    ? { duration: duration.instant }
-                    : { duration: duration.standard, ease: [...ease.enter] }
-                }
-              >
-                {hint}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-        <div
-          ref={inkRef}
-          className="pointer-events-none absolute inset-0 [&_svg]:block [&_svg]:h-full [&_svg]:w-full [&_svg]:overflow-visible"
-        >
-          <svg
-            viewBox={`0 0 ${PAD_WIDTH} ${PAD_HEIGHT}`}
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <AnimatePresence initial={false}>
-              {visible.map(({ stroke, d }) => (
-                <motion.path
-                  key={stroke.id}
-                  className="fill-[var(--ink-black)] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
-                  data-color={stroke.color}
-                  d={d ?? strokePath(stroke)}
-                  initial={history.fresh === stroke.id ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{
-                    opacity: 0,
-                    transition: {
-                      duration: wiping ? 0 : duration.standard,
-                      ease: [...ease.standard],
-                    },
-                  }}
-                  transition={{
-                    duration: duration.standard,
-                    ease: [...ease.standard],
-                  }}
-                />
-              ))}
-            </AnimatePresence>
-            <path
-              ref={liveRef}
-              className="fill-[var(--ink-black)] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
-              data-color={color}
-            />
-            {nib && (
-              <circle
-                className="fill-[var(--ink-black)] opacity-[.35] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
-                data-color={nibColor}
-                cx={nib.x}
-                cy={nib.y}
-                r={WIDTHS[width].size * 0.9}
+                transition={{
+                  duration: duration.standard,
+                  ease: [...ease.standard],
+                }}
               />
-            )}
-          </svg>
-        </div>
-        {wiping && (
-          <motion.span
-            className="pointer-events-none absolute inset-0 before:absolute before:top-[8%] before:bottom-[8%] before:left-[-1px] before:w-[2px] before:rounded-[2px] before:bg-[var(--foreground)] before:opacity-50 before:content-[''] after:absolute after:inset-y-0 after:left-[-28px] after:w-[28px] after:bg-[linear-gradient(to_right,transparent,color-mix(in_oklab,var(--foreground)_5%,transparent))] after:content-['']"
-            aria-hidden="true"
-            initial={{ x: "0%", opacity: 0 }}
-            animate={{ x: "100%", opacity: [0, 1, 1, 0] }}
-            transition={{
-              duration: 0.56,
-              ease: [...ease.inOut],
-              opacity: { duration: 0.56, times: [0, 0.12, 0.85, 1] },
-            }}
+            ))}
+          </AnimatePresence>
+          <path
+            ref={liveRef}
+            className="fill-[var(--ink-black)] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
+            data-color={color}
           />
-        )}
+          {nib && (
+            <circle
+              className="fill-[var(--ink-black)] opacity-[.35] data-[color=blue]:fill-[var(--ink-blue)] data-[color=violet]:fill-[var(--ink-violet)]"
+              data-color={nibColor}
+              cx={nib.x}
+              cy={nib.y}
+              r={WIDTHS[width].size * 0.9}
+            />
+          )}
+        </svg>
       </div>
+      {wiping && (
+        <motion.span
+          className="pointer-events-none absolute inset-0 before:absolute before:top-[8%] before:bottom-[8%] before:left-[-1px] before:w-[2px] before:rounded-[2px] before:bg-[var(--foreground)] before:opacity-50 before:content-[''] after:absolute after:inset-y-0 after:left-[-28px] after:w-[28px] after:bg-[linear-gradient(to_right,transparent,color-mix(in_oklab,var(--foreground)_5%,transparent))] after:content-['']"
+          aria-hidden="true"
+          initial={{ x: "0%", opacity: 0 }}
+          animate={{ x: "100%", opacity: [0, 1, 1, 0] }}
+          transition={{
+            duration: 0.56,
+            ease: [...ease.inOut],
+            opacity: { duration: 0.56, times: [0, 0.12, 0.85, 1] },
+          }}
+        />
+      )}
+    </div>
+  )
+}
 
+interface SignatureControlsProps {
+  uid: string
+  color: InkColor
+  width: InkWidth
+  reduced: boolean
+  transition: Transition
+  history: History
+  wiping: boolean
+  replaying: boolean
+  empty: boolean
+  saved: Saved
+  status: string
+  onColorChange: (color: InkColor) => void
+  onWidthChange: (width: InkWidth) => void
+  onUndo: () => void
+  onRedo: () => void
+  onReplay: () => void
+  onClear: () => void
+  onSave: (kind: "png" | "svg") => void
+}
+
+function SignatureControls({
+  uid,
+  color,
+  width,
+  reduced,
+  transition,
+  history,
+  wiping,
+  replaying,
+  empty,
+  saved,
+  status,
+  onColorChange,
+  onWidthChange,
+  onUndo,
+  onRedo,
+  onReplay,
+  onClear,
+  onSave,
+}: SignatureControlsProps) {
+  return (
+    <>
       <div className="flex flex-wrap items-center justify-between gap-[8px]">
         <div className="flex items-center gap-[2px]">
           <Choice
             label="Ink color"
             options={COLORS}
             value={color}
-            onChange={(next) => {
-              setColor(next)
-              setStatus(`${INK[next].label} selected`)
-            }}
+            onChange={onColorChange}
             layoutId={`${uid}-color`}
             reduced={reduced}
             render={(option) => (
@@ -890,10 +922,7 @@ export function SignaturePad({
             label="Stroke width"
             options={SIZES}
             value={width}
-            onChange={(next) => {
-              setWidth(next)
-              setStatus(`${WIDTHS[next].label} nib selected`)
-            }}
+            onChange={onWidthChange}
             layoutId={`${uid}-width`}
             reduced={reduced}
             render={(option) => (
@@ -911,21 +940,21 @@ export function SignaturePad({
         <div className="flex items-center gap-[2px]">
           <IconButton
             label="Undo"
-            onClick={undo}
+            onClick={onUndo}
             disabled={!history.past.length || wiping}
           >
             <Undo2 size={18} strokeWidth={1.75} aria-hidden="true" />
           </IconButton>
           <IconButton
             label="Redo"
-            onClick={redo}
+            onClick={onRedo}
             disabled={!history.future.length || wiping}
           >
             <Redo2 size={18} strokeWidth={1.75} aria-hidden="true" />
           </IconButton>
           <IconButton
             label={replaying ? "Stop replay" : "Replay signature"}
-            onClick={toggleReplay}
+            onClick={onReplay}
             disabled={empty || wiping}
             pressed={replaying}
           >
@@ -936,7 +965,7 @@ export function SignaturePad({
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.6 }}
-                transition={t}
+                transition={transition}
               >
                 {replaying ? (
                   <Square size={15} strokeWidth={1.75} aria-hidden="true" />
@@ -948,14 +977,13 @@ export function SignaturePad({
           </IconButton>
           <IconButton
             label="Clear signature"
-            onClick={clear}
+            onClick={onClear}
             disabled={empty || wiping}
           >
             <Eraser size={18} strokeWidth={1.75} aria-hidden="true" />
           </IconButton>
         </div>
       </div>
-
       <div className="flex items-center justify-end gap-[6px]">
         <span className="mr-[4px] text-[length:var(--text-xs)] text-[color:var(--text-muted)]">
           Save as
@@ -965,7 +993,7 @@ export function SignaturePad({
             key={kind}
             type="button"
             className="grid h-[var(--control-height-sm)] min-w-[76px] cursor-pointer rounded-[var(--radius-control)] border border-[color:var(--border)] bg-[var(--surface)] px-[12px] py-0 text-[length:var(--text-sm)] text-[color:var(--foreground)] [-webkit-tap-highlight-color:transparent] [transition:background-color_var(--duration-fast)_var(--ease-standard),transform_var(--duration-instant)_var(--ease-standard)] hover:not-disabled:bg-[var(--surface-muted)] hover:not-disabled:text-[color:var(--foreground)] active:not-disabled:[transform:scale(.97)] disabled:cursor-default disabled:text-[color:var(--text-muted)]"
-            onClick={() => save(kind)}
+            onClick={() => onSave(kind)}
             disabled={empty}
             aria-label={`Download ${kind.toUpperCase()}`}
           >
@@ -1026,6 +1054,304 @@ export function SignaturePad({
       >
         {status}
       </p>
+    </>
+  )
+}
+
+export function SignaturePad({
+  signer,
+  hint = "Sign here",
+  defaultColor = "black",
+  defaultWidth = "medium",
+  onChange,
+  fileName = "signature",
+  label = "Signature pad",
+  className,
+}: SignaturePadProps) {
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, "")
+  const reduced = useReducedFlag()
+  const [history, setHistory] = useState<History>({
+    past: [],
+    present: [],
+    future: [],
+    fresh: null,
+  })
+  const [color, setColor] = useState<InkColor>(defaultColor)
+  const [width, setWidth] = useState<InkWidth>(defaultWidth)
+  const [drawing, setDrawing] = useState(false)
+  const [wiping, setWiping] = useState(false)
+  const [replay, setReplay] = useState<ReplayState | null>(null)
+  const [saved, setSaved] = useState<Saved>(null)
+  const [status, setStatus] = useState("")
+
+  const padRef = useRef<HTMLDivElement>(null)
+  const inkRef = useRef<HTMLDivElement>(null)
+  const liveRef = useRef<SVGPathElement>(null)
+  const live = useRef<LiveStroke | null>(null)
+  const replayFrame = useRef(0)
+  const savedTimer = useRef(0)
+  const wipeAnimation = useRef<{
+    stop: () => void
+    complete: () => void
+  } | null>(null)
+  const counter = useRef(0)
+  const onChangeRef = useRef(onChange)
+  useEffect(() => {
+    onChangeRef.current = onChange
+  })
+
+  const strokes = history.present
+  const empty = strokes.length === 0
+  const replaying = replay !== null
+
+  useEffect(() => {
+    onChangeRef.current?.(strokes)
+  }, [strokes])
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(replayFrame.current)
+      window.clearTimeout(savedTimer.current)
+    },
+    []
+  )
+
+  const commit = useCallback(
+    (next: InkStroke[], fresh: string | null = null) => {
+      setHistory((current) => ({
+        past: [...current.past, current.present].slice(-60),
+        present: next,
+        future: [],
+        fresh,
+      }))
+    },
+    []
+  )
+
+  const stopReplay = useCallback(() => {
+    cancelAnimationFrame(replayFrame.current)
+    setReplay(null)
+  }, [])
+  /** A wipe in flight completes at once, so whatever comes next starts from a clear pad. */
+  const settleWipe = useCallback(() => {
+    wipeAnimation.current?.complete()
+  }, [])
+
+  function toPad(event: { clientX: number; clientY: number }) {
+    const box = padRef.current!.getBoundingClientRect()
+    return {
+      x: ((event.clientX - box.left) / box.width) * PAD_WIDTH,
+      y: ((event.clientY - box.top) / box.height) * PAD_HEIGHT,
+    }
+  }
+
+  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    startSignatureStroke(event, {
+      live,
+      counter,
+      pad: padRef,
+      uid,
+      color,
+      width,
+      replaying,
+      toPad,
+      settleWipe,
+      stopReplay,
+      setDrawing,
+      paintLive,
+    })
+  }
+  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const current = live.current
+    if (current?.id === event.pointerId)
+      appendPointerSamples(event, current, toPad, paintLive)
+  }
+  function onPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    finishSignatureStroke(
+      event,
+      live,
+      strokes,
+      liveRef,
+      commit,
+      setDrawing,
+      setStatus
+    )
+  }
+  function paintLive() {
+    const current = live.current
+    if (!current || !liveRef.current) return
+    liveRef.current.setAttribute(
+      "d",
+      outlineToPath(
+        getStrokeOutline(
+          current.stroke.points,
+          strokeOptions(current.stroke, false)
+        )
+      )
+    )
+  }
+
+  function undo() {
+    restoreSignatureHistory(
+      "undo",
+      history,
+      live,
+      settleWipe,
+      stopReplay,
+      setHistory,
+      setStatus
+    )
+  }
+  function redo() {
+    restoreSignatureHistory(
+      "redo",
+      history,
+      live,
+      settleWipe,
+      stopReplay,
+      setHistory,
+      setStatus
+    )
+  }
+
+  function clear() {
+    if (empty || wiping || live.current) return
+    stopReplay()
+    const node = inkRef.current
+    const finish = () => {
+      wipeAnimation.current = null
+      commit([])
+      setWiping(false)
+      setStatus("Signature cleared. Undo brings it back.")
+      // Lift the clip only once the wiped strokes have left, so they never flash back for a frame.
+      if (node)
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            node.style.clipPath = ""
+          })
+        )
+    }
+    if (!node || reduced) {
+      finish()
+      return
+    }
+    setWiping(true)
+    // The ink is cut away behind a squeegee edge that sweeps across the pad; the edge itself is drawn by the sweep element.
+    const controls = animate(
+      node,
+      { clipPath: ["inset(0% 0% 0% 0%)", "inset(0% 0% 0% 100%)"] },
+      { duration: 0.56, ease: [...ease.inOut] }
+    )
+    wipeAnimation.current = {
+      stop: () => controls.stop(),
+      complete: () => {
+        controls.complete()
+      },
+    }
+    controls.then(finish)
+  }
+
+  function toggleReplay() {
+    toggleSignatureReplay(
+      replaying,
+      empty,
+      live,
+      strokes,
+      replayFrame,
+      settleWipe,
+      stopReplay,
+      setReplay,
+      setStatus
+    )
+  }
+  function save(kind: "png" | "svg") {
+    return saveSignatureFile(
+      kind,
+      strokes,
+      fileName,
+      empty,
+      savedTimer,
+      setSaved,
+      setStatus
+    )
+  }
+
+  function onKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    handleSignatureKey(event, replaying, { undo, redo, clear, stopReplay })
+  }
+
+  const { visible, nib, nibColor } = getVisibleStrokes(strokes, replay, color)
+  const { showHint, hintHidden, transition: t } = getSignaturePresentation(
+    empty,
+    drawing,
+    wiping,
+    reduced
+  ) as {
+    showHint: boolean
+    hintHidden: TargetAndTransition
+    transition: Transition
+  }
+
+  return (
+    <div
+      className={cn(
+        "grid w-full min-w-0 gap-[10px] font-[family-name:var(--font-body)] tracking-[var(--tracking-body)] [--ink-black:var(--foreground)] [--ink-blue:oklch(46%_.17_262)] [--ink-violet:oklch(49%_.2_292)] dark:[--ink-blue:oklch(76%_.12_258)] dark:[--ink-violet:oklch(77%_.13_295)]",
+        className
+      )}
+      data-ink={color}
+    >
+      <SignatureSurface
+        padRef={padRef}
+        inkRef={inkRef}
+        liveRef={liveRef}
+        label={label}
+        count={strokes.length}
+        empty={empty}
+        drawing={drawing}
+        wiping={wiping}
+        signer={signer}
+        hint={hint}
+        hintHidden={hintHidden}
+        showHint={showHint}
+        reduced={reduced}
+        uid={uid}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onKeyDown={onKeyDown}
+        visible={visible}
+        fresh={history.fresh}
+        color={color}
+        width={width}
+        nib={nib}
+        nibColor={nibColor}
+      />
+
+      <SignatureControls
+        uid={uid}
+        color={color}
+        width={width}
+        reduced={reduced}
+        transition={t}
+        history={history}
+        wiping={wiping}
+        replaying={replaying}
+        empty={empty}
+        saved={saved}
+        status={status}
+        onColorChange={(next) => {
+          setColor(next)
+          setStatus(`${INK[next].label} selected`)
+        }}
+        onWidthChange={(next) => {
+          setWidth(next)
+          setStatus(`${WIDTHS[next].label} nib selected`)
+        }}
+        onUndo={undo}
+        onRedo={redo}
+        onReplay={toggleReplay}
+        onClear={clear}
+        onSave={save}
+      />
     </div>
   )
 }

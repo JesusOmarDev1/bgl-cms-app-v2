@@ -19,22 +19,102 @@ import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
 import { Separator } from "@/components/ui/separator"
 
+function MissingHero() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <MaterialIcon name="web" />
+        </EmptyMedia>
+      </EmptyHeader>
+      <EmptyContent>
+        <EmptyTitle>No se encontró el bloque</EmptyTitle>
+        <EmptyDescription>Intentalo de nuevo mas tarde.</EmptyDescription>
+      </EmptyContent>
+    </Empty>
+  )
+}
+
+function HeroCarouselCopy({ data }: { data: HeroBlockQuery }) {
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-4 px-4 text-center text-balance">
+      {data.title ? (
+        <h1 className="w-full text-3xl font-semibold tracking-tight text-shadow-2xs sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+          {data.title}
+        </h1>
+      ) : null}
+      {data.excerpt ? (
+        <SafeHtml
+          className="text-sm text-muted-foreground text-shadow-2xs md:text-base lg:text-lg"
+          content={data.excerpt}
+          preset="compact"
+        />
+      ) : null}
+      {data.primary_button || data.secondary_button ? (
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {data.primary_button ? (
+            <LinkButton href={data.primary_url ?? ""} variant="red">
+              <MaterialIcon
+                className="text-primary"
+                name={data.primary_icon ?? ""}
+                size={20}
+              />
+              {data.primary_button}
+            </LinkButton>
+          ) : null}
+          {data.secondary_button ? (
+            <LinkButton href={data.secondary_url ?? ""} variant="glass">
+              <MaterialIcon
+                className="text-primary"
+                name={data.secondary_icon ?? ""}
+                size={20}
+              />
+              {data.secondary_button}
+            </LinkButton>
+          ) : null}
+        </div>
+      ) : null}
+      {data.brands && data.brands.length > 0 ? (
+        <Box
+          display="flex"
+          gap={2}
+          align="center"
+          justify="center"
+          orientation="horizontal"
+        >
+          <Box
+            display="flex"
+            gap={2}
+            align="center"
+            justify="center"
+            orientation="horizontal"
+          >
+            <h2 className="hidden text-2xl font-semibold text-shadow-2xs lg:inline-flex">
+              Nuestras Marcas
+            </h2>
+            <Separator className="hidden lg:inline-flex" orientation="vertical" />
+          </Box>
+          <Marquee
+            className="max-w-2xs mask-r-from-90% mask-l-from-90% md:max-w-md"
+            repeat={2}
+          >
+            {data.brands.map((row) => (
+              <DirectusImage
+                key={row.brands_id.logo?.id ?? ""}
+                alt={row.brands_id.logo?.title ?? ""}
+                src={row.brands_id.logo?.id ?? ""}
+                variant="logo"
+              />
+            ))}
+          </Marquee>
+        </Box>
+      ) : null}
+    </div>
+  )
+}
+
 export function HeroCarouselWithLogos({ data }: { data: HeroBlockQuery }) {
-  if (!data.images?.length) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <MaterialIcon name="web" />
-          </EmptyMedia>
-        </EmptyHeader>
-        <EmptyContent>
-          <EmptyTitle>No se encontró el bloque</EmptyTitle>
-          <EmptyDescription>Intentalo de nuevo mas tarde.</EmptyDescription>
-        </EmptyContent>
-      </Empty>
-    )
-  }
+  if (!data.images?.length) return <MissingHero />
 
   return (
     <Box
@@ -59,82 +139,7 @@ export function HeroCarouselWithLogos({ data }: { data: HeroBlockQuery }) {
         gap={2}
         orientation="vertical"
       >
-        <div className="flex w-full flex-col items-center justify-center gap-4 px-4 text-center text-balance">
-          {data.title ? (
-            <h1 className="w-full text-3xl font-semibold tracking-tight text-shadow-2xs sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-              {data.title}
-            </h1>
-          ) : null}
-          {data.excerpt ? (
-            <SafeHtml
-              className="text-sm text-muted-foreground text-shadow-2xs md:text-base lg:text-lg"
-              content={data.excerpt}
-              preset="compact"
-            />
-          ) : null}
-          {data.primary_button || data.secondary_button ? (
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {data.primary_button ? (
-                <LinkButton href={data.primary_url ?? ""} variant="red">
-                  <MaterialIcon
-                    className="text-primary"
-                    name={data.primary_icon ?? ""}
-                    size={20}
-                  />
-                  {data.primary_button}
-                </LinkButton>
-              ) : null}
-              {data.secondary_button ? (
-                <LinkButton href={data.secondary_url ?? ""} variant="glass">
-                  <MaterialIcon
-                    className="text-primary"
-                    name={data.secondary_icon ?? ""}
-                    size={20}
-                  />
-                  {data.secondary_button}
-                </LinkButton>
-              ) : null}
-            </div>
-          ) : null}
-          {data.brands && data.brands.length > 0 ? (
-            <Box
-              display="flex"
-              gap={2}
-              align="center"
-              justify="center"
-              orientation="horizontal"
-            >
-              <Box
-                display="flex"
-                gap={2}
-                align="center"
-                justify="center"
-                orientation="horizontal"
-              >
-                <h2 className="hidden text-2xl font-semibold text-shadow-2xs lg:inline-flex">
-                  Nuestras Marcas
-                </h2>
-                <Separator
-                  className="hidden lg:inline-flex"
-                  orientation="vertical"
-                />
-              </Box>
-              <Marquee
-                className="max-w-2xs mask-r-from-90% mask-l-from-90% md:max-w-md"
-                repeat={2}
-              >
-                {data.brands?.map((row) => (
-                  <DirectusImage
-                    key={row.brands_id.logo?.id ?? ""}
-                    alt={row.brands_id.logo?.title ?? ""}
-                    src={row.brands_id.logo?.id ?? ""}
-                    variant="logo"
-                  />
-                ))}
-              </Marquee>
-            </Box>
-          ) : null}
-        </div>
+        <HeroCarouselCopy data={data} />
       </BoxContainer>
       <Marquee
         className="absolute inset-0 -z-10 h-full w-full mask-b-from-60% opacity-40"

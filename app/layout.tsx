@@ -1,11 +1,10 @@
 import "./globals.css"
-import { GoogleAnalytics } from "@next/third-parties/google"
 import { NextIntlClientProvider } from "next-intl"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ThemeProvider } from "@/providers/ThemeProvider"
 import { QueryProvider } from "@/providers/QueryProvider"
 import { Toaster } from "@/components/ui/sonner"
-import { GA_MEASUREMENT_ID } from "@/lib/env/constants"
+import { CookieConsentAnalytics } from "@/components/shared/utility/CookieConsentAnalytics"
 import { preloadResources } from "@/lib/seo/preload-resources"
 import { createRootMetadata } from "@/lib/seo/metadata"
 import { cn } from "cn"
@@ -87,9 +86,7 @@ export default function RootLayout({
                 position="bottom-right"
               />
             </ThemeProvider>
-            {GA_MEASUREMENT_ID ? (
-              <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
-            ) : null}
+            <CookieConsentAnalytics />
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

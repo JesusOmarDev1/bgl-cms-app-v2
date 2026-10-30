@@ -16,7 +16,14 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
 } from "react"
-import { animate, motion, useMotionValue, useReducedMotion } from "motion/react"
+import {
+  LazyMotion,
+  animate,
+  domAnimation,
+  useMotionValue,
+  useReducedMotion,
+} from "motion/react"
+import * as m from "motion/react-m"
 import type { Transition } from "motion/react"
 import { cn } from "cn"
 import { motionTokens } from "@/lib/animation/motion/motion-tokens"
@@ -226,22 +233,23 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
     }
 
     return (
-      <div
-        ref={rootRef}
-        role="radiogroup"
-        aria-disabled={disabled || undefined}
-        aria-required={required || undefined}
-        className={cn(
-          "group/radio relative grid gap-[10px] font-[family-name:var(--font-body)] text-[length:var(--text-sm)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[var(--foreground)] data-[layout=grid]:grid-cols-[repeat(auto-fill,minmax(min(100%,var(--min-column,180px)),1fr))] data-[layout=list]:grid-cols-[minmax(0,1fr)] data-[layout=list]:gap-[8px]",
-          className
-        )}
-        data-layout={layout}
-        style={
-          { "--min-column": `${minColumnWidth}px`, ...style } as CSSProperties
-        }
-        {...rest}
-      >
-        <motion.span
+      <LazyMotion features={domAnimation}>
+        <div
+          ref={rootRef}
+          role="radiogroup"
+          aria-disabled={disabled || undefined}
+          aria-required={required || undefined}
+          className={cn(
+            "group/radio relative grid gap-[10px] font-[family-name:var(--font-body)] text-[length:var(--text-sm)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[var(--foreground)] data-[layout=grid]:grid-cols-[repeat(auto-fill,minmax(min(100%,var(--min-column,180px)),1fr))] data-[layout=list]:grid-cols-[minmax(0,1fr)] data-[layout=list]:gap-[8px]",
+            className
+          )}
+          data-layout={layout}
+          style={
+            { "--min-column": `${minColumnWidth}px`, ...style } as CSSProperties
+          }
+          {...rest}
+        >
+        <m.span
           className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
           style={{ x, y, width: w, height: h, opacity: o }}
           aria-hidden="true"
@@ -289,7 +297,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                 )}
                 aria-hidden="true"
               >
-                <motion.span
+                <m.span
                   className="size-[6px] rounded-[50%] bg-[var(--control-glyph)]"
                   initial={false}
                   animate={{ scale: checked ? 1 : 0 }}
@@ -337,7 +345,8 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
             required={required}
           />
         )}
-      </div>
+        </div>
+      </LazyMotion>
     )
   }
 )

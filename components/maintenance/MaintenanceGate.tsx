@@ -14,5 +14,5 @@ export async function MaintenanceGate({ children }: MaintenanceGateProps) {
     redirect("/maintenance")
   }
 
-  return <>{children}</>
+  return children
 }

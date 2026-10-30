@@ -52,9 +52,20 @@ const dotMarker = (level: number, styles: Styles): React.ReactElement =>
     </View>
   )
 
+const getStableItemKeys = (items: ListItem[]) => {
+  const occurrences = new Map<string, number>()
+  return items.map((item) => {
+    const identity = JSON.stringify(item)
+    const occurrence = occurrences.get(identity) ?? 0
+    occurrences.set(identity, occurrence + 1)
+    return `${identity}:${occurrence}`
+  })
+}
+
 // eslint-disable-next-line prefer-const
 let renderBulletItem: (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
@@ -64,6 +75,7 @@ let renderBulletItem: (
 // eslint-disable-next-line prefer-const
 let renderMultiLevelItem: (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
@@ -73,13 +85,14 @@ let renderMultiLevelItem: (
 
 const renderNumberedItem = (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
   styles: Styles
 ): React.ReactElement => (
   <View
-    key={index}
+    key={key}
     style={buildRowStyles(index, total, gap, styles, "center") as never}
   >
     <View style={styles.markerNumberBadge}>
@@ -93,6 +106,7 @@ const renderNumberedItem = (
 
 const renderChecklistItem = (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
@@ -101,7 +115,7 @@ const renderChecklistItem = (
   const isChecked = item.checked ?? true
   return (
     <View
-      key={index}
+      key={key}
       style={buildRowStyles(index, total, gap, styles, "center") as never}
     >
       <View
@@ -118,13 +132,14 @@ const renderChecklistItem = (
 
 const renderIconItem = (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
   styles: Styles
 ): React.ReactElement => (
   <View
-    key={index}
+    key={key}
     style={buildRowStyles(index, total, gap, styles, "center") as never}
   >
     <View style={styles.iconBox}>
@@ -138,12 +153,13 @@ const renderIconItem = (
 
 const renderDescriptiveItem = (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   gap: GapProp,
   styles: Styles
 ): React.ReactElement => (
-  <View key={index} style={buildRowStyles(index, total, gap, styles) as never}>
+  <View key={key} style={buildRowStyles(index, total, gap, styles) as never}>
     <View style={styles.descriptiveAccent} />
     <View style={styles.descriptiveContent}>
       <PDFText style={styles.descriptiveTitle}>{item.text}</PDFText>
@@ -156,6 +172,7 @@ const renderDescriptiveItem = (
 
 const renderItem = (
   item: ListItem,
+  key: string,
   index: number,
   total: number,
   variant: ListVariant,
@@ -165,22 +182,22 @@ const renderItem = (
 ): React.ReactElement | null => {
   switch (variant) {
     case "bullet": {
-      return renderBulletItem(item, index, total, gap, styles, level)
+      return renderBulletItem(item, key, index, total, gap, styles, level)
     }
     case "numbered": {
-      return renderNumberedItem(item, index, total, gap, styles)
+      return renderNumberedItem(item, key, index, total, gap, styles)
     }
     case "checklist": {
-      return renderChecklistItem(item, index, total, gap, styles)
+      return renderChecklistItem(item, key, index, total, gap, styles)
     }
     case "icon": {
-      return renderIconItem(item, index, total, gap, styles)
+      return renderIconItem(item, key, index, total, gap, styles)
     }
     case "multi-level": {
-      return renderMultiLevelItem(item, index, total, gap, styles, level)
+      return renderMultiLevelItem(item, key, index, total, gap, styles, level)
     }
     case "descriptive": {
-      return renderDescriptiveItem(item, index, total, gap, styles)
+      return renderDescriptiveItem(item, key, index, total, gap, styles)
     }
     default: {
       break
@@ -195,16 +212,19 @@ const renderItemList = (
   gap: GapProp,
   styles: Styles,
   level: number
-): React.ReactElement => (
-  <View style={level > 0 ? styles.childrenContainer : undefined}>
-    {items.map((item, index) =>
-      renderItem(item, index, items.length, variant, gap, styles, level)
-    )}
-  </View>
-)
+): React.ReactElement => {
+  const keys = getStableItemKeys(items)
+  return (
+    <View style={level > 0 ? styles.childrenContainer : undefined}>
+      {items.map((item, index) =>
+        renderItem(item, keys[index], index, items.length, variant, gap, styles, level)
+      )}
+    </View>
+  )
+}
 
-renderBulletItem = (item, index, total, gap, styles, level) => (
-  <View key={index}>
+renderBulletItem = (item, key, index, total, gap, styles, level) => (
+  <View key={key}>
     <View style={buildRowStyles(index, total, gap, styles) as never}>
       {dotMarker(level, styles)}
       <View style={styles.itemTextWrap}>
@@ -217,8 +237,8 @@ renderBulletItem = (item, index, total, gap, styles, level) => (
   </View>
 )
 
-renderMultiLevelItem = (item, index, total, gap, styles, level) => (
-  <View key={index}>
+renderMultiLevelItem = (item, key, index, total, gap, styles, level) => (
+  <View key={key}>
     <View style={buildRowStyles(index, total, gap, styles) as never}>
       {dotMarker(level, styles)}
       <View style={styles.itemTextWrap}>
@@ -255,11 +275,12 @@ export const PdfList = ({
     containerStyles.push(styles.childrenContainer)
   }
   const styleArray = style ? [...containerStyles, style] : containerStyles
+  const keys = getStableItemKeys(items)
 
   return (
     <View style={styleArray as never}>
       {items.map((item, index) =>
-        renderItem(item, index, items.length, variant, gap, styles, _level)
+        renderItem(item, keys[index], index, items.length, variant, gap, styles, _level)
       )}
     </View>
   )

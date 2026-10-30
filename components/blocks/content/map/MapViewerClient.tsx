@@ -51,6 +51,7 @@ export default function MapViewerClient({
           <iframe
             src={data.url_embed}
             title={data.title || "Mapa de ubicación"}
+            sandbox="allow-scripts allow-popups allow-forms"
             className="aspect-video min-h-80 w-full border-0"
             width="600"
             height="450"
