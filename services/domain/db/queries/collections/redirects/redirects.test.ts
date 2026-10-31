@@ -38,10 +38,26 @@ describe("getRedirectIndexQuery", () => {
     ])
   })
 
+  it("filters the redirect index by origin when provided", async () => {
+    request.mockResolvedValueOnce([{ id: "matching" }])
+
+    await getRedirectIndexQuery("failed", "/old")
+
+    expect(request).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: { origin: { _eq: "/old" } },
+      })
+    )
+  })
+
   it("rejects a failed later page instead of returning a partial index", async () => {
+<<<<<<< HEAD
     request.mockResolvedValueOnce(
       Array.from({ length: 200 }, (_, id) => ({ id: `first-page-${id}` }))
     )
+=======
+    request.mockResolvedValueOnce(Array.from({ length: 200 }, () => ({})))
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     request.mockRejectedValueOnce(new Error("Directus unavailable"))
 
     await expect(getRedirectIndexQuery("failed")).rejects.toThrow(

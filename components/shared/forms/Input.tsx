@@ -163,24 +163,32 @@ function InputFieldDecorations({
   return (
     <>
       {leftIcon ? (
+<<<<<<< HEAD
         <span
           className={cn(
             "pointer-events-none absolute start-3 top-1/2 flex -translate-y-1/2 items-center text-muted-foreground [&_svg]:h-4 [&_svg]:w-4",
             classNames?.leftIcon
           )}
         >
+=======
+        <span className={cn("pointer-events-none absolute start-3 top-1/2 flex -translate-y-1/2 items-center text-muted-foreground [&_svg]:h-4 [&_svg]:w-4", classNames?.leftIcon)}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           {leftIcon}
         </span>
       ) : null}
       {success ? (
         <InputSuccessIcon reduce={reduce} className={classNames?.successIcon} />
       ) : rightSlot ? (
+<<<<<<< HEAD
         <span
           className={cn(
             "absolute end-0 top-0 flex h-full items-center text-muted-foreground [&_button]:grid [&_button]:size-11 [&_button]:place-items-center [&_svg]:h-4 [&_svg]:w-4",
             classNames?.rightIcon
           )}
         >
+=======
+        <span className={cn("absolute end-0 top-0 flex h-full items-center text-muted-foreground [&_button]:grid [&_button]:size-11 [&_button]:place-items-center [&_svg]:h-4 [&_svg]:w-4", classNames?.rightIcon)}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           {rightSlot}
         </span>
       ) : null}

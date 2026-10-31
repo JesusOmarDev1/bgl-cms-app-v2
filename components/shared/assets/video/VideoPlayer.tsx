@@ -25,6 +25,185 @@ const EMPTY_CHAPTERS: Chapter[] = []
 const AMBIENT_CANVAS_W = 64
 const AMBIENT_CANVAS_H = 36
 
+type DoubleTapAction = { side: "left" | "right"; id: number } | null
+
+function PlaybackFeedback({
+  isLoading,
+  doubleTapAction,
+  handleTap,
+}: {
+  isLoading: boolean
+  doubleTapAction: DoubleTapAction
+  handleTap: (event?: React.MouseEvent<HTMLButtonElement>) => void
+}) {
+  return (
+    <>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="animate-spin">
+            <MaterialIcon
+              name="progress_activity"
+              size={48}
+              className="text-white"
+            />
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        className="absolute inset-0 z-10 border-0 bg-transparent p-0"
+        onClick={handleTap}
+        aria-label="Play/Pause"
+      />
+      {doubleTapAction && (
+        <div
+          key={doubleTapAction.id}
+          className={`absolute inset-y-0 ${
+            doubleTapAction.side === "left"
+              ? "left-0 justify-start pl-12"
+              : "right-0 justify-end pr-12"
+          } pointer-events-none z-20 flex w-1/2 items-center`}
+        >
+          <div className="flex animate-in flex-col items-center justify-center rounded-full shadow-lg duration-500 fade-in zoom-in">
+            <MaterialIcon
+              name={
+                doubleTapAction.side === "left"
+                  ? "keyboard_double_arrow_left"
+                  : "keyboard_double_arrow_right"
+              }
+              size={32}
+              className="text-white"
+            />
+            <span className="mt-1 text-xs font-bold text-white shadow-lg select-none">
+              10s
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+function AmbientCanvas({
+  canvasRef,
+  blur,
+  intensity,
+}: {
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
+  blur?: number
+  intensity?: number
+}) {
+  if (!((blur ?? 0) > 0)) return null
+  return (
+    <canvas
+      ref={canvasRef}
+      width={AMBIENT_CANVAS_W}
+      height={AMBIENT_CANVAS_H}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 -z-50 scale-110 lg:scale-95"
+      style={{
+        width: "100%",
+        height: "100%",
+        filter: `blur(${blur ?? 100}px)`,
+        opacity: intensity ?? 0.8,
+        zIndex: 0,
+      }}
+    />
+  )
+}
+
+function VideoElement({
+  videoRef,
+  src,
+  poster,
+  tracks,
+  onTimeUpdate,
+  onPlay,
+  onPause,
+}: {
+  videoRef: React.RefObject<HTMLVideoElement | null>
+  src: string
+  poster?: string
+  tracks: CaptionTrack[]
+  onTimeUpdate: React.ComponentProps<"video">["onTimeUpdate"]
+  onPlay: () => void
+  onPause: () => void
+}) {
+  return (
+    // biome-ignore lint/a11y/useMediaCaption: Video player component may not have captions
+    <video
+      ref={videoRef}
+      src={src}
+      poster={poster}
+      preload="metadata"
+      playsInline
+      onTimeUpdate={onTimeUpdate}
+      onPlay={onPlay}
+      onPause={onPause}
+      className="absolute inset-0 h-full w-full"
+      style={{ zIndex: 1 }}
+    >
+      {tracks.map((track) => (
+        <track
+          key={track.src}
+          kind="captions"
+          src={track.src}
+          srcLang={track.srcLang}
+          label={track.label}
+          default={track.default}
+        />
+      ))}
+    </video>
+  )
+}
+
+function CenterPlayButton({
+  showControls,
+  isPlaying,
+  onTogglePlay,
+}: {
+  showControls: boolean
+  isPlaying: boolean
+  onTogglePlay: () => void
+}) {
+  if (!showControls || isPlaying) return null
+  return (
+    <div className="pointer-events-none absolute inset-0 z-20 flex animate-in items-center justify-center duration-200 fade-in">
+      <Button
+        className="mb-4 h-14 w-14 sm:mb-0 lg:h-24 lg:w-24"
+        onClick={onTogglePlay}
+        variant="glass"
+        size="icon"
+        aria-label={isPlaying ? "Pausar video" : "Reproducir video"}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") onTogglePlay()
+        }}
+      >
+        <MaterialIcon
+          name="play_arrow"
+          size={48}
+          className="fill-white text-white"
+        />
+      </Button>
+    </div>
+  )
+}
+
+function ProgressBar({
+  showControls,
+  ...progressProps
+}: React.ComponentProps<typeof VideoPlayerProgress> & {
+  showControls: boolean
+}) {
+  return (
+    <div
+      className={`absolute right-0 bottom-0 left-0 z-40 px-4 py-3 transition-all duration-200 ${showControls ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-5 opacity-0"}`}
+    >
+      <VideoPlayerProgress {...progressProps} />
+    </div>
+  )
+}
+
 export interface VideoPlayerProps {
   src: string | QualitySource[]
   tracks?: CaptionTrack[]
@@ -111,10 +290,7 @@ export function VideoPlayer({
 
   const [hoverTime, setHoverTime] = useState<number | null>(null)
   const [hoverPosition, setHoverPosition] = useState<number | null>(null)
-  const [doubleTapAction, setDoubleTapAction] = useState<{
-    side: "left" | "right"
-    id: number
-  } | null>(null)
+  const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction>(null)
   const lastTapRef = useRef<{ time: number; x: number } | null>(null)
   const tapTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const containerRectRef = useRef<DOMRect | null>(null)
@@ -130,7 +306,7 @@ export function VideoPlayer({
     return () => ro.disconnect()
   }, [])
 
-  const handleTap = (e?: React.MouseEvent<HTMLDivElement>) => {
+  const handleTap = (e?: React.MouseEvent<HTMLButtonElement>) => {
     const time = getTimestamp()
 
     // Keyboard-triggered tap (no coordinates) — just toggle play
@@ -260,160 +436,53 @@ export function VideoPlayer({
         className
       )}
     >
-      {(ambientBlur ?? 0) > 0 && (
-        <canvas
-          ref={ambientCanvasRef}
-          width={AMBIENT_CANVAS_W}
-          height={AMBIENT_CANVAS_H}
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-50 scale-110 lg:scale-95"
-          style={{
-            width: "100%",
-            height: "100%",
-            filter: `blur(${ambientBlur ?? 100}px)`,
-            opacity: ambientIntensity ?? 0.8,
-            zIndex: 0,
-          }}
-        />
-      )}
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg transition-all duration-300">
-        {/* biome-ignore lint/a11y/useMediaCaption: Video player component may not have captions */}
-        <video
-          ref={videoRef}
+      <AmbientCanvas
+        canvasRef={ambientCanvasRef}
+        blur={ambientBlur}
+        intensity={ambientIntensity}
+      />
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg transition-opacity duration-300">
+        <VideoElement
+          videoRef={videoRef}
           src={currentSrc}
           poster={poster}
-          preload="metadata"
-          playsInline
+          tracks={tracks}
           onTimeUpdate={handleTimeUpdate}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          className="absolute inset-0 h-full w-full"
-          style={{ zIndex: 1 }}
-        >
-          {tracks.map((track) => (
-            <track
-              key={track.src}
-              kind="captions"
-              src={track.src}
-              srcLang={track.srcLang}
-              label={track.label}
-              default={track.default}
-            />
-          ))}
-        </video>
-
-        {/* Loading Spinner */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <div className="animate-spin">
-              <MaterialIcon
-                name="progress_activity"
-                size={48}
-                className="text-white"
-              />
-            </div>
-          </div>
-        )}
+        />
 
         {/* Controls Background Gradient */}
         <div
           className={`absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t from-black via-black/50 to-transparent transition-opacity duration-200 ${showControls ? "opacity-100" : "opacity-0"}`}
         />
 
-        {/* Click Overlay */}
-        <div
-          className="absolute inset-0 z-10"
-          onClick={handleTap}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              handleTap()
-            }
-          }}
-          role="button"
-          aria-label="Play/Pause"
-          tabIndex={0}
+        <PlaybackFeedback
+          isLoading={isLoading}
+          doubleTapAction={doubleTapAction}
+          handleTap={handleTap}
         />
 
-        {/* Double Tap Animation */}
-        {doubleTapAction && (
-          <div
-            key={doubleTapAction.id}
-            className={`absolute inset-y-0 ${
-              doubleTapAction.side === "left"
-                ? "left-0 justify-start pl-12"
-                : "right-0 justify-end pr-12"
-            } pointer-events-none z-20 flex w-1/2 items-center`}
-          >
-            <div className="flex animate-in flex-col items-center justify-center rounded-full shadow-lg duration-500 fade-in zoom-in">
-              {doubleTapAction.side === "left" ? (
-                <>
-                  <MaterialIcon
-                    name="keyboard_double_arrow_left"
-                    size={32}
-                    className="text-white"
-                  />
-                  <span className="mt-1 text-xs font-bold text-white shadow-lg select-none">
-                    10s
-                  </span>
-                </>
-              ) : (
-                <>
-                  <MaterialIcon
-                    name="keyboard_double_arrow_right"
-                    size={32}
-                    className="text-white"
-                  />
-                  <span className="mt-1 text-xs font-bold text-white shadow-lg select-none">
-                    10s
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        <CenterPlayButton
+          showControls={showControls}
+          isPlaying={isPlaying}
+          onTogglePlay={togglePlay}
+        />
 
-        {/* Center Play Button */}
-        {showControls && !isPlaying && (
-          <div className="pointer-events-none absolute inset-0 z-20 flex animate-in items-center justify-center duration-200 fade-in">
-            <Button
-              className="mb-4 h-14 w-14 sm:mb-0 lg:h-24 lg:w-24"
-              onClick={togglePlay}
-              variant="glass"
-              size="icon"
-              aria-label={isPlaying ? "Pausar video" : "Reproducir video"}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  togglePlay()
-                }
-              }}
-            >
-              <MaterialIcon
-                name="play_arrow"
-                size={48}
-                className="fill-white text-white"
-              />
-            </Button>
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        <div
-          className={`absolute right-0 bottom-0 left-0 z-40 px-4 py-3 transition-all duration-200 ${showControls ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-5 opacity-0"}`}
-        >
-          <VideoPlayerProgress
-            currentTime={currentTime}
-            duration={duration}
-            buffered={buffered}
-            chapters={chapters}
-            hoverTime={hoverTime}
-            hoverPosition={hoverPosition}
-            onProgressClick={handleProgressClick}
-            onProgressHover={handleProgressHover}
-            onProgressLeave={handleProgressLeave}
-            onSkip={handleSkip}
-            formatTime={formatTime}
-          />
-        </div>
+        <ProgressBar
+          showControls={showControls}
+          currentTime={currentTime}
+          duration={duration}
+          buffered={buffered}
+          chapters={chapters}
+          hoverTime={hoverTime}
+          hoverPosition={hoverPosition}
+          onProgressClick={handleProgressClick}
+          onProgressHover={handleProgressHover}
+          onProgressLeave={handleProgressLeave}
+          onSkip={handleSkip}
+          formatTime={formatTime}
+        />
 
         <VideoPlayerControls
           isPlaying={isPlaying}

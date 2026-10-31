@@ -915,6 +915,7 @@ function FileTypeGraphic({
           "[--file-type-square:none]"
         )}
       >
+<<<<<<< HEAD
         <path
           {...STROKE}
           d={PAGE_PATH}
@@ -958,11 +959,26 @@ function FileTypeGraphic({
               GLYPH_CLASS[variant]
             )}
           >
+=======
+        <path {...STROKE} d={PAGE_PATH} className={cn(PAGE_CLASS[variant], ROUND)} />
+        <path {...STROKE} d={PAGE_PATH_SQUARE} strokeLinejoin="miter" className={cn(PAGE_CLASS[variant], SQUARE)} />
+        {variant === "solid" ? (
+          <>
+            <path d={FLAP_PATH} className={cn("fill-white/30 stroke-none", ROUND)} />
+            <path d={FLAP_PATH_SQUARE} className={cn("fill-white/30 stroke-none", SQUARE)} />
+          </>
+        ) : null}
+        <path {...STROKE} d={FOLD_PATH} className={cn(FOLD_CLASS[variant], ROUND)} />
+        <path {...STROKE} d={FOLD_PATH_SQUARE} strokeLinejoin="miter" className={cn(FOLD_CLASS[variant], SQUARE)} />
+        {glyphNode ? (
+          <g data-slot="file-type-glyph" stroke="currentColor" className={cn("origin-[12px_15px] scale-75 @max-[21px]:scale-100", GLYPH_CLASS[variant])}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             {glyphNode}
           </g>
         ) : null}
       </svg>
       {hasIcon ? (
+<<<<<<< HEAD
         <span
           data-slot="file-type-custom-icon"
           aria-hidden="true"
@@ -971,17 +987,24 @@ function FileTypeGraphic({
             GLYPH_CLASS[variant]
           )}
         >
+=======
+        <span data-slot="file-type-custom-icon" aria-hidden="true" className={cn("absolute top-[62.5%] left-1/2 flex size-[37.5cqw] -translate-1/2 items-center justify-center @max-[21px]:size-[50cqw] [&>svg]:size-full", GLYPH_CLASS[variant])}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           {icon}
         </span>
       ) : null}
       {showLabel ? (
         <span
           data-slot="file-type-label"
+<<<<<<< HEAD
           style={
             {
               "--file-type-chars": typeof text === "string" ? text.length : 4,
             } as CSSProperties
           }
+=======
+          style={{ "--file-type-chars": typeof text === "string" ? text.length : 4 } as CSSProperties}
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           className={cn(
             "absolute top-(--file-type-label-y) left-[5%] flex h-(--file-type-label-h) max-w-[95%] items-center justify-center overflow-hidden rounded-[var(--file-type-radius,var(--file-type-label-radius,10cqw))] px-[var(--file-type-label-px,7cqw)] font-medium whitespace-nowrap",
             "text-[length:min(24cqw,calc((95cqw-2*var(--file-type-label-px,7cqw))/(var(--file-type-chars)*0.72)))] [--file-type-label-h:35%] [--file-type-label-y:45%]",
@@ -993,12 +1016,16 @@ function FileTypeGraphic({
             labelClassName
           )}
         >
+<<<<<<< HEAD
           <span
             className={cn(
               "max-w-[min(95cqw,calc(100%+2*max(0px,var(--file-type-label-px,7cqw)-7cqw)))] shrink-0 truncate py-[0.25em] [text-box:trim-both_cap_alphabetic] @max-[21px]:max-w-full",
               LABEL_TEXT_CLASS[variant]
             )}
           >
+=======
+          <span className={cn("max-w-[min(95cqw,calc(100%+2*max(0px,var(--file-type-label-px,7cqw)-7cqw)))] shrink-0 truncate py-[0.25em] [text-box:trim-both_cap_alphabetic] @max-[21px]:max-w-full", LABEL_TEXT_CLASS[variant])}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             {text}
           </span>
         </span>
@@ -1017,6 +1044,7 @@ function resolveFileTypeDisplay({
   const text = label !== undefined ? label : resolved.label
   const hasText = text !== undefined && text !== null && text !== ""
   const spelled = resolved.label ? resolved.type.toUpperCase() : undefined
+<<<<<<< HEAD
   const typeName = spelled
     ? `${spelled} file`
     : CATEGORY_NAMES[resolved.category]
@@ -1025,6 +1053,13 @@ function resolveFileTypeDisplay({
     custom && custom !== resolved.label && custom !== spelled
       ? `${label}, ${typeName}`
       : typeName
+=======
+  const typeName = spelled ? `${spelled} file` : CATEGORY_NAMES[resolved.category]
+  const custom = typeof label === "string" ? label.toUpperCase() : ""
+  const name = custom && custom !== resolved.label && custom !== spelled
+    ? `${label}, ${typeName}`
+    : typeName
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   const hasIcon = icon !== undefined && icon !== null && icon !== false
   const showLabel = hasText && !glyph && !hasIcon
   const glyphNode = showLabel || hasIcon ? null : GLYPHS[resolved.category]
@@ -1061,109 +1096,15 @@ function FileType({
       )}
       {...props}
     >
-      <svg
-        data-slot="file-type-icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        focusable="false"
-        className={cn(
-          "absolute inset-0 size-full overflow-visible [stroke-width:var(--file-type-stroke,max(1px,2.5cqw))] [--file-type-outline:var(--file-type-border,color-mix(in_oklab,var(--muted-foreground)_40%,transparent))] @max-[21px]:[--file-type-outline:var(--file-type-border,color-mix(in_oklab,var(--muted-foreground)_65%,transparent))]",
-          "[--file-type-round:inline]",
-          "[--file-type-square:none]"
-        )}
-      >
-        <path
-          {...STROKE}
-          d={PAGE_PATH}
-          className={cn(PAGE_CLASS[variant], ROUND)}
-        />
-        <path
-          {...STROKE}
-          d={PAGE_PATH_SQUARE}
-          strokeLinejoin="miter"
-          className={cn(PAGE_CLASS[variant], SQUARE)}
-        />
-        {variant === "solid" ? (
-          <>
-            <path
-              d={FLAP_PATH}
-              className={cn("fill-white/30 stroke-none", ROUND)}
-            />
-            <path
-              d={FLAP_PATH_SQUARE}
-              className={cn("fill-white/30 stroke-none", SQUARE)}
-            />
-          </>
-        ) : null}
-        <path
-          {...STROKE}
-          d={FOLD_PATH}
-          className={cn(FOLD_CLASS[variant], ROUND)}
-        />
-        <path
-          {...STROKE}
-          d={FOLD_PATH_SQUARE}
-          strokeLinejoin="miter"
-          className={cn(FOLD_CLASS[variant], SQUARE)}
-        />
-        {glyphNode ? (
-          <g
-            data-slot="file-type-glyph"
-            stroke="currentColor"
-            className={cn(
-              "origin-[12px_15px] scale-75 @max-[21px]:scale-100",
-              GLYPH_CLASS[variant]
-            )}
-          >
-            {glyphNode}
-          </g>
-        ) : null}
-      </svg>
-      {hasIcon ? (
-        <span
-          data-slot="file-type-custom-icon"
-          aria-hidden="true"
-          className={cn(
-            "absolute top-[62.5%] left-1/2 flex size-[37.5cqw] -translate-1/2 items-center justify-center @max-[21px]:size-[50cqw] [&>svg]:size-full",
-            GLYPH_CLASS[variant]
-          )}
-        >
-          {icon}
-        </span>
-      ) : null}
-      {showLabel ? (
-        <span
-          data-slot="file-type-label"
-          style={
-            {
-              "--file-type-chars": typeof text === "string" ? text.length : 4,
-            } as CSSProperties
-          }
-          className={cn(
-            "absolute top-(--file-type-label-y) left-[5%] flex h-(--file-type-label-h) max-w-[95%] items-center justify-center overflow-hidden rounded-[var(--file-type-radius,var(--file-type-label-radius,10cqw))] px-[var(--file-type-label-px,7cqw)] font-medium whitespace-nowrap",
-            "text-[length:min(24cqw,calc((95cqw-2*var(--file-type-label-px,7cqw))/(var(--file-type-chars)*0.72)))] [--file-type-label-h:35%] [--file-type-label-y:45%]",
-            "supports-[margin:round(1cap,1px)]:mt-[calc(round(nearest,calc(var(--file-type-label-y)+(var(--file-type-label-h)+1cap)/2),1px)-var(--file-type-label-y)-(var(--file-type-label-h)+1cap)/2)]",
-            "@max-[21px]:px-[4cqw] @max-[21px]:text-[length:min(32.5cqw,5.8px,calc(87cqw/(var(--file-type-chars)*0.88)))] @max-[21px]:font-semibold @max-[21px]:[--file-type-label-h:45%] @max-[21px]:[--file-type-label-y:40%]",
-            "[--file-type-label-radius:10cqw]",
-            "[--file-type-label-px:7cqw]",
-            LABEL_CLASS[variant],
-            labelClassName
-          )}
-        >
-          <span
-            className={cn(
-              "max-w-[min(95cqw,calc(100%+2*max(0px,var(--file-type-label-px,7cqw)-7cqw)))] shrink-0 truncate py-[0.25em] [text-box:trim-both_cap_alphabetic] @max-[21px]:max-w-full",
-              LABEL_TEXT_CLASS[variant]
-            )}
-          >
-            {text}
-          </span>
-        </span>
-      ) : null}
+      <FileTypeGraphic
+        variant={variant}
+        glyphNode={glyphNode}
+        hasIcon={hasIcon}
+        icon={icon}
+        showLabel={showLabel}
+        text={text}
+        labelClassName={labelClassName}
+      />
     </span>
   )
 }

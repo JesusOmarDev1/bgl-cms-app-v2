@@ -1,7 +1,16 @@
 "use client"
 // beui.dev/components/motion/color-selector
 
+<<<<<<< HEAD
 import { LayoutGroup, LazyMotion, domMax, useReducedMotion } from "motion/react"
+=======
+import {
+  LayoutGroup,
+  LazyMotion,
+  domMax,
+  useReducedMotion,
+} from "motion/react"
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 import * as m from "motion/react-m"
 import {
   createContext,
@@ -55,6 +64,7 @@ export function ColorSelector({
   const [internal, setInternal] = useState(defaultValue)
   const current = value ?? internal
   return (
+<<<<<<< HEAD
     <LazyMotion features={domMax}>
       <ColorSelectorContext.Provider
         value={{
@@ -70,6 +80,23 @@ export function ColorSelector({
           form,
         }}
       >
+=======
+    <ColorSelectorContext.Provider
+      value={{
+        value: current,
+        select: (next) => {
+          if (next === current) return
+          if (value === undefined) setInternal(next)
+          onValueChange?.(next)
+        },
+        name: name ?? id,
+        disabled,
+        required,
+        form,
+      }}
+    >
+      <LazyMotion features={domMax}>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
         <fieldset
           {...props}
           disabled={disabled}
@@ -78,8 +105,13 @@ export function ColorSelector({
         >
           <LayoutGroup id={id}>{children}</LayoutGroup>
         </fieldset>
+<<<<<<< HEAD
       </ColorSelectorContext.Provider>
     </LazyMotion>
+=======
+      </LazyMotion>
+    </ColorSelectorContext.Provider>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   )
 }
 

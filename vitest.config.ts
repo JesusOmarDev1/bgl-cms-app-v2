@@ -24,6 +24,7 @@ export default defineConfig({
           include: [
             "lib/**/*.test.ts",
             "services/**/*.test.ts",
+<<<<<<< HEAD
             "components/collections/catalog/catalog-items.test.ts",
           ],
         },
@@ -43,6 +44,10 @@ export default defineConfig({
             provider: playwright({}),
             instances: [{ browser: "chromium" }],
           },
+=======
+            "components/collections/catalog/**/*.test.ts",
+          ],
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
         },
       },
       {

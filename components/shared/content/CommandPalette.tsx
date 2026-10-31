@@ -495,6 +495,49 @@ function CommandPaletteHotkeys() {
   )
 }
 
+function getStatusAnnouncement(
+  status: CommandPaletteStatus | undefined,
+  errorMessage: string | undefined,
+  errorTitle: string,
+  emptyTitle: string,
+  promptTitle: string
+) {
+  switch (status) {
+    case "loading":
+      return "Buscando…"
+    case "error":
+      return errorMessage ?? errorTitle
+    case "empty":
+      return emptyTitle
+    case "prompt":
+      return promptTitle
+    default:
+      return ""
+  }
+}
+
+function handlePaletteKeyDown(
+  event: React.KeyboardEvent,
+  rows: CommandItem[],
+  active: number,
+  moveActive: (direction: 1 | -1) => void,
+  setOpen: (open: boolean) => void
+) {
+  if (event.key === "ArrowDown") {
+    event.preventDefault()
+    moveActive(1)
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault()
+    moveActive(-1)
+  } else if (event.key === "Enter") {
+    event.preventDefault()
+    const item = rows[active]
+    if (!item) return
+    item.onSelect()
+    setOpen(false)
+  }
+}
+
 export function CommandPalette({
   items,
   shortcut = "k",
@@ -531,16 +574,13 @@ export function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
-  const statusAnnouncement =
-    status === "loading"
-      ? "Buscando…"
-      : status === "error"
-        ? (errorMessage ?? errorTitle)
-        : status === "empty"
-          ? emptyTitle
-          : status === "prompt"
-            ? promptTitle
-            : ""
+  const statusAnnouncement = getStatusAnnouncement(
+    status,
+    errorMessage,
+    errorTitle,
+    emptyTitle,
+    promptTitle
+  )
 
   const onKeyDownEvent = useEffectEvent((e: KeyboardEvent) => {
     if (
@@ -618,22 +658,8 @@ export function CommandPalette({
     return () => cancelAnimationFrame(frame)
   }, [open])
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      moveActive(1)
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      moveActive(-1)
-    } else if (e.key === "Enter") {
-      e.preventDefault()
-      const it = rows[active]
-      if (it) {
-        it.onSelect()
-        setOpen(false)
-      }
-    }
-  }
+  const onKeyDown = (event: React.KeyboardEvent) =>
+    handlePaletteKeyDown(event, rows, active, moveActive, setOpen)
 
   useEffect(() => {
     if (!open) return

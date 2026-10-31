@@ -39,6 +39,30 @@ function useColumnCount() {
 }
 
 function CatalogGrid<T extends CatalogItem>({
+  items,
+  renderItem,
+}: {
+  items: readonly T[]
+  renderItem: (item: T) => ReactNode
+}) {
+  return (
+    <Box
+      className="list-none"
+      cols={{ base: 1, sm: 2, lg: 3 }}
+      display="grid"
+      gap={2}
+      render={(props) => <ul {...props} />}
+    >
+      {items.map((item) => (
+        <li className="min-w-0" key={item.id}>
+          {renderItem(item)}
+        </li>
+      ))}
+    </Box>
+  )
+}
+
+function InfiniteCatalogGrid<T extends CatalogItem>({
   columns,
   items,
   renderItem,
@@ -61,19 +85,7 @@ function CatalogGrid<T extends CatalogItem>({
       next={reveal}
       showSpinner={false}
     >
-      <Box
-        className="list-none"
-        cols={{ base: 1, sm: 2, lg: 3 }}
-        display="grid"
-        gap={2}
-        render={(props) => <ul {...props} />}
-      >
-        {shown.map((item) => (
-          <li className="min-w-0" key={item.id}>
-            {renderItem(item)}
-          </li>
-        ))}
-      </Box>
+      <CatalogGrid items={shown} renderItem={renderItem} />
     </InfiniteScroll>
   )
 }
@@ -125,7 +137,7 @@ export function CatalogBodyClient<T extends CatalogItem>({
 
   if (pageSize === undefined) {
     return (
-      <CatalogGrid
+      <InfiniteCatalogGrid
         columns={columns}
         items={matches}
         key={`${q}\0${cat}\0${sort}`}
@@ -134,7 +146,7 @@ export function CatalogBodyClient<T extends CatalogItem>({
     )
   }
 
-  const itemsPerPage = pageSize ?? Math.max(matches.length, 1)
+  const itemsPerPage = pageSize
   const pageCount = Math.ceil(matches.length / itemsPerPage)
   const currentPage = Math.min(Math.max(page, 1), pageCount)
   const shown = matches.slice(
@@ -144,19 +156,7 @@ export function CatalogBodyClient<T extends CatalogItem>({
 
   return (
     <div className="flex flex-col gap-6">
-      <Box
-        className="list-none"
-        cols={{ base: 1, sm: 2, lg: 3 }}
-        display="grid"
-        gap={2}
-        render={(props) => <ul {...props} />}
-      >
-        {shown.map((item) => (
-          <li className="min-w-0" key={item.id}>
-            {renderItem(item)}
-          </li>
-        ))}
-      </Box>
+      <CatalogGrid items={shown} renderItem={renderItem} />
       {pageCount > 1 ? (
         <Pagination aria-label="Paginación de productos">
           <PaginationContent>

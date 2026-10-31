@@ -1,10 +1,11 @@
-import { getTranslations } from "next-intl/server"
-import { MaintenanceView } from "@/components/maintenance/MaintenanceView"
-import { getSiteSettingsRepository } from "@/services/domain/db/repositories/singletons/site-settings"
 import { Suspense } from "react"
+import { getTranslations } from "next-intl/server"
+
+import { MaintenanceView } from "@/components/maintenance/MaintenanceView"
 import { MaintenanceViewSkeleton } from "@/components/maintenance/MaintenanceViewSkeleton"
-import { metadata as createMetadata } from "@/lib/seo/metadata"
 import { WEBSITE_URL } from "@/lib/env/constants"
+import { metadata as createMetadata } from "@/lib/seo/metadata"
+import { getSiteSettingsRepository } from "@/services/domain/db/repositories/singletons/site-settings"
 
 export const metadata = createMetadata({
   title: "Pagina de mantenimiento",
@@ -18,23 +19,30 @@ export const metadata = createMetadata({
   },
 })
 
-export default async function MaintenancePage() {
-  const t = await getTranslations("maintenance")
-  const siteSettings = await getSiteSettingsRepository()
+async function MaintenancePageContent() {
+  const [t, siteSettings] = await Promise.all([
+    getTranslations("maintenance"),
+    getSiteSettingsRepository(),
+  ])
 
+  return (
+    <MaintenanceView
+      title={siteSettings?.maintenance_title || t("title")}
+      message={siteSettings?.maintenance_message || t("message")}
+      statusLabel={t("statusLabel")}
+      helperText={t("helperText")}
+    />
+  )
+}
+
+export default function MaintenancePage() {
   return (
     <Suspense
       defer
       name="maintenance-view"
-      key="maintenance-view"
       fallback={<MaintenanceViewSkeleton />}
     >
-      <MaintenanceView
-        title={siteSettings?.maintenance_title || t("title")}
-        message={siteSettings?.maintenance_message || t("message")}
-        statusLabel={t("statusLabel")}
-        helperText={t("helperText")}
-      />
+      <MaintenancePageContent />
     </Suspense>
   )
 }

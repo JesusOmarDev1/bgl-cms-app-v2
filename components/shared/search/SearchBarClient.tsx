@@ -70,14 +70,22 @@ function queueSearch(value: string, state: SearchState) {
   state.setHasError(false)
   state.setWaiting(false)
   const trimmed = value.trim()
+<<<<<<< HEAD
   if (trimmed.length < MIN_QUERY_LENGTH || trimmed.length > MAX_QUERY_LENGTH)
     return
+=======
+  if (trimmed.length < MIN_QUERY_LENGTH || trimmed.length > MAX_QUERY_LENGTH) return
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 
   state.setWaiting(true)
   state.timerRef.current = window.setTimeout(() => {
     const seq = ++state.seqRef.current
+<<<<<<< HEAD
     void state
       .mutateAsync({ query: trimmed })
+=======
+    void state.mutateAsync({ query: trimmed })
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
       .then((data) => {
         if (seq !== state.seqRef.current) return
         if (Array.isArray(data)) {
@@ -154,11 +162,15 @@ function SearchBarTriggers({
             aria-label="Buscar"
             aria-busy={loading}
             isDisabled={loading}
+<<<<<<< HEAD
             className={cn(
               "rounded-full",
               variant === "header" && "min-[1366px]:hidden",
               className
             )}
+=======
+            className={cn("rounded-full", variant === "header" && "min-[1366px]:hidden", className)}
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             onClick={onOpen}
           >
             <MaterialIcon name="search" size={20} className="text-foreground" />
@@ -172,18 +184,26 @@ function SearchBarTriggers({
             aria-label="Buscar"
             aria-busy={loading}
             disabled={loading}
+<<<<<<< HEAD
             className={cn(
               "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-40 2xl:w-52",
               variant === "header" && "hidden min-[1366px]:inline-flex",
               className
             )}
+=======
+            className={cn("inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44", variant === "header" && "hidden min-[1366px]:inline-flex", className)}
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             onClick={onOpen}
           >
             <MaterialIcon name="search" size={16} className="me-2 shrink-0" />
             <span className="flex w-full items-center justify-between">
+<<<<<<< HEAD
               <span className="font-normal text-muted-foreground/70">
                 {loading ? "Buscando..." : "Buscar..."}
               </span>
+=======
+              <span className="font-normal text-muted-foreground/70">{loading ? "Buscando..." : "Buscar..."}</span>
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
               <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
             </span>
           </button>
@@ -270,7 +290,10 @@ export function SearchBarClient({
     errorMessage,
     status
   )
+<<<<<<< HEAD
 
+=======
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   const shortcutLabel = isMac ? "⌘ K" : "Ctrl + K"
 
   return (

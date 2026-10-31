@@ -11,12 +11,20 @@ import {
   type CatalogSort,
 } from "@/components/collections/catalog/catalog-items"
 
+<<<<<<< HEAD
 const queryOptions = (shallow: boolean) =>
   ({
     history: "replace",
     scroll: false,
     shallow,
   }) as const
+=======
+const queryOptions = (shallow: boolean) => ({
+  history: "replace" as const,
+  scroll: false,
+  shallow,
+})
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 
 export function useCatalogParams(shallow = true, paginated = false) {
   const options = queryOptions(shallow)

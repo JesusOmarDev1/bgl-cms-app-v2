@@ -24,7 +24,11 @@
         "description": "Permiten medir campañas y personalizar publicidad."
       }
     },
+<<<<<<< HEAD
     "manage": "Gestionar cookies",
+=======
+    "manage": "Configurar cookies",
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     "accept": "Aceptar todo",
     "reject": "Rechazar todo",
     "learnMore": "Más información",

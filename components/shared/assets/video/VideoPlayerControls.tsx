@@ -49,11 +49,15 @@ function CaptionControl({
   onSetActiveDialog,
 }: Pick<
   VideoPlayerControlsProps,
+<<<<<<< HEAD
   | "tracks"
   | "currentCaption"
   | "activeDialog"
   | "onCaptionChange"
   | "onSetActiveDialog"
+=======
+  "tracks" | "currentCaption" | "activeDialog" | "onCaptionChange" | "onSetActiveDialog"
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 >) {
   if (!tracks.length) return null
   return (
@@ -69,7 +73,11 @@ function CaptionControl({
               onSetActiveDialog(activeDialog === "captions" ? null : "captions")
             }
           }}
+<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
+=======
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             currentCaption
               ? "bg-foreground/30 hover:bg-foreground/40"
               : "hover:bg-white/20"
@@ -152,7 +160,11 @@ function SettingsControl({
           onClick={() =>
             onSetActiveDialog(activeDialog === "settings" ? null : "settings")
           }
+<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
+=======
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             activeDialog === "settings"
               ? "bg-foreground/30"
               : "hover:bg-white/20"
@@ -228,7 +240,11 @@ function OptionsControl({
           onClick={() =>
             onSetActiveDialog(activeDialog === "options" ? null : "options")
           }
+<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
+=======
+          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             activeDialog === "options"
               ? "bg-foreground/30"
               : "hover:bg-white/20"
@@ -309,7 +325,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={onTogglePlay}
-              className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+              className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
               aria-label="Play/Pause"
             >
               {isPlaying ? (
@@ -334,7 +350,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={() => onSkip(-10)}
-              className="hidden items-center justify-center rounded-full p-2 transition-all hover:bg-white/20 lg:flex"
+              className="hidden items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20 lg:flex"
               aria-label="Skip back 10 seconds"
             >
               <MaterialIcon name="replay_10" size={20} className="text-white" />
@@ -347,7 +363,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={() => onSkip(10)}
-              className="hidden items-center justify-center rounded-full p-2 transition-all hover:bg-white/20 lg:flex"
+              className="hidden items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20 lg:flex"
               aria-label="Skip forward 10 seconds"
             >
               <MaterialIcon
@@ -365,7 +381,7 @@ export function VideoPlayerControls({
                 variant="ghost"
                 size="icon"
                 onClick={onPrevVideo}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Previous video"
               >
                 <MaterialIcon
@@ -384,7 +400,7 @@ export function VideoPlayerControls({
                 variant="ghost"
                 size="icon"
                 onClick={onNextVideo}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Next video"
               >
                 <MaterialIcon
@@ -407,7 +423,7 @@ export function VideoPlayerControls({
                 onMouseEnter={() => setShowVolumeSlider(true)}
                 onMouseLeave={() => setShowVolumeSlider(false)}
                 onClick={onToggleMute}
-                className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+                className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
                 aria-label="Mute/Unmute"
               >
                 {isMuted ? (
@@ -496,6 +512,10 @@ export function VideoPlayerControls({
             onQualityChange={onQualityChange}
             onSpeedChange={onSpeedChange}
           />
+<<<<<<< HEAD
+=======
+
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           <OptionsControl
             activeDialog={activeDialog}
             isLooping={isLooping}
@@ -515,7 +535,7 @@ export function VideoPlayerControls({
               variant="ghost"
               size="icon"
               onClick={onFullscreen}
-              className="flex items-center justify-center rounded-full p-2 transition-all hover:bg-white/20"
+              className="flex items-center justify-center rounded-full p-2 transition-colors hover:bg-white/20"
               aria-label="Fullscreen"
             >
               {isFullscreen ? (

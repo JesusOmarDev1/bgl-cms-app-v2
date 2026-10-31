@@ -5,6 +5,7 @@ import {
 } from "@/components/collections/catalog/catalog-items"
 
 describe("filterCatalogProducts", () => {
+<<<<<<< HEAD
   it("preserves date, title, and category sorting", () => {
     const products = [
       {
@@ -48,6 +49,41 @@ describe("filterCatalogProducts", () => {
     expect(
       filterCatalogProducts(products, "", "", "z-a").map((item) => item.id)
     ).toEqual(["newer-c", "older-b", "newer-a"])
+=======
+  it("filters by category and searches text before sorting", () => {
+    const products = [
+      {
+        title: "Zulu",
+        excerpt: null,
+        description: "manual alpha",
+        dateCreated: "2024-01-01",
+        categorySlug: "manuals",
+      },
+      {
+        title: "Alpha",
+        excerpt: "manual beta",
+        description: null,
+        dateCreated: "2024-01-02",
+        categorySlug: "other",
+      },
+      {
+        title: "Beta",
+        excerpt: null,
+        description: null,
+        dateCreated: "2024-01-03",
+        categorySlug: "manuals",
+      },
+    ]
+
+    expect(filterCatalogProducts(products, "alpha", "", "a-z")).toEqual([
+      products[1],
+      products[0],
+    ])
+    expect(filterCatalogProducts(products, "", "manuals", "newest")).toEqual([
+      products[2],
+      products[0],
+    ])
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   })
 })
 

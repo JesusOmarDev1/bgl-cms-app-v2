@@ -92,10 +92,14 @@ function HeroCarouselCopy({ data }: { data: HeroBlockQuery }) {
             <h2 className="hidden text-2xl font-semibold text-shadow-2xs lg:inline-flex">
               Nuestras Marcas
             </h2>
+<<<<<<< HEAD
             <Separator
               className="hidden lg:inline-flex"
               orientation="vertical"
             />
+=======
+            <Separator className="hidden lg:inline-flex" orientation="vertical" />
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           </Box>
           <Marquee
             className="max-w-2xs mask-r-from-90% mask-l-from-90% md:max-w-md"

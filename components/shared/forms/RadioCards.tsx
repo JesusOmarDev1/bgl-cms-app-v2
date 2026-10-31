@@ -249,6 +249,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
           }
           {...rest}
         >
+<<<<<<< HEAD
           <m.span
             className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
             style={{ x, y, width: w, height: h, opacity: o }}
@@ -268,6 +269,48 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                 key={option.value}
                 role="radio"
                 data-card={index}
+=======
+        <m.span
+          className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
+          style={{ x, y, width: w, height: h, opacity: o }}
+          aria-hidden="true"
+        />
+        {options.map((option, index) => {
+          const checked = index === selectedIndex,
+            off = !usable(option)
+          const labelId = `${uid}-${index}-label`,
+            descriptionId = `${uid}-${index}-description`
+          const description =
+            off && option.disabledReason
+              ? option.disabledReason
+              : option.description
+          return (
+            <div
+              key={option.value}
+              role="radio"
+              data-card={index}
+              className={cn(
+                "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] select-none [-webkit-tap-highlight-color:transparent] motion-reduce:transition-none",
+                "group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta']",
+                "group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px] group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta']",
+                checked &&
+                  "bg-[color-mix(in_oklab,var(--control-on)_4%,var(--surface))]",
+                off && "cursor-not-allowed bg-[var(--surface-muted)]",
+                "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)]"
+              )}
+              aria-checked={checked}
+              aria-disabled={off || undefined}
+              aria-labelledby={labelId}
+              aria-describedby={description ? descriptionId : undefined}
+              tabIndex={index === tabStop ? 0 : -1}
+              data-checked={checked || undefined}
+              onClick={() => {
+                if (!off) select(option.value)
+              }}
+              onKeyDown={(event) => onKeyDown(event, index)}
+            >
+              <span
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
                 className={cn(
                   "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] select-none [-webkit-tap-highlight-color:transparent] motion-reduce:transition-none",
                   "group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta']",
@@ -288,6 +331,19 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                 }}
                 onKeyDown={(event) => onKeyDown(event, index)}
               >
+<<<<<<< HEAD
+=======
+                <m.span
+                  className="size-[6px] rounded-[50%] bg-[var(--control-glyph)]"
+                  initial={false}
+                  animate={{ scale: checked ? 1 : 0 }}
+                  transition={
+                    reduced ? { duration: 0 } : motionTokens.spring.snappy
+                  }
+                />
+              </span>
+              <span className="grid min-w-0 gap-[2px] [grid-area:body]">
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
                 <span
                   className={cn(
                     "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [grid-area:indicator] group-data-[layout=grid]/radio:mt-px motion-reduce:transition-none",
@@ -334,6 +390,7 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
                     {option.meta}
                   </span>
                 )}
+<<<<<<< HEAD
               </div>
             )
           })}
@@ -345,6 +402,25 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
               required={required}
             />
           )}
+=======
+              </span>
+              {option.meta && (
+                <span className="whitespace-nowrap text-[var(--foreground)] tabular-nums [grid-area:meta] group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
+                  {option.meta}
+                </span>
+              )}
+            </div>
+          )
+        })}
+        {name && (
+          <input
+            type="hidden"
+            name={name}
+            value={selected ?? ""}
+            required={required}
+          />
+        )}
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
         </div>
       </LazyMotion>
     )

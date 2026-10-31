@@ -51,7 +51,7 @@ export async function getRedirectsQuery(
   }
 }
 
-async function fetchRedirectIndex() {
+async function fetchRedirectIndex(origin: string | null) {
   "use cache"
   cacheTag("redirects")
   cacheLife("minutes")
@@ -69,6 +69,7 @@ async function fetchRedirectIndex() {
         limit: 200,
         page,
         sort: ["-date_created", "id"],
+        ...(origin === null ? {} : { filter: { origin: { _eq: origin } } }),
       } satisfies Query<Schema, RedirectsTypes>)
     )
     rows.push(...batch)
@@ -76,9 +77,12 @@ async function fetchRedirectIndex() {
   }
 }
 
-export async function getRedirectIndexQuery(failedToFetchMessage: string) {
+export async function getRedirectIndexQuery(
+  failedToFetchMessage: string,
+  origin: string | null = null
+) {
   try {
-    return await fetchRedirectIndex()
+    return await fetchRedirectIndex(origin)
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

@@ -57,7 +57,7 @@ export interface StoredCookieConsent {
 }
 
 export interface CookieConsentHandle {
-  /** Opens the preferences panel, for example from a "Cookie settings" footer link. */
+  /** Opens the full preferences panel, for example from the footer settings action. */
   openPreferences: () => void
   /** Closes the preferences panel without saving. */
   closePreferences: () => void
@@ -79,9 +79,9 @@ export interface CookieConsentLabels {
 }
 
 /**
- * A consent bar that morphs into a preferences panel and, once a choice is saved, folds into a small floating button that
- * reopens it. One surface springs between all three shapes. Non-essential categories start off, refusing is as easy as
- * accepting, and the choice is reported through `onChange` and can be remembered in `localStorage`.
+ * A consent bar that opens a full preferences panel and hides after a choice is saved. An optional floating button can
+ * reopen it, while the default flow keeps settings in the footer. The choice is reported through `onChange` and can be
+ * remembered in `localStorage`.
  */
 export interface CookieConsentProps {
   categories?: CookieCategory[]
@@ -105,7 +105,7 @@ export interface CookieConsentProps {
   position?: "bottom" | "bottom-left" | "bottom-right"
   /** `fixed` pins to the viewport; `absolute` fills the nearest positioned ancestor, useful for previews. */
   strategy?: "fixed" | "absolute"
-  /** Keep a small button after a choice so visitors can change their mind. Defaults to true. */
+  /** Keep a small button after a choice. Defaults to false; settings can be reopened from the footer. */
   showReopenButton?: boolean
   /** Corner for the reopen button. Defaults to the bar's side, or left when the bar is centered. */
   reopenSide?: "left" | "right"
@@ -113,7 +113,7 @@ export interface CookieConsentProps {
   className?: string
 }
 
-export const defaultCookieCategories: CookieCategory[] = [
+export const defaultCookieCategories = [
   {
     id: "necessary",
     label: "Strictly necessary",
@@ -136,7 +136,7 @@ export const defaultCookieCategories: CookieCategory[] = [
     label: "Marketing",
     description: "Measure campaigns and show relevant ads on other sites.",
   },
-]
+] satisfies CookieCategory[]
 
 const defaultLabels: CookieConsentLabels = {
   message:
@@ -276,7 +276,12 @@ function getSurfaceTarget(
   const width = widths[mode]
   const height = mode === "chip" ? CHIP : heights[mode]
   if (!height) return null
+<<<<<<< HEAD
   const side = mode === "chip" ? chipSide : mode === "panel" ? panelSide : align
+=======
+  const side =
+    mode === "chip" ? chipSide : mode === "panel" ? panelSide : align
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   return {
     x: place(width, side),
     w: width,
@@ -298,7 +303,12 @@ function getConsentLayout(
       : position === "bottom-right"
         ? "right"
         : "center"
+<<<<<<< HEAD
   const chipSide: Side = reopenSide ?? (align === "right" ? "right" : "left")
+=======
+  const chipSide: Side =
+    reopenSide ?? (align === "right" ? "right" : "left")
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   const widths = {
     bar: Math.min(layerWidth, BAR_MAX),
     panel: Math.min(layerWidth, PANEL_MAX),
@@ -422,10 +432,481 @@ interface CookieBarFaceProps {
   messageId: string
   policyLink: ReactNode
   stacked: boolean
+<<<<<<< HEAD
   onCustomize: () => void
   onReject: () => void
   onAccept: () => void
 }
+=======
+  onReject: () => void
+  onAccept: () => void
+}
+
+function CookieBarFace({
+  width,
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  labels,
+  messageId,
+  policyLink,
+  stacked,
+  onReject,
+  onAccept,
+}: CookieBarFaceProps) {
+  return (
+    <Face
+      id="bar"
+      width={width}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="@container py-[10px] pr-[10px] pl-[18px]"
+      role="dialog"
+      aria-modal={false}
+      aria-label={labels.preferencesTitle}
+      aria-describedby={messageId}
+    >
+      <div
+        className="group/bar flex items-center gap-[var(--space-4)] data-[stack]:flex-col data-[stack]:items-stretch data-[stack]:gap-[var(--space-3)] data-[stack]:pt-[6px] data-[stack]:pr-[8px]"
+        data-stack={stacked || undefined}
+      >
+        <p
+          id={messageId}
+          className="m-0 min-w-0 flex-auto text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+        >
+          {labels.message}
+          {policyLink ? <> {policyLink}</> : null}
+        </p>
+        <div className="flex flex-none items-center gap-[6px] group-data-[stack]/bar:grid group-data-[stack]/bar:grid-cols-[1fr_1fr]">
+          <Button size="sm" variant="secondary" onClick={onReject}>
+            {labels.rejectAll}
+          </Button>
+          <Button size="sm" variant="secondary" onClick={onAccept}>
+            {labels.acceptAll}
+          </Button>
+        </div>
+      </div>
+    </Face>
+  )
+}
+
+interface CookieChipFaceProps {
+  side: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusOnMount: boolean
+  label: string
+  onOpen: () => void
+}
+
+function CookieChipFace({
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  label,
+  onOpen,
+}: CookieChipFaceProps) {
+  return (
+    <Face
+      id="chip"
+      width={CHIP}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="h-[44px]"
+    >
+      <button
+        type="button"
+        className="grid size-[44px] cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--foreground)] transition-[background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)] motion-reduce:transition-none"
+        aria-label={label}
+        aria-haspopup="dialog"
+        data-autofocus
+        onClick={onOpen}
+      >
+        <Cookie size={20} strokeWidth={1.75} aria-hidden="true" />
+      </button>
+    </Face>
+  )
+}
+
+interface PreferencesFaceProps {
+  width: number
+  side: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusOnMount: boolean
+  labels: CookieConsentLabels
+  titleId: string
+  descriptionId: string
+  policyLink: ReactNode
+  uid: string
+  categories: CookieCategory[]
+  draft: CookieConsentValue
+  onDraftChange: (id: string, checked: boolean) => void
+  allowedCount: number
+  optionalCount: number
+  onPanelKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+  onClose: () => void
+  onChoose: (action: "accept-all" | "reject-all" | "save") => void
+}
+
+function PreferencesFace({
+  width,
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  labels,
+  titleId,
+  descriptionId,
+  policyLink,
+  uid,
+  categories,
+  draft,
+  onDraftChange,
+  allowedCount,
+  optionalCount,
+  onPanelKeyDown,
+  onClose,
+  onChoose,
+}: PreferencesFaceProps) {
+  return (
+    <Face
+      id="panel"
+      width={width}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="@container grid gap-[var(--space-3)] p-[18px]"
+      role="dialog"
+      aria-modal={false}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onKeyDown={onPanelKeyDown}
+    >
+      <div className="-mt-[4px] -mb-[6px] flex items-center justify-between gap-[var(--space-3)]">
+        <h2
+          id={titleId}
+          className="m-0 text-[length:var(--text-base)] leading-[var(--leading-body)] font-semibold"
+          tabIndex={-1}
+          data-autofocus
+        >
+          {labels.preferencesTitle}
+        </h2>
+        <button
+          type="button"
+          className="-mr-[8px] inline-grid size-[32px] flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--text-secondary)] transition-[color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)] active:bg-[var(--surface-muted)] active:text-[var(--foreground)] motion-reduce:transition-none"
+          aria-label={labels.close}
+          onClick={onClose}
+        >
+          <X size={16} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>
+      <p
+        id={descriptionId}
+        className="m-0 text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+      >
+        {labels.preferencesDescription}
+        {policyLink ? <> {policyLink}</> : null}
+      </p>
+      <ul className="my-0 grid min-w-0 max-w-full max-h-[var(--cookie-consent-list-max,min(46vh,300px))] [scrollbar-width:thin] list-none overflow-x-hidden overflow-y-auto overscroll-contain p-0">
+        {categories.map((category) => {
+          const switchId = `${uid}-${category.id}`
+          const hintId = `${switchId}-hint`
+          return (
+            <li
+              key={category.id}
+              className="flex min-w-0 items-center justify-between gap-[var(--space-4)] border-t border-solid border-[color:var(--border-subtle)] py-3 first:border-t-0"
+            >
+              <div className="grid min-w-0 gap-[2px]">
+                <label
+                  htmlFor={category.required ? undefined : switchId}
+                  className="text-[length:var(--text-sm)] leading-[var(--leading-body)] font-semibold text-[var(--foreground)] [&[for]]:cursor-pointer"
+                >
+                  {category.label}
+                </label>
+                {category.description ? (
+                  <p
+                    id={hintId}
+                    className="m-0 text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[var(--text-muted)]"
+                  >
+                    {category.description}
+                  </p>
+                ) : null}
+              </div>
+              {category.required ? (
+                <span className="flex-none text-[length:var(--text-xs)] whitespace-nowrap text-[var(--text-muted)]">
+                  {labels.alwaysOn}
+                </span>
+              ) : (
+                <Switch
+                  id={switchId}
+                  aria-describedby={category.description ? hintId : undefined}
+                  isSelected={!!draft[category.id]}
+                  onChange={(checked) => onDraftChange(category.id, checked)}
+                />
+              )}
+            </li>
+          )
+        })}
+      </ul>
+      <div className="grid grid-cols-[1fr_1fr] gap-[6px] border-t border-solid border-[color:var(--border-subtle)] pt-[var(--space-2)] @min-[340px]:grid-cols-[auto_auto_1fr]">
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onChoose("reject-all")}
+        >
+          {labels.rejectAll}
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onChoose("accept-all")}
+        >
+          {labels.acceptAll}
+        </Button>
+        <Button
+          size="sm"
+          className="col-span-full @min-[340px]:col-auto"
+          onClick={() => onChoose("save")}
+          aria-describedby={`${uid}-count`}
+        >
+          {labels.save}
+        </Button>
+        <span
+          id={`${uid}-count`}
+          className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
+        >{`${allowedCount} of ${optionalCount} optional categories allowed`}</span>
+      </div>
+    </Face>
+  )
+}
+
+interface CookieFacesProps {
+  mode: Mode | null
+  widths: Record<Mode, number>
+  align: Side
+  panelSide: Side
+  chipSide: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusTarget: Mode | null
+  labels: CookieConsentLabels
+  messageId: string
+  titleId: string
+  descriptionId: string
+  policyLink: ReactNode
+  uid: string
+  categories: CookieCategory[]
+  draft: CookieConsentValue
+  allowedCount: number
+  optionalCount: number
+  onDraftChange: (id: string, checked: boolean) => void
+  onPanelKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+  onClosePanel: () => void
+  onChoose: (action: "accept-all" | "reject-all" | "save") => void
+  onOpenPanel: () => void
+}
+
+function CookieFaces({
+  mode,
+  widths,
+  align,
+  panelSide,
+  chipSide,
+  reduced,
+  onSize,
+  focusTarget,
+  labels,
+  messageId,
+  titleId,
+  descriptionId,
+  policyLink,
+  uid,
+  categories,
+  draft,
+  allowedCount,
+  optionalCount,
+  onDraftChange,
+  onPanelKeyDown,
+  onClosePanel,
+  onChoose,
+  onOpenPanel,
+}: CookieFacesProps) {
+  return (
+    <AnimatePresence initial={false}>
+      {mode === "bar" ? (
+        <CookieBarFace
+          key="bar"
+          width={widths.bar}
+          side={align}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "bar"}
+          labels={labels}
+          messageId={messageId}
+          policyLink={policyLink}
+          stacked={widths.bar < STACK_BELOW}
+          onReject={() => onChoose("reject-all")}
+          onAccept={() => onChoose("accept-all")}
+        />
+      ) : null}
+      {mode === "panel" ? (
+        <PreferencesFace
+          key="panel"
+          width={widths.panel}
+          side={panelSide}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "panel"}
+          labels={labels}
+          titleId={titleId}
+          descriptionId={descriptionId}
+          policyLink={policyLink}
+          uid={uid}
+          categories={categories}
+          draft={draft}
+          onDraftChange={onDraftChange}
+          allowedCount={allowedCount}
+          optionalCount={optionalCount}
+          onPanelKeyDown={onPanelKeyDown}
+          onClose={onClosePanel}
+          onChoose={onChoose}
+        />
+      ) : null}
+      {mode === "chip" ? (
+        <CookieChipFace
+          key="chip"
+          side={chipSide}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "chip"}
+          label={labels.reopen}
+          onOpen={onOpenPanel}
+        />
+      ) : null}
+    </AnimatePresence>
+  )
+}
+
+function useSurfaceGeometry(
+  mode: Mode | null,
+  layerWidth: number,
+  reduced: boolean,
+  layout: ReturnType<typeof getConsentLayout>
+) {
+  const { align, chipSide, widths, place, panelSide } = layout
+  const x = useMotionValue(0)
+  const width = useMotionValue(0)
+  const height = useMotionValue(0)
+  const radius = useMotionValue(22)
+  const heights = useRef<Record<Mode, number>>({ bar: 0, panel: 0, chip: CHIP })
+  const shape = useRef({ w: 0, h: 0, ready: false })
+  const [tick, setTick] = useState(0)
+  const onSize = useCallback((id: Mode, h: number) => {
+    if (heights.current[id] === h) return
+    heights.current[id] = h
+    setTick((count) => count + 1)
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!mode || !layerWidth) {
+      shape.current.ready = false
+      return
+    }
+    const next = getSurfaceTarget(
+      mode,
+      widths,
+      heights.current,
+      place,
+      align,
+      chipSide,
+      panelSide
+    )
+    if (!next) return
+    if (!shape.current.ready || reduced) {
+      x.jump(next.x)
+      width.jump(next.w)
+      height.jump(next.h)
+      radius.jump(next.r)
+      shape.current = { w: next.w, h: next.h, ready: true }
+      return
+    }
+    const transition =
+      next.w * next.h >= shape.current.w * shape.current.h ? GROW : SHRINK
+    shape.current = { w: next.w, h: next.h, ready: true }
+    animate(x, next.x, transition)
+    animate(width, next.w, transition)
+    animate(height, next.h, transition)
+    animate(radius, next.r, transition)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, layerWidth, tick, reduced, align, chipSide, panelSide])
+
+  return { x, width, height, radius, onSize }
+}
+
+export const CookieConsent = forwardRef<
+  CookieConsentHandle,
+  CookieConsentProps
+>(function CookieConsent(
+  {
+    categories: categoryOverrides,
+    value,
+    defaultValue = null,
+    onChange,
+    storageKey,
+    version = "1",
+    preferencesOpen,
+    defaultPreferencesOpen = false,
+    onPreferencesOpenChange,
+    policy,
+    position = "bottom",
+    strategy = "fixed",
+    showReopenButton = false,
+    reopenSide,
+    labels: labelOverrides,
+    className,
+  },
+  ref
+) {
+  const t = useTranslations("cookies")
+  const labels = {
+    ...defaultLabels,
+    message: t("notice"),
+    customize: t("customize"),
+    acceptAll: t("accept"),
+    rejectAll: t("reject"),
+    save: t("save"),
+    preferencesTitle: t("title"),
+    preferencesDescription: t("description"),
+    reopen: t("manage"),
+    alwaysOn: t("alwaysOn"),
+    close: t("close"),
+    ...labelOverrides,
+  }
+  const categories = useMemo(
+    () =>
+      categoryOverrides ??
+      defaultCookieCategories.map((category) => ({
+        ...category,
+        label: t(`categories.${category.id}.label`),
+        description: t(`categories.${category.id}.description`),
+      })),
+    [categoryOverrides, t]
+  )
+  const reduced = !!useReducedMotion()
+  const hydrated = useHydrated()
+  const uid = useId()
+  const titleId = `${uid}-title`,
+    descriptionId = `${uid}-description`,
+    messageId = `${uid}-message`
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 
 function CookieBarFace({
   width,
@@ -487,6 +968,7 @@ function CookieBarFace({
   )
 }
 
+<<<<<<< HEAD
 interface CookieChipFaceProps {
   side: Side
   reduced: boolean
@@ -525,9 +1007,21 @@ function CookieChipFace({
         <Cookie size={20} strokeWidth={1.75} aria-hidden="true" />
       </button>
     </Face>
+=======
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+  const [panelInternal, setPanelInternal] = useState(defaultPreferencesOpen)
+  const panelOpen = preferencesOpen ?? panelInternal
+  const setPanel = useCallback(
+    (next: boolean) => {
+      if (preferencesOpen === undefined) setPanelInternal(next)
+      onPreferencesOpenChange?.(next)
+    },
+    [onPreferencesOpenChange, preferencesOpen]
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   )
 }
 
+<<<<<<< HEAD
 interface PreferencesFaceProps {
   width: number
   side: Side
@@ -679,6 +1173,88 @@ function PreferencesFace({
         >{`${allowedCount} of ${optionalCount} optional categories allowed`}</span>
       </div>
     </Face>
+=======
+  const baseline = useCallback(
+    (from: CookieConsentValue | null) => consentBaseline(categories, from),
+    [categories]
+  )
+  const [draft, setDraft] = useState<CookieConsentValue>(() =>
+    baseline(consent)
+  )
+  const [focusTarget, setFocusTarget] = useState<Mode | null>(null)
+
+  const mode = resolveMode(
+    hydrated,
+    loaded,
+    panelOpen,
+    decided,
+    showReopenButton
+  )
+
+  const openPanel = useCallback(
+    (focus = true) => {
+      setDraft(baseline(consent))
+      if (focus && document.activeElement instanceof HTMLElement)
+        returnFocusRef.current = document.activeElement
+      setFocusTarget(focus ? "panel" : null)
+      setPanel(true)
+    },
+    [baseline, consent, setPanel]
+  )
+
+  const closePanel = useCallback(
+    (focus = true) => {
+      setFocusTarget(
+        focus ? (decided ? (showReopenButton ? "chip" : null) : "bar") : null
+      )
+      setPanel(false)
+      if (focus && !showReopenButton)
+        returnFocusRef.current?.focus({ preventScroll: true })
+    },
+    [decided, setPanel, showReopenButton]
+  )
+
+  const commit = useCallback(
+    (next: CookieConsentValue | null, action: CookieConsentAction) => {
+      const updatedAt = new Date()
+      if (value === undefined) setInternal(next)
+      if (storageKey)
+        writeCookieConsent(
+          storageKey,
+          next
+            ? { value: next, version, updatedAt: updatedAt.toISOString() }
+            : null
+        )
+      onChange?.(next, { action, updatedAt })
+    },
+    [onChange, storageKey, value, version]
+  )
+
+  const choose = (action: "accept-all" | "reject-all" | "save") => {
+    const next = consentChoice(action, categories, draft)
+    // Keep focus on the page: the choice folds the surface into its reopen button, which takes focus when it exists.
+    setFocusTarget(showReopenButton ? "chip" : null)
+    commit(next, action)
+    if (panelOpen) {
+      setPanel(false)
+      if (!showReopenButton)
+        returnFocusRef.current?.focus({ preventScroll: true })
+    }
+  }
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      openPreferences: () => openPanel(true),
+      closePreferences: () => closePanel(false),
+      reset: () => {
+        setPanel(false)
+        setFocusTarget(null)
+        commit(null, "reset")
+      },
+    }),
+    [closePanel, commit, openPanel, setPanel]
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   )
 }
 
@@ -708,6 +1284,7 @@ interface CookieFacesProps {
   onOpenPanel: () => void
 }
 
+<<<<<<< HEAD
 function CookieFaces({
   mode,
   widths,
@@ -842,6 +1419,23 @@ function useSurfaceGeometry(
     animate(radius, next.r, transition)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, layerWidth, tick, reduced, align, chipSide, panelSide])
+=======
+  // Reopened preferences grow out of the corner button, so the panel opens on its side once a choice exists.
+  const { align, chipSide, widths, place, panelSide } = getConsentLayout(
+    position,
+    reopenSide,
+    decided,
+    showReopenButton,
+    layerWidth
+  )
+
+  const { x, width, height, radius, onSize } = useSurfaceGeometry(
+    mode,
+    layerWidth,
+    reduced,
+    { align, chipSide, widths, place, panelSide }
+  )
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 
   return { x, width, height, radius, onSize }
 }
@@ -1182,7 +1776,11 @@ export const CookieConsent = forwardRef<
         {mode ? (
           <motion.div
             key="surface"
+<<<<<<< HEAD
             className="pointer-events-auto absolute bottom-0 left-0 origin-bottom overflow-hidden bg-background text-[var(--foreground)] shadow-[0_0_0_1px_var(--border),var(--shadow-floating)] will-change-[transform,width,height]"
+=======
+            className="pointer-events-auto absolute bottom-0 left-0 origin-bottom overflow-hidden border border-border bg-card text-card-foreground shadow-xl"
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             style={{ x, width, height, borderRadius: radius }}
             initial={
               reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }
@@ -1229,7 +1827,13 @@ export const CookieConsent = forwardRef<
               draft={draft}
               allowedCount={allowedCount}
               optionalCount={optional.length}
+<<<<<<< HEAD
               onDraftChange={onDraftChange}
+=======
+              onDraftChange={(id, checked) =>
+                setDraft((current) => ({ ...current, [id]: checked }))
+              }
+>>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
               onPanelKeyDown={onPanelKeyDown}
               onClosePanel={() => closePanel(true)}
               onChoose={choose}

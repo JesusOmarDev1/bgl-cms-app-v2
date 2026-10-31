@@ -42,6 +42,7 @@ export default function PdfViewerClient({
         <embed
           src={getAssetUrl(data.id) || ""}
           type="application/pdf"
+          title={`Vista previa del PDF: ${data.title}`}
           className="h-150 w-full rounded-md"
         />
       </CardContent>
