@@ -61,9 +61,8 @@ export function useVideoPlayback(
       if (isPlaying) {
         videoRef.current.pause()
       } else {
-        videoRef.current.play()
+        void videoRef.current.play().catch(() => {})
       }
-      setIsPlaying(!isPlaying)
     }
   }
 
@@ -110,7 +109,7 @@ export function useVideoPlayback(
         const handleCanPlay = () => {
           if (videoRef.current) {
             videoRef.current.currentTime = time
-            if (wasPlaying) videoRef.current.play()
+            if (wasPlaying) void videoRef.current.play().catch(() => {})
             videoRef.current.removeEventListener(
               "loadedmetadata",
               handleCanPlay

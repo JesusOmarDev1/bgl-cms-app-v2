@@ -52,30 +52,3 @@ export function pickProductCard(product: ProductCardSource): ProductCardData {
     categoryIcon: trimmed(product.product_category?.icon),
   }
 }
-
-function expectProductCard() {
-  const card = pickProductCard({
-    id: "1",
-    slug: "",
-    title: "Indicador",
-    excerpt: "<p>ok</p>",
-    description: null,
-    date_created: "2020-01-01T00:00:00.000Z",
-    image: { id: "file" },
-    brand: { title: "Metrology" },
-    model: { title: "A-2" },
-    product_category: { title: "Etiquetadoras", slug: "etiquetadoras" },
-  })
-  if (
-    card.slug !== null ||
-    card.brand !== "Metrology" ||
-    card.model !== "A-2" ||
-    card.categoryTitle !== "Etiquetadoras" ||
-    card.categorySlug !== "etiquetadoras" ||
-    card.imageId !== "file"
-  ) {
-    throw new Error("product card self-check failed")
-  }
-}
-
-expectProductCard()

@@ -34,7 +34,7 @@ export function ProductCatalogClients({
         noMatches={noMatches}
         pageSize={24}
         paginated
-        renderItem={(item) => <ProductCard product={item} />}
+        renderItem={(item) => <ProductCard data={item} />}
         shallow={false}
       />
     </>

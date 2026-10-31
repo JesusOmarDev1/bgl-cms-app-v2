@@ -147,6 +147,47 @@ type InputFieldProps = {
   >
 }
 
+function InputFieldDecorations({
+  leftIcon,
+  rightSlot,
+  success,
+  reduce,
+  classNames,
+}: {
+  leftIcon?: ReactNode
+  rightSlot: ReactNode | null
+  success?: boolean
+  reduce: boolean | null
+  classNames?: InputClassNames
+}) {
+  return (
+    <>
+      {leftIcon ? (
+        <span
+          className={cn(
+            "pointer-events-none absolute start-3 top-1/2 flex -translate-y-1/2 items-center text-muted-foreground [&_svg]:h-4 [&_svg]:w-4",
+            classNames?.leftIcon
+          )}
+        >
+          {leftIcon}
+        </span>
+      ) : null}
+      {success ? (
+        <InputSuccessIcon reduce={reduce} className={classNames?.successIcon} />
+      ) : rightSlot ? (
+        <span
+          className={cn(
+            "absolute end-0 top-0 flex h-full items-center text-muted-foreground [&_button]:grid [&_button]:size-11 [&_button]:place-items-center [&_svg]:h-4 [&_svg]:w-4",
+            classNames?.rightIcon
+          )}
+        >
+          {rightSlot}
+        </span>
+      ) : null}
+    </>
+  )
+}
+
 function InputField({
   fieldRef,
   id,
@@ -190,17 +231,6 @@ function InputField({
         classNames?.field
       )}
     >
-      {leftIcon ? (
-        <span
-          className={cn(
-            "pointer-events-none absolute start-3 top-1/2 flex -translate-y-1/2 items-center text-muted-foreground [&_svg]:h-4 [&_svg]:w-4",
-            classNames?.leftIcon
-          )}
-        >
-          {leftIcon}
-        </span>
-      ) : null}
-
       <input
         ref={inputRef}
         id={id}
@@ -224,18 +254,13 @@ function InputField({
         )}
       />
 
-      {success ? (
-        <InputSuccessIcon reduce={reduce} className={classNames?.successIcon} />
-      ) : rightSlot ? (
-        <span
-          className={cn(
-            "absolute end-0 top-0 flex h-full items-center text-muted-foreground [&_button]:grid [&_button]:size-11 [&_button]:place-items-center [&_svg]:h-4 [&_svg]:w-4",
-            classNames?.rightIcon
-          )}
-        >
-          {rightSlot}
-        </span>
-      ) : null}
+      <InputFieldDecorations
+        leftIcon={leftIcon}
+        rightSlot={rightSlot}
+        success={success}
+        reduce={reduce}
+        classNames={classNames}
+      />
     </div>
   )
 }

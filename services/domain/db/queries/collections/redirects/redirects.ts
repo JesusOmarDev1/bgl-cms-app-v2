@@ -56,7 +56,12 @@ async function fetchRedirectIndex() {
   cacheTag("redirects")
   cacheLife("minutes")
 
-  const rows: { id: string; origin: string; destiny: string; http_code: string }[] = []
+  const rows: {
+    id: string
+    origin: string
+    destiny: string
+    http_code: string
+  }[] = []
   for (let page = 1; ; page++) {
     const batch = await directus.request(
       readItems("redirects", {

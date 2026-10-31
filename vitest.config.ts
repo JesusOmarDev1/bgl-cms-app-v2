@@ -21,7 +21,28 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["lib/**/*.test.ts", "services/**/*.test.ts"],
+          include: [
+            "lib/**/*.test.ts",
+            "services/**/*.test.ts",
+            "components/collections/catalog/catalog-items.test.ts",
+          ],
+        },
+      },
+      {
+        extends: true,
+        optimizeDeps: { include: ["react/jsx-dev-runtime"] },
+        test: {
+          name: "media",
+          include: [
+            "hooks/useAudioProvider.test.tsx",
+            "hooks/useVideoPlayback.test.tsx",
+          ],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{ browser: "chromium" }],
+          },
         },
       },
       {

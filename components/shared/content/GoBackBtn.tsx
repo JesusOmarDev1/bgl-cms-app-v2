@@ -11,7 +11,7 @@ export function GoBackBtn({
   children: ReactNode
 }) {
   return (
-    <LinkButton className="w-fit" href={href} variant="ghost">
+    <LinkButton className="w-fit rounded-full" href={href} variant="ghost">
       <MaterialIcon data-icon="inline-start" name="arrow_back" />
       {children}
     </LinkButton>

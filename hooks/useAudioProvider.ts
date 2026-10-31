@@ -343,7 +343,9 @@ export function useAudioProvider({ tracks = [] }: { tracks?: Track[] } = {}) {
 
     const handlePlaying = () => {
       setState({
-        ...getLoadingSuccessState(),
+        ...getLoadingSuccessState(
+          audio.duration || useAudioStore.getState().duration
+        ),
         isPlaying: true,
       })
     }

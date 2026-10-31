@@ -7,11 +7,16 @@ import {
   useId,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
 } from "react"
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react"
+import type {
+  ForwardedRef,
+  KeyboardEvent as ReactKeyboardEvent,
+  ReactNode,
+} from "react"
 import {
   AnimatePresence,
   animate,
@@ -26,6 +31,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { motionTokens } from "@/lib/animation/motion/motion-tokens"
 import { cn } from "cn"
+import { useTranslations } from "next-intl"
 
 /** One group of cookies a visitor can allow or refuse. */
 export interface CookieCategory {
@@ -41,6 +47,7 @@ export interface CookieCategory {
 /** Category id to allowed. */
 export type CookieConsentValue = Record<string, boolean>
 export type CookieConsentAction = "accept-all" | "reject-all" | "save" | "reset"
+export const COOKIE_CONSENT_OPEN_EVENT = "bgl:open-cookie-consent"
 
 /** What is written to storage under `storageKey`. */
 export interface StoredCookieConsent {
@@ -186,6 +193,7 @@ function writeCookieConsent(
 }
 
 type Mode = "bar" | "panel" | "chip"
+type Side = "left" | "right" | "center"
 type Bezier = [number, number, number, number]
 const enter = [...motionTokens.ease.enter] as Bezier
 const standard = [...motionTokens.ease.standard] as Bezier
@@ -213,6 +221,102 @@ function useHydrated() {
     () => true,
     () => false
   )
+}
+
+function consentBaseline(
+  categories: CookieCategory[],
+  from: CookieConsentValue | null
+): CookieConsentValue {
+  return Object.fromEntries(
+    categories.map((category) => [
+      category.id,
+      category.required
+        ? true
+        : (from?.[category.id] ?? category.defaultEnabled ?? false),
+    ])
+  )
+}
+
+function consentChoice(
+  action: "accept-all" | "reject-all" | "save",
+  categories: CookieCategory[],
+  draft: CookieConsentValue
+): CookieConsentValue {
+  if (action === "save") return { ...draft }
+  return Object.fromEntries(
+    categories.map((category) => [
+      category.id,
+      category.required ? true : action === "accept-all",
+    ])
+  )
+}
+
+function resolveMode(
+  hydrated: boolean,
+  loaded: boolean,
+  panelOpen: boolean,
+  decided: boolean,
+  showReopenButton: boolean
+): Mode | null {
+  if (!hydrated || !loaded) return null
+  if (panelOpen) return "panel"
+  if (!decided) return "bar"
+  return showReopenButton ? "chip" : null
+}
+
+function getSurfaceTarget(
+  mode: Mode,
+  widths: Record<Mode, number>,
+  heights: Record<Mode, number>,
+  place: (width: number, side: Side) => number,
+  align: Side,
+  chipSide: Side,
+  panelSide: Side
+) {
+  const width = widths[mode]
+  const height = mode === "chip" ? CHIP : heights[mode]
+  if (!height) return null
+  const side = mode === "chip" ? chipSide : mode === "panel" ? panelSide : align
+  return {
+    x: place(width, side),
+    w: width,
+    h: height,
+    r: mode === "chip" ? CHIP / 2 : mode === "panel" ? 26 : 22,
+  }
+}
+
+function getConsentLayout(
+  position: CookieConsentProps["position"],
+  reopenSide: CookieConsentProps["reopenSide"],
+  decided: boolean,
+  showReopenButton: boolean,
+  layerWidth: number
+) {
+  const align: Side =
+    position === "bottom-left"
+      ? "left"
+      : position === "bottom-right"
+        ? "right"
+        : "center"
+  const chipSide: Side = reopenSide ?? (align === "right" ? "right" : "left")
+  const widths = {
+    bar: Math.min(layerWidth, BAR_MAX),
+    panel: Math.min(layerWidth, PANEL_MAX),
+    chip: CHIP,
+  }
+  const place = (width: number, side: "left" | "right" | "center") =>
+    side === "left"
+      ? 0
+      : side === "right"
+        ? layerWidth - width
+        : (layerWidth - width) / 2
+  return {
+    align,
+    chipSide,
+    widths,
+    place,
+    panelSide: decided && showReopenButton ? chipSide : align,
+  }
 }
 
 const faceVariants: Variants = {
@@ -308,194 +412,395 @@ function Face({
   )
 }
 
-export const CookieConsent = forwardRef<
-  CookieConsentHandle,
-  CookieConsentProps
->(function CookieConsent(
-  {
-    categories = defaultCookieCategories,
-    value,
-    defaultValue = null,
-    onChange,
-    storageKey,
-    version = "1",
-    preferencesOpen,
-    defaultPreferencesOpen = false,
-    onPreferencesOpenChange,
-    policy,
-    position = "bottom",
-    strategy = "fixed",
-    showReopenButton = true,
-    reopenSide,
-    labels: labelOverrides,
-    className,
-  },
-  ref
-) {
-  const labels = { ...defaultLabels, ...labelOverrides }
-  const reduced = !!useReducedMotion()
-  const hydrated = useHydrated()
-  const uid = useId()
-  const titleId = `${uid}-title`,
-    descriptionId = `${uid}-description`,
-    messageId = `${uid}-message`
+interface CookieBarFaceProps {
+  width: number
+  side: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusOnMount: boolean
+  labels: CookieConsentLabels
+  messageId: string
+  policyLink: ReactNode
+  stacked: boolean
+  onCustomize: () => void
+  onReject: () => void
+  onAccept: () => void
+}
 
-  /* The saved choice: controlled, or internal and seeded from storage once on the client. */
-  const [internal, setInternal] = useState<CookieConsentValue | null>(
-    defaultValue
+function CookieBarFace({
+  width,
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  labels,
+  messageId,
+  policyLink,
+  stacked,
+  onCustomize,
+  onReject,
+  onAccept,
+}: CookieBarFaceProps) {
+  return (
+    <Face
+      id="bar"
+      width={width}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="@container py-[10px] pr-[10px] pl-[18px]"
+      role="dialog"
+      aria-modal={false}
+      aria-label={labels.preferencesTitle}
+      aria-describedby={messageId}
+    >
+      <div
+        className="group/bar flex items-center gap-[var(--space-4)] data-[stack]:flex-col data-[stack]:items-stretch data-[stack]:gap-[var(--space-3)] data-[stack]:pt-[6px] data-[stack]:pr-[8px]"
+        data-stack={stacked || undefined}
+      >
+        <p
+          id={messageId}
+          className="m-0 min-w-0 flex-auto text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+        >
+          {labels.message}
+          {policyLink ? <> {policyLink}</> : null}
+        </p>
+        <div className="flex flex-none items-center gap-[6px] group-data-[stack]/bar:grid group-data-[stack]/bar:grid-cols-[auto_1fr_1fr] @max-[300px]:group-data-[stack]/bar:grid-cols-[repeat(2,minmax(0,1fr))] @max-[300px]:group-data-[stack]/bar:[&>:first-child]:order-1 @max-[300px]:group-data-[stack]/bar:[&>:first-child]:col-span-full">
+          <Button
+            size="sm"
+            variant="ghost"
+            data-autofocus
+            onClick={onCustomize}
+          >
+            {labels.customize}
+          </Button>
+          <Button size="sm" variant="secondary" onClick={onReject}>
+            {labels.rejectAll}
+          </Button>
+          <Button size="sm" variant="secondary" onClick={onAccept}>
+            {labels.acceptAll}
+          </Button>
+        </div>
+      </div>
+    </Face>
   )
-  const [loaded, setLoaded] = useState(!storageKey || value !== undefined)
-  useEffect(() => {
-    if (loaded || !storageKey) return
-    const stored = readCookieConsent(storageKey, version)
-    // Storage is only readable after hydration; this runs once to seed the saved choice.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (stored) setInternal(stored.value)
-    setLoaded(true)
-  }, [loaded, storageKey, version])
-  const consent = value !== undefined ? value : internal
-  const decided = consent != null
+}
 
-  const [panelInternal, setPanelInternal] = useState(defaultPreferencesOpen)
-  const panelOpen = preferencesOpen ?? panelInternal
-  const setPanel = useCallback(
-    (next: boolean) => {
-      if (preferencesOpen === undefined) setPanelInternal(next)
-      onPreferencesOpenChange?.(next)
-    },
-    [onPreferencesOpenChange, preferencesOpen]
+interface CookieChipFaceProps {
+  side: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusOnMount: boolean
+  label: string
+  onOpen: () => void
+}
+
+function CookieChipFace({
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  label,
+  onOpen,
+}: CookieChipFaceProps) {
+  return (
+    <Face
+      id="chip"
+      width={CHIP}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="h-[44px]"
+    >
+      <button
+        type="button"
+        className="grid size-[44px] cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--foreground)] transition-[background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)] motion-reduce:transition-none"
+        aria-label={label}
+        aria-haspopup="dialog"
+        data-autofocus
+        onClick={onOpen}
+      >
+        <Cookie size={20} strokeWidth={1.75} aria-hidden="true" />
+      </button>
+    </Face>
   )
+}
 
-  const baseline = useCallback(
-    (from: CookieConsentValue | null) =>
-      Object.fromEntries(
-        categories.map((category) => [
-          category.id,
-          category.required
-            ? true
-            : (from?.[category.id] ?? category.defaultEnabled ?? false),
-        ])
-      ),
-    [categories]
-  )
-  const [draft, setDraft] = useState<CookieConsentValue>(() =>
-    baseline(consent)
-  )
-  const [focusTarget, setFocusTarget] = useState<Mode | null>(null)
+interface PreferencesFaceProps {
+  width: number
+  side: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusOnMount: boolean
+  labels: CookieConsentLabels
+  titleId: string
+  descriptionId: string
+  policyLink: ReactNode
+  uid: string
+  categories: CookieCategory[]
+  draft: CookieConsentValue
+  onDraftChange: (id: string, checked: boolean) => void
+  allowedCount: number
+  optionalCount: number
+  onPanelKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+  onClose: () => void
+  onChoose: (action: "accept-all" | "reject-all" | "save") => void
+}
 
-  const mode: Mode | null =
-    !hydrated || !loaded
-      ? null
-      : panelOpen
-        ? "panel"
-        : !decided
-          ? "bar"
-          : showReopenButton
-            ? "chip"
-            : null
-
-  const openPanel = useCallback(
-    (focus = true) => {
-      setDraft(baseline(consent))
-      setFocusTarget(focus ? "panel" : null)
-      setPanel(true)
-    },
-    [baseline, consent, setPanel]
-  )
-
-  const closePanel = useCallback(
-    (focus = true) => {
-      setFocusTarget(focus ? (decided ? "chip" : "bar") : null)
-      setPanel(false)
-    },
-    [decided, setPanel]
-  )
-
-  const commit = useCallback(
-    (next: CookieConsentValue | null, action: CookieConsentAction) => {
-      const updatedAt = new Date()
-      if (value === undefined) setInternal(next)
-      if (storageKey)
-        writeCookieConsent(
-          storageKey,
-          next
-            ? { value: next, version, updatedAt: updatedAt.toISOString() }
-            : null
-        )
-      onChange?.(next, { action, updatedAt })
-    },
-    [onChange, storageKey, value, version]
-  )
-
-  const choose = (action: "accept-all" | "reject-all" | "save") => {
-    const next =
-      action === "save"
-        ? { ...draft }
-        : Object.fromEntries(
-            categories.map((category) => [
-              category.id,
-              category.required ? true : action === "accept-all",
-            ])
+function PreferencesFace({
+  width,
+  side,
+  reduced,
+  onSize,
+  focusOnMount,
+  labels,
+  titleId,
+  descriptionId,
+  policyLink,
+  uid,
+  categories,
+  draft,
+  onDraftChange,
+  allowedCount,
+  optionalCount,
+  onPanelKeyDown,
+  onClose,
+  onChoose,
+}: PreferencesFaceProps) {
+  return (
+    <Face
+      id="panel"
+      width={width}
+      side={side}
+      reduced={reduced}
+      onSize={onSize}
+      focusOnMount={focusOnMount}
+      className="@container grid gap-4 p-4"
+      role="dialog"
+      aria-modal={false}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onKeyDown={onPanelKeyDown}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <h2
+          id={titleId}
+          className="m-0 text-2xl leading-[var(--leading-body)] font-medium"
+          tabIndex={-1}
+          data-autofocus
+        >
+          {labels.preferencesTitle}
+        </h2>
+        <button
+          type="button"
+          className="-mr-[8px] inline-grid size-[32px] flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--text-secondary)] transition-[color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)] active:bg-[var(--surface-muted)] active:text-[var(--foreground)] motion-reduce:transition-none"
+          aria-label={labels.close}
+          onClick={onClose}
+        >
+          <X size={16} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>
+      <p
+        id={descriptionId}
+        className="m-0 text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+      >
+        {labels.preferencesDescription}
+        {policyLink ? <> {policyLink}</> : null}
+      </p>
+      <ul className="my-0 grid max-h-[var(--cookie-consent-list-max,min(46vh,300px))] [scrollbar-width:thin] list-none overflow-x-hidden overflow-y-auto overscroll-contain p-0">
+        {categories.map((category) => {
+          const switchId = `${uid}-${category.id}`
+          const hintId = `${switchId}-hint`
+          return (
+            <li
+              key={category.id}
+              className="flex items-center justify-between gap-4 px-3 py-3"
+            >
+              <div className="grid min-w-0 gap-[2px]">
+                <label
+                  htmlFor={category.required ? undefined : switchId}
+                  className="text-[length:var(--text-sm)] leading-[var(--leading-body)] font-medium text-[var(--foreground)] [&[for]]:cursor-pointer"
+                >
+                  {category.label}
+                </label>
+                {category.description ? (
+                  <p
+                    id={hintId}
+                    className="m-0 text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[var(--text-muted)]"
+                  >
+                    {category.description}
+                  </p>
+                ) : null}
+              </div>
+              {category.required ? (
+                <span className="flex-none text-[length:var(--text-xs)] whitespace-nowrap text-[var(--text-muted)]">
+                  {labels.alwaysOn}
+                </span>
+              ) : (
+                <Switch
+                  id={switchId}
+                  aria-describedby={category.description ? hintId : undefined}
+                  isSelected={!!draft[category.id]}
+                  onChange={(checked) => onDraftChange(category.id, checked)}
+                />
+              )}
+            </li>
           )
-    // Keep focus on the page: the choice folds the surface into its reopen button, which takes focus when it exists.
-    setFocusTarget(showReopenButton ? "chip" : null)
-    commit(next, action)
-    if (panelOpen) setPanel(false)
-  }
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      openPreferences: () => openPanel(true),
-      closePreferences: () => closePanel(false),
-      reset: () => {
-        setPanel(false)
-        setFocusTarget(null)
-        commit(null, "reset")
-      },
-    }),
-    [closePanel, commit, openPanel, setPanel]
+        })}
+      </ul>
+      <div className="grid grid-cols-[1fr_1fr] gap-[6px] pt-2 @min-[340px]:grid-cols-[auto_auto_1fr]">
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onChoose("reject-all")}
+        >
+          {labels.rejectAll}
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onChoose("accept-all")}
+        >
+          {labels.acceptAll}
+        </Button>
+        <Button
+          size="sm"
+          className="col-span-full @min-[340px]:col-auto"
+          onClick={() => onChoose("save")}
+          aria-describedby={`${uid}-count`}
+        >
+          {labels.save}
+        </Button>
+        <span
+          id={`${uid}-count`}
+          className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
+        >{`${allowedCount} of ${optionalCount} optional categories allowed`}</span>
+      </div>
+    </Face>
   )
+}
 
-  /* Geometry. The layer is measured; each face gets an explicit width, reports its height, and the surface springs to it. */
-  const layerRef = useRef<HTMLDivElement>(null)
-  const [layerWidth, setLayerWidth] = useState(0)
-  useLayoutEffect(() => {
-    const node = layerRef.current
-    if (!node) return
-    const read = () => setLayerWidth(node.clientWidth)
-    read()
-    if (typeof ResizeObserver === "undefined") return
-    const observer = new ResizeObserver(read)
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+interface CookieFacesProps {
+  mode: Mode | null
+  widths: Record<Mode, number>
+  align: Side
+  panelSide: Side
+  chipSide: Side
+  reduced: boolean
+  onSize: (id: Mode, height: number) => void
+  focusTarget: Mode | null
+  labels: CookieConsentLabels
+  messageId: string
+  titleId: string
+  descriptionId: string
+  policyLink: ReactNode
+  uid: string
+  categories: CookieCategory[]
+  draft: CookieConsentValue
+  allowedCount: number
+  optionalCount: number
+  onDraftChange: (id: string, checked: boolean) => void
+  onPanelKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+  onClosePanel: () => void
+  onChoose: (action: "accept-all" | "reject-all" | "save") => void
+  onOpenPanel: () => void
+}
 
-  const align =
-    position === "bottom-left"
-      ? "left"
-      : position === "bottom-right"
-        ? "right"
-        : "center"
-  const chipSide = reopenSide ?? (align === "right" ? "right" : "left")
-  const widths = {
-    bar: Math.min(layerWidth, BAR_MAX),
-    panel: Math.min(layerWidth, PANEL_MAX),
-    chip: CHIP,
-  }
-  const place = (width: number, side: "left" | "right" | "center") =>
-    side === "left"
-      ? 0
-      : side === "right"
-        ? layerWidth - width
-        : (layerWidth - width) / 2
-  // Reopened preferences grow out of the corner button, so the panel opens on its side once a choice exists.
-  const panelSide = decided && showReopenButton ? chipSide : align
+function CookieFaces({
+  mode,
+  widths,
+  align,
+  panelSide,
+  chipSide,
+  reduced,
+  onSize,
+  focusTarget,
+  labels,
+  messageId,
+  titleId,
+  descriptionId,
+  policyLink,
+  uid,
+  categories,
+  draft,
+  allowedCount,
+  optionalCount,
+  onDraftChange,
+  onPanelKeyDown,
+  onClosePanel,
+  onChoose,
+  onOpenPanel,
+}: CookieFacesProps) {
+  return (
+    <AnimatePresence initial={false}>
+      {mode === "bar" ? (
+        <CookieBarFace
+          key="bar"
+          width={widths.bar}
+          side={align}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "bar"}
+          labels={labels}
+          messageId={messageId}
+          policyLink={policyLink}
+          stacked={widths.bar < STACK_BELOW}
+          onCustomize={onOpenPanel}
+          onReject={() => onChoose("reject-all")}
+          onAccept={() => onChoose("accept-all")}
+        />
+      ) : null}
+      {mode === "panel" ? (
+        <PreferencesFace
+          key="panel"
+          width={widths.panel}
+          side={panelSide}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "panel"}
+          labels={labels}
+          titleId={titleId}
+          descriptionId={descriptionId}
+          policyLink={policyLink}
+          uid={uid}
+          categories={categories}
+          draft={draft}
+          onDraftChange={onDraftChange}
+          allowedCount={allowedCount}
+          optionalCount={optionalCount}
+          onPanelKeyDown={onPanelKeyDown}
+          onClose={onClosePanel}
+          onChoose={onChoose}
+        />
+      ) : null}
+      {mode === "chip" ? (
+        <CookieChipFace
+          key="chip"
+          side={chipSide}
+          reduced={reduced}
+          onSize={onSize}
+          focusOnMount={focusTarget === "chip"}
+          label={labels.reopen}
+          onOpen={onOpenPanel}
+        />
+      ) : null}
+    </AnimatePresence>
+  )
+}
 
-  const x = useMotionValue(0),
-    width = useMotionValue(0),
-    height = useMotionValue(0),
-    radius = useMotionValue(22)
+function useSurfaceGeometry(
+  mode: Mode | null,
+  layerWidth: number,
+  reduced: boolean,
+  layout: ReturnType<typeof getConsentLayout>
+) {
+  const { align, chipSide, widths, place, panelSide } = layout
+  const x = useMotionValue(0)
+  const width = useMotionValue(0)
+  const height = useMotionValue(0)
+  const radius = useMotionValue(22)
   const heights = useRef<Record<Mode, number>>({ bar: 0, panel: 0, chip: CHIP })
   const shape = useRef({ w: 0, h: 0, ready: false })
   const [tick, setTick] = useState(0)
@@ -510,18 +815,16 @@ export const CookieConsent = forwardRef<
       shape.current.ready = false
       return
     }
-    const w = widths[mode],
-      h = mode === "chip" ? CHIP : heights.current[mode]
-    if (!h) return
-    const next = {
-      x: place(
-        w,
-        mode === "chip" ? chipSide : mode === "panel" ? panelSide : align
-      ),
-      w,
-      h,
-      r: mode === "chip" ? CHIP / 2 : mode === "panel" ? 26 : 22,
-    }
+    const next = getSurfaceTarget(
+      mode,
+      widths,
+      heights.current,
+      place,
+      align,
+      chipSide,
+      panelSide
+    )
+    if (!next) return
     if (!shape.current.ready || reduced) {
       x.jump(next.x)
       width.jump(next.w)
@@ -539,6 +842,309 @@ export const CookieConsent = forwardRef<
     animate(radius, next.r, transition)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, layerWidth, tick, reduced, align, chipSide, panelSide])
+
+  return { x, width, height, radius, onSize }
+}
+
+function useCookieConsentTranslations(
+  categoryOverrides: CookieCategory[] | undefined,
+  labelOverrides: Partial<CookieConsentLabels> | undefined
+) {
+  const t = useTranslations("cookies")
+  const labels = {
+    ...defaultLabels,
+    message: t.has("notice") ? t("notice") : defaultLabels.message,
+    customize: t.has("customize") ? t("customize") : defaultLabels.customize,
+    acceptAll: t("accept"),
+    rejectAll: t("reject"),
+    save: t.has("save") ? t("save") : defaultLabels.save,
+    preferencesTitle: t("title"),
+    preferencesDescription: t("description"),
+    reopen: t("manage"),
+    alwaysOn: t.has("alwaysOn") ? t("alwaysOn") : defaultLabels.alwaysOn,
+    close: t("close"),
+    ...labelOverrides,
+  }
+  const categories = useMemo(
+    () =>
+      categoryOverrides ??
+      defaultCookieCategories.map((category) => ({
+        ...category,
+        label: t.has(`categories.${category.id}.label`)
+          ? t(`categories.${category.id}.label`)
+          : category.label,
+        description: t.has(`categories.${category.id}.description`)
+          ? t(`categories.${category.id}.description`)
+          : category.description,
+      })),
+    [categoryOverrides, t]
+  )
+  return { labels, categories }
+}
+
+type CookieConsentCommit = (
+  next: CookieConsentValue | null,
+  action: CookieConsentAction
+) => void
+
+function useStoredConsent({
+  value,
+  defaultValue,
+  storageKey,
+  version,
+  onChange,
+}: {
+  value: CookieConsentValue | null | undefined
+  defaultValue: CookieConsentValue | null
+  storageKey: string | undefined
+  version: string
+  onChange: CookieConsentProps["onChange"]
+}) {
+  const [internal, setInternal] = useState<CookieConsentValue | null>(
+    defaultValue
+  )
+  const [loaded, setLoaded] = useState(!storageKey || value !== undefined)
+  useEffect(() => {
+    if (loaded || !storageKey) return
+    const stored = readCookieConsent(storageKey, version)
+    // Storage is only readable after hydration; this runs once to seed the saved choice.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (stored) setInternal(stored.value)
+    setLoaded(true)
+  }, [loaded, storageKey, version])
+
+  const commit = useCallback(
+    (next: CookieConsentValue | null, action: CookieConsentAction) => {
+      const updatedAt = new Date()
+      if (value === undefined) setInternal(next)
+      if (storageKey)
+        writeCookieConsent(
+          storageKey,
+          next
+            ? { value: next, version, updatedAt: updatedAt.toISOString() }
+            : null
+        )
+      onChange?.(next, { action, updatedAt })
+    },
+    [onChange, storageKey, value, version]
+  )
+
+  return { consent: value !== undefined ? value : internal, loaded, commit }
+}
+
+function useCookiePreferences({
+  categories,
+  consent,
+  decided,
+  preferencesOpen,
+  defaultPreferencesOpen,
+  onPreferencesOpenChange,
+  showReopenButton,
+  commit,
+  ref,
+}: {
+  categories: CookieCategory[]
+  consent: CookieConsentValue | null
+  decided: boolean
+  preferencesOpen: boolean | undefined
+  defaultPreferencesOpen: boolean
+  onPreferencesOpenChange: CookieConsentProps["onPreferencesOpenChange"]
+  showReopenButton: boolean
+  commit: CookieConsentCommit
+  ref: ForwardedRef<CookieConsentHandle>
+}) {
+  const [panelInternal, setPanelInternal] = useState(defaultPreferencesOpen)
+  const panelOpen = preferencesOpen ?? panelInternal
+  const setPanel = useCallback(
+    (next: boolean) => {
+      if (preferencesOpen === undefined) setPanelInternal(next)
+      onPreferencesOpenChange?.(next)
+    },
+    [onPreferencesOpenChange, preferencesOpen]
+  )
+  const baseline = useCallback(
+    (from: CookieConsentValue | null) => consentBaseline(categories, from),
+    [categories]
+  )
+  const [draft, setDraft] = useState<CookieConsentValue>(() =>
+    baseline(consent)
+  )
+  const [focusTarget, setFocusTarget] = useState<Mode | null>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+
+  const openPanel = useCallback(
+    (focus = true) => {
+      setDraft(baseline(consent))
+      if (focus && document.activeElement instanceof HTMLElement)
+        returnFocusRef.current = document.activeElement
+      setFocusTarget(focus ? "panel" : null)
+      setPanel(true)
+    },
+    [baseline, consent, setPanel]
+  )
+
+  useEffect(() => {
+    const openPreferences = () => openPanel(false)
+    window.addEventListener(COOKIE_CONSENT_OPEN_EVENT, openPreferences)
+    return () =>
+      window.removeEventListener(COOKIE_CONSENT_OPEN_EVENT, openPreferences)
+  }, [openPanel])
+
+  const closePanel = useCallback(
+    (focus = true) => {
+      setFocusTarget(
+        focus ? (decided ? (showReopenButton ? "chip" : null) : "bar") : null
+      )
+      setPanel(false)
+      if (focus && !showReopenButton)
+        returnFocusRef.current?.focus({ preventScroll: true })
+    },
+    [decided, setPanel, showReopenButton]
+  )
+
+  const onDraftChange = useCallback((id: string, checked: boolean) => {
+    setDraft((current) => ({ ...current, [id]: checked }))
+  }, [])
+
+  const choose = useCallback(
+    (action: "accept-all" | "reject-all" | "save") => {
+      const next = consentChoice(action, categories, draft)
+      // Keep focus on the page: the choice folds the surface into its reopen button, which takes focus when it exists.
+      setFocusTarget(showReopenButton ? "chip" : null)
+      commit(next, action)
+      if (panelOpen) {
+        setPanel(false)
+        if (!showReopenButton)
+          returnFocusRef.current?.focus({ preventScroll: true })
+      }
+    },
+    [categories, commit, draft, panelOpen, setPanel, showReopenButton]
+  )
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      openPreferences: () => openPanel(true),
+      closePreferences: () => closePanel(false),
+      reset: () => {
+        setPanel(false)
+        setFocusTarget(null)
+        commit(null, "reset")
+      },
+    }),
+    [closePanel, commit, openPanel, setPanel]
+  )
+
+  return {
+    panelOpen,
+    draft,
+    focusTarget,
+    openPanel,
+    closePanel,
+    onDraftChange,
+    choose,
+  }
+}
+
+export const CookieConsent = forwardRef<
+  CookieConsentHandle,
+  CookieConsentProps
+>(function CookieConsent(
+  {
+    categories: categoryOverrides,
+    value,
+    defaultValue = null,
+    onChange,
+    storageKey,
+    version = "1",
+    preferencesOpen,
+    defaultPreferencesOpen = false,
+    onPreferencesOpenChange,
+    policy,
+    position = "bottom",
+    strategy = "fixed",
+    showReopenButton = false,
+    reopenSide,
+    labels: labelOverrides,
+    className,
+  },
+  ref
+) {
+  const { labels, categories } = useCookieConsentTranslations(
+    categoryOverrides,
+    labelOverrides
+  )
+  const reduced = !!useReducedMotion()
+  const hydrated = useHydrated()
+  const uid = useId()
+  const titleId = `${uid}-title`,
+    descriptionId = `${uid}-description`,
+    messageId = `${uid}-message`
+
+  const { consent, loaded, commit } = useStoredConsent({
+    value,
+    defaultValue,
+    storageKey,
+    version,
+    onChange,
+  })
+  const decided = consent != null
+  const {
+    panelOpen,
+    draft,
+    focusTarget,
+    openPanel,
+    closePanel,
+    onDraftChange,
+    choose,
+  } = useCookiePreferences({
+    categories,
+    consent,
+    decided,
+    preferencesOpen,
+    defaultPreferencesOpen,
+    onPreferencesOpenChange,
+    showReopenButton,
+    commit,
+    ref,
+  })
+  const mode = resolveMode(
+    hydrated,
+    loaded,
+    panelOpen,
+    decided,
+    showReopenButton
+  )
+
+  /* Geometry. The layer is measured; each face gets an explicit width, reports its height, and the surface springs to it. */
+  const layerRef = useRef<HTMLDivElement>(null)
+  const [layerWidth, setLayerWidth] = useState(0)
+  useLayoutEffect(() => {
+    const node = layerRef.current
+    if (!node) return
+    const read = () => setLayerWidth(node.clientWidth)
+    read()
+    if (typeof ResizeObserver === "undefined") return
+    const observer = new ResizeObserver(read)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  // Reopened preferences grow out of the corner button, so the panel opens on its side once a choice exists.
+  const layout = getConsentLayout(
+    position,
+    reopenSide,
+    decided,
+    showReopenButton,
+    layerWidth
+  )
+  const { align, chipSide, widths, panelSide } = layout
+  const { x, width, height, radius, onSize } = useSurfaceGeometry(
+    mode,
+    layerWidth,
+    reduced,
+    layout
+  )
 
   const onPanelKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Escape") return
@@ -576,7 +1182,7 @@ export const CookieConsent = forwardRef<
         {mode ? (
           <motion.div
             key="surface"
-            className="pointer-events-auto absolute bottom-0 left-0 origin-bottom overflow-hidden bg-[var(--surface-raised)] text-[var(--foreground)] shadow-[0_0_0_1px_var(--border),var(--shadow-floating)] will-change-[transform,width,height]"
+            className="pointer-events-auto absolute bottom-0 left-0 origin-bottom overflow-hidden bg-background text-[var(--foreground)] shadow-[0_0_0_1px_var(--border),var(--shadow-floating)] will-change-[transform,width,height]"
             style={{ x, width, height, borderRadius: radius }}
             initial={
               reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }
@@ -604,205 +1210,31 @@ export const CookieConsent = forwardRef<
                   }
             }
           >
-            <AnimatePresence initial={false}>
-              {mode === "bar" ? (
-                <Face
-                  key="bar"
-                  id="bar"
-                  width={widths.bar}
-                  side={align}
-                  reduced={reduced}
-                  onSize={onSize}
-                  focusOnMount={focusTarget === "bar"}
-                  className="@container py-[10px] pr-[10px] pl-[18px]"
-                  role="dialog"
-                  aria-modal={false}
-                  aria-label={labels.preferencesTitle}
-                  aria-describedby={messageId}
-                >
-                  <div
-                    className="group/bar flex items-center gap-[var(--space-4)] data-[stack]:flex-col data-[stack]:items-stretch data-[stack]:gap-[var(--space-3)] data-[stack]:pt-[6px] data-[stack]:pr-[8px]"
-                    data-stack={widths.bar < STACK_BELOW || undefined}
-                  >
-                    <p
-                      id={messageId}
-                      className="m-0 min-w-0 flex-auto text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
-                    >
-                      {labels.message}
-                      {policyLink ? <> {policyLink}</> : null}
-                    </p>
-                    <div className="flex flex-none items-center gap-[6px] group-data-[stack]/bar:grid group-data-[stack]/bar:grid-cols-[auto_1fr_1fr] @max-[300px]:group-data-[stack]/bar:grid-cols-[repeat(2,minmax(0,1fr))] @max-[300px]:group-data-[stack]/bar:[&>:first-child]:order-1 @max-[300px]:group-data-[stack]/bar:[&>:first-child]:col-span-full">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        data-autofocus
-                        onClick={() => openPanel(true)}
-                      >
-                        {labels.customize}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => choose("reject-all")}
-                      >
-                        {labels.rejectAll}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => choose("accept-all")}
-                      >
-                        {labels.acceptAll}
-                      </Button>
-                    </div>
-                  </div>
-                </Face>
-              ) : null}
-
-              {mode === "panel" ? (
-                <Face
-                  key="panel"
-                  id="panel"
-                  width={widths.panel}
-                  side={panelSide}
-                  reduced={reduced}
-                  onSize={onSize}
-                  focusOnMount={focusTarget === "panel"}
-                  className="@container grid gap-[var(--space-3)] p-[18px]"
-                  role="dialog"
-                  aria-modal={false}
-                  aria-labelledby={titleId}
-                  aria-describedby={descriptionId}
-                  onKeyDown={onPanelKeyDown}
-                >
-                  <div className="-mt-[4px] -mb-[6px] flex items-center justify-between gap-[var(--space-3)]">
-                    <h2
-                      id={titleId}
-                      className="m-0 text-[length:var(--text-base)] leading-[var(--leading-body)] font-medium"
-                      tabIndex={-1}
-                      data-autofocus
-                    >
-                      {labels.preferencesTitle}
-                    </h2>
-                    <button
-                      type="button"
-                      className="-mr-[8px] inline-grid size-[32px] flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--text-secondary)] transition-[color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)] active:bg-[var(--surface-muted)] active:text-[var(--foreground)] motion-reduce:transition-none"
-                      aria-label={labels.close}
-                      onClick={() => closePanel(true)}
-                    >
-                      <X size={16} strokeWidth={1.75} aria-hidden="true" />
-                    </button>
-                  </div>
-                  <p
-                    id={descriptionId}
-                    className="m-0 text-[length:var(--text-sm)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
-                  >
-                    {labels.preferencesDescription}
-                    {policyLink ? <> {policyLink}</> : null}
-                  </p>
-                  <ul className="mx-[-6px] my-0 grid max-h-[var(--cookie-consent-list-max,min(46vh,300px))] [scrollbar-width:thin] list-none overflow-y-auto overscroll-contain p-0">
-                    {categories.map((category) => {
-                      const switchId = `${uid}-${category.id}`,
-                        hintId = `${switchId}-hint`
-                      return (
-                        <li
-                          key={category.id}
-                          className="flex items-center justify-between gap-[var(--space-4)] border-t border-solid border-[color:var(--border-subtle)] px-[6px] py-[10px] first:border-t-0"
-                        >
-                          <div className="grid min-w-0 gap-[2px]">
-                            <label
-                              htmlFor={category.required ? undefined : switchId}
-                              className="text-[length:var(--text-sm)] leading-[var(--leading-body)] font-medium text-[var(--foreground)] [&[for]]:cursor-pointer"
-                            >
-                              {category.label}
-                            </label>
-                            {category.description ? (
-                              <p
-                                id={hintId}
-                                className="m-0 text-[length:var(--text-xs)] leading-[var(--leading-body)] text-[var(--text-muted)]"
-                              >
-                                {category.description}
-                              </p>
-                            ) : null}
-                          </div>
-                          {category.required ? (
-                            <span className="flex-none text-[length:var(--text-xs)] whitespace-nowrap text-[var(--text-muted)]">
-                              {labels.alwaysOn}
-                            </span>
-                          ) : (
-                            <Switch
-                              id={switchId}
-                              aria-describedby={
-                                category.description ? hintId : undefined
-                              }
-                              isSelected={!!draft[category.id]}
-                              onChange={(checked) =>
-                                setDraft((current) => ({
-                                  ...current,
-                                  [category.id]: checked,
-                                }))
-                              }
-                            />
-                          )}
-                        </li>
-                      )
-                    })}
-                  </ul>
-                  <div className="grid grid-cols-[1fr_1fr] gap-[6px] border-t border-solid border-[color:var(--border-subtle)] pt-[var(--space-2)] @min-[340px]:grid-cols-[auto_auto_1fr]">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => choose("reject-all")}
-                    >
-                      {labels.rejectAll}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => choose("accept-all")}
-                    >
-                      {labels.acceptAll}
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="col-span-full @min-[340px]:col-auto"
-                      onClick={() => choose("save")}
-                      aria-describedby={`${uid}-count`}
-                    >
-                      {labels.save}
-                    </Button>
-                    <span
-                      id={`${uid}-count`}
-                      className="absolute h-px w-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"
-                    >{`${allowedCount} of ${optional.length} optional categories allowed`}</span>
-                  </div>
-                </Face>
-              ) : null}
-
-              {mode === "chip" ? (
-                <Face
-                  key="chip"
-                  id="chip"
-                  width={CHIP}
-                  side={chipSide}
-                  reduced={reduced}
-                  onSize={onSize}
-                  focusOnMount={focusTarget === "chip"}
-                  className="h-[44px]"
-                >
-                  <button
-                    type="button"
-                    className="grid size-[44px] cursor-pointer place-items-center rounded-[50%] border-0 bg-transparent p-0 text-[var(--foreground)] transition-[background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [-webkit-tap-highlight-color:transparent] hover:bg-[var(--surface-muted)] active:bg-[var(--surface-muted)] motion-reduce:transition-none"
-                    aria-label={labels.reopen}
-                    aria-haspopup="dialog"
-                    data-autofocus
-                    onClick={() => openPanel(true)}
-                  >
-                    <Cookie size={20} strokeWidth={1.75} aria-hidden="true" />
-                  </button>
-                </Face>
-              ) : null}
-            </AnimatePresence>
+            <CookieFaces
+              mode={mode}
+              widths={widths}
+              align={align}
+              panelSide={panelSide}
+              chipSide={chipSide}
+              reduced={reduced}
+              onSize={onSize}
+              focusTarget={focusTarget}
+              labels={labels}
+              messageId={messageId}
+              titleId={titleId}
+              descriptionId={descriptionId}
+              policyLink={policyLink}
+              uid={uid}
+              categories={categories}
+              draft={draft}
+              allowedCount={allowedCount}
+              optionalCount={optional.length}
+              onDraftChange={onDraftChange}
+              onPanelKeyDown={onPanelKeyDown}
+              onClosePanel={() => closePanel(true)}
+              onChoose={choose}
+              onOpenPanel={() => openPanel(true)}
+            />
           </motion.div>
         ) : null}
       </AnimatePresence>

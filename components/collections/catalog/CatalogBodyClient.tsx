@@ -97,8 +97,10 @@ export function CatalogBodyClient<T extends CatalogItem>({
   pageSize?: number
   paginated?: boolean
 }) {
-  const { q, cat, sort, page, setPage, clearFilters } =
-    useCatalogParams(shallow, paginated)
+  const { q, cat, sort, page, setPage, clearFilters } = useCatalogParams(
+    shallow,
+    paginated
+  )
   const columns = useColumnCount()
 
   if (items.length === 0) {

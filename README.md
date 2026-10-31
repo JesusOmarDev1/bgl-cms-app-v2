@@ -13,19 +13,21 @@ Node version: [.nvmrc](.nvmrc).
 
 ## Commands
 
-| Command                | What it runs                                      |
-| ---------------------- | ------------------------------------------------- |
-| `pnpm dev`             | `next dev`                                        |
-| `pnpm storybook`       | Storybook on port 6006                            |
-| `pnpm typegen`         | `next typegen`                                    |
-| `pnpm typecheck`       | `tsc --noEmit`                                    |
-| `pnpm lint`            | `eslint`                                          |
-| `pnpm format`          | Prettier                                          |
-| `pnpm build`           | `next build`                                      |
-| `pnpm build-storybook` | Storybook build                                   |
-| `pnpm start`           | `next start`                                      |
-| `pnpm pre-deploy`      | `typegen`, `typecheck`, `lint`, `format`, `build` |
-| `pnpm reset`           | Clean install (`clean --lockfile`)                |
+| Command                                | What it runs                                      |
+| -------------------------------------- | ------------------------------------------------- |
+| `pnpm dev`                             | `next dev`                                        |
+| `pnpm storybook`                       | Storybook on port 6006                            |
+| `pnpm typegen`                         | `next typegen`                                    |
+| `pnpm typecheck`                       | `tsc --noEmit`                                    |
+| `pnpm exec vitest run --project unit`  | Unit tests                                        |
+| `pnpm exec vitest run --project media` | Audio and video hook browser tests                |
+| `pnpm lint`                            | `eslint`                                          |
+| `pnpm format`                          | Prettier                                          |
+| `pnpm build`                           | `next build`                                      |
+| `pnpm build-storybook`                 | Storybook build                                   |
+| `pnpm start`                           | `next start`                                      |
+| `pnpm pre-deploy`                      | `typegen`, `typecheck`, `lint`, `format`, `build` |
+| `pnpm reset`                           | Clean install (`clean --lockfile`)                |
 
 ## Layout
 

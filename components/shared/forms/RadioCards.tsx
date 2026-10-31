@@ -16,7 +16,14 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
 } from "react"
-import { animate, motion, useMotionValue, useReducedMotion } from "motion/react"
+import {
+  LazyMotion,
+  animate,
+  domAnimation,
+  useMotionValue,
+  useReducedMotion,
+} from "motion/react"
+import * as m from "motion/react-m"
 import type { Transition } from "motion/react"
 import { cn } from "cn"
 import { motionTokens } from "@/lib/animation/motion/motion-tokens"
@@ -226,118 +233,120 @@ export const RadioCards = forwardRef<HTMLDivElement, RadioCardsProps>(
     }
 
     return (
-      <div
-        ref={rootRef}
-        role="radiogroup"
-        aria-disabled={disabled || undefined}
-        aria-required={required || undefined}
-        className={cn(
-          "group/radio relative grid gap-[10px] font-[family-name:var(--font-body)] text-[length:var(--text-sm)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[var(--foreground)] data-[layout=grid]:grid-cols-[repeat(auto-fill,minmax(min(100%,var(--min-column,180px)),1fr))] data-[layout=list]:grid-cols-[minmax(0,1fr)] data-[layout=list]:gap-[8px]",
-          className
-        )}
-        data-layout={layout}
-        style={
-          { "--min-column": `${minColumnWidth}px`, ...style } as CSSProperties
-        }
-        {...rest}
-      >
-        <motion.span
-          className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
-          style={{ x, y, width: w, height: h, opacity: o }}
-          aria-hidden="true"
-        />
-        {options.map((option, index) => {
-          const checked = index === selectedIndex,
-            off = !usable(option)
-          const labelId = `${uid}-${index}-label`,
-            descriptionId = `${uid}-${index}-description`
-          const description =
-            off && option.disabledReason
-              ? option.disabledReason
-              : option.description
-          return (
-            <div
-              key={option.value}
-              role="radio"
-              data-card={index}
-              className={cn(
-                "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] select-none [-webkit-tap-highlight-color:transparent] motion-reduce:transition-none",
-                "group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta']",
-                "group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px] group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta']",
-                checked &&
-                  "bg-[color-mix(in_oklab,var(--control-on)_4%,var(--surface))]",
-                off && "cursor-not-allowed bg-[var(--surface-muted)]",
-                "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)]"
-              )}
-              aria-checked={checked}
-              aria-disabled={off || undefined}
-              aria-labelledby={labelId}
-              aria-describedby={description ? descriptionId : undefined}
-              tabIndex={index === tabStop ? 0 : -1}
-              data-checked={checked || undefined}
-              onClick={() => {
-                if (!off) select(option.value)
-              }}
-              onKeyDown={(event) => onKeyDown(event, index)}
-            >
-              <span
+      <LazyMotion features={domAnimation}>
+        <div
+          ref={rootRef}
+          role="radiogroup"
+          aria-disabled={disabled || undefined}
+          aria-required={required || undefined}
+          className={cn(
+            "group/radio relative grid gap-[10px] font-[family-name:var(--font-body)] text-[length:var(--text-sm)] leading-[var(--leading-body)] tracking-[var(--tracking-body)] text-[var(--foreground)] data-[layout=grid]:grid-cols-[repeat(auto-fill,minmax(min(100%,var(--min-column,180px)),1fr))] data-[layout=list]:grid-cols-[minmax(0,1fr)] data-[layout=list]:gap-[8px]",
+            className
+          )}
+          data-layout={layout}
+          style={
+            { "--min-column": `${minColumnWidth}px`, ...style } as CSSProperties
+          }
+          {...rest}
+        >
+          <m.span
+            className="pointer-events-none absolute top-0 left-0 z-[1] rounded-[20px] border-[1.5px] border-solid border-[var(--control-on)]"
+            style={{ x, y, width: w, height: h, opacity: o }}
+            aria-hidden="true"
+          />
+          {options.map((option, index) => {
+            const checked = index === selectedIndex,
+              off = !usable(option)
+            const labelId = `${uid}-${index}-label`,
+              descriptionId = `${uid}-${index}-description`
+            const description =
+              off && option.disabledReason
+                ? option.disabledReason
+                : option.description
+            return (
+              <div
+                key={option.value}
+                role="radio"
+                data-card={index}
                 className={cn(
-                  "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [grid-area:indicator] group-data-[layout=grid]/radio:mt-px motion-reduce:transition-none",
+                  "group/card relative grid min-w-0 cursor-pointer items-start gap-x-[12px] gap-y-[4px] rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[14px_16px] transition-[background-color,border-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] select-none [-webkit-tap-highlight-color:transparent] motion-reduce:transition-none",
+                  "group-data-[layout=grid]/radio:grid-cols-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:grid-rows-[minmax(0,1fr)_auto] group-data-[layout=grid]/radio:[grid-template-areas:'body_indicator'_'meta_meta']",
+                  "group-data-[layout=list]/radio:grid-cols-[auto_minmax(0,1fr)_auto] group-data-[layout=list]/radio:items-center group-data-[layout=list]/radio:p-[13px_16px_13px_14px] group-data-[layout=list]/radio:[grid-template-areas:'indicator_body_meta']",
                   checked &&
-                    "border-[var(--control-on)] bg-[var(--control-on)]",
-                  off && "border-[var(--border)]"
+                    "bg-[color-mix(in_oklab,var(--control-on)_4%,var(--surface))]",
+                  off && "cursor-not-allowed bg-[var(--surface-muted)]",
+                  "hover:not-data-checked:not-aria-disabled:border-[var(--border-strong)] focus-visible:not-data-checked:border-[var(--border-strong)] focus-visible:not-data-checked:bg-[var(--surface-muted)] active:not-data-checked:not-aria-disabled:bg-[var(--surface-muted)]"
                 )}
-                aria-hidden="true"
+                aria-checked={checked}
+                aria-disabled={off || undefined}
+                aria-labelledby={labelId}
+                aria-describedby={description ? descriptionId : undefined}
+                tabIndex={index === tabStop ? 0 : -1}
+                data-checked={checked || undefined}
+                onClick={() => {
+                  if (!off) select(option.value)
+                }}
+                onKeyDown={(event) => onKeyDown(event, index)}
               >
-                <motion.span
-                  className="size-[6px] rounded-[50%] bg-[var(--control-glyph)]"
-                  initial={false}
-                  animate={{ scale: checked ? 1 : 0 }}
-                  transition={
-                    reduced ? { duration: 0 } : motionTokens.spring.snappy
-                  }
-                />
-              </span>
-              <span className="grid min-w-0 gap-[2px] [grid-area:body]">
                 <span
-                  id={labelId}
-                  className="flex min-w-0 items-center gap-[8px] font-medium group-aria-disabled/card:text-[var(--text-muted)]"
+                  className={cn(
+                    "grid size-[18px] flex-none place-items-center rounded-[50%] border-[1.5px] border-solid border-[var(--border-strong)] transition-[border-color,background-color] duration-[var(--duration-fast)] ease-[var(--ease-standard)] [grid-area:indicator] group-data-[layout=grid]/radio:mt-px motion-reduce:transition-none",
+                    checked &&
+                      "border-[var(--control-on)] bg-[var(--control-on)]",
+                    off && "border-[var(--border)]"
+                  )}
+                  aria-hidden="true"
                 >
-                  {option.icon && (
-                    <span className="grid size-[18px] flex-none place-items-center text-[var(--text-secondary)] group-data-checked/card:text-[var(--foreground)] [&>svg]:size-[18px]">
-                      {option.icon}
+                  <m.span
+                    className="size-[6px] rounded-[50%] bg-[var(--control-glyph)]"
+                    initial={false}
+                    animate={{ scale: checked ? 1 : 0 }}
+                    transition={
+                      reduced ? { duration: 0 } : motionTokens.spring.snappy
+                    }
+                  />
+                </span>
+                <span className="grid min-w-0 gap-[2px] [grid-area:body]">
+                  <span
+                    id={labelId}
+                    className="flex min-w-0 items-center gap-[8px] font-medium group-aria-disabled/card:text-[var(--text-muted)]"
+                  >
+                    {option.icon && (
+                      <span className="grid size-[18px] flex-none place-items-center text-[var(--text-secondary)] group-data-checked/card:text-[var(--foreground)] [&>svg]:size-[18px]">
+                        {option.icon}
+                      </span>
+                    )}
+                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {option.label}
+                    </span>
+                  </span>
+                  {description && (
+                    <span
+                      id={descriptionId}
+                      className="text-[length:var(--text-xs)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
+                    >
+                      {description}
                     </span>
                   )}
-                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
-                    {option.label}
-                  </span>
                 </span>
-                {description && (
-                  <span
-                    id={descriptionId}
-                    className="text-[length:var(--text-xs)] leading-[var(--leading-body)] text-pretty text-[var(--text-secondary)]"
-                  >
-                    {description}
+                {option.meta && (
+                  <span className="whitespace-nowrap text-[var(--foreground)] tabular-nums [grid-area:meta] group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
+                    {option.meta}
                   </span>
                 )}
-              </span>
-              {option.meta && (
-                <span className="whitespace-nowrap text-[var(--foreground)] tabular-nums [grid-area:meta] group-aria-disabled/card:text-[var(--text-muted)] group-data-[layout=grid]/radio:mt-[10px] group-data-[layout=grid]/radio:text-[length:var(--text-lg)] group-data-[layout=list]/radio:font-medium">
-                  {option.meta}
-                </span>
-              )}
-            </div>
-          )
-        })}
-        {name && (
-          <input
-            type="hidden"
-            name={name}
-            value={selected ?? ""}
-            required={required}
-          />
-        )}
-      </div>
+              </div>
+            )
+          })}
+          {name && (
+            <input
+              type="hidden"
+              name={name}
+              value={selected ?? ""}
+              required={required}
+            />
+          )}
+        </div>
+      </LazyMotion>
     )
   }
 )

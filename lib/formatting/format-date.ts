@@ -6,7 +6,7 @@ import { es } from "date-fns/locale"
  * @param date - The date to format short
  * @returns Formatted date distance
  */
-export function formatDateShort(date: Date | number): string {
+export function formatDateShort(date: Date | number | string): string {
   return format(date, "PPP", { locale: es })
 }
 

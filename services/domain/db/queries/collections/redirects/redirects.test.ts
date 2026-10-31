@@ -18,7 +18,9 @@ describe("getRedirectIndexQuery", () => {
   beforeEach(() => request.mockReset())
 
   it("loads compact records in 200-row pages ordered by newest then ID", async () => {
-    request.mockResolvedValueOnce(Array.from({ length: 200 }, (_, id) => ({ id })))
+    request.mockResolvedValueOnce(
+      Array.from({ length: 200 }, (_, id) => ({ id }))
+    )
     request.mockResolvedValueOnce([{ id: 201 }])
 
     const rows = await getRedirectIndexQuery("failed")
@@ -37,11 +39,16 @@ describe("getRedirectIndexQuery", () => {
   })
 
   it("rejects a failed later page instead of returning a partial index", async () => {
-    request.mockResolvedValueOnce([{ id: "first-page" }])
+    request.mockResolvedValueOnce(
+      Array.from({ length: 200 }, (_, id) => ({ id: `first-page-${id}` }))
+    )
     request.mockRejectedValueOnce(new Error("Directus unavailable"))
 
     await expect(getRedirectIndexQuery("failed")).rejects.toThrow(
       "Directus unavailable"
+    )
+    expect(request.mock.calls[1]?.[0]).toEqual(
+      expect.objectContaining({ page: 2 })
     )
   })
 })

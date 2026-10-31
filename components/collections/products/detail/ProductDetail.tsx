@@ -259,7 +259,7 @@ export async function ProductDetail({
             >
               {related.map((item) => (
                 <li className="min-w-0" key={item.id}>
-                  <ProductCard product={item.card} />
+                  <ProductCard data={item.card} />
                 </li>
               ))}
             </Box>

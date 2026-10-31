@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { useDebounceFn } from "@/hooks/useDebounceFn"
@@ -48,6 +48,12 @@ export function CatalogToolBarClient({
 }) {
   const { q, setQ, cat, setCat, sort, setSort, clearFilters } =
     useCatalogParams(shallow, paginated)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (searchInputRef.current && searchInputRef.current.value !== q) {
+      searchInputRef.current.value = q
+    }
+  }, [q])
   const commitQuery = useMemo(
     () => (value: string) => void setQ(value || null),
     [setQ]
@@ -140,9 +146,9 @@ export function CatalogToolBarClient({
             } else queryDebounce.run(value)
           }}
           placeholder={labels.search.placeholder}
+          ref={searchInputRef}
           type="search"
           defaultValue={q}
-          key={q}
         />
       </div>
       <Select

@@ -49,6 +49,150 @@ function resolvePanelStatus(opts: {
   return undefined
 }
 
+type SearchState = {
+  seqRef: React.MutableRefObject<number>
+  timerRef: React.MutableRefObject<number>
+  reset: () => void
+  clearTimer: () => void
+  setQuery: (query: string) => void
+  setHits: (hits: SearchHitTypes[]) => void
+  setHasError: (hasError: boolean) => void
+  setWaiting: (waiting: boolean) => void
+  mutateAsync: (input: { query: string }) => Promise<unknown>
+}
+
+function queueSearch(value: string, state: SearchState) {
+  state.seqRef.current += 1
+  state.reset()
+  state.setQuery(value)
+  state.clearTimer()
+  state.setHits([])
+  state.setHasError(false)
+  state.setWaiting(false)
+  const trimmed = value.trim()
+  if (trimmed.length < MIN_QUERY_LENGTH || trimmed.length > MAX_QUERY_LENGTH)
+    return
+
+  state.setWaiting(true)
+  state.timerRef.current = window.setTimeout(() => {
+    const seq = ++state.seqRef.current
+    void state
+      .mutateAsync({ query: trimmed })
+      .then((data) => {
+        if (seq !== state.seqRef.current) return
+        if (Array.isArray(data)) {
+          state.setHits(data as SearchHitTypes[])
+          state.setHasError(false)
+          return
+        }
+        state.setHits([])
+        state.setHasError(true)
+      })
+      .catch(() => {
+        if (seq !== state.seqRef.current) return
+        state.setHits([])
+        state.setHasError(true)
+      })
+      .finally(() => {
+        if (seq === state.seqRef.current) state.setWaiting(false)
+      })
+  }, SEARCH_DEBOUNCE_MS)
+}
+
+function getSearchItems(
+  hits: SearchHitTypes[],
+  onNavigate: (() => void) | undefined,
+  navigate: (url: string) => void
+): CommandItem[] {
+  const items: CommandItem[] = []
+  for (const hit of hits) {
+    const mapped = toSearchCommandItem(hit)
+    if (!mapped) continue
+    items.push({
+      ...mapped,
+      onSelect: () => {
+        onNavigate?.()
+        navigate(hit.url)
+      },
+    })
+  }
+  return items
+}
+
+function getSearchStatusAnnouncement(
+  loading: boolean,
+  errorMessage: string | undefined,
+  status: CommandPaletteStatus | undefined
+) {
+  if (loading) return "Buscando…"
+  if (errorMessage) return errorMessage
+  return status === "empty" ? "Sin resultados" : ""
+}
+
+function SearchBarTriggers({
+  variant,
+  className,
+  loading,
+  shortcutLabel,
+  onOpen,
+}: {
+  variant: SearchBarVariant
+  className?: string
+  loading: boolean
+  shortcutLabel: string
+  onOpen: () => void
+}) {
+  const showIcon = variant === "icon" || variant === "header"
+  const showDefault = variant === "default" || variant === "header"
+  return (
+    <>
+      {showIcon ? (
+        <BorderBeam size="md" colorVariant="mono">
+          <Button
+            variant="glass"
+            size="icon-xl"
+            aria-label="Buscar"
+            aria-busy={loading}
+            isDisabled={loading}
+            className={cn(
+              "rounded-full",
+              variant === "header" && "min-[1366px]:hidden",
+              className
+            )}
+            onClick={onOpen}
+          >
+            <MaterialIcon name="search" size={20} className="text-foreground" />
+          </Button>
+        </BorderBeam>
+      ) : null}
+      {showDefault ? (
+        <BorderBeam size="line" colorVariant="mono">
+          <button
+            type="button"
+            aria-label="Buscar"
+            aria-busy={loading}
+            disabled={loading}
+            className={cn(
+              "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-40 2xl:w-52",
+              variant === "header" && "hidden min-[1366px]:inline-flex",
+              className
+            )}
+            onClick={onOpen}
+          >
+            <MaterialIcon name="search" size={16} className="me-2 shrink-0" />
+            <span className="flex w-full items-center justify-between">
+              <span className="font-normal text-muted-foreground/70">
+                {loading ? "Buscando..." : "Buscar..."}
+              </span>
+              <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
+            </span>
+          </button>
+        </BorderBeam>
+      ) : null}
+    </>
+  )
+}
+
 export function SearchBarClient({
   variant = "default",
   className,
@@ -90,60 +234,22 @@ export function SearchBarClient({
     if (!next) resetSearch()
   }
 
-  const handleQueryChange = (value: string) => {
-    seqRef.current += 1
-    reset()
-    setQuery(value)
-    clearTimer()
-    setHits([])
-    setHasError(false)
-    setWaiting(false)
-    const trimmed = value.trim()
-    if (trimmed.length < MIN_QUERY_LENGTH) {
-      return
-    }
-    if (trimmed.length > MAX_QUERY_LENGTH) return
-    setWaiting(true)
-    timerRef.current = window.setTimeout(() => {
-      const seq = ++seqRef.current
-      void mutateAsync({ query: trimmed })
-        .then((data) => {
-          if (seq !== seqRef.current) return
-          if (Array.isArray(data)) {
-            setHits(data)
-            setHasError(false)
-            return
-          }
-          setHits([])
-          setHasError(true)
-        })
-        .catch(() => {
-          if (seq !== seqRef.current) return
-          setHits([])
-          setHasError(true)
-        })
-        .finally(() => {
-          if (seq !== seqRef.current) return
-          setWaiting(false)
-        })
-    }, SEARCH_DEBOUNCE_MS)
-  }
+  const handleQueryChange = (value: string) =>
+    queueSearch(value, {
+      seqRef,
+      timerRef,
+      reset,
+      clearTimer,
+      setQuery,
+      setHits,
+      setHasError,
+      setWaiting,
+      mutateAsync,
+    })
 
   useEffect(() => () => window.clearTimeout(timerRef.current), [])
 
-  const items: CommandItem[] = []
-  for (const hit of hits) {
-    const mapped = toSearchCommandItem(hit)
-    if (!mapped) continue
-    const url = hit.url
-    items.push({
-      ...mapped,
-      onSelect: () => {
-        onNavigate?.()
-        router.push(url)
-      },
-    })
-  }
+  const items = getSearchItems(hits, onNavigate, (url) => router.push(url))
 
   const loading = waiting
   const status = resolvePanelStatus({
@@ -159,16 +265,12 @@ export function SearchBarClient({
       : "Intenta de nuevo."
     : undefined
 
-  const statusAnnouncement = loading
-    ? "Buscando…"
-    : errorMessage
-      ? errorMessage
-      : status === "empty"
-        ? "Sin resultados"
-        : ""
+  const statusAnnouncement = getSearchStatusAnnouncement(
+    loading,
+    errorMessage,
+    status
+  )
 
-  const showIcon = variant === "icon" || variant === "header"
-  const showDefault = variant === "default" || variant === "header"
   const shortcutLabel = isMac ? "⌘ K" : "Ctrl + K"
 
   return (
@@ -176,50 +278,13 @@ export function SearchBarClient({
       <div role="status" aria-live="polite" className="sr-only">
         {statusAnnouncement}
       </div>
-      {showIcon ? (
-        <BorderBeam size="md" colorVariant="mono">
-          <Button
-            variant="glass"
-            size="icon-xl"
-            aria-label="Buscar"
-            aria-busy={loading}
-            isDisabled={loading}
-            className={cn(
-              "rounded-full",
-              variant === "header" && "min-[1366px]:hidden",
-              className
-            )}
-            onClick={() => handleOpenChange(true)}
-          >
-            <MaterialIcon name="search" size={20} className="text-foreground" />
-          </Button>
-        </BorderBeam>
-      ) : null}
-
-      {showDefault ? (
-        <BorderBeam size="line" colorVariant="mono">
-          <button
-            type="button"
-            aria-label="Buscar"
-            aria-busy={loading}
-            disabled={loading}
-            className={cn(
-              "inline-flex h-11 items-center rounded-3xl border border-input bg-background/60 px-3.5 py-2 text-sm shadow-sm backdrop-blur-md transition-shadow focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none lg:w-32 2xl:w-44",
-              variant === "header" && "hidden min-[1366px]:inline-flex",
-              className
-            )}
-            onClick={() => handleOpenChange(true)}
-          >
-            <MaterialIcon name="search" size={16} className="me-2 shrink-0" />
-            <span className="flex w-full items-center justify-between">
-              <span className="font-normal text-muted-foreground/70">
-                {loading ? "Buscando..." : "Buscar..."}
-              </span>
-              <Kbd className="hidden px-2 sm:flex">{shortcutLabel}</Kbd>
-            </span>
-          </button>
-        </BorderBeam>
-      ) : null}
+      <SearchBarTriggers
+        variant={variant}
+        className={className}
+        loading={loading}
+        shortcutLabel={shortcutLabel}
+        onOpen={() => handleOpenChange(true)}
+      />
 
       <CommandPalette
         portaled={portaled}

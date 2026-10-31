@@ -29,7 +29,7 @@ export function ManualCatalogClients({
         emptyCatalog={emptyCatalog}
         items={items}
         noMatches={noMatches}
-        renderItem={(item) => <ManualCard manual={item} />}
+        renderItem={(item) => <ManualCard data={item} />}
       />
     </>
   )

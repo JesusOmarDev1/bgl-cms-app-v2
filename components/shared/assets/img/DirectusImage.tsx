@@ -81,6 +81,208 @@ type DirectusImageProps = Omit<
   ref?: Ref<HTMLImageElement>
 }
 
+function DirectusImagePlaceholder({
+  rest,
+  ref,
+  src,
+  alt,
+  width,
+  height,
+  className,
+  style,
+}: {
+  rest: Omit<
+    ImageProps,
+    | "src"
+    | "ref"
+    | "alt"
+    | "width"
+    | "height"
+    | "className"
+    | "style"
+    | "loader"
+    | "placeholder"
+    | "fill"
+    | "sizes"
+    | "quality"
+    | "onError"
+  >
+  ref?: Ref<HTMLImageElement>
+  src: string
+  alt: string
+  width: number
+  height: number
+  className: string
+  style: CSSProperties
+}) {
+  return (
+    <Image
+      {...rest}
+      ref={ref}
+      src={src}
+      alt={alt}
+      unoptimized
+      width={width}
+      height={height}
+      className={className}
+      style={style}
+      data-placeholder="true"
+    />
+  )
+}
+
+function DirectusImageOutput({
+  rest,
+  ref,
+  src,
+  alt,
+  sizing,
+  width,
+  height,
+  loader,
+  placeholder,
+  sizes,
+  quality,
+  className,
+  style,
+  onError,
+}: {
+  rest: Omit<
+    ImageProps,
+    | "src"
+    | "ref"
+    | "alt"
+    | "width"
+    | "height"
+    | "className"
+    | "style"
+    | "loader"
+    | "placeholder"
+    | "fill"
+    | "sizes"
+    | "quality"
+    | "onError"
+  >
+  ref?: Ref<HTMLImageElement>
+  src: string
+  alt: string
+  sizing: DirectusImageSizing
+  width: number
+  height: number
+  loader: ImageProps["loader"]
+  placeholder: ImageProps["placeholder"]
+  sizes: string | undefined
+  quality: number
+  className: string
+  style: CSSProperties
+  onError: ImageProps["onError"]
+}) {
+  return sizing === "fill" ? (
+    <Image
+      {...rest}
+      ref={ref}
+      src={src}
+      alt={alt}
+      fill
+      loader={loader}
+      placeholder={placeholder}
+      sizes={sizes}
+      quality={quality}
+      className={className}
+      style={style}
+      onError={onError}
+    />
+  ) : (
+    <Image
+      {...rest}
+      ref={ref}
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      loader={loader}
+      placeholder={placeholder}
+      {...(sizes !== undefined ? { sizes } : {})}
+      quality={quality}
+      className={className}
+      style={style}
+      onError={onError}
+    />
+  )
+}
+
+function resolveImagePresentation({
+  src,
+  variant,
+  sizing,
+  width,
+  height,
+  sizes,
+  quality,
+  className,
+  imgClassName,
+  style,
+  failedSrc,
+}: {
+  src: string | null | undefined
+  variant: DirectusImageVariant
+  sizing: DirectusImageSizing
+  width: number | undefined
+  height: number | undefined
+  sizes: string | undefined
+  quality: DirectusImageQuality | undefined
+  className: string | undefined
+  imgClassName: string | undefined
+  style: CSSProperties | undefined
+  failedSrc: string | null
+}) {
+  const config = VARIANT_CONFIG[variant]
+  const resolvedSrc = resolveDirectusSrc(src, config.fit)
+  const showPlaceholder = resolvedSrc === null || failedSrc === resolvedSrc
+  const resolvedWidth = width ?? config.defaultSize.w
+  const resolvedHeight = height ?? config.defaultSize.h
+  const resolvedSizes =
+    sizes ?? (sizing === "auto" && !config.fluid ? undefined : config.sizes)
+  const resolvedQuality = quality ?? config.quality
+  const wrapperClassName = cn(
+    "overflow-hidden",
+    sizing === "fill" && "relative",
+    sizing === "auto" && (config.fluid ? "w-full" : "shrink-0"),
+    className
+  )
+  const imageClassName = cn(
+    sizing === "contained" && "h-auto w-full",
+    sizing === "auto" && "max-w-none",
+    imgClassName
+  )
+  const imageStyle: CSSProperties = {
+    objectFit: config.objectFit,
+    ...(sizing === "auto" && {
+      aspectRatio: `${resolvedWidth} / ${resolvedHeight}`,
+      width: config.fluid ? "100%" : resolvedWidth,
+      maxWidth: config.fluid ? resolvedWidth : undefined,
+      height: "auto",
+    }),
+    ...(sizing === "fill" &&
+      showPlaceholder && { width: "100%", height: "100%" }),
+    ...style,
+  }
+  return {
+    config,
+    resolvedSrc,
+    showPlaceholder,
+    resolvedWidth,
+    resolvedHeight,
+    resolvedSizes,
+    resolvedQuality,
+    wrapperClassName,
+    imageClassName,
+    imageStyle,
+    nonFillStyle:
+      sizing === "fill" ? imageStyle : pairCssDimensions(imageStyle),
+  }
+}
+
 export function DirectusImage({
   src,
   variant = "original",
@@ -98,108 +300,62 @@ export function DirectusImage({
   ...rest
 }: DirectusImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
-  const config = VARIANT_CONFIG[variant]
-  const resolvedSrc = resolveDirectusSrc(src, config.fit)
-  const showPlaceholder = resolvedSrc === null || failedSrc === resolvedSrc
+  const image = resolveImagePresentation({
+    src,
+    variant,
+    sizing,
+    width,
+    height,
+    sizes,
+    quality,
+    className,
+    imgClassName,
+    style,
+    failedSrc,
+  })
 
-  const resolvedWidth = width ?? config.defaultSize.w
-  const resolvedHeight = height ?? config.defaultSize.h
-  const resolvedSizes =
-    sizes ?? (sizing === "auto" && !config.fluid ? undefined : config.sizes)
-  const resolvedQuality = quality ?? config.quality
-
-  const wrapperClassName = cn(
-    "overflow-hidden",
-    sizing === "fill" && "relative",
-    sizing === "auto" && (config.fluid ? "w-full" : "shrink-0"),
-    className
-  )
-
-  const imageClassName = cn(
-    sizing === "contained" && "h-auto w-full",
-    sizing === "auto" && "max-w-none",
-    imgClassName
-  )
-
-  const imageStyle: CSSProperties = {
-    objectFit: config.objectFit,
-    ...(sizing === "auto" && {
-      aspectRatio: `${resolvedWidth} / ${resolvedHeight}`,
-      width: config.fluid ? "100%" : resolvedWidth,
-      maxWidth: config.fluid ? resolvedWidth : undefined,
-      height: "auto",
-    }),
-    ...(sizing === "fill" &&
-      showPlaceholder && {
-        width: "100%",
-        height: "100%",
-      }),
-    ...style,
-  }
-
-  const nonFillStyle =
-    sizing === "fill" ? imageStyle : pairCssDimensions(imageStyle)
-
-  if (showPlaceholder) {
+  if (image.showPlaceholder) {
     return (
-      <div className={wrapperClassName}>
-        <Image
-          {...rest}
+      <div className={image.wrapperClassName}>
+        <DirectusImagePlaceholder
+          rest={rest}
           ref={ref}
-          src={config.placeholder}
+          src={image.config.placeholder}
           alt={alt}
-          unoptimized
-          width={resolvedWidth}
-          height={resolvedHeight}
-          className={imageClassName}
-          style={nonFillStyle}
-          data-placeholder="true"
+          width={image.resolvedWidth}
+          height={image.resolvedHeight}
+          className={image.imageClassName}
+          style={image.nonFillStyle}
         />
       </div>
     )
   }
 
   const handleError: ImageProps["onError"] = (event) => {
-    setFailedSrc(resolvedSrc)
+    setFailedSrc(image.resolvedSrc)
     onError?.(event)
   }
 
-  if (sizing === "fill") {
-    return (
-      <div className={wrapperClassName}>
-        <Image
-          {...rest}
-          ref={ref}
-          src={resolvedSrc}
-          alt={alt}
-          fill
-          loader={imageLoader}
-          placeholder={config.placeholder}
-          sizes={resolvedSizes ?? config.sizes}
-          quality={resolvedQuality}
-          className={imageClassName}
-          style={imageStyle}
-          onError={handleError}
-        />
-      </div>
-    )
-  }
-
   return (
-    <div className={wrapperClassName}>
-      <Image
-        {...rest}
+    <div className={image.wrapperClassName}>
+      <DirectusImageOutput
+        rest={rest}
         ref={ref}
-        src={resolvedSrc}
+        src={image.resolvedSrc!}
         alt={alt}
-        width={resolvedWidth}
-        height={resolvedHeight}
+        sizing={sizing}
+        width={image.resolvedWidth}
+        height={image.resolvedHeight}
         loader={imageLoader}
-        placeholder={config.placeholder}
-        {...(resolvedSizes !== undefined ? { sizes: resolvedSizes } : {})}
-        quality={resolvedQuality}
-        className={imageClassName}
-        style={nonFillStyle}
+        placeholder={image.config.placeholder}
+        sizes={
+          sizing === "fill"
+            ? (image.resolvedSizes ?? image.config.sizes)
+            : image.resolvedSizes
+        }
+        quality={image.resolvedQuality}
+        className={image.imageClassName}
+        style={sizing === "fill" ? image.imageStyle : image.nonFillStyle}
         onError={handleError}
       />
     </div>

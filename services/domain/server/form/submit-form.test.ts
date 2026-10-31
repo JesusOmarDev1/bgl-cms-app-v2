@@ -75,13 +75,22 @@ describe("submitForm persistence", () => {
     vi.mocked(formLimiter.consume).mockResolvedValue({} as never)
     vi.mocked(getPublishedFormBlockRepository).mockResolvedValue({
       captcha: false,
-      fields: [{ collection: "text_block", item: { identifier: "name", required: true } }],
+      fields: [
+        {
+          collection: "text_block",
+          item: { identifier: "name", required: true },
+        },
+      ],
     } as never)
-    vi.mocked(createFormResponseRepository).mockResolvedValue({ id: "response-1" } as never)
+    vi.mocked(createFormResponseRepository).mockResolvedValue({
+      id: "response-1",
+    } as never)
   })
 
   it("persists validated values", async () => {
-    await expect(submitForm({ formId, values: { name: "Ada" } })).resolves.toEqual({
+    await expect(
+      submitForm({ formId, values: { name: "Ada" } })
+    ).resolves.toEqual({
       data: { ok: true },
     })
     expect(createFormResponseRepository).toHaveBeenCalledWith({
@@ -91,8 +100,14 @@ describe("submitForm persistence", () => {
   })
 
   it("does not persist invalid values", async () => {
-    await expect(submitForm({ formId, values: { name: "" } })).resolves.toMatchObject({
-      data: { ok: false, message: "invalid", fieldErrors: { name: expect.any(String) } },
+    await expect(
+      submitForm({ formId, values: { name: "" } })
+    ).resolves.toMatchObject({
+      data: {
+        ok: false,
+        message: "invalid",
+        fieldErrors: { name: expect.any(String) },
+      },
     })
     expect(createFormResponseRepository).not.toHaveBeenCalled()
   })
@@ -100,11 +115,18 @@ describe("submitForm persistence", () => {
   it("does not persist when captcha verification fails", async () => {
     vi.mocked(getPublishedFormBlockRepository).mockResolvedValue({
       captcha: true,
-      fields: [{ collection: "text_block", item: { identifier: "name", required: true } }],
+      fields: [
+        {
+          collection: "text_block",
+          item: { identifier: "name", required: true },
+        },
+      ],
     } as never)
     vi.mocked(verifyTurnstile).mockResolvedValue(false)
 
-    await expect(submitForm({ formId, values: { name: "Ada" }, captchaToken: "bad" })).resolves.toEqual({
+    await expect(
+      submitForm({ formId, values: { name: "Ada" }, captchaToken: "bad" })
+    ).resolves.toEqual({
       data: { ok: false, message: "captcha_failed" },
     })
     expect(verifyTurnstile).toHaveBeenCalledWith("bad")

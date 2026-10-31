@@ -13,7 +13,7 @@ import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 const SHOW_MS = 12_000
 const HIDE_MS = 180_000
 const CYCLE_MS = SHOW_MS + HIDE_MS
-const STORAGE_KEY = "whatsapp-cta"
+const STORAGE_KEY = "bgl-whatsapp-cta"
 
 export function WhatsappBtnClient({
   data,

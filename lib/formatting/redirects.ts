@@ -149,26 +149,3 @@ export function matchRedirect(
 
   return null
 }
-
-function assertRedirectMatches(): void {
-  const home = new URL("/", "http://localhost:3000")
-  const hit = matchRedirect(
-    home,
-    [{ origin: "/", destiny: "/inicio", http_code: "301" }],
-    null
-  )
-  if (hit?.location.pathname !== "/inicio" || hit.status !== 301) {
-    throw new Error("redirect self-check: / -> /inicio")
-  }
-  if (
-    matchRedirect(
-      home,
-      [{ origin: "/", destiny: "https://evil.example/x", http_code: "302" }],
-      null
-    ) !== null
-  ) {
-    throw new Error("redirect self-check: off-site")
-  }
-}
-
-assertRedirectMatches()
