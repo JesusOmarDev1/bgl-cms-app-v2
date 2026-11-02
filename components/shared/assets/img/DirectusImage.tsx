@@ -91,7 +91,6 @@ function DirectusImagePlaceholder({
   className,
   style,
 }: {
-<<<<<<< HEAD
   rest: Omit<
     ImageProps,
     | "src"
@@ -108,9 +107,6 @@ function DirectusImagePlaceholder({
     | "quality"
     | "onError"
   >
-=======
-  rest: Omit<ImageProps, "src" | "ref" | "alt" | "width" | "height" | "className" | "style" | "loader" | "placeholder" | "fill" | "sizes" | "quality" | "onError">
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   ref?: Ref<HTMLImageElement>
   src: string
   alt: string
@@ -151,7 +147,6 @@ function DirectusImageOutput({
   style,
   onError,
 }: {
-<<<<<<< HEAD
   rest: Omit<
     ImageProps,
     | "src"
@@ -168,9 +163,6 @@ function DirectusImageOutput({
     | "quality"
     | "onError"
   >
-=======
-  rest: Omit<ImageProps, "src" | "ref" | "alt" | "width" | "height" | "className" | "style" | "loader" | "placeholder" | "fill" | "sizes" | "quality" | "onError">
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   ref?: Ref<HTMLImageElement>
   src: string
   alt: string
@@ -186,7 +178,6 @@ function DirectusImageOutput({
   onError: ImageProps["onError"]
 }) {
   return sizing === "fill" ? (
-<<<<<<< HEAD
     <Image
       {...rest}
       ref={ref}
@@ -217,11 +208,6 @@ function DirectusImageOutput({
       style={style}
       onError={onError}
     />
-=======
-    <Image {...rest} ref={ref} src={src} alt={alt} fill loader={loader} placeholder={placeholder} sizes={sizes} quality={quality} className={className} style={style} onError={onError} />
-  ) : (
-    <Image {...rest} ref={ref} src={src} alt={alt} width={width} height={height} loader={loader} placeholder={placeholder} {...(sizes !== undefined ? { sizes } : {})} quality={quality} className={className} style={style} onError={onError} />
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   )
 }
 
@@ -255,12 +241,8 @@ function resolveImagePresentation({
   const showPlaceholder = resolvedSrc === null || failedSrc === resolvedSrc
   const resolvedWidth = width ?? config.defaultSize.w
   const resolvedHeight = height ?? config.defaultSize.h
-<<<<<<< HEAD
   const resolvedSizes =
     sizes ?? (sizing === "auto" && !config.fluid ? undefined : config.sizes)
-=======
-  const resolvedSizes = sizes ?? (sizing === "auto" && !config.fluid ? undefined : config.sizes)
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   const resolvedQuality = quality ?? config.quality
   const wrapperClassName = cn(
     "overflow-hidden",
@@ -281,12 +263,8 @@ function resolveImagePresentation({
       maxWidth: config.fluid ? resolvedWidth : undefined,
       height: "auto",
     }),
-<<<<<<< HEAD
     ...(sizing === "fill" &&
       showPlaceholder && { width: "100%", height: "100%" }),
-=======
-    ...(sizing === "fill" && showPlaceholder && { width: "100%", height: "100%" }),
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     ...style,
   }
   return {
@@ -300,12 +278,8 @@ function resolveImagePresentation({
     wrapperClassName,
     imageClassName,
     imageStyle,
-<<<<<<< HEAD
     nonFillStyle:
       sizing === "fill" ? imageStyle : pairCssDimensions(imageStyle),
-=======
-    nonFillStyle: sizing === "fill" ? imageStyle : pairCssDimensions(imageStyle),
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   }
 }
 
@@ -374,15 +348,11 @@ export function DirectusImage({
         height={image.resolvedHeight}
         loader={imageLoader}
         placeholder={image.config.placeholder}
-<<<<<<< HEAD
         sizes={
           sizing === "fill"
             ? (image.resolvedSizes ?? image.config.sizes)
             : image.resolvedSizes
         }
-=======
-        sizes={sizing === "fill" ? image.resolvedSizes ?? image.config.sizes : image.resolvedSizes}
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
         quality={image.resolvedQuality}
         className={image.imageClassName}
         style={sizing === "fill" ? image.imageStyle : image.nonFillStyle}

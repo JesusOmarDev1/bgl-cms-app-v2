@@ -190,7 +190,9 @@ function FlipCard({
             sizes="(min-width: 640px) 430px, 100vw"
             className="object-cover"
             loading={index < 2 ? "eager" : "lazy"}
-            unoptimized={!item.image.startsWith("https://images.unsplash.com/photo-")}
+            unoptimized={
+              !item.image.startsWith("https://images.unsplash.com/photo-")
+            }
             draggable={false}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />

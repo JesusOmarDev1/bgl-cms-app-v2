@@ -12,6 +12,7 @@ export default getRequestConfig(async () => {
       ...(await import(`./messages/${locale}/visual-editing.json`)).default,
       ...(await import(`./messages/${locale}/share.json`)).default,
       ...(await import(`./messages/${locale}/db.json`)).default,
+      ...(await import(`./messages/${locale}/directus-errors.json`)).default,
       ...(await import(`./messages/${locale}/products.json`)).default,
       ...(await import(`./messages/${locale}/catalog.json`)).default,
       ...(await import(`./messages/${locale}/manuals.json`)).default,

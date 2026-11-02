@@ -60,54 +60,133 @@ function formatTime(): string {
   return `${Math.floor(performance.now())}ms`
 }
 
-/**
- * Human-readable line. Configured error/warn/info: base + code + collection.
- * Configured debug: + raw message + details.
- */
+const TRUSTED_COLLECTIONS = new Set([
+  "blog_categories",
+  "blog_posts",
+  "brands",
+  "clients",
+  "emails",
+  "footer",
+  "form_block",
+  "form_responses",
+  "health",
+  "header",
+  "manual_categories",
+  "manuals",
+  "models",
+  "pages",
+  "phones",
+  "product_attributes",
+  "product_categories",
+  "products",
+  "redirects",
+  "seo",
+  "services",
+  "services_button",
+  "services_categories",
+  "site_settings",
+  "social_links",
+  "sub_links",
+  "suppliers",
+  "tags",
+  "url_links",
+  "whatsapp_button",
+])
+
+const TRUSTED_ERROR_CODES = new Set([
+  "FORBIDDEN",
+  "INTERNAL_SERVER_ERROR",
+  "INVALID_CREDENTIALS",
+  "INVALID_PAYLOAD",
+  "INVALID_QUERY",
+  "INVALID_TOKEN",
+  "ITEM_NOT_FOUND",
+  "LIMIT_EXCEEDED",
+  "RECORD_NOT_UNIQUE",
+  "REQUESTS_EXCEEDED",
+  "ROUTE_NOT_FOUND",
+  "SERVICE_UNAVAILABLE",
+  "TOKEN_EXPIRED",
+  "UNKNOWN",
+  "UNPROCESSABLE_ENTITY",
+  "VALUE_NOT_NULLABLE",
+  "VALUE_OUT_OF_RANGE",
+])
+
+function safeComponent(value: string | undefined): string | undefined {
+  return value === "db.queries" ? value : undefined
+}
+
+function safeCollection(value: string | undefined): string | undefined {
+  return value !== undefined && TRUSTED_COLLECTIONS.has(value)
+    ? value
+    : undefined
+}
+
+function safeErrorCode(value: string | undefined): string | undefined {
+  return value !== undefined && TRUSTED_ERROR_CODES.has(value)
+    ? value
+    : undefined
+}
+
+function safeEvent(
+  value: LogContext["event"]
+): LogContext["event"] | undefined {
+  return value === "request.start" ||
+    value === "request.success" ||
+    value === "request.failure"
+    ? value
+    : undefined
+}
+
+/** Emit only structured, validated metadata; event text and payloads are never logged. */
 function formatHumanLine(
-  configuredLevel: LogLevel,
   eventLevel: LogLevel,
   location: string,
-  message: string,
   ctx?: LogContext
-): { line: string; details?: unknown } {
-  let line = `[${formatTime()}] ${eventLevel.toUpperCase()} ${location || "app"} — ${message}`
+): string {
+  let line = `[${formatTime()}] ${eventLevel.toUpperCase()} ${location || "app"}`
 
-  if (ctx?.code) line += ` — ${ctx.code}`
-  if (ctx?.collection) line += ` (${ctx.collection})`
+  const code = safeErrorCode(ctx?.code)
+  const collection = safeCollection(ctx?.collection)
+  const status = ctx?.status
+  const event = safeEvent(ctx?.event)
+  const durationMs = ctx?.durationMs
 
-  if (configuredLevel === "debug" && ctx?.message) {
-    line += ` — ${ctx.message}`
+  if (event) line += ` — ${event}`
+  if (code) line += ` — ${code}`
+  if (
+    status !== undefined &&
+    Number.isInteger(status) &&
+    status >= 100 &&
+    status <= 599
+  ) {
+    line += ` — ${status}`
+  }
+  if (collection) line += ` (${collection})`
+  if (
+    durationMs !== undefined &&
+    Number.isFinite(durationMs) &&
+    durationMs >= 0
+  ) {
+    line += ` — ${durationMs.toFixed(1)}ms`
   }
 
-  return {
-    line,
-    details: configuredLevel === "debug" ? ctx?.details : undefined,
-  }
+  return line
 }
 
 function buildLogger(level: LogLevel, windowMs: number): Logger {
-  const write = (target: LogLevel, message: string, ctx?: LogContext) => {
+  const write = (target: LogLevel, _message: string, ctx?: LogContext) => {
     if (PRIORITY[level] > PRIORITY[target]) return
 
-    const location = [ctx?.component, ctx?.operation].filter(Boolean).join(".")
-    const throttleKey = `${location}:${message}:${ctx?.code ?? ""}`
-    if (!throttled(throttleKey, windowMs)) return
+    const component = safeComponent(ctx?.component)
+    const location = component ?? "app"
+    const event = safeEvent(ctx?.event)
+    const throttleKey = `${location}:${target}:${safeErrorCode(ctx?.code) ?? ""}:${ctx?.status ?? ""}`
+    if (event === undefined && !throttled(throttleKey, windowMs)) return
 
-    const { line, details } = formatHumanLine(
-      level,
-      target,
-      location,
-      message,
-      ctx
-    )
-
-    const method = LEVEL_METHOD[target]
-    if (details !== undefined) {
-      console[method](line, details)
-    } else {
-      console[method](line)
-    }
+    const line = formatHumanLine(target, location, ctx)
+    console[LEVEL_METHOD[target]](line)
   }
 
   return {
@@ -121,14 +200,12 @@ function buildLogger(level: LogLevel, windowMs: number): Logger {
 /**
  * Logger governed by `DIRECTUS_LOG_LEVEL`.
  *
- * - error/warn/info: location + safe message + code + (collection)
- * - debug: + raw message + details
+ * - all levels: trusted component and finite code/status/collection metadata only
  *
  * Classic severity gate: skip if configured priority > event priority.
- * Throttle (60s default) on non-debug; Map pruned periodically.
+ * Throttle (60s default) on non-debug, except finite request trace events; Map pruned periodically.
  *
- * Golden rule: first arg `message` is ALWAYS safe. Sensitive data goes in
- * context and only appears when configured level allows.
+ * Event messages and raw context values are never emitted, including at debug.
  */
 export function createLogger(level: LogLevel, throttleMs = 60_000): Logger {
   const window = level === "debug" ? 0 : throttleMs
