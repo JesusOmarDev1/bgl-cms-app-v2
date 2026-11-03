@@ -466,14 +466,10 @@ function restoreSignatureHistory(
   setHistory: (update: (current: History) => History) => void,
   setStatus: (status: string) => void
 ) {
-<<<<<<< HEAD
   if (
     (action === "undo" ? !history.past.length : !history.future.length) ||
     live.current
   )
-=======
-  if ((action === "undo" ? !history.past.length : !history.future.length) || live.current)
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     return
   settleWipe()
   stopReplay()
@@ -520,14 +516,10 @@ function finishSignatureStroke(
 function appendPointerSamples(
   event: ReactPointerEvent<HTMLDivElement>,
   current: LiveStroke,
-<<<<<<< HEAD
   toPad: (point: { clientX: number; clientY: number }) => {
     x: number
     y: number
   },
-=======
-  toPad: (point: { clientX: number; clientY: number }) => { x: number; y: number },
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   paintLive: () => void
 ) {
   const samples =
@@ -561,14 +553,10 @@ function startSignatureStroke(
     color: InkColor
     width: InkWidth
     replaying: boolean
-<<<<<<< HEAD
     toPad: (point: { clientX: number; clientY: number }) => {
       x: number
       y: number
     }
-=======
-    toPad: (point: { clientX: number; clientY: number }) => { x: number; y: number }
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     settleWipe: () => void
     stopReplay: () => void
     setDrawing: (drawing: boolean) => void
@@ -1301,20 +1289,11 @@ export function SignaturePad({
   }
 
   const { visible, nib, nibColor } = getVisibleStrokes(strokes, replay, color)
-<<<<<<< HEAD
   const {
     showHint,
     hintHidden,
     transition: t,
   } = getSignaturePresentation(empty, drawing, wiping, reduced) as {
-=======
-  const { showHint, hintHidden, transition: t } = getSignaturePresentation(
-    empty,
-    drawing,
-    wiping,
-    reduced
-  ) as {
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
     showHint: boolean
     hintHidden: TargetAndTransition
     transition: Transition

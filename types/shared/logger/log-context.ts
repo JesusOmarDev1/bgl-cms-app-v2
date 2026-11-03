@@ -3,6 +3,7 @@ export interface LogContext {
   operation?: string
   collection?: string
   code?: string
-  message?: string // raw error msg — solo debug
-  details?: unknown // error crudo — solo debug
+  status?: number
+  event?: "request.start" | "request.success" | "request.failure"
+  durationMs?: number
 }

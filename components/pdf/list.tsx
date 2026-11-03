@@ -217,7 +217,6 @@ const renderItemList = (
   return (
     <View style={level > 0 ? styles.childrenContainer : undefined}>
       {items.map((item, index) =>
-<<<<<<< HEAD
         renderItem(
           item,
           keys[index],
@@ -228,9 +227,6 @@ const renderItemList = (
           styles,
           level
         )
-=======
-        renderItem(item, keys[index], index, items.length, variant, gap, styles, level)
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
       )}
     </View>
   )
@@ -293,7 +289,6 @@ export const PdfList = ({
   return (
     <View style={styleArray as never}>
       {items.map((item, index) =>
-<<<<<<< HEAD
         renderItem(
           item,
           keys[index],
@@ -304,9 +299,6 @@ export const PdfList = ({
           styles,
           _level
         )
-=======
-        renderItem(item, keys[index], index, items.length, variant, gap, styles, _level)
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
       )}
     </View>
   )

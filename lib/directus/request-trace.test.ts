@@ -1,0 +1,121 @@
+import { afterEach, describe, expect, it, vi } from "vitest"
+import { createLogger } from "@/lib/directus/logger"
+import { createDirectusTraceFetch } from "@/lib/directus/request-trace"
+
+vi.mock("server-only", () => ({}))
+
+describe("createDirectusTraceFetch", () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it("traces every successful request without exposing request or response data", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const body = "person@example.com secret-payload"
+    const response = new Response(body, { status: 200 })
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response)
+    const tracedFetch = createDirectusTraceFetch(
+      fetcher,
+      createLogger("info", 60_000)
+    )
+
+    const result = await tracedFetch(
+      "https://cms.example/items/form_responses?filter[email]=person@example.com&access_token=secret-token",
+      {
+        method: "POST",
+        headers: { Authorization: "Bearer secret-token" },
+        body,
+      }
+    )
+
+    expect(result).toBe(response)
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(await result.text()).toBe(body)
+    expect(log).toHaveBeenCalledTimes(2)
+    expect(
+      log.mock.calls.map(
+        ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
+      )
+    ).toEqual(["request.start", "request.success"])
+    const args = log.mock.calls.flat().join(" ")
+    for (const secret of [
+      "cms.example",
+      "form_responses?",
+      "person@example.com",
+      "secret-token",
+      body,
+    ]) {
+      expect(args).not.toContain(secret)
+    }
+    expect(args).toContain("request.start")
+    expect(args).toContain("request.success")
+    expect(args).toContain("form_responses")
+  })
+
+  it("traces an HTTP failure while returning the original response to the SDK", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const response = new Response('{"errors":[{"message":"private detail"}]}', {
+      status: 403,
+    })
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response)
+    const tracedFetch = createDirectusTraceFetch(
+      fetcher,
+      createLogger("info", 60_000)
+    )
+
+    const result = await tracedFetch(
+      "https://cms.example/items/pages?secret=value"
+    )
+
+    expect(result).toBe(response)
+    expect(result.status).toBe(403)
+    expect(log).toHaveBeenCalledTimes(2)
+    expect(
+      log.mock.calls.map(
+        ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
+      )
+    ).toEqual(["request.start", "request.failure"])
+    const args = log.mock.calls.flat().join(" ")
+    expect(args).toContain("request.failure")
+    expect(args).toContain("403")
+    expect(args).not.toContain("private detail")
+    expect(args).not.toContain("secret=value")
+  })
+
+  it("traces and rethrows transport failures without logging error details", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const error = new Error("secret-token person@example.com")
+    const fetcher = vi.fn<typeof fetch>().mockRejectedValue(error)
+    const tracedFetch = createDirectusTraceFetch(
+      fetcher,
+      createLogger("info", 60_000)
+    )
+
+    await expect(tracedFetch("https://cms.example/items/pages")).rejects.toBe(
+      error
+    )
+
+    expect(log).toHaveBeenCalledTimes(2)
+    expect(
+      log.mock.calls.map(
+        ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
+      )
+    ).toEqual(["request.start", "request.failure"])
+    const args = log.mock.calls.flat().join(" ")
+    expect(args).toContain("request.failure")
+    expect(args).not.toContain("secret-token")
+    expect(args).not.toContain("person@example.com")
+  })
+
+  it("does not throttle repeated request attempts at info level", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("{}"))
+    const tracedFetch = createDirectusTraceFetch(
+      fetcher,
+      createLogger("info", 60_000)
+    )
+
+    await tracedFetch("https://cms.example/items/pages")
+    await tracedFetch("https://cms.example/items/pages")
+
+    expect(log).toHaveBeenCalledTimes(4)
+  })
+})

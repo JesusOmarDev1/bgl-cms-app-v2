@@ -5,14 +5,14 @@ import { usePdfcnTheme, useSafeMemo } from "@/components/pdf/theme-provider"
 import { Text as PDFText, View } from "@/components/pdf/pdf-primitives"
 import type { Style } from "@/components/pdf/pdf-primitives"
 
-import { createTableStyles } from "../../lib/pdf-themes/styles/table.styles"
+import { createTableStyles } from "@/lib/pdf-themes/styles/table.styles"
 import type {
   TableCellProps,
   TableProps,
   TableRowProps,
   TableSectionProps,
   TableVariant,
-} from "../../types/pdf-themes/table.types"
+} from "@/types/pdf-themes/table.types"
 
 export const TableHeader = ({ children, style }: TableSectionProps) => (
   <View style={style}>{children}</View>

@@ -5,7 +5,6 @@ import {
 } from "@/components/collections/catalog/catalog-items"
 
 describe("filterCatalogProducts", () => {
-<<<<<<< HEAD
   it("preserves date, title, and category sorting", () => {
     const products = [
       {
@@ -49,7 +48,8 @@ describe("filterCatalogProducts", () => {
     expect(
       filterCatalogProducts(products, "", "", "z-a").map((item) => item.id)
     ).toEqual(["newer-c", "older-b", "newer-a"])
-=======
+  })
+
   it("filters by category and searches text before sorting", () => {
     const products = [
       {
@@ -83,7 +83,6 @@ describe("filterCatalogProducts", () => {
       products[2],
       products[0],
     ])
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
   })
 })
 

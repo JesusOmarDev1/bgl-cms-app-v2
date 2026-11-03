@@ -49,15 +49,11 @@ function CaptionControl({
   onSetActiveDialog,
 }: Pick<
   VideoPlayerControlsProps,
-<<<<<<< HEAD
   | "tracks"
   | "currentCaption"
   | "activeDialog"
   | "onCaptionChange"
   | "onSetActiveDialog"
-=======
-  "tracks" | "currentCaption" | "activeDialog" | "onCaptionChange" | "onSetActiveDialog"
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
 >) {
   if (!tracks.length) return null
   return (
@@ -73,11 +69,7 @@ function CaptionControl({
               onSetActiveDialog(activeDialog === "captions" ? null : "captions")
             }
           }}
-<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
-=======
-          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             currentCaption
               ? "bg-foreground/30 hover:bg-foreground/40"
               : "hover:bg-white/20"
@@ -160,11 +152,7 @@ function SettingsControl({
           onClick={() =>
             onSetActiveDialog(activeDialog === "settings" ? null : "settings")
           }
-<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
-=======
-          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             activeDialog === "settings"
               ? "bg-foreground/30"
               : "hover:bg-white/20"
@@ -240,11 +228,7 @@ function OptionsControl({
           onClick={() =>
             onSetActiveDialog(activeDialog === "options" ? null : "options")
           }
-<<<<<<< HEAD
           className={`flex items-center justify-center rounded-full p-2 transition-all ${
-=======
-          className={`flex items-center justify-center rounded-full p-2 transition-colors ${
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
             activeDialog === "options"
               ? "bg-foreground/30"
               : "hover:bg-white/20"
@@ -512,10 +496,6 @@ export function VideoPlayerControls({
             onQualityChange={onQualityChange}
             onSpeedChange={onSpeedChange}
           />
-<<<<<<< HEAD
-=======
-
->>>>>>> dc117f02e8dc3847ce9f7c2e18c73989ee8cd902
           <OptionsControl
             activeDialog={activeDialog}
             isLooping={isLooping}

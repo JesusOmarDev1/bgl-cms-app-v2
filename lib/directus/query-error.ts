@@ -1,5 +1,5 @@
 import "server-only"
-import { isDirectusError } from "@directus/sdk"
+import { classifyDirectusError } from "@/lib/directus/classify-error"
 import { directusLogger } from "@/lib/directus/logger"
 import type { LogContext } from "@/types/shared/logger/log-context"
 
@@ -15,46 +15,35 @@ function isDirectusWarnCode(code: string): code is DirectusWarnCode {
   return (DIRECTUS_WARN_CODES as readonly string[]).includes(code)
 }
 
-function extractDirectusErrorInfo(error: unknown): {
-  code?: string
-  rawMessage?: string
-} {
-  if (isDirectusError(error)) {
-    const apiError = error.errors[0]
-    return {
-      code: apiError?.extensions.code,
-      rawMessage: apiError?.message ?? error.message,
-    }
-  }
-
-  if (error instanceof Error) {
-    return { rawMessage: error.message }
-  }
-
-  return {}
-}
-
-/**
- * Log a Directus query failure. `message` must be a safe i18n string.
- * FORBIDDEN / INVALID_TOKEN / LIMIT_EXCEEDED emit `warn`; other failures emit `error`.
- */
+/** Log safe diagnostics for a Directus query failure; event text is intentionally omitted. */
 export function returnDirectusQueryError(
   error: unknown,
-  message: string,
+  _message: string,
   context: LogContext
 ): void {
-  const { code, rawMessage } = extractDirectusErrorInfo(error)
+  const classification = classifyDirectusError(error)
+  const { diagnosticCodes, malformedError, unknownCode, status } =
+    classification
+  const warningOnly =
+    diagnosticCodes.length > 0 &&
+    !malformedError &&
+    !unknownCode &&
+    diagnosticCodes.every(isDirectusWarnCode)
+  const code =
+    diagnosticCodes.find((candidate) => !isDirectusWarnCode(candidate)) ??
+    diagnosticCodes[0]
   const ctx: LogContext = {
-    ...context,
+    component: context.component,
+    operation: context.operation,
+    collection: context.collection,
     code: code ?? context.code,
-    message: rawMessage ?? context.message,
-    details: error,
+    status,
   }
 
-  if (code !== undefined && isDirectusWarnCode(code)) {
-    directusLogger.warn(message, ctx)
+  if (warningOnly) {
+    directusLogger.warn("Directus query failed", ctx)
     return
   }
 
-  directusLogger.error(message, ctx)
+  directusLogger.error("Directus query failed", ctx)
 }
