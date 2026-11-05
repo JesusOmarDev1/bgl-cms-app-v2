@@ -37,6 +37,7 @@ export default defineConfig({
             "hooks/useAudioProvider.test.tsx",
             "hooks/useVideoPlayback.test.tsx",
             "components/shared/utility/CookieConsentAnalytics.test.tsx",
+            "components/shared/forms/DateRangePicker.test.tsx",
           ],
           browser: {
             enabled: true,
