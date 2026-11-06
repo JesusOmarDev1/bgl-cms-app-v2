@@ -2,7 +2,7 @@
 export const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL ?? ""
 export const DIRECTUS_STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN ?? ""
 export const DIRECTUS_PREVIEW_SECRET = process.env.DIRECTUS_PREVIEW_SECRET ?? ""
-export const DIRECTUS_LOG_LEVEL = process.env.DIRECTUS_LOG_LEVEL
+export const DIRECTUS_LOG_LEVEL = process.env.DIRECTUS_LOG_LEVEL ?? "info"
 
 // VISUAL EDITING
 export const ENABLE_VISUAL_EDITING =

@@ -50,6 +50,23 @@ describe("createLogger", () => {
     expect(error.mock.calls[0]).toHaveLength(1)
   })
 
+  it("formats output as a quiet, compact Directus diagnostic", () => {
+    const info = vi.spyOn(console, "log").mockImplementation(() => {})
+    vi.spyOn(performance, "now").mockReturnValue(123.4)
+
+    createLogger("info").info("private message", {
+      component: "db.queries",
+      event: "request.success",
+      collection: "pages",
+      status: 200,
+      durationMs: 12.34,
+    })
+
+    expect(info).toHaveBeenCalledWith(
+      "[123ms] directus: info db.queries request.success 200 (pages) 12.3ms"
+    )
+  })
+
   it("filters events below the configured severity", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
@@ -60,6 +77,6 @@ describe("createLogger", () => {
 
     expect(log).not.toHaveBeenCalled()
     expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0][0]).toContain("WARN")
+    expect(warn.mock.calls[0][0]).toContain("directus: warn")
   })
 })

@@ -30,7 +30,8 @@ export function createDirectusTraceFetch(
       durationMs?: number
     ) => {
       try {
-        logger.info("Directus request", {
+        const log = event === "request.failure" ? logger.info : logger.debug
+        log("Directus request", {
           component: "db.queries",
           collection,
           event,

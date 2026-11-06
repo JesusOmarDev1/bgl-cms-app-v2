@@ -1,6 +1,6 @@
 import type React from "react"
 
-import type { TableVariant } from "@/components/pdf/table/table.types"
+import type { TableVariant } from "@/types/pdf-themes/table.types"
 import type { PDFComponentProps } from "@/types/pdf-themes/pdf-components"
 
 /** DataTable row density size. */

@@ -1,4 +1,4 @@
-import type { PdfcnTheme } from "@/types/pdf-themes"
+import type { PdfcnTheme } from "@/types/pdf-themes/pdf-themes"
 
 import { defaultPrimitives } from "./primitives"
 

@@ -7,14 +7,14 @@ vi.mock("server-only", () => ({}))
 describe("createDirectusTraceFetch", () => {
   afterEach(() => vi.restoreAllMocks())
 
-  it("traces every successful request without exposing request or response data", async () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+  it("traces start and success at debug without exposing request or response data", async () => {
+    const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
     const body = "person@example.com secret-payload"
     const response = new Response(body, { status: 200 })
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response)
     const tracedFetch = createDirectusTraceFetch(
       fetcher,
-      createLogger("info", 60_000)
+      createLogger("debug", 60_000)
     )
 
     const result = await tracedFetch(
@@ -29,13 +29,13 @@ describe("createDirectusTraceFetch", () => {
     expect(result).toBe(response)
     expect(fetcher).toHaveBeenCalledTimes(1)
     expect(await result.text()).toBe(body)
-    expect(log).toHaveBeenCalledTimes(2)
+    expect(debug).toHaveBeenCalledTimes(2)
     expect(
-      log.mock.calls.map(
+      debug.mock.calls.map(
         ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
       )
     ).toEqual(["request.start", "request.success"])
-    const args = log.mock.calls.flat().join(" ")
+    const args = debug.mock.calls.flat().join(" ")
     for (const secret of [
       "cms.example",
       "form_responses?",
@@ -50,8 +50,9 @@ describe("createDirectusTraceFetch", () => {
     expect(args).toContain("form_responses")
   })
 
-  it("traces an HTTP failure while returning the original response to the SDK", async () => {
+  it("traces an HTTP failure at info while returning the original response to the SDK", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
     const response = new Response('{"errors":[{"message":"private detail"}]}', {
       status: 403,
     })
@@ -67,12 +68,9 @@ describe("createDirectusTraceFetch", () => {
 
     expect(result).toBe(response)
     expect(result.status).toBe(403)
-    expect(log).toHaveBeenCalledTimes(2)
-    expect(
-      log.mock.calls.map(
-        ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
-      )
-    ).toEqual(["request.start", "request.failure"])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toMatch(/request\.failure/)
+    expect(debug).not.toHaveBeenCalled()
     const args = log.mock.calls.flat().join(" ")
     expect(args).toContain("request.failure")
     expect(args).toContain("403")
@@ -82,6 +80,7 @@ describe("createDirectusTraceFetch", () => {
 
   it("traces and rethrows transport failures without logging error details", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
     const error = new Error("secret-token person@example.com")
     const fetcher = vi.fn<typeof fetch>().mockRejectedValue(error)
     const tracedFetch = createDirectusTraceFetch(
@@ -93,19 +92,16 @@ describe("createDirectusTraceFetch", () => {
       error
     )
 
-    expect(log).toHaveBeenCalledTimes(2)
-    expect(
-      log.mock.calls.map(
-        ([line]) => line.match(/request\.(?:start|success|failure)/)?.[0]
-      )
-    ).toEqual(["request.start", "request.failure"])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toMatch(/request\.failure/)
+    expect(debug).not.toHaveBeenCalled()
     const args = log.mock.calls.flat().join(" ")
     expect(args).toContain("request.failure")
     expect(args).not.toContain("secret-token")
     expect(args).not.toContain("person@example.com")
   })
 
-  it("does not throttle repeated request attempts at info level", async () => {
+  it("does not emit start or success traces at info level", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("{}"))
     const tracedFetch = createDirectusTraceFetch(
@@ -116,6 +112,26 @@ describe("createDirectusTraceFetch", () => {
     await tracedFetch("https://cms.example/items/pages")
     await tracedFetch("https://cms.example/items/pages")
 
-    expect(log).toHaveBeenCalledTimes(4)
+    expect(log).not.toHaveBeenCalled()
+  })
+
+  it("suppresses all request traces at warn and error levels", async () => {
+    const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const error = vi.spyOn(console, "error").mockImplementation(() => {})
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("{}"))
+
+    for (const level of ["warn", "error"] as const) {
+      await createDirectusTraceFetch(
+        fetcher,
+        createLogger(level)
+      )("https://cms.example/items/pages")
+    }
+
+    expect(debug).not.toHaveBeenCalled()
+    expect(log).not.toHaveBeenCalled()
+    expect(warn).not.toHaveBeenCalled()
+    expect(error).not.toHaveBeenCalled()
   })
 })

@@ -145,7 +145,7 @@ function formatHumanLine(
   location: string,
   ctx?: LogContext
 ): string {
-  let line = `[${formatTime()}] ${eventLevel.toUpperCase()} ${location || "app"}`
+  let line = `[${formatTime()}] directus: ${eventLevel} ${location || "app"}`
 
   const code = safeErrorCode(ctx?.code)
   const collection = safeCollection(ctx?.collection)
@@ -153,15 +153,15 @@ function formatHumanLine(
   const event = safeEvent(ctx?.event)
   const durationMs = ctx?.durationMs
 
-  if (event) line += ` — ${event}`
-  if (code) line += ` — ${code}`
+  if (event) line += ` ${event}`
+  if (code) line += ` ${code}`
   if (
     status !== undefined &&
     Number.isInteger(status) &&
     status >= 100 &&
     status <= 599
   ) {
-    line += ` — ${status}`
+    line += ` ${status}`
   }
   if (collection) line += ` (${collection})`
   if (
@@ -169,32 +169,10 @@ function formatHumanLine(
     Number.isFinite(durationMs) &&
     durationMs >= 0
   ) {
-    line += ` — ${durationMs.toFixed(1)}ms`
+    line += ` ${durationMs.toFixed(1)}ms`
   }
 
   return line
-}
-
-function buildLogger(level: LogLevel, windowMs: number): Logger {
-  const write = (target: LogLevel, _message: string, ctx?: LogContext) => {
-    if (PRIORITY[level] > PRIORITY[target]) return
-
-    const component = safeComponent(ctx?.component)
-    const location = component ?? "app"
-    const event = safeEvent(ctx?.event)
-    const throttleKey = `${location}:${target}:${safeErrorCode(ctx?.code) ?? ""}:${ctx?.status ?? ""}`
-    if (event === undefined && !throttled(throttleKey, windowMs)) return
-
-    const line = formatHumanLine(target, location, ctx)
-    console[LEVEL_METHOD[target]](line)
-  }
-
-  return {
-    debug: (m, c) => write("debug", m, c),
-    info: (m, c) => write("info", m, c),
-    warn: (m, c) => write("warn", m, c),
-    error: (m, c) => write("error", m, c),
-  }
 }
 
 /**
@@ -209,7 +187,25 @@ function buildLogger(level: LogLevel, windowMs: number): Logger {
  */
 export function createLogger(level: LogLevel, throttleMs = 60_000): Logger {
   const window = level === "debug" ? 0 : throttleMs
-  return buildLogger(level, window)
+  const write = (target: LogLevel, _message: string, ctx?: LogContext) => {
+    if (PRIORITY[level] > PRIORITY[target]) return
+
+    const component = safeComponent(ctx?.component)
+    const location = component ?? "app"
+    const event = safeEvent(ctx?.event)
+    const throttleKey = `${location}:${target}:${safeErrorCode(ctx?.code) ?? ""}:${ctx?.status ?? ""}`
+    if (event === undefined && !throttled(throttleKey, window)) return
+
+    const line = formatHumanLine(target, location, ctx)
+    console[LEVEL_METHOD[target]](line)
+  }
+
+  return {
+    debug: (m, c) => write("debug", m, c),
+    info: (m, c) => write("info", m, c),
+    warn: (m, c) => write("warn", m, c),
+    error: (m, c) => write("error", m, c),
+  }
 }
 
 /** Process-wide Directus logger governed by `DIRECTUS_LOG_LEVEL`. */

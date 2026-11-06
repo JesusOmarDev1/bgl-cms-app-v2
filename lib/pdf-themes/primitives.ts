@@ -1,4 +1,4 @@
-import type { PrimitiveTokens } from "@/types/pdf-themes"
+import type { PrimitiveTokens } from "@/types/pdf-themes/pdf-themes"
 
 /**
  * Default primitive tokens shared by all theme presets.

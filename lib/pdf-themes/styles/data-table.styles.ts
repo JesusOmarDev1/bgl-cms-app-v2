@@ -1,6 +1,6 @@
 import { StyleSheet } from "@formepdf/react"
 
-import type { PdfcnTheme } from "@/types/pdf-themes"
+import type { PdfcnTheme } from "@/types/pdf-themes/pdf-themes"
 
 /**
  * Creates compact-mode cell and text styles for the DataTable component.
