@@ -4,67 +4,82 @@ import { init, renderDocument } from "@formepdf/core/worker"
 import wasmUrl from "@formepdf/core/pkg-web/forme_bg.wasm?url"
 import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { expect, within } from "storybook/test"
-import { ServiceOrderPreview } from "@/components/pdf/templates/service-order"
+import {
+  ServiceOrderPreview,
+  serviceOrderAmounts,
+  type ServiceOrderData,
+} from "@/components/pdf/templates/service-order"
 
-const partnerLogos = [
-  {
-    id: "rice-lake",
-    url: new URL("../../assets/logos/pdf/rice_lake.png", import.meta.url).href,
+// Synthetic Storybook fixture; these values are not read from Directus.
+const sampleOrder = {
+  folio: "123e4567-e89b-42d3-a456-426614174000",
+  date_created: "2026-11-07T12:00:00.000Z",
+  client: {
+    id: "123e4567-e89b-42d3-a456-426614174001",
+    name: "Cliente de ejemplo",
+    address: "Calle de ejemplo 123",
+    contact: "Contacto de ejemplo",
+    city: "Zapopan",
+    state: "Jalisco",
   },
-  {
-    id: "revuelta",
-    url: new URL(
-      "../../assets/logos/pdf/basculas_revuelta.png",
-      import.meta.url
-    ).href,
-  },
-  {
-    id: "torrey",
-    url: new URL("../../assets/logos/pdf/torrey.png", import.meta.url).href,
-  },
-  {
-    id: "anyload",
-    url: new URL("../../assets/logos/pdf/anyload.png", import.meta.url).href,
-  },
-  {
-    id: "gse",
-    url: new URL("../../assets/logos/pdf/gse.png", import.meta.url).href,
-  },
-  {
-    id: "kretz",
-    url: new URL("../../assets/logos/pdf/kretz.png", import.meta.url).href,
-  },
-  {
-    id: "epson",
-    url: new URL("../../assets/logos/pdf/epson.png", import.meta.url).href,
-  },
-]
+  description: "Servicio preventivo de ejemplo.",
+  technician_name: { first_name: "Técnico", last_name: "Ejemplo" },
+  technician_signature: { id: "123e4567-e89b-42d3-a456-426614174003" },
+  client_signature: { id: "123e4567-e89b-42d3-a456-426614174004" },
+  status: "draft",
+  client_name: "Receptor de ejemplo",
+  client_department: "Mantenimiento",
+  scales: [
+    {
+      scales_id: {
+        id: "123e4567-e89b-42d3-a456-426614174002",
+        client: { id: "123e4567-e89b-42d3-a456-426614174001" },
+        brand: { title: "Marca de ejemplo" },
+        model: { title: "Modelo de ejemplo" },
+        serial_number: "SER-001",
+        capacity: 50,
+        units: "kg",
+      },
+    },
+  ],
+  parts: [
+    {
+      quantity: 2,
+      inventory_id: { title: "Refacción de ejemplo", price: "15.50" },
+    },
+  ],
+  labor_cost: "100.00",
+  overtime_cost: null,
+  travel_cost: null,
+  other_cost: null,
+  apply_vat: true,
+} satisfies ServiceOrderData
 
-function ServiceOrderStory() {
+function ServiceOrderStory({
+  variant = "blank",
+}: {
+  variant?: "blank" | "filled"
+}) {
   const [pdfUrl, setPdfUrl] = useState<string>()
   const [error, setError] = useState<string>()
 
   // Static local Storybook assets; cleanup revokes the generated PDF URL.
-  // eslint-disable-next-line react-doctor/no-fetch-in-effect
   useEffect(() => {
     let cancelled = false
     let url: string | undefined
     async function generate() {
       try {
-        const logos = partnerLogos.map(({ id, url }) => ({ id, src: url }))
-        const brandLogo = new URL("/static/logo-dark.png", window.location.href)
-          .href
-        const footerLogo = new URL(
-          "/static/inverted-logo.png",
-          window.location.href
-        ).href
         await init(new URL(wasmUrl, window.location.href))
         const bytes = await renderDocument(
-          <ServiceOrderPreview
-            logos={logos}
-            brandLogo={brandLogo}
-            footerLogo={footerLogo}
-          />
+          variant === "filled" ? (
+            <ServiceOrderPreview
+              variant="filled"
+              data={sampleOrder}
+              showPrices
+            />
+          ) : (
+            <ServiceOrderPreview variant="blank" />
+          )
         )
         url = URL.createObjectURL(
           new Blob([new Uint8Array(bytes)], { type: "application/pdf" })
@@ -81,7 +96,7 @@ function ServiceOrderStory() {
       cancelled = true
       if (url) URL.revokeObjectURL(url)
     }
-  }, [])
+  }, [variant])
 
   return (
     <div
@@ -112,7 +127,7 @@ function ServiceOrderStory() {
 }
 
 const meta = {
-  title: "PDF/Orden de servicio (prototipo pdfcn)",
+  title: "Orden de servicio",
   component: ServiceOrderStory,
   parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof ServiceOrderStory>
@@ -120,7 +135,77 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const FormularioEnBlanco: Story = {
+export const Filled: Story = {
+  args: { variant: "filled" },
+  play: async ({ canvasElement }) => {
+    const amounts = serviceOrderAmounts(sampleOrder)
+    await expect(amounts.parts).toBe(3100)
+    await expect(amounts.subtotal).toBe(13100)
+    await expect(amounts.vat).toBe(2096)
+    await expect(amounts.total).toBe(15196)
+    await expect(
+      serviceOrderAmounts({ ...sampleOrder, parts: [], labor_cost: "0.04" }).vat
+    ).toBe(1)
+    await expect(
+      serviceOrderAmounts({
+        ...sampleOrder,
+        parts: [
+          { quantity: 2, inventory_id: { title: "Sin precio", price: null } },
+        ],
+      }).total
+    ).toBeNull()
+    await expect(
+      serviceOrderAmounts({
+        ...sampleOrder,
+        parts: [],
+        labor_cost: null,
+      }).total
+    ).toBeNull()
+    const secondPage = await renderDocument(
+      <ServiceOrderPreview
+        variant="filled"
+        data={{
+          ...sampleOrder,
+          scales: [
+            ...sampleOrder.scales,
+            {
+              scales_id: {
+                ...sampleOrder.scales[0].scales_id,
+                id: "123e4567-e89b-42d3-a456-426614174006",
+              },
+            },
+            {
+              scales_id: {
+                ...sampleOrder.scales[0].scales_id,
+                id: "123e4567-e89b-42d3-a456-426614174005",
+              },
+            },
+          ],
+          parts: [
+            ...sampleOrder.parts,
+            ...[2, 3, 4].map((i) => ({
+              quantity: 1,
+              inventory_id: { title: `Refacción ${i}`, price: "1.00" },
+            })),
+          ],
+        }}
+      />
+    )
+    await expect(
+      new TextDecoder("latin1").decode(secondPage).match(/\/Type\s*\/Page\b/g)
+        ?.length
+    ).toBe(2)
+    const iframe = (await within(canvasElement).findByTitle(
+      "Orden de servicio — PDF de muestra",
+      {},
+      { timeout: 30000 }
+    )) as HTMLIFrameElement
+    const bytes = new Uint8Array(await (await fetch(iframe.src)).arrayBuffer())
+    await expect(new TextDecoder().decode(bytes.subarray(0, 5))).toBe("%PDF-")
+  },
+}
+
+export const BlankForm: Story = {
   play: async ({ canvasElement }) => {
     const iframe = (await within(canvasElement).findByTitle(
       "Orden de servicio — PDF de muestra",
