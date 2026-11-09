@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { formatTime } from "@/lib/formatting/format-time"
+import { formatTime } from "@/lib/formatting/time"
 
 export interface QualitySource {
   quality: string

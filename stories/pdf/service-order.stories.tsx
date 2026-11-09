@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { expect, within } from "storybook/test"
 import {
   ServiceOrderPreview,
-  serviceOrderAmounts,
+  ServiceOrderAmounts,
   type ServiceOrderData,
 } from "@/components/pdf/templates/service-order"
 
@@ -138,16 +138,16 @@ type Story = StoryObj<typeof meta>
 export const Filled: Story = {
   args: { variant: "filled" },
   play: async ({ canvasElement }) => {
-    const amounts = serviceOrderAmounts(sampleOrder)
+    const amounts = ServiceOrderAmounts(sampleOrder)
     await expect(amounts.parts).toBe(3100)
     await expect(amounts.subtotal).toBe(13100)
     await expect(amounts.vat).toBe(2096)
     await expect(amounts.total).toBe(15196)
     await expect(
-      serviceOrderAmounts({ ...sampleOrder, parts: [], labor_cost: "0.04" }).vat
+      ServiceOrderAmounts({ ...sampleOrder, parts: [], labor_cost: "0.04" }).vat
     ).toBe(1)
     await expect(
-      serviceOrderAmounts({
+      ServiceOrderAmounts({
         ...sampleOrder,
         parts: [
           { quantity: 2, inventory_id: { title: "Sin precio", price: null } },
@@ -155,12 +155,48 @@ export const Filled: Story = {
       }).total
     ).toBeNull()
     await expect(
-      serviceOrderAmounts({
+      ServiceOrderAmounts({
         ...sampleOrder,
         parts: [],
         labor_cost: null,
       }).total
     ).toBeNull()
+    const fourPartsData = {
+      ...sampleOrder,
+      parts: [
+        ...sampleOrder.parts,
+        ...[2, 3, 4].map((i) => ({
+          quantity: 1,
+          inventory_id: { title: `Refacción ${i}`, price: "1.00" },
+        })),
+      ],
+    }
+    const fourParts = await renderDocument(
+      <ServiceOrderPreview variant="filled" data={fourPartsData} />
+    )
+    await expect(
+      new TextDecoder("latin1").decode(fourParts).match(/\/Type\s*\/Page\b/g)
+        ?.length
+    ).toBe(1)
+    const fiveParts = await renderDocument(
+      <ServiceOrderPreview
+        variant="filled"
+        data={{
+          ...fourPartsData,
+          parts: [
+            ...fourPartsData.parts,
+            {
+              quantity: 1,
+              inventory_id: { title: "Refacción 5", price: "1.00" },
+            },
+          ],
+        }}
+      />
+    )
+    await expect(
+      new TextDecoder("latin1").decode(fiveParts).match(/\/Type\s*\/Page\b/g)
+        ?.length
+    ).toBe(2)
     const secondPage = await renderDocument(
       <ServiceOrderPreview
         variant="filled"

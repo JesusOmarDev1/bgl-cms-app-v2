@@ -13,7 +13,7 @@ import { getAssetUrl } from "@/lib/directus/asset-url"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
-import { formatBytes } from "@/lib/formatting/format-bytes"
+import { formatBytes } from "@/lib/formatting/bytes"
 import { Track } from "@/lib/audio/html-audio"
 import {
   AudioPlayer,

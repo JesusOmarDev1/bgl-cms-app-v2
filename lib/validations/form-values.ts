@@ -1,5 +1,5 @@
 import * as v from "valibot"
-import { parseDateString } from "@/lib/formatting/format-date"
+import { parseDateString } from "@/lib/formatting/date"
 import { DATE_REGEX } from "@/lib/validations/date"
 import { DATETIME_LOCAL_REGEX } from "@/lib/validations/datetime"
 import { EMAIL_REGEX } from "@/lib/validations/email"

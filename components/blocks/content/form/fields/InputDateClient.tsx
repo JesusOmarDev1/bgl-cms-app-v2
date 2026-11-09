@@ -7,7 +7,7 @@ import {
 } from "@/components/shared/forms/DatePicker"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { formatDateValue, parseDateString } from "@/lib/formatting/format-date"
+import { formatDateValue, parseDateString } from "@/lib/formatting/date"
 import type { ExpandedFormField } from "@/lib/validations/form-values"
 
 interface InputDateClientProps {

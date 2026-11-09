@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import type { CatalogItem } from "@/components/collections/catalog/catalog-items"
-import { formatDateShort } from "@/lib/formatting/format-date"
+import { formatDateShort } from "@/lib/formatting/date"
 
 export type ManualCardData = CatalogItem & {
   slug: string | null

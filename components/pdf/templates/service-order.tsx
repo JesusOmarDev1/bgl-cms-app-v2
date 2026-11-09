@@ -3,6 +3,8 @@ import { PdfImage } from "@/components/pdf/pdf-image"
 import { View } from "@/components/pdf/pdf-primitives"
 import { Section } from "@/components/pdf/section"
 import { Text } from "@/components/pdf/text"
+import { cents, money } from "@/lib/formatting/money"
+import { formatDateLong } from "@/lib/formatting/date"
 
 // Relations must be expanded before passing an order to the PDF; IDs alone cannot fill it.
 export interface ServiceOrderData {
@@ -60,27 +62,7 @@ type ServiceOrderProps = {
     }
 )
 
-function cents(value: string | number | null): number | null {
-  if (value === null) return null
-  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(String(value))
-  if (!match) throw new Error("Invalid service order amount")
-  const result =
-    Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"))
-  if (!Number.isSafeInteger(result))
-    throw new Error("Service order amount exceeds safe range")
-  return result
-}
-
-const currency = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-})
-
-function money(value: number | null): string {
-  return value === null ? "" : currency.format(value / 100)
-}
-
-export function serviceOrderAmounts(data: ServiceOrderData) {
+export function ServiceOrderAmounts(data: ServiceOrderData) {
   const lines = data.parts.map(({ quantity, inventory_id }) => {
     if (!Number.isSafeInteger(quantity) || quantity <= 0)
       throw new Error("Invalid service order quantity")
@@ -113,6 +95,12 @@ export function serviceOrderAmounts(data: ServiceOrderData) {
     total: subtotal === null ? null : subtotal + (vat ?? 0),
   }
 }
+
+// Logos
+const HEADER_LOGO = new URL("/public/static/logo-dark.png", import.meta.url)
+  .href
+const FOOTER_LOGO = new URL("/public/static/inverted-logo.png", import.meta.url)
+  .href
 
 // Partner Logos
 const PARTNER_LOGOS = [
@@ -150,19 +138,6 @@ const PARTNER_LOGOS = [
   },
 ]
 
-function staticLogo(path: string): string {
-  if (typeof window === "undefined")
-    throw new Error("Service order PDF requires browser-generated image URLs")
-  return new URL(path, window.location.href).href
-}
-
-const dateFormatter = new Intl.DateTimeFormat("es-MX", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "America/Mexico_City",
-})
-
 // Colors
 const RED = "#d3393b"
 const GRAY = "#ebebeb"
@@ -177,7 +152,7 @@ const FIELD = {
 }
 
 // Field Labels
-const EQUIPMENT_FIELDS = ["MARCA", "MODELO", "SERIE", "CAPACIDAD"]
+const EQUIPMENT_FIELDS = ["MARCA", "MODELO", "SERIE", "CAPACIDAD"] as const
 
 const PART_FIELDS = [
   { label: "CANTIDAD", width: 70 },
@@ -274,13 +249,13 @@ function Bar({ children }: { children: string }) {
 
 function ServiceOrderHeader({
   data,
-  brandLogo,
+  brandLogo = HEADER_LOGO,
 }: {
   data?: ServiceOrderData
   brandLogo?: string
 }) {
   const date = data
-    ? dateFormatter.formatToParts(new Date(data.date_created))
+    ? formatDateLong.formatToParts(new Date(data.date_created))
     : null
   const day = date?.find(({ type }) => type === "day")?.value
   const month = date?.find(({ type }) => type === "month")?.value
@@ -292,7 +267,7 @@ function ServiceOrderHeader({
           ORDEN DE SERVICIO
         </Text>
         <PdfImage
-          src={brandLogo ?? staticLogo("/static/logo-dark.png")}
+          src={brandLogo ?? ""}
           width={60}
           height={60}
           aspectRatio={1 / 1}
@@ -448,47 +423,48 @@ function ReviewedEquipment({
     <View style={{ paddingHorizontal: 24, height: 114 }}>
       <Bar>EQUIPO REVISADO</Bar>
       <View style={{ flexDirection: "row", gap: 10 }}>
-        {[0, 1].map((set) => (
-          <View key={set} style={{ flexDirection: "row", flexGrow: 1, gap: 3 }}>
-            {EQUIPMENT_FIELDS.map((label) => (
-              <View key={label} style={{ flexGrow: 1, gap: 5 }}>
-                <Text
-                  noMargin
-                  style={{ color: INK, fontSize: 8, fontWeight: 700 }}
-                >
-                  {label}
-                </Text>
-                <View
-                  style={{
-                    backgroundColor: GRAY,
-                    borderRadius: 3,
-                    height: 51,
-                    padding: scales ? 4 : 0,
-                  }}
-                >
-                  {scales?.[page * 2 + set] ? (
-                    <Text noMargin style={{ color: INK, fontSize: 8 }}>
-                      {String(
-                        (
-                          {
-                            MARCA: scales[page * 2 + set].scales_id.brand.title,
-                            MODELO:
-                              scales[page * 2 + set].scales_id.model?.title ??
-                              "",
-                            SERIE:
-                              scales[page * 2 + set].scales_id.serial_number ??
-                              "",
-                            CAPACIDAD: `${scales[page * 2 + set].scales_id.capacity} ${scales[page * 2 + set].scales_id.units}`,
-                          } as Record<string, string>
-                        )[label]
-                      )}
-                    </Text>
-                  ) : null}
+        {[0, 1].map((set) => {
+          const scale = scales?.[page * 2 + set]?.scales_id
+          const values = scale
+            ? {
+                MARCA: scale.brand.title,
+                MODELO: scale.model?.title ?? "",
+                SERIE: scale.serial_number ?? "",
+                CAPACIDAD: `${scale.capacity} ${scale.units}`,
+              }
+            : null
+          return (
+            <View
+              key={set}
+              style={{ flexDirection: "row", flexGrow: 1, gap: 3 }}
+            >
+              {EQUIPMENT_FIELDS.map((label) => (
+                <View key={label} style={{ flexGrow: 1, gap: 5 }}>
+                  <Text
+                    noMargin
+                    style={{ color: INK, fontSize: 8, fontWeight: 700 }}
+                  >
+                    {label}
+                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: GRAY,
+                      borderRadius: 3,
+                      height: 51,
+                      padding: scales ? 4 : 0,
+                    }}
+                  >
+                    {values ? (
+                      <Text noMargin style={{ color: INK, fontSize: 8 }}>
+                        {values[label]}
+                      </Text>
+                    ) : null}
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
-        ))}
+              ))}
+            </View>
+          )
+        })}
       </View>
     </View>
   )
@@ -501,12 +477,12 @@ function SpareParts({
   showPrices,
 }: {
   parts?: ServiceOrderData["parts"]
-  lines?: ReturnType<typeof serviceOrderAmounts>["lines"]
+  lines?: ReturnType<typeof ServiceOrderAmounts>["lines"]
   page: number
   showPrices: boolean
 }) {
   return (
-    <View style={{ paddingHorizontal: 24, height: 114 }}>
+    <View style={{ paddingHorizontal: 24, height: 132 }}>
       <Bar>REFACCIONES</Bar>
       <View style={{ flexDirection: "row", gap: 3 }}>
         {PART_FIELDS.map(({ label, width }) => (
@@ -514,9 +490,9 @@ function SpareParts({
             <Text noMargin style={{ color: INK, fontSize: 8, fontWeight: 700 }}>
               {label}
             </Text>
-            {[0, 1, 2].map((row) => {
-              const part = parts?.[page * 3 + row]
-              const line = lines?.[page * 3 + row]
+            {[0, 1, 2, 3].map((row) => {
+              const part = parts?.[page * 4 + row]
+              const line = lines?.[page * 4 + row]
               const values: Record<string, string> = {
                 CANTIDAD: part ? String(part.quantity) : "",
                 DESCRIPCIÓN: part?.inventory_id.title ?? "",
@@ -591,7 +567,7 @@ function ServiceSignatures({
                 variant="thumbnail"
               />
             ) : data ? (
-              <Text noMargin style={{ color: INK, fontSize: 7 }}>
+              <Text noMargin style={{ color: INK, fontSize: 8 }}>
                 Firma no disponible
               </Text>
             ) : null}
@@ -626,7 +602,7 @@ function ServiceSignatures({
                 variant="thumbnail"
               />
             ) : data ? (
-              <Text noMargin style={{ color: INK, fontSize: 7 }}>
+              <Text noMargin style={{ color: INK, fontSize: 8 }}>
                 Firma no disponible
               </Text>
             ) : null}
@@ -697,7 +673,7 @@ function PartnerLogos({ logos }: { logos: { id: string; url: string }[] }) {
         alignItems: "center",
         flexDirection: "row",
         gap: 6,
-        height: 36,
+        height: 30,
       }}
     >
       {logos.map(({ id, url }) => (
@@ -710,7 +686,7 @@ function PartnerLogos({ logos }: { logos: { id: string; url: string }[] }) {
           <PdfImage
             src={url}
             width={68}
-            height={20}
+            height={18}
             fit="contain"
             variant="thumbnail"
           />
@@ -720,7 +696,11 @@ function PartnerLogos({ logos }: { logos: { id: string; url: string }[] }) {
   )
 }
 
-function ServiceOrderFooter({ footerLogo }: { footerLogo?: string }) {
+function ServiceOrderFooter({
+  footerLogo = FOOTER_LOGO,
+}: {
+  footerLogo?: string
+}) {
   return (
     <View
       style={{
@@ -728,14 +708,14 @@ function ServiceOrderFooter({ footerLogo }: { footerLogo?: string }) {
         backgroundColor: RED,
         flexDirection: "row",
         gap: 8,
-        height: 70,
-        paddingHorizontal: 24,
+        height: 80,
+        paddingHorizontal: 20,
       }}
     >
       <PdfImage
-        src={footerLogo ?? staticLogo("/static/inverted-logo.png")}
-        width={65}
-        height={65}
+        src={footerLogo ?? ""}
+        width={60}
+        height={60}
         aspectRatio={1 / 1}
         fit="contain"
         variant="thumbnail"
@@ -761,8 +741,8 @@ function ServiceOrderFooter({ footerLogo }: { footerLogo?: string }) {
 
 export function ServiceOrderPreview({
   logos = PARTNER_LOGOS,
-  brandLogo,
-  footerLogo,
+  brandLogo = HEADER_LOGO,
+  footerLogo = FOOTER_LOGO,
   showPrices = false,
   ...props
 }: ServiceOrderProps) {
@@ -775,14 +755,14 @@ export function ServiceOrderPreview({
       ))
   )
     throw new Error("Service order scales must belong to the selected client")
-  const amounts = data ? serviceOrderAmounts(data) : null
+  const amounts = data ? ServiceOrderAmounts(data) : null
   const totals = amounts
     ? [amounts.parts, ...amounts.charges, amounts.total]
     : []
   const extraPages = data
     ? Math.max(
         Math.ceil(Math.max(0, data.scales.length - 2) / 2),
-        Math.ceil(Math.max(0, data.parts.length - 3) / 3)
+        Math.ceil(Math.max(0, data.parts.length - 4) / 4)
       )
     : 0
   return (
@@ -804,7 +784,7 @@ export function ServiceOrderPreview({
               paddingHorizontal: 24,
               flexDirection: "row",
               gap: 10,
-              height: 131,
+              height: 113,
             }}
           >
             <ServiceSignatures
