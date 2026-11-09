@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import type { ProductCardData } from "@/components/collections/products/product-card"
-import { formatDateShort } from "@/lib/formatting/format-date"
+import { formatDateShort } from "@/lib/formatting/date"
 import { Button } from "@/components/ui/button"
 
 export function ProductCard({ data }: { data: ProductCardData }) {

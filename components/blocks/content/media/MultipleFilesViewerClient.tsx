@@ -2,7 +2,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import GenericViewerClient from "./GenericViewerClient"
-import { formatBytes } from "@/lib/formatting/format-bytes"
+import { formatBytes } from "@/lib/formatting/bytes"
 
 export default function MultipleFilesViewerClient({
   data,

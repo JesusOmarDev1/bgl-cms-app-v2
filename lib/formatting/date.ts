@@ -59,3 +59,16 @@ export function formatDateValue(date: Date, withHours: boolean): string {
 
   return format(date, withHours ? "yyyy-MM-dd'T'HH:mm" : "yyyy-MM-dd")
 }
+
+/**
+ * Format a date to a form-compatible value string.
+ * @param date - Date object to format
+ * @param withHours - Whether to include time
+ * @returns Formatted value string ("yyyy-MM-dd" or "yyyy-MM-dd'T'HH:mm")
+ */
+export const formatDateLong = new Intl.DateTimeFormat("es-MX", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "America/Mexico_City",
+})

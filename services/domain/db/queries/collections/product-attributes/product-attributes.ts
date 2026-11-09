@@ -4,7 +4,7 @@ import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
 import directus from "@/config/directus"
-import { parseAggregateCount } from "@/lib/formatting/parse-aggregate-count"
+import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { PRODUCT_ATTRIBUTES_FIELDS } from "@/services/domain/db/queries/collections/product-attributes/product-attributes.fields"
 import type { ProductAttributesTypes } from "@/types/collections/product-attributes"

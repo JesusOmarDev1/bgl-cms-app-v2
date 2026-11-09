@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import type { DirectusFileQuery } from "@/services/domain/db/queries/blocks/directus-file/directus-file.fields"
 import { PdfIcon } from "@/assets/logos/docs/pdf"
-import { formatBytes } from "@/lib/formatting/format-bytes"
+import { formatBytes } from "@/lib/formatting/bytes"
 
 export default function PdfViewerClient({
   data,
