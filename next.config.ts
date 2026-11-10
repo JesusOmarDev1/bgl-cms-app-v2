@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     agentUpgrade: "security",
     turbopackGc: true,
   },
+  poweredByHeader: false,
 }
 
 export default withNextIntl(nextConfig)

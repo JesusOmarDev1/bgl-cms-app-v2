@@ -6,7 +6,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { AuthDivider } from "@/components/shared/auth/AuthDivider"
 import { FloatingPaths } from "@/components/shared/animation/FloatingPaths"
 import { ChevronLeftIcon, AtSignIcon } from "lucide-react"
 import { StaticLogo } from "@/assets/logos/static-logo"

@@ -1,22 +1,9 @@
 import "server-only"
 import { DIRECTUS_LOG_LEVEL } from "@/lib/env/constants"
+import { createLogger as createReusableLogger } from "@/lib/logger"
 import { LogLevelEnum, type LogLevel } from "@/types/enums/log-level"
 import type { LogContext } from "@/types/shared/logger/log-context"
 import type { Logger } from "@/types/shared/logger/logger"
-
-const PRIORITY: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
-}
-
-const LEVEL_METHOD: Record<LogLevel, "debug" | "log" | "warn" | "error"> = {
-  debug: "debug",
-  info: "log",
-  warn: "warn",
-  error: "error",
-}
 
 function isLogLevel(value: string): value is LogLevel {
   return (LogLevelEnum as readonly string[]).includes(value)
@@ -28,31 +15,6 @@ function resolveDirectusLogLevel(
 ): LogLevel {
   if (raw !== undefined && isLogLevel(raw)) return raw
   return "warn"
-}
-
-const THROTTLE_PRUNE_EVERY = 64
-const throttledKeys = new Map<string, number>()
-let throttleOps = 0
-
-function pruneThrottleMap(now: number, windowMs: number): void {
-  const staleBefore = now - Math.max(windowMs * 2, 120_000)
-  for (const [key, ts] of throttledKeys) {
-    if (ts < staleBefore) throttledKeys.delete(key)
-  }
-}
-
-function throttled(key: string, windowMs: number): boolean {
-  if (windowMs <= 0) return true
-  const now = performance.now()
-  throttleOps++
-  if (throttleOps >= THROTTLE_PRUNE_EVERY) {
-    throttleOps = 0
-    pruneThrottleMap(now, windowMs)
-  }
-  const last = throttledKeys.get(key)
-  if (last !== undefined && now - last < windowMs) return false
-  throttledKeys.set(key, now)
-  return true
 }
 
 /** Process-relative ms. Wall clock (`new Date()` / `Date.now()`) is illegal during Cache Components prerender. */
@@ -179,33 +141,24 @@ function formatHumanLine(
  * Logger governed by `DIRECTUS_LOG_LEVEL`.
  *
  * - all levels: trusted component and finite code/status/collection metadata only
- *
- * Classic severity gate: skip if configured priority > event priority.
- * Throttle (60s default) on non-debug, except finite request trace events; Map pruned periodically.
- *
- * Event messages and raw context values are never emitted, including at debug.
+ * - non-debug: throttled for 60s by default, except finite request trace events
+ * - messages and raw context values are never emitted, including at debug
  */
 export function createLogger(level: LogLevel, throttleMs = 60_000): Logger {
-  const window = level === "debug" ? 0 : throttleMs
-  const write = (target: LogLevel, _message: string, ctx?: LogContext) => {
-    if (PRIORITY[level] > PRIORITY[target]) return
+  return createReusableLogger<LogContext>(level, {
+    throttleMs,
+    throttleKey: (target, ctx) => {
+      const event = safeEvent(ctx?.event)
+      if (event !== undefined) return undefined
 
-    const component = safeComponent(ctx?.component)
-    const location = component ?? "app"
-    const event = safeEvent(ctx?.event)
-    const throttleKey = `${location}:${target}:${safeErrorCode(ctx?.code) ?? ""}:${ctx?.status ?? ""}`
-    if (event === undefined && !throttled(throttleKey, window)) return
-
-    const line = formatHumanLine(target, location, ctx)
-    console[LEVEL_METHOD[target]](line)
-  }
-
-  return {
-    debug: (m, c) => write("debug", m, c),
-    info: (m, c) => write("info", m, c),
-    warn: (m, c) => write("warn", m, c),
-    error: (m, c) => write("error", m, c),
-  }
+      const location = safeComponent(ctx?.component) ?? "app"
+      return `${location}:${target}:${safeErrorCode(ctx?.code) ?? ""}:${ctx?.status ?? ""}`
+    },
+    format: (target, _message, ctx) => {
+      const location = safeComponent(ctx?.component) ?? "app"
+      return formatHumanLine(target, location, ctx)
+    },
+  })
 }
 
 /** Process-wide Directus logger governed by `DIRECTUS_LOG_LEVEL`. */
