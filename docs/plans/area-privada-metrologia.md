@@ -1,6 +1,6 @@
 # Plan para el área privada de metrología
 
-Estado: planificación y decisiones de producto. Batch 0 tiene un [contrato técnico revisable](area-privada-metrologia-batch-0.md), aún pendiente de evaluación humana; su redacción no autoriza Batch 1, código, nuevas operaciones de Directus ni lectura de registros privados. Una validación de cantidad ya aplicada con autorización al Flow activo se describe en §2; sus pruebas end-to-end y propiedades de atomicidad siguen sin verificarse. El plan separado de errores/logger se menciona como antecedente, pero `docs/plans/directus-errors-logger.md` no existe en este árbol: no dar por disponible su contrato ni recrearlo sin pedido.
+Estado (2026-11-11): Batch 0 **aprobado por el usuario** (contrato en [area-privada-metrologia-batch-0.md](area-privada-metrologia-batch-0.md)). Batch 1 está **implementado y verificado localmente** (suite 87/87, typecheck, ESLint, Prettier; verificación independiente en copia aislada 70/70), pero **no cerrado**: faltan el Experimento 1 y el A/B integrado que ejecuta el usuario en su entorno aislado, más las validaciones de despliegue (XFF y rate-limit de Directus). El detalle de lo implementado está en §3.0 y en Batch 1 (§4). Batches 2–9 no autorizados ni iniciados; Batch 10 opcional. Una validación de cantidad ya aplicada con autorización al Flow activo se describe en §2; sus pruebas end-to-end y propiedades de atomicidad siguen sin verificarse. El plan separado de errores/logger se menciona como antecedente, pero `docs/plans/directus-errors-logger.md` no existe en este árbol: no dar por disponible su contrato ni recrearlo sin pedido.
 Alcance: área privada para gestionar órdenes de servicio y las colecciones que realmente facilitan ese trabajo, mediante permisos individuales efectivos. `traceable` y `accredited` se evalúan después; `consecutives` permanece excluida.
 
 **Lectura rápida:** el esquema vivo confirma `order`, `order_scales`, `scales`, `clients`, `inventory` e `inventory_movements`; `order.status` existe (`draft`, `paid`, `cancelled`, default `draft`, `NOT NULL`). El usuario informó que aún no había órdenes al momento de la conversación; no se consultaron registros. El modelo de líneas de refacciones, `scales.client` y el vínculo de movimientos a órdenes siguen sin crearse. `inventory.price` es decimal(10,2), nullable, default `NULL`. Las decisiones de producto y UI confirmadas están abajo, incluida la obligatoriedad futura de `supplier` para todo `entry` y `client` para todo `withdrawal`, independientemente de `status`. La forma técnica de garantizar transiciones, atomicidad, idempotencia y concurrencia no está demostrada. No se verificaron permisos efectivos, enforcement API, rollback integral, historial de firmas ni integración del PDF privado. El prototipo PDF sí se renderizó en navegador dentro de Storybook con datos sintéticos; eso no prueba descarga de órdenes reales.
@@ -60,7 +60,7 @@ Se puede reutilizar el patrón de archivos `*.fields.ts`, consultas y repositori
 
 Las versiones instaladas verificadas en esta reevaluación son:
 
-- Next.js **16.4.5** (coincide con `package.json`; el dato histórico 16.4.2 quedó obsoleto).
+- Next.js **16.4.6** (bump aplicado directamente por el usuario en `package.json` y `pnpm-lock.yaml`; los cambios de dependencias y su commit los gestiona él; el dato histórico 16.4.2/16.4.5 quedó obsoleto).
 - SDK de Directus **24.0.0**.
 - `@formepdf/core` y `@formepdf/react` **0.25.0**.
 
@@ -142,15 +142,44 @@ El avance previo del `DateRangePicker` tiene cuatro pruebas enfocadas que pasaro
 
 ## 3. Propuesta técnica mínima
 
-### 3.1 Autenticación: JSON elegido; integración pendiente de prueba
+### 3.0 Implementado en Batch 1 (fuente de verdad del código actual)
 
-**Decisión del usuario para Batch 1: modo `json`.** La [API oficial](https://directus.com/docs/api/authentication) documenta que el refresh token se devuelve en la respuesta JSON. Que los tokens lleguen a Next.js no implica entregarlos al JavaScript del navegador, pero obliga a custodiar y rotar access y refresh tokens correctamente. La documentación no prueba por sí sola las carreras de refresh ni los permisos efectivos en el despliegue.
+**Clientes Directus.** `config/directus-public.ts` exporta el singleton `publicDirectus` (antes `config/directus.ts`; setup byte-idéntico: `staticToken` + `rest` + timeout 10 s + trace fetch) y alimenta las 31 consultas públicas. `config/directus-private.ts` no exporta singletons autenticados: `buildPrivateClient()` construye por llamada un cliente `authentication("json", { autoRefresh: false })` + `rest({ cache: "no-store", signal: options.signal ?? AbortSignal.timeout(DIRECTUS_TIMEOUT_MS) })`; sobre él, `createPrivateDirectus(accessToken)` (rechaza token vacío, hace `await setToken`) para lecturas privadas y `createDirectusAuthClient()` (sin token) para login/refresh/logout.
 
-Comparación de modos (referencia, no puerta de elección):
+**Sesión.** `services/domain/server/auth/session.ts`: cookies propias `bgl_auth_access` y `bgl_auth_refresh` (`HttpOnly`, `Secure` en producción, `lax`, `path: "/"`, sin `Domain`); access con `maxAge` derivado de `expires` de Directus, refresh fijo 7 días (`AUTH_REFRESH_COOKIE_MAX_AGE`, anotado como shortcut hasta confirmar TTL real del despliegue). `readAuthSession()` lee ambas cookies; `createSessionClient(accessToken)` construye el cliente privado; `applyAuthCookies` exige ambos tokens y solo corre en Server Actions/Route Handlers; `clearAuthCookies` borra ambas.
+
+**Server Actions de auth** (`login.ts`, `refresh.ts`, `logout.ts`, todas `"use server"` + next-safe-action + valibot):
+
+- **Login:** rate-limit por IP (`loginLimiter` en `config/rate-limiter.ts`, 5/60 s con bloqueo 300 s y insurance en memoria; fail-closed si el `x-forwarded-for` es multi-hop, con mensaje de indisponibilidad, no de rate-limit). SDK `login({ email, password }, { mode: "json", otp })`; MFA: sin OTP → `mfaRequired`, OTP inválida → `mfaInvalid`. Gate de rol: `readMe({ fields: ["id", "role"] })` rechaza cuentas sin rol con `noRole` **antes de emitir cookies**. Solo entonces `applyAuthCookies`.
+- **Refresh:** single-flight por proceso (`pendingRefreshes` map por refresh_token, promesa compartida, limpieza en `finally`). Comando crudo `refresh({ mode: "json", refresh_token })` — la extensión `authentication()` del SDK **ignora** el refresh_token de options y lee su propio storage, por eso no se usa. Clasificación: sesión vencida/inválida → borra cookies y pide login; error de Directus transitorio (p. ej. 503) → conserva cookies e informa indisponibilidad; sin sesión → 0 fetch y `sessionExpired`.
+- **Logout:** comando crudo `logout({ mode: "json", refresh_token })` revoca en Directus; borra cookies locales siempre; si Directus falla, cierra localmente con `remoteRevoked: false` (nunca afirma revocación confirmada).
+- **Contrato de errores estable:** las acciones devuelven **claves** (`invalidCredentials`, `mfaRequired`, `mfaInvalid`, `noRole`, `rateLimited`, `unavailable`, `generic`, `sessionExpired`), nunca texto traducido; la traducción ocurre solo en el cliente (`auth.json` + `directusErrors`). Los mocks de next-intl en tests devuelven `T:<key>` para que un bug de doble traducción (MISSING_MESSAGE, ya ocurrido) no vuelva a pasar. `classifyDirectusError` (lib/directus/classify-error.ts) mapea códigos SDK a categorías.
+
+**Rutas y layouts.** Root layout sin chrome público; `(site)`/`(http)`/mantenimiento usan `PublicChrome`; el área privada vive en el grupo `(auth)`: `/login` (metadata noindex) y `/dashboard` (SessionCard dentro de `<Suspense>`, redirect a `/login` sin sesión, identity vía `getIdentityRepository` — patrón casa: `types/collections/session.ts`, query + `session.fields.ts` y repositorio; sin SDK en la página, sin `"use cache"` en datos privados). `AuthPage` usa TanStack Form + valibot, `PasswordInput` (InputGroup + toggle con `LazyMotion`/`m`), `InputOTP`, `MaterialIcon`; `RefreshSession` y `LogoutButton` componentes cliente.
+
+**Hardening aplicado:** `onRequest` preserva el `signal` del llamador; `request-trace` registra 4xx a `debug` y 5xx/transporte a `info`, sin headers ni cuerpos.
+
+**Verificación:** suite 87/87 (22 archivos), `tsc` limpio, ESLint sin errores, Prettier, `git diff --check` (solo EOL). Verificación independiente en copia aislada: 70/70 + typecheck (la preparación falló 3 veces copiando `node_modules`; la solución fue copiar solo el árbol fuente + junction de `node_modules`, sin red; scratch eliminado). **No commits del asistente: los sube el usuario.**
+
+**Lecciones aprendidas (aplicar en Batches 2+):**
+
+1. La extensión `authentication()` del SDK v24 guarda tokens en su propio storage y `refresh()`/`logout()` ignoran opciones: usar siempre los comandos crudos con `{ mode: "json", refresh_token }` explícito.
+2. Un import de módulo inexistente en Vitest no falla al importar: el síntoma es «unavailable» con 0 fetch — diagnosticar por conteo de llamadas.
+3. Las Server Actions devuelven claves de error, no texto; traducir en cliente. Mocks de i18n con prefijo (`T:`) para detectar doble traducción.
+4. Las copias aisladas para verificación independiente: solo árbol fuente + junction de `node_modules`; nunca copiar `node_modules` (timeout 240 s).
+5. El usuario edita el árbol en paralelo: releer cada archivo antes de editarlo.
+6. Patrón casa obligatorio: tipos en `/types`, `*.fields.ts` + query + repositorio, sin SDK inline en la app; `use cache`/`cacheTag`/`cacheLife` solo para datos públicos.
+7. `REQUESTS_EXCEEDED` de Directus ya llega clasificado como `rateLimited`: segunda capa tras el limiter local.
+
+### 3.1 Autenticación: JSON elegido e implementado; pendiente de prueba integrada
+
+**Decisión del usuario para Batch 1: modo `json`, definitivo para dominios distintos.** La [API oficial](https://directus.com/docs/api/authentication) documenta que el refresh token se devuelve en la respuesta JSON, y la documentación de Single Sign-On lo confirma para este despliegue: cookies solo alcanzan subdominios del mismo dominio padre; con dominios de segundo nivel distintos "each domain will maintain its own independent session" ([Cookie Limitations](https://directus.com/docs/configuration/auth-sso)). `SameSite=None` es un ajuste de borde (default `lax`) que solo agregaría CSRF y riesgo de bloqueo por third-party cookies: **`session`/`cookie` de Directus quedan descartados**, no solo diferidos. Que los tokens lleguen a Next.js no implica entregarlos al JavaScript del navegador, pero obliga a custodiar y rotar access y refresh tokens correctamente. La documentación no prueba por sí sola las carreras de refresh ni los permisos efectivos en el despliegue.
+
+Comparación de modos (elección cerrada; referencia para el historial de decisión):
 
 - **JSON:** devuelve access token, refresh token y duración. Next.js controla sus cookies del mismo origen y usa el access token en las consultas del empleado.
-- **`session`:** Directus emite una cookie con un token que combina acceso y renovación. Es viable, pero requiere resolver dominio, reenvío de cookies y propagación de `Set-Cookie` entre Directus, Next.js y navegador.
-- **`cookie` no es sinónimo de `session`:** es otro modo, asociado al refresh token en cookie.
+- **`session`:** Directus emite una cookie con un token que combina acceso y renovación. **Descartado:** esa cookie nunca llegaría al dominio de Next.js (dominios de segundo nivel distintos) y forzarla con `SameSite=None` agrega CSRF y bloqueo de third-party cookies.
+- **`cookie` no es sinónimo de `session`:** es otro modo, asociado al refresh token en cookie; mismo descarte.
 
 **Implementación:** usar `json` sin depender de una cookie emitida por Directus en otro dominio. Probar respuestas de refresh fuera de orden en varias pestañas e instancias; si no se demuestra renovación segura, cerrar sesión al vencer el acceso y pedir nuevo login, sin prometer renovación transparente.
 
@@ -159,6 +188,7 @@ Fuentes:
 - [Tokens y cookies de Directus](https://directus.com/docs/guides/auth/tokens-cookies).
 - [SDK oficial de Directus](https://directus.com/docs/guides/connect/sdk).
 - [Autenticación Next.js: sección JSON solicitada](https://directus.com/docs/frameworks/nextjs/authentication#json-authentication-mode).
+- [Cookie Limitations (auth-sso)](https://directus.com/docs/configuration/auth-sso) — cookie no cruza dominios de segundo nivel distintos.
 
 **No copiar literalmente el tutorial:** utiliza un cliente global mutable, registra respuestas de login y muestra un logout que solo borra una cookie. No constituye por sí solo una solución completa para producción.
 
@@ -174,22 +204,26 @@ Login, logout y refresh son operaciones POST en Server Actions separadas: `servi
    - Validar ingreso al área antes de establecer la sesión definitiva.
 
 2. **Cookies**
-   - En JSON, access y refresh tokens en cookies `HttpOnly` administradas por Next.js; en `session`, verificar el dominio y la propagación efectiva de la cookie emitida por Directus.
-   - `Secure` en producción, sin `Domain` compartido y con `SameSite` explícito.
+   - En JSON, **dos cookies propias de Next.js**: `access` (vida corta) y `refresh` (largavida), ambas `HttpOnly`, `Secure` en producción, `sameSite: "lax"`, `path: "/"` y **sin atributo `Domain`** — cookies del mismo origen, nunca reenviadas a Directus ni bajadas al cliente.
+   - Emisionidas **solo en Server Actions o Route Handlers**; nunca durante el render de un Server Component (HTTP no permite encabezados tras el streaming).
    - Duraciones alineadas con la configuración real de Directus; no asumir sus valores por defecto.
    - Sin tokens en `localStorage`, props, URLs o parámetros de descarga.
    - No guardar contraseñas ni copiar roles del navegador como autoridad.
 
 3. **Validación**
-   - Una función pequeña de acceso a datos verifica identidad con `readMe()` y devuelve solo los campos necesarios.
-   - Cada consulta privada usa las credenciales de esa solicitud: por ejemplo `withToken()` en JSON, o la cookie de sesión del empleado reenviada correctamente en `session`; nunca el token público compartido.
+   - Un único módulo de sesión (DAL) lee cookies por solicitud y construye `createPrivateDirectus(accessToken)`; sin singleton autenticado ni token público.
+   - Cada consulta privada usa las credenciales de esa solicitud; **nunca el token público compartido** ni las queries con `use cache` del sitio.
+   - **Re-verificar identidad dentro de cada Server Action**, no solo en layout o página: una action es alcanzable por POST directo y la verificación de página no la cubre ([Data Security](https://nextjs.org/docs/app/guides/data-security)).
    - La existencia de una cookie, o decodificar un JWT sin validación, no basta.
    - El acceso a una orden se resuelve mediante una lectura autorizada de esa orden.
+   - Con Cache Components activos (`cacheComponents: true` en `next.config.ts`), ninguna función con `cookies()` entra en `use cache`; la UI autenticada streamea detrás de `<Suspense>` y nunca hace `await` de la sesión en el top-level del layout.
 
 4. **Expiración y refresh**
    - Refresh no se ejecuta durante el render de un Server Component ni escribe cookies desde ese render.
-   - No usar temporizadores automáticos del SDK como gestor de sesiones del servidor.
-   - Access token vencido: renovar solo si la estrategia elegida resiste concurrencia; en caso contrario, requerir nuevo login.
+   - No usar temporizadores automáticos del SDK como gestor de sesiones del servidor: `autoRefresh: false` en el cliente privado.
+   - **Refresh siempre con `{ mode: "json", refresh_token }` explícito**: el SDK v24 usa `mode: "cookie"` por defecto incluso en `refresh()`/`logout()` y esa llamada falla con json (`@directus/sdk/dist/rest/commands/auth/refresh.js`).
+   - Refresh **single-flight por proceso**: una sola solicitud en vuelo comparte la respuesta entre llamadas concurrentes del mismo proceso; la carrera entre pestañas/réplicas es distinta y se prueba aparte (Directus ofrece `SESSION_REFRESH_GRACE_PERIOD`, default 10s, no verificado en el despliegue).
+   - Access token vencido: renovar una vez con single-flight y cookies rotadas emitidas en la misma respuesta del Server Action; si la renovación falla, cerrar sesión y pedir login, sin bucle.
    - Refresh o sesión inválidos o vencidos: eliminar las cookies propias, cerrar localmente y pedir login.
    - Error transitorio de red: mostrar indisponibilidad, sin afirmar que las credenciales son incorrectas ni iniciar un bucle de renovación.
 
@@ -210,11 +244,11 @@ No proponer un `Map` global como solución de renovación: no coordina réplicas
 Para el MVP:
 
 - Las lecturas paralelas no renuevan cada una por su cuenta.
-- Un flujo explícito concentra el refresh; deduplicar una interfaz es una optimización, **no** coordinación suficiente entre pestañas o réplicas.
+- Un flujo explícito concentra el refresh con **single-flight por proceso** (una promesa compartida entre llamadas concurrentes); sigue sin coordinar pestañas o réplicas y tampoco basta un `Map` global: no coordina réplicas y podría mezclar sesiones si se indexa incorrectamente.
 - Nunca hay un token de empleado almacenado en un singleton mutable.
 - Hay que probar múltiples pestañas, respuestas fuera de orden y logout durante refresh.
 
-Directus documenta `SESSION_REFRESH_GRACE_PERIOD` para tolerar carreras de renovación. **No se comprobó la versión del servidor, su configuración ni su comportamiento real.** La documentación no basta para garantizar todos los casos de varias pestañas y réplicas.
+Directus documenta `SESSION_REFRESH_GRACE_PERIOD` (default 10 s, según security-limits) para tolerar carreras de renovación server-side. **No se comprobó la versión del servidor, su TTL efectivo ni su comportamiento real:** el despliegue podría tener otro valor u otro modo de invalidación (issue #24310/#20572 documentan refresh de un solo uso que falla bajo carreras). La documentación no basta para garantizar todos los casos de varias pestañas y réplicas.
 
 La aceptación debe demostrar que la rotación no deja cookies obsoletas ni restaura una sesión cerrada, incluso con `Set-Cookie` fuera de orden y varias instancias. Si falla, no aprobar renovación transparente: cerrar localmente, pedir nuevo login y registrar explícitamente esa limitación del MVP. Invalidar un refresh token no demuestra revocación inmediata de access tokens ya emitidos.
 
@@ -278,19 +312,19 @@ Enlaces oficiales:
 
 ### 3.6 Área privada, dashboard y sidebar
 
-Rutas propuestas, no existentes:
+Rutas propuestas, renombradas por el usuario de `/metrologia/*` a la raíz (2026-11-11):
 
-- `/metrologia/login`
-- `/metrologia` (entrada al área: dashboard, no redirección directa a la tabla)
-- `/metrologia/ordenes` y `/metrologia/ordenes/[id]`
-- `/metrologia/movimientos` y pantallas de catálogo según §3.8
-- `/metrologia/configuracion`
+- `/login`
+- `/dashboard` (entrada al área: dashboard, no redirección directa a la tabla)
+- `/dashboard/ordenes` y `/dashboard/ordenes/[id]`
+- `/dashboard/movimientos` y pantallas de catálogo según §3.8
+- `/dashboard/configuracion`
 
 No se propone una ruta API por colección ni una ruta PDF dedicada. Separar login del layout protegido para evitar ciclos de redirección. La entrada privada es un dashboard con navegación a la izquierda y contenido ocupando el resto. Diseño oscuro fijo conforme a `DESIGN.md`, reutilizando `components/ui/sidebar.tsx`; las capturas externas son referencias de agrupación/ubicación, no especificación literal de colores ni contenido.
 
 **Bloques previstos, aún no instalados:** `components.json` registra `@efferd` con una URL antigua sin estilo (`https://efferd.com/r/{name}.json`). En esta reevaluación esa URL devolvió **«Style Missing»**, y la [URL pública con estilo `aria-nova` para `settings-1`](https://efferd.com/r/aria-nova/settings-1.json) **sí devolvió el manifiesto y código** sin credenciales; el HTTP 401 pertenece a una consulta previa y no describe el estado actual. La [galería indicada por el usuario](https://efferd.com/blocks/settings#settings-1) muestra el bloque como referencia. Su manifiesto contiene perfil editable, avatar, email, notificaciones y contenido de ejemplo ajeno: aprovechar composición solamente, sin instalar automáticamente campos o acciones no solicitadas. `dashboard-3` sigue siendo de soporte al cliente (CSAT, conversaciones, tickets) y [su manifiesto con estilo](https://efferd.com/r/aria-nova/dashboard-3.json) incluye `chart`, `table`, `@efferd/indicator` y `@efferd/app-shell-3`. En Batch 2 corregir **solo si se va a usar el registro** la plantilla de `@efferd` a `https://efferd.com/r/{style}/{name}.json`, revisar licencia, dependencias y compatibilidad con `components/ui` y no sobrescribir componentes locales; no modificar `components.json` durante esta planificación. No copiar contenido ficticio. Aplicar pulido después de conectar login, dashboard y Configuración. [Configuración actual de Efferd](https://efferd.com/docs/quick-setup).
 
-**i18n del área privada (planificado, no creado):** el proyecto usa `next-intl`, locale `es`, archivos `i18n/messages/es/<namespace>.json` con su clave raíz y ensamblaje únicamente en `i18n/request.ts`; el documento HTML usa `es-MX`. En Batch 1, crear `i18n/messages/es/auth.json` (namespace `auth`) para el login real de `components/shared/auth/AuthPage.tsx`: título, instrucciones, etiquetas/ayuda de campos, envío, carga, validación, error seguro y cierre/expiración de sesión según el flujo implementado. Su pantalla actual contiene texto inglés de Efferd, invitación a registrarse, testimonio ficticio y enlaces `#`: **no traducir ese contenido literalmente ni prometer registro/términos inexistentes**; eliminar o sustituir con texto auténtico de acceso exclusivo a empleados. Reutilizar `directusErrors` para errores comunes, sin duplicarlos.
+**i18n del área privada:** el proyecto usa `next-intl`, locale `es`, archivos `i18n/messages/es/<namespace>.json` con su clave raíz y ensamblaje únicamente en `i18n/request.ts`. **Batch 1 ya creó** `i18n/messages/es/auth.json` (namespace `auth`) y lo registró en `i18n/request.ts`: copy real de acceso de empleados (sin registro público ni enlaces falsos), claves de estado de sesión y las claves de error del contrato (`invalidCredentials`, `mfaRequired`, `mfaInvalid`, `noRole`, etc.). Regla vigente: las Server Actions devuelven **claves**, y la traducción ocurre solo en el cliente con `useTranslations`; reutilizar `directusErrors` para errores comunes, sin duplicarlos.
 
 En Batch 2, crear `i18n/messages/es/app.json` (namespace `privateApp`) para navegación, acciones comunes, estados vacíos y configuración del área privada; y `i18n/messages/es/dashboard.json` (namespace `dashboard`) para títulos, descripciones y estados propios del dashboard, sin copiar términos CSAT/tickets de Efferd. Cuando lleguen listados y operaciones, crear `i18n/messages/es/metrology.json` (namespace `metrology`, grupos por órdenes, inventario, movimientos y catálogos) **solo para mensajes efectivamente usados**, con confirmaciones, denegaciones y estados de integridad donde correspondan. Reutilizar los catálogos existentes `search`, `share` y `directusErrors` en vez de crear traducciones duplicadas. Agregar cada catálogo al ensamblaje de `i18n/request.ts` al usarlo; componentes cliente usan `useTranslations`, contextos de servidor `getTranslations`. Mantener queries sin `next-intl`: el repositorio resuelve mensajes y los pasa a la consulta cuando corresponda. No añadir un segundo sistema de i18n ni valores privados a JSON de traducciones.
 
@@ -407,13 +441,16 @@ Entregable para revisar: [contrato de órdenes e inventario y matriz de pruebas]
 - **Comprobar:** contrato revisable que distinga campos existentes de propuestos y matriz A/B de operaciones permitidas/denegadas, efectos de stock y reparaciones. Permisos efectivos, usuarios, datos y configuración remota solo se consultan si el usuario autoriza ese acceso; una falta de evidencia no se presenta como garantía.
 - **Cierre:** acordar correcciones o aprobar el paso al Batch 1. Ninguna migración ni cambio de Flow queda autorizado por aprobar este contrato.
 
-### Batch 1 — Sesión y cliente Directus privado
+### Batch 1 — Sesión y cliente Directus privado (implementado; cierre pendiente de evidencia del usuario)
 
-El usuario eligió `json` para dominios distintos. El [protocolo aislado de autenticación](area-privada-metrologia-batch-1-pruebas-sesion.md) sigue sirviendo para comprobar comportamiento real, pero comparar `session` ya no bloquea la implementación; la evidencia de aislamiento y renovación integrada sigue pendiente.
+**Estado: código completo y verificado localmente.** Toda la lista «Hacer» original está implementada (detalle exacto en §3.0, que prevalece sobre este resumen). Lo único que falta para cerrar el batch es la evidencia que solo el usuario puede producir en su entorno aislado:
 
-- **Hacer:** identificar el cliente público como `config/directus-public.ts` y crear un cliente privado por solicitud en `config/directus-private.ts` sin estado de autenticación compartido. Incorporar login/refresh/logout JSON con SDK oficial, cookies `HttpOnly` de Next.js y `components/shared/auth/AuthPage.tsx` conectado. Crear `i18n/messages/es/auth.json` y registrar su namespace en `i18n/request.ts`; reemplazar el texto ficticio/inglés del bloque por copy real de acceso de empleados, sin registro público ni enlaces falsos. Separar login del layout protegido y evitar caché compartida de datos privados.
-- **Comprobar:** acceso anónimo y cruce A/B denegados; sitio público intacto; dos pestañas, respuestas de refresh fuera de orden, logout concurrente, cambio de usuario, sesión expirada y varias instancias. Confirmar en pantalla textos españoles de formulario, validación, envío, expiración y denegación, sin claves visibles ni copy de Efferd. Si la renovación no resulta segura, cerrar sesión y pedir login; no declarar refresh transparente verificado.
-- **Cierre:** demostrar inicio/cierre y aislamiento con cuentas/entorno autorizados; consultar correcciones o aprobación del Batch 2.
+- **Experimento 1 (protocolo ya redactado):** login/refresh/logout JSON reales contra el despliegue, incluyendo un usuario **sin rol** para comprobar el rechazo `noRole` antes de emitir cookies, y un intento fallido para comprobar `invalidCredentials`/`mfaRequired` en pantalla.
+- **A/B integrado:** acceso anónimo y cruce A/B denegados; sitio público intacto; dos pestañas, respuestas de refresh fuera de orden, logout concurrente durante refresh, cambio de usuario, sesión expirada y varias instancias (single-flight no coordina réplicas: invalidar una solicitud solo mata la sesión de esa réplica).
+- **Validaciones de despliegue:** confirmar que el proxy del proveedor sobrescribe `x-forwarded-for` (el rate-limit por IP depende de ello) y revisar `REQUESTS_EXCEEDED` / TTL de sesión en la configuración de Directus para alinear el refresh de 7 días anotado como shortcut.
+- **Comprobar en pantalla:** textos españoles de formulario, validación, envío, expiración y denegación, sin claves visibles ni copy de Efferd. Si la renovación no resulta segura, cerrar sesión y pedir login; no declarar refresh transparente verificado.
+
+- **Cierre:** con esos resultados redactados (sin secretos), corregir dentro del batch si aplica y pedir aprobación explícita del Batch 2. Ningún resultado favorable autoriza por sí solo el Batch 2.
 
 ### Batch 2 — Shell, dashboard y configuración
 
@@ -511,12 +548,15 @@ Un PDF regenerado con datos actuales cambia si cambia la orden o la plantilla. P
 
 ### Verificaciones no realizadas
 
+**Actualizado al cierre de Batch 1 (2026-11-11).** Nuevas verificaciones realizadas desde la versión anterior del plan: suite completa **87/87** (22 archivos, incluidos login/refresh/logout/session/cliente privado, rate-limit multi-hop, gate de rol y request-trace), `tsc` limpio, ESLint sin errores, Prettier y `git diff --check`. La **verificación independiente en copia aislada sí se completó** (70/70 + typecheck; la preparación falló 3 veces copiando `node_modules` hasta adoptar árbol fuente + junction; scratch eliminado). Siguen sin realizarse:
+
+- **Experimento 1 y A/B integrado de Batch 1** (los ejecuta el usuario; ver Batch 1 en §4): login/refresh/logout reales, usuario sin rol, carreras de refresh, logout concurrente, cambio de usuario, múltiples instancias.
+- **Validaciones de despliegue:** sobrescritura de `x-forwarded-for` por el proxy del proveedor; TTL de sesión y `REQUESTS_EXCEEDED` reales en Directus para alinear el refresh de 7 días (hoy un shortcut anotado).
 - Snapshot/export local (no localizado). **El esquema vivo básico de `order`, `scales`, `traceable` y `accredited` sí se verificó por MCP**, pero no sus registros, datos históricos ni consistencia efectiva.
-- Roles, políticas, MFA, TTL, versión y configuración efectiva de Directus.
+- Roles, políticas, MFA, TTL, versión y configuración efectiva de Directus (más allá del gate de rol por `readMe`, ya implementado y probado con mocks).
 - Identidad y privilegios del token público.
-- Renovación concurrente contra la versión real del servidor.
 - Integración Next.js del renderizado y descarga privada, paginación con contenido largo, memoria y empaquetado WASM. El renderizado y casos acotados de paginación sí se probaron en Storybook; la cuarta fila aún no pasó una verificación independiente (0 pruebas ejecutadas por fallo de preparación).
-- Verificación global completa y build Next.js: no realizados en esta actualización. Sí pasaron typecheck, lint/formato focalizados, 2 stories y build de Storybook en el trabajo del prototipo; no sustituyen las pruebas de autorización ni el build de la aplicación. Cuatro pruebas enfocadas del `DateRangePicker` pasaron en una ejecución previa; un typecheck anterior falló por módulos `pdf-theme` ausentes.
+- Build Next.js de la aplicación con el área privada conectada (no ejecutado en esta tarea; `pre-deploy` queda a cargo del usuario).
 
 En la investigación inicial funcionó CodeGraph; la revisión posterior lo contrastó con Git y lecturas locales (757 archivos indexados, con advertencia de algún vínculo pendiente de sincronización). Directus Documentation MCP aportó documentación pública; **Directus MCP**, autorizado posteriormente por el usuario para investigar el esquema, aportó metadatos vivos mediante `schema`, `fields`, `relations` y `collections`, siempre en modo lectura. Ninguno de esos metadatos prueba los permisos de las cuentas de empleados.
 
@@ -536,7 +576,7 @@ Todo `entry` requiere proveedor real y todo `withdrawal` requiere cliente real, 
 2. Probar stock entero/no negativo y rechazo íntegro ante insuficiencia o falta de cualquiera de los permisos requeridos, incluida sustitución de parte pagada. No exigir permiso de creación en pagos que no necesiten movimientos.
 3. Resolver técnicamente historial/nombre de firmantes previos y acceso a firmas, carga autorizada del PNG transparente de SignaturePad a Directus, selección de esquema y prueba del redondeo monetario aprobado e integrar/medir el PDF en la aplicación privada; el renderizado aislado en Storybook ya se probó, pero la cuarta fila requiere una nueva verificación independiente autorizada tras preparar el entorno aislado. Route Handler solo ante limitación medida. No afirmar que revisions conservan archivos accesibles.
 4. Verificar permisos efectivos, API enforcement, versión/configuración Directus y sesión solo con autorización específica. Las pruebas de escritura API/enforcement están expresamente diferidas por el usuario para una continuación posterior; no presentarlas como realizadas. No consultar datos/usuarios/políticas ni editar Directus.
-5. Sesión `json` vs `session` y MFA requieren validación técnica; browser es la propuesta preferida de PDF, pero el preview y descarga con datos privados aún deben probarse fuera de Storybook. Preview local puede reflejar ediciones no guardadas, nunca ser fuente de descarga. Histórico PDF inmutable no está acordado.
+5. `json` ya está elegido y `session` descartado por dominios distintos ([auth-sso](https://directus.com/docs/configuration/auth-sso)); quedan por validar carreras/rotación integradas y MFA. Browser es la propuesta preferida de PDF, pero el preview y descarga con datos privados aún deben probarse fuera de Storybook. Preview local puede reflejar ediciones no guardadas, nunca ser fuente de descarga. Histórico PDF inmutable no está acordado.
 6. En una continuación autorizada, implementar y probar enforcement server-side de la regla resuelta: `entry` requiere supplier real y `withdrawal` requiere client real, cualquiera que sea `status`; rechazo de retiros independientes `damaged`/`decommissioned` sin cliente real; y permisos efectivos combinados para pago con movimientos. Las pruebas de API aisladas —expresamente diferidas, no realizadas— deben cubrir cambio de tipo en update, relación ausente/null, tipo inválido, pago con falta de cada permiso y creación independiente sin orden; incluir cliente derivado de una orden vinculada cuando aplique, sin inventar reglas adicionales. La lista general de movimientos vinculados ya es read-only; edición/corrección desde detalle de orden.
 
 No se autoriza implementar código ni modificar esquema, datos, políticas o Flows. Flow dedicado de orden sigue sin decisión ni autorización. El cambio previo del Flow activo de cantidad fue autorizado, aplicado y leído de vuelta; la prueba satisfactoria reportada por el usuario no sustituye evidencia de logs/stock ni pruebas independientes.

@@ -12,55 +12,37 @@ vi.mock("@/lib/directus/query-error", () => ({
   returnDirectusQueryError: vi.fn(),
 }))
 
-import { getRedirectIndexQuery } from "@/services/domain/db/queries/collections/redirects/redirects"
+import { getRedirectsQuery } from "@/services/domain/db/queries/collections/redirects/redirects"
 
-describe("getRedirectIndexQuery", () => {
+describe("getRedirectsQuery", () => {
   beforeEach(() => request.mockReset())
 
-  it("loads compact records in 200-row pages ordered by newest then ID", async () => {
-    request.mockResolvedValueOnce(
-      Array.from({ length: 200 }, (_, id) => ({ id }))
-    )
-    request.mockResolvedValueOnce([{ id: 201 }])
-
-    const rows = await getRedirectIndexQuery("failed")
-
-    expect(rows).toHaveLength(201)
-    expect(request).toHaveBeenCalledTimes(2)
-    expect(request.mock.calls.map(([query]) => query)).toEqual([
-      expect.objectContaining({
-        fields: ["id", "origin", "destiny", "http_code"],
-        limit: 200,
-        page: 1,
-        sort: ["-date_created", "id"],
-      }),
-      expect.objectContaining({ page: 2 }),
-    ])
-  })
-
-  it("filters the redirect index by origin when provided", async () => {
+  it("supports paginated exact-origin queries", async () => {
     request.mockResolvedValueOnce([{ id: "matching" }])
 
-    await getRedirectIndexQuery("failed", "/old")
+    await getRedirectsQuery({ limit: 200, page: 2, origin: "/old" }, "failed")
 
-    expect(request).toHaveBeenCalledWith(
+    expect(request).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
+        limit: 200,
+        page: 2,
         filter: { origin: { _eq: "/old" } },
       })
     )
   })
 
-  it("rejects a failed later page instead of returning a partial index", async () => {
-    request.mockResolvedValueOnce(
-      Array.from({ length: 200 }, (_, id) => ({ id: `first-page-${id}` }))
-    )
+  it("propagates a failed endpoint query instead of returning a partial index", async () => {
     request.mockRejectedValueOnce(new Error("Directus unavailable"))
 
-    await expect(getRedirectIndexQuery("failed")).rejects.toThrow(
-      "Directus unavailable"
-    )
-    expect(request.mock.calls[1]?.[0]).toEqual(
-      expect.objectContaining({ page: 2 })
-    )
+    await expect(
+      getRedirectsQuery({ origin: "/old", throwOnError: true }, "failed")
+    ).rejects.toThrow("Directus unavailable")
+  })
+
+  it("returns an empty result when the main query fails", async () => {
+    request.mockRejectedValueOnce(new Error("Directus unavailable"))
+
+    await expect(getRedirectsQuery({ origin: "/old" }, "failed")).resolves.toEqual([])
+    expect(request).toHaveBeenCalledTimes(1)
   })
 })

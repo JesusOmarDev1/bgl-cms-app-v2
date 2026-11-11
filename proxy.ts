@@ -33,7 +33,7 @@ function isRedirectRecord(value: unknown): value is RedirectRecord {
 
 async function loadRedirectRecords(
   requestUrl: URL
-): Promise<readonly RedirectRecord[]> {
+): Promise<readonly RedirectRecord[] | null> {
   try {
     // Cached lookup lives in the route. Proxy cannot run "use cache" itself.
     const endpoint = new URL("/api/redirects", requestUrl.origin)
@@ -41,25 +41,31 @@ async function loadRedirectRecords(
     const response = await fetch(endpoint, {
       signal: AbortSignal.timeout(2_500),
     })
-    if (!response.ok) return []
+    if (!response.ok) return null
     const data: unknown = await response.json()
-    if (!Array.isArray(data)) return []
+    if (!Array.isArray(data)) return null
     return data.filter(isRedirectRecord)
   } catch {
-    return []
+    return null
   }
 }
 
 export async function proxy(request: NextRequest) {
-  const redirect = matchRedirect(
-    request.nextUrl,
-    await loadRedirectRecords(request.nextUrl),
-    websiteOrigin()
-  )
+  const siteOrigin = websiteOrigin()
+  const rows = await loadRedirectRecords(request.nextUrl)
+  const redirect = rows && matchRedirect(request.nextUrl, rows, siteOrigin)
   if (redirect) {
-    const response = NextResponse.redirect(redirect.location, redirect.status)
-    setSecurityHeaders(response)
-    return response
+    const reverseRows = await loadRedirectRecords(redirect.location)
+    const reverse =
+      reverseRows && matchRedirect(redirect.location, reverseRows, siteOrigin)
+    if (
+      reverseRows &&
+      reverse?.location.pathname !== request.nextUrl.pathname
+    ) {
+      const response = NextResponse.redirect(redirect.location, redirect.status)
+      setSecurityHeaders(response)
+      return response
+    }
   }
 
   const response = NextResponse.next()

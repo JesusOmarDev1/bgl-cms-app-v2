@@ -34,7 +34,7 @@ Node version: [.nvmrc](.nvmrc).
 - `app/` — routes
 - `components/` — UI, blocks, shared
 - `services/domain/db/` — Directus queries and repositories
-- `config/` — Directus, Arcjet, CSP, Meilisearch, Redis, rate limit
+- `config/` — Directus, CSP, Meilisearch, Redis, rate limit
 - `lib/` — helpers
 - `i18n/` — Spanish catalogs
 - `stories/` — Storybook

@@ -33,6 +33,7 @@
     "@componentry": "https://componentry.fun/r/{name}.json",
     "@pdfcn": "https://pdfcn.dev/r/{name}.json",
     "@uiarc": "https://uiarc.dev/r/{name}.json",
-    "@efferd": "https://efferd.com/r/{name}.json"
+    "@efferd": "https://efferd.com/r/{name}.json",
+    "@chewypixel": "https://chewypixel.io/r/{name}.json"
   }
 }

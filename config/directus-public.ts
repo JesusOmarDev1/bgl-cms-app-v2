@@ -19,7 +19,7 @@ export const publicDirectus = createDirectus<Schema>(DIRECTUS_URL, {
     rest({
       onRequest: (options) => ({
         ...options,
-        signal: AbortSignal.timeout(DIRECTUS_TIMEOUT_MS),
+        signal: options.signal ?? AbortSignal.timeout(DIRECTUS_TIMEOUT_MS),
       }),
     })
   )

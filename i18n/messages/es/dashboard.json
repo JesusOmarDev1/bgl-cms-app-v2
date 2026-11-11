@@ -1,0 +1,46 @@
+{
+  "dashboard": {
+    "brand": "BGL BASCULAS APP",
+    "nav": {
+      "operation": "Operación",
+      "catalogs": "Catálogos",
+      "dashboard": "Panel",
+      "orders": "Órdenes",
+      "movements": "Movimientos",
+      "clients": "Clientes",
+      "scales": "Básculas",
+      "inventory": "Inventario",
+      "brands": "Marcas",
+      "models": "Modelos",
+      "suppliers": "Proveedores",
+      "configuration": "Configuración"
+    },
+    "comingSoon": "Disponible próximamente",
+    "openMenu": "Abrir menú de cuenta",
+    "settings": {
+      "title": "Configuración",
+      "appearanceSection": "Apariencia",
+      "profileSection": "Perfil",
+      "fontSizeLabel": "Tamaño de texto",
+      "fontSizeSmall": "Pequeño",
+      "fontSizeDefault": "Predeterminado",
+      "fontSizeLarge": "Grande",
+      "motionLabel": "Movimiento reducido",
+      "motionHint": "Reduce las animaciones y transiciones de la aplicación.",
+      "profileFirstName": "Nombre",
+      "profileLastName": "Apellido",
+      "profileTitle": "Título",
+      "profileLocation": "Ubicación",
+      "profileDescription": "Descripción",
+      "profileTags": "Etiquetas",
+      "locationPlaceholder": "Ej.: Bogotá, Colombia",
+      "descriptionPlaceholder": "Describe brevemente tu función",
+      "tagsPlaceholder": "básculas, calibración",
+      "profileReadonly": "El correo electrónico y el avatar son de solo lectura.",
+      "profileSave": "Guardar cambios",
+      "profileSaving": "Guardando…",
+      "profileSaved": "Perfil actualizado.",
+      "textTooLong": "Escribe hasta {count} caracteres."
+    }
+  }
+}

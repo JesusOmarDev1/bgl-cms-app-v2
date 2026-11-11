@@ -1,6 +1,6 @@
 import "server-only"
 import { DIRECTUS_LOG_LEVEL } from "@/lib/env/constants"
-import { createLogger as createReusableLogger } from "@/lib/logger"
+import { createLogger as createReusableLogger } from "@/lib/log/logger"
 import { LogLevelEnum, type LogLevel } from "@/types/enums/log-level"
 import type { LogContext } from "@/types/shared/logger/log-context"
 import type { Logger } from "@/types/shared/logger/logger"

@@ -30,7 +30,11 @@ export function createDirectusTraceFetch(
       durationMs?: number
     ) => {
       try {
-        const log = event === "request.failure" ? logger.info : logger.debug
+        // debug: start/success traces and 4xx denials; info: 5xx and transport failures
+        const log =
+          event === "request.failure" && !(status !== undefined && status < 500)
+            ? logger.info
+            : logger.debug
         log("Directus request", {
           component: "db.queries",
           collection,

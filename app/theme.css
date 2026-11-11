@@ -159,3 +159,26 @@
     frame-sizing: content-height;
   }
 }
+
+/* Private-area device preferences (set by /dashboard/configuracion). */
+html[data-font-size="small"] {
+  font-size: 14px;
+}
+
+html[data-font-size="large"] {
+  font-size: 18px;
+}
+
+/* Local choice wins over prefers-reduced-motion; without a choice the
+   media query alone applies, so no data-motion attribute is set. */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) *,
+  html[data-motion="reduce"] *,
+  html[data-motion="reduce"] *::before,
+  html[data-motion="reduce"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

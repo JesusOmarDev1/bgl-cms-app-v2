@@ -11,10 +11,8 @@ if (!DIRECTUS_URL) {
   throw new Error("You must set API credentials in the environment variables")
 }
 
-export async function createPrivateDirectus(accessToken: string) {
-  if (!accessToken.trim()) throw new Error("Missing employee token")
-
-  const privateDirectus = createDirectus<Schema>(DIRECTUS_URL, {
+function buildPrivateClient() {
+  return createDirectus<Schema>(DIRECTUS_URL, {
     globals: { fetch: createDirectusTraceFetch(fetch) },
   })
     .with(authentication("json", { autoRefresh: false }))
@@ -27,6 +25,16 @@ export async function createPrivateDirectus(accessToken: string) {
         }),
       })
     )
+}
+
+export function createDirectusAuthClient() {
+  return buildPrivateClient()
+}
+
+export async function createPrivateDirectus(accessToken: string) {
+  if (!accessToken.trim()) throw new Error("Missing employee token")
+
+  const privateDirectus = buildPrivateClient()
 
   await privateDirectus.setToken(accessToken)
   return privateDirectus

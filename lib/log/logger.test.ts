@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { createLogger } from "@/lib/logger"
+import { createLogger } from "@/lib/log/logger"
 import type { LogLevel } from "@/types/enums/log-level"
 
 describe("createLogger", () => {

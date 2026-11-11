@@ -60,3 +60,12 @@
     }
   }
 }
+
+@utility field-halo {
+    border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--foreground) 9%, transparent);
+}
+
+@utility field-halo-invalid {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive) 18%, transparent);
+}

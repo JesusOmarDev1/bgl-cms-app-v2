@@ -13,6 +13,7 @@ export interface RedirectsQuery {
   limit?: number
   page?: number
   origin?: string
+  throwOnError?: boolean
 }
 
 async function fetchRedirects(
@@ -47,49 +48,8 @@ export async function getRedirectsQuery(
       operation: "getRedirectsQuery",
       collection: "redirects",
     })
+    if (query.throwOnError) throw error
     return []
-  }
-}
-
-async function fetchRedirectIndex(origin: string | null) {
-  "use cache"
-  cacheTag("redirects")
-  cacheLife("minutes")
-
-  const rows: {
-    id: string
-    origin: string
-    destiny: string
-    http_code: string
-  }[] = []
-  for (let page = 1; ; page++) {
-    const batch = await publicDirectus.request(
-      readItems("redirects", {
-        fields: ["id", "origin", "destiny", "http_code"],
-        limit: 200,
-        page,
-        sort: ["-date_created", "id"],
-        ...(origin === null ? {} : { filter: { origin: { _eq: origin } } }),
-      } satisfies Query<Schema, RedirectsTypes>)
-    )
-    rows.push(...batch)
-    if (batch.length < 200) return rows
-  }
-}
-
-export async function getRedirectIndexQuery(
-  failedToFetchMessage: string,
-  origin: string | null = null
-) {
-  try {
-    return await fetchRedirectIndex(origin)
-  } catch (error) {
-    returnDirectusQueryError(error, failedToFetchMessage, {
-      component: "db.queries",
-      operation: "getRedirectIndexQuery",
-      collection: "redirects",
-    })
-    throw error
   }
 }
 

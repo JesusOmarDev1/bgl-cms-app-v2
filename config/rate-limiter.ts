@@ -14,6 +14,12 @@ const formLimiterMemory = new RateLimiterMemory({
   duration: 60,
 })
 
+const loginLimiterMemory = new RateLimiterMemory({
+  keyPrefix: "auth-login",
+  points: 5,
+  duration: 60,
+})
+
 export const searchLimiter = new RateLimiterRedis({
   storeClient: redis,
   keyPrefix: "search",
@@ -34,4 +40,15 @@ export const formLimiter = new RateLimiterRedis({
   inMemoryBlockOnConsumed: 5,
   inMemoryBlockDuration: 300,
   insuranceLimiter: formLimiterMemory,
+})
+
+export const loginLimiter = new RateLimiterRedis({
+  storeClient: redis,
+  keyPrefix: "auth-login",
+  points: 5,
+  duration: 60,
+  blockDuration: 300,
+  inMemoryBlockOnConsumed: 5,
+  inMemoryBlockDuration: 300,
+  insuranceLimiter: loginLimiterMemory,
 })

@@ -134,6 +134,9 @@
     },
     "services_button": {
       "failed_to_fetch": "Error al obtener el botón de servicios."
+    },
+    "session": {
+      "failed_to_fetch": "No pudimos cargar tu información de sesión."
     }
   }
 }

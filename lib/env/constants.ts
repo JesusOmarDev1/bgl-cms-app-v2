@@ -15,11 +15,6 @@ export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY ?? ""
 export const TURNSTILE_VERIFY_URL = process.env.NEXT_PUBLIC_SITEVERIFY_URL ?? ""
 export const TURNSTILE_FORM_ACTION = "submit_form"
 
-// ARCJET API SECURITY
-export const ARCJET_KEY = process.env.ARCJET_KEY ?? ""
-export const ARCJET_MODE = process.env.ARCJET_MODE ?? ""
-export const ARCJET_LOG_LEVEL = process.env.ARCJET_LOG_LEVEL ?? "info"
-
 // GOOGLE ANALYTICS
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ""
 

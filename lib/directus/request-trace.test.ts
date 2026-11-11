@@ -50,16 +50,18 @@ describe("createDirectusTraceFetch", () => {
     expect(args).toContain("form_responses")
   })
 
-  it("traces an HTTP failure at info while returning the original response to the SDK", async () => {
+  it("traces client-side 4xx failures at debug level", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {})
     const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
     const response = new Response('{"errors":[{"message":"private detail"}]}', {
       status: 403,
     })
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response)
+    // At level "info" the suppressed debug target emits nothing; "debug" shows
+    // which target the trace picked while still failing if it picked info.
     const tracedFetch = createDirectusTraceFetch(
       fetcher,
-      createLogger("info", 60_000)
+      createLogger("debug", 60_000)
     )
 
     const result = await tracedFetch(
@@ -68,14 +70,35 @@ describe("createDirectusTraceFetch", () => {
 
     expect(result).toBe(response)
     expect(result.status).toBe(403)
-    expect(log).toHaveBeenCalledTimes(1)
-    expect(log.mock.calls[0][0]).toMatch(/request\.failure/)
-    expect(debug).not.toHaveBeenCalled()
-    const args = log.mock.calls.flat().join(" ")
+    // 4xx failures are expected denials in the private area: debug, not info.
+    // At level "debug" both start and failure traces are visible.
+    expect(debug).toHaveBeenCalledTimes(2)
+    expect(log).not.toHaveBeenCalled()
+    expect(debug.mock.calls[1][0]).toMatch(/request\.failure/)
+    const args = debug.mock.calls.flat().join(" ")
     expect(args).toContain("request.failure")
     expect(args).toContain("403")
     expect(args).not.toContain("private detail")
     expect(args).not.toContain("secret=value")
+  })
+
+  it("traces server-side 5xx failures at info level", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {})
+    const debug = vi.spyOn(console, "debug").mockImplementation(() => {})
+    const response = new Response("{}", { status: 503 })
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response)
+    const tracedFetch = createDirectusTraceFetch(
+      fetcher,
+      createLogger("info", 60_000)
+    )
+
+    const result = await tracedFetch("https://cms.example/items/pages")
+
+    expect(result).toBe(response)
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toMatch(/request\.failure/)
+    expect(log.mock.calls.flat().join(" ")).toContain("503")
+    expect(debug).not.toHaveBeenCalled()
   })
 
   it("traces and rethrows transport failures without logging error details", async () => {

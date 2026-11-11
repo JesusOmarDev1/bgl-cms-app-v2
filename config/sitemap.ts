@@ -74,6 +74,17 @@ function collectionEntries(
   return entries
 }
 
+async function allRows(
+  fetchPage: (page: number) => Promise<readonly SitemapRow[]>
+): Promise<SitemapRow[]> {
+  const rows: SitemapRow[] = []
+  for (let page = 1; ; page++) {
+    const batch = await fetchPage(page)
+    rows.push(...batch)
+    if (batch.length < SITEMAP_LIMIT) return rows
+  }
+}
+
 function staticEntries(): MetadataRoute.Sitemap {
   const origin = BASE_URL
   return LEGAL_PATHS.map((path) => ({
@@ -91,13 +102,20 @@ export const sitemapRegistry = {
   pages: {
     prefix: "pages",
     entries: async () =>
-      collectionEntries(await getPagesRepository({ limit: SITEMAP_LIMIT }), ""),
+      collectionEntries(
+        await allRows((page) =>
+          getPagesRepository({ limit: SITEMAP_LIMIT, page })
+        ),
+        ""
+      ),
   },
   services: {
     prefix: "services",
     entries: async () =>
       collectionEntries(
-        await getServicesRepository({ limit: SITEMAP_LIMIT }),
+        await allRows((page) =>
+          getServicesRepository({ limit: SITEMAP_LIMIT, page })
+        ),
         "/servicios"
       ),
   },
@@ -105,7 +123,9 @@ export const sitemapRegistry = {
     prefix: "blog",
     entries: async () =>
       collectionEntries(
-        await getBlogPostsRepository({ limit: SITEMAP_LIMIT }),
+        await allRows((page) =>
+          getBlogPostsRepository({ limit: SITEMAP_LIMIT, page })
+        ),
         "/blog"
       ),
   },
@@ -113,7 +133,9 @@ export const sitemapRegistry = {
     prefix: "products",
     entries: async () =>
       collectionEntries(
-        await getProductsRepository({ limit: SITEMAP_LIMIT }),
+        await allRows((page) =>
+          getProductsRepository({ limit: SITEMAP_LIMIT, page })
+        ),
         "/tienda/producto"
       ),
   },
@@ -121,7 +143,9 @@ export const sitemapRegistry = {
     prefix: "manuals",
     entries: async () =>
       collectionEntries(
-        await getManualsRepository({ limit: SITEMAP_LIMIT }),
+        await allRows((page) =>
+          getManualsRepository({ limit: SITEMAP_LIMIT, page })
+        ),
         "/manuales"
       ),
   },
