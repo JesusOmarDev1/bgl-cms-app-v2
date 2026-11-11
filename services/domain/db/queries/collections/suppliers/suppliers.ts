@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { SUPPLIERS_FIELDS } from "@/services/domain/db/queries/collections/suppliers/suppliers.fields"
@@ -21,7 +21,7 @@ async function fetchSuppliers(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("suppliers")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("suppliers", {
       fields: SUPPLIERS_FIELDS,
       limit,
@@ -53,7 +53,7 @@ async function fetchSuppliersCount(status: StatusType) {
   "use cache"
   cacheTag("suppliers_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("suppliers", {
       aggregate: { count: "*" },
       query: {

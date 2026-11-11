@@ -4,7 +4,7 @@ import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
 import { cacheLife, cacheTag } from "next/cache"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { Schema } from "@/types/schema"
 import type { SiteSettingsType } from "@/types/singletons/site-settings"
@@ -14,7 +14,7 @@ async function fetchSiteSettings() {
   "use cache"
   cacheTag("site_settings")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readSingleton("site_settings", {
       fields: SITE_SETTINGS_FIELDS,
     } satisfies Query<Schema, SiteSettingsType>)

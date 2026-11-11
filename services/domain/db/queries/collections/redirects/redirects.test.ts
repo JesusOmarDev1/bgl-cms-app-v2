@@ -6,7 +6,7 @@ vi.mock("@directus/sdk", () => ({
   aggregate: vi.fn(),
   readItems: vi.fn((_collection: string, query: object) => query),
 }))
-vi.mock("@/config/directus", () => ({ default: { request } }))
+vi.mock("@/config/directus-public", () => ({ publicDirectus: { request } }))
 vi.mock("next/cache", () => ({ cacheLife: vi.fn(), cacheTag: vi.fn() }))
 vi.mock("@/lib/directus/query-error", () => ({
   returnDirectusQueryError: vi.fn(),

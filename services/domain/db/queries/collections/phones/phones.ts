@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { PHONES_FIELDS } from "@/services/domain/db/queries/collections/phones/phones.fields"
@@ -18,7 +18,7 @@ async function fetchPhones(limit: number, page: number) {
   "use cache"
   cacheTag("phones")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("phones", {
       fields: PHONES_FIELDS,
       limit,
@@ -49,7 +49,7 @@ async function fetchPhonesCount() {
   "use cache"
   cacheTag("phones_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("phones", {
       aggregate: { count: "*" },
     })

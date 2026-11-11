@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { MODELS_FIELDS } from "@/services/domain/db/queries/collections/models/models.fields"
@@ -22,7 +22,7 @@ async function fetchModels(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("models")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("models", {
       fields: MODELS_FIELDS,
       limit,
@@ -54,7 +54,7 @@ async function fetchModelsCount(status: StatusType) {
   "use cache"
   cacheTag("models_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("models", {
       aggregate: { count: "*" },
       query: {

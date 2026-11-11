@@ -4,7 +4,7 @@ import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
 import { cacheLife, cacheTag } from "next/cache"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { HEADER_FIELDS } from "@/services/domain/db/queries/singletons/header/header.fields"
 import type { Schema } from "@/types/schema"
@@ -14,7 +14,7 @@ async function fetchHeader() {
   "use cache"
   cacheTag("header")
   cacheLife("hours")
-  return directus.request(
+  return publicDirectus.request(
     readSingleton("header", {
       fields: HEADER_FIELDS,
     } satisfies Query<Schema, HeaderType>)

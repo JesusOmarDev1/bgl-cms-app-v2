@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { URL_LINKS_FIELDS } from "@/services/domain/db/queries/collections/url-links/url-links.fields"
@@ -17,7 +17,7 @@ async function fetchUrlLinks(limit: number, page: number) {
   "use cache"
   cacheTag("url_links")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("url_links", {
       fields: URL_LINKS_FIELDS,
       limit,
@@ -48,7 +48,7 @@ async function fetchUrlLinksCount() {
   "use cache"
   cacheTag("url_links_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("url_links", {
       aggregate: { count: "*" },
     })

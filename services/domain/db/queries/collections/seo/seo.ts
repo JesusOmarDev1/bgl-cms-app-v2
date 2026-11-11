@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fields"
@@ -17,7 +17,7 @@ async function fetchSeo(limit: number, page: number) {
   "use cache"
   cacheTag("seo")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("seo", {
       fields: SEO_FIELDS,
       limit,
@@ -48,7 +48,7 @@ async function fetchSeoCount() {
   "use cache"
   cacheTag("seo_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("seo", {
       aggregate: { count: "*" },
     })

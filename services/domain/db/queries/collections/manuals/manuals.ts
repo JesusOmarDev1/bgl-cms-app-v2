@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { ManualsTypes } from "@/types/collections/manuals"
@@ -20,7 +20,7 @@ async function fetchManuals(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("manuals")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("manuals", {
       fields: MANUALS_FIELDS,
       deep: MANUALS_DEEP,
@@ -58,7 +58,7 @@ async function fetchManualsBySlug(
   "use cache"
   cacheTag("manuals_by_slug")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("manuals", {
       fields: MANUALS_FIELDS,
       deep: MANUALS_DEEP,
@@ -92,7 +92,7 @@ async function fetchManualsCount(status: StatusType) {
   "use cache"
   cacheTag("manuals_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("manuals", {
       aggregate: { count: "*" },
       query: {

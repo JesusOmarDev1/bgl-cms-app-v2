@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { REDIRECTS_FIELDS } from "@/services/domain/db/queries/collections/redirects/redirects.fields"
@@ -23,7 +23,7 @@ async function fetchRedirects(
   "use cache"
   cacheTag("redirects")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("redirects", {
       fields: REDIRECTS_FIELDS,
       limit,
@@ -63,7 +63,7 @@ async function fetchRedirectIndex(origin: string | null) {
     http_code: string
   }[] = []
   for (let page = 1; ; page++) {
-    const batch = await directus.request(
+    const batch = await publicDirectus.request(
       readItems("redirects", {
         fields: ["id", "origin", "destiny", "http_code"],
         limit: 200,
@@ -97,7 +97,7 @@ async function fetchRedirectsCount() {
   "use cache"
   cacheTag("redirects_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("redirects", {
       aggregate: { count: "*" },
     })

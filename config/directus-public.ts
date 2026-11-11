@@ -11,7 +11,7 @@ if (!DIRECTUS_STATIC_TOKEN || !DIRECTUS_URL) {
   throw new Error("You must set API credentials in the environment variables")
 }
 
-const directus = createDirectus<Schema>(DIRECTUS_URL, {
+export const publicDirectus = createDirectus<Schema>(DIRECTUS_URL, {
   globals: { fetch: createDirectusTraceFetch(fetch) },
 })
   .with(staticToken(DIRECTUS_STATIC_TOKEN))
@@ -23,5 +23,3 @@ const directus = createDirectus<Schema>(DIRECTUS_URL, {
       }),
     })
   )
-
-export default directus

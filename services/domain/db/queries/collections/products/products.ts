@@ -3,7 +3,7 @@ import "server-only"
 import type { ApplyQueryFields, Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { getCatalogCategoryAncestors } from "@/components/collections/catalog/catalog-items"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
@@ -44,7 +44,7 @@ async function fetchCatalogProducts() {
   const products: ProductCatalogRow[] = []
   const categoryRows: ProductCategoryCatalogRow[] = []
   for (let page = 1; ; page += 1) {
-    const batch = await directus.request(
+    const batch = await publicDirectus.request(
       readItems("products", {
         fields: PRODUCT_CATALOG_FIELDS,
         limit: CATALOG_BATCH_SIZE,
@@ -57,7 +57,7 @@ async function fetchCatalogProducts() {
     if (batch.length < CATALOG_BATCH_SIZE) break
   }
   for (let page = 1; ; page += 1) {
-    const batch = await directus.request(
+    const batch = await publicDirectus.request(
       readItems("product_categories", {
         fields: PRODUCT_CATALOG_CATEGORY_FIELDS,
         limit: CATALOG_BATCH_SIZE,
@@ -95,7 +95,7 @@ async function fetchProducts(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("products")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("products", {
       fields: PRODUCTS_FIELDS,
       deep: {
@@ -141,7 +141,7 @@ async function fetchProductsBySlug(
   "use cache"
   cacheTag("products_by_slug")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("products", {
       fields: PRODUCTS_FIELDS,
       deep: {
@@ -183,7 +183,7 @@ async function fetchProductsCount(status: StatusType) {
   "use cache"
   cacheTag("products_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("products", {
       aggregate: { count: "*" },
       query: {

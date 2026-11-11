@@ -1,6 +1,6 @@
 import "server-only"
 import { serverPing } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { HealthResult } from "@/types/shared/health/health-result"
 import { cacheLife, cacheTag } from "next/cache"
@@ -10,7 +10,7 @@ async function fetchHealth(): Promise<HealthResult> {
   cacheTag("health")
   cacheLife("minutes")
   const start = performance.now()
-  await directus.request(serverPing())
+  await publicDirectus.request(serverPing())
   const responseTime = performance.now() - start
   return { status: "ok", responseTime, ping: true }
 }

@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { BlogPostsTypes } from "@/types/collections/blog-posts"
@@ -20,7 +20,7 @@ async function fetchBlogPosts(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("blog_posts")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("blog_posts", {
       fields: BLOG_POSTS_FIELDS,
       deep: BLOG_POSTS_DEEP,
@@ -58,7 +58,7 @@ async function fetchBlogPostsBySlug(
   "use cache"
   cacheTag("blog_posts_by_slug")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("blog_posts", {
       fields: BLOG_POSTS_FIELDS,
       deep: BLOG_POSTS_DEEP,
@@ -92,7 +92,7 @@ async function fetchBlogPostsCount(status: StatusType) {
   "use cache"
   cacheTag("blog_posts_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("blog_posts", {
       aggregate: { count: "*" },
       query: {

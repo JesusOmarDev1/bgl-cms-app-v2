@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { EMAILS_FIELDS } from "@/services/domain/db/queries/collections/emails/emails.fields"
@@ -17,7 +17,7 @@ async function fetchEmails(limit: number, page: number) {
   "use cache"
   cacheTag("emails")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("emails", {
       fields: EMAILS_FIELDS,
       limit,
@@ -48,7 +48,7 @@ async function fetchEmailsCount() {
   "use cache"
   cacheTag("emails_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("emails", {
       aggregate: { count: "*" },
     })

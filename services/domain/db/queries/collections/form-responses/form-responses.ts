@@ -1,7 +1,7 @@
 import "server-only"
 
 import { createItem, type Query } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type {
   FormResponseAnswer,
@@ -21,7 +21,7 @@ export async function createFormResponseQuery(
   failedToCreateMessage: string
 ) {
   try {
-    return await directus.request(
+    return await publicDirectus.request(
       createItem("form_responses", { status: "new", form, answer }, {
         fields: FORM_RESPONSE_FIELDS,
       } as const satisfies Query<Schema, FormResponsesTypes>)

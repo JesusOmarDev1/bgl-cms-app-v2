@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { PRODUCT_ATTRIBUTES_FIELDS } from "@/services/domain/db/queries/collections/product-attributes/product-attributes.fields"
@@ -26,7 +26,7 @@ async function fetchProductAttributes(
   "use cache"
   cacheTag("product_attributes")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("product_attributes", {
       fields: PRODUCT_ATTRIBUTES_FIELDS,
       limit,
@@ -58,7 +58,7 @@ async function fetchProductAttributesCount(status: StatusType) {
   "use cache"
   cacheTag("product_attributes_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("product_attributes", {
       aggregate: { count: "*" },
       query: {

@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { FOOTER_FIELDS } from "@/services/domain/db/queries/singletons/footer/footer.fields"
 import type { Schema } from "@/types/schema"
@@ -14,7 +14,7 @@ async function fetchFooter() {
   "use cache"
   cacheTag("footer")
   cacheLife("hours")
-  return directus.request(
+  return publicDirectus.request(
     readSingleton("footer", {
       fields: FOOTER_FIELDS,
     } satisfies Query<Schema, FooterType>)

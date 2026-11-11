@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { BRANDS_FIELDS } from "@/services/domain/db/queries/collections/brands/brands.fields"
@@ -22,7 +22,7 @@ async function fetchBrands(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("brands")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("brands", {
       fields: BRANDS_FIELDS,
       limit,
@@ -56,7 +56,7 @@ export async function getBrandsCountQuery(
 ) {
   const { status = "published" } = query
   try {
-    const rows = await directus.request(
+    const rows = await publicDirectus.request(
       aggregate("brands", {
         aggregate: { count: "*" },
         query: {

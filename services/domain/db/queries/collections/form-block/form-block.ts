@@ -1,7 +1,7 @@
 import "server-only"
 
 import { readItem, type Query } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { FORM_BLOCK_FIELDS } from "@/services/domain/db/queries/blocks/form-block/form-block.fields"
 import type { FormBlock } from "@/types/blocks/form/form-block"
@@ -12,7 +12,7 @@ export async function getPublishedFormBlockQuery(
   failedToFetchMessage: string
 ) {
   try {
-    return await directus.request(
+    return await publicDirectus.request(
       readItem("form_block", id, {
         fields: FORM_BLOCK_FIELDS,
         filter: { status: { _eq: "published" } },

@@ -3,7 +3,7 @@ import "server-only"
 import type { Query } from "@directus/sdk"
 import { readSingleton } from "@directus/sdk"
 
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { WHATSAPP_BUTTON_FIELDS } from "@/services/domain/db/queries/singletons/whatsapp-button/whatsapp-button.fields"
 import type { Schema } from "@/types/schema"
@@ -14,7 +14,7 @@ async function fetchWhatsappButton() {
   "use cache"
   cacheTag("whatsapp_button")
   cacheLife("hours")
-  return directus.request(
+  return publicDirectus.request(
     readSingleton("whatsapp_button", {
       fields: WHATSAPP_BUTTON_FIELDS,
     } satisfies Query<Schema, WhatsappButtonType>)

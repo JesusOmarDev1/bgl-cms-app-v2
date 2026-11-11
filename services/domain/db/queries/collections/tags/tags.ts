@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import { TAGS_FIELDS } from "@/services/domain/db/queries/collections/tags/tags.fields"
@@ -19,7 +19,7 @@ async function fetchTags(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("tags")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("tags", {
       fields: TAGS_FIELDS,
       limit,
@@ -51,7 +51,7 @@ async function fetchTagsCount(status: StatusType) {
   "use cache"
   cacheTag("tags_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("tags", {
       aggregate: { count: "*" },
       query: {

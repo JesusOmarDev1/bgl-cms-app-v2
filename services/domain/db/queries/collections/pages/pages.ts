@@ -1,7 +1,7 @@
 import "server-only"
 import type { Query } from "@directus/sdk"
 import { aggregate, readItems } from "@directus/sdk"
-import directus from "@/config/directus"
+import { publicDirectus } from "@/config/directus-public"
 import { parseAggregateCount } from "@/lib/formatting/finite-number"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import type { PagesTypes } from "@/types/collections/pages"
@@ -20,7 +20,7 @@ async function fetchPages(status: StatusType, limit: number, page: number) {
   "use cache"
   cacheTag("pages")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("pages", {
       fields: PAGES_FIELDS,
       deep: { body: { _sort: ["sort"] } },
@@ -58,7 +58,7 @@ async function fetchPagesBySlug(
   "use cache"
   cacheTag("pages_by_slug")
   cacheLife("minutes")
-  return directus.request(
+  return publicDirectus.request(
     readItems("pages", {
       fields: PAGES_FIELDS,
       deep: { body: { _sort: ["sort"] } },
@@ -92,7 +92,7 @@ async function fetchPagesCount(status: StatusType) {
   "use cache"
   cacheTag("pages_count")
   cacheLife("minutes")
-  const rows = await directus.request(
+  const rows = await publicDirectus.request(
     aggregate("pages", {
       aggregate: { count: "*" },
       query: {
