@@ -144,5 +144,5 @@ Icons go through `MaterialIcon` (Material Symbols Rounded).
 - Do keep `#e7000b` on the `red` button and on `::selection`.
 - Do put Spanish UI copy in the next-intl catalogs.
 - Don't add a new hex color.
-- Don't add a light theme.
+- Don't add a light theme to the public site: it stays dark-forced via the `[data-theme-scope="dark"]` wrapper in `PublicSite` (plus `app/error.tsx` and `app/not-found.tsx`). The private area (`app/(auth)`) follows `next-themes` (light/dark/system, `localStorage bgl-theme`); the scheme picker lives in the settings dialog and the quick toggle in the private navbar. `#e7000b` is the accent in both schemes.
 - Don't add a second button, card, or input component.

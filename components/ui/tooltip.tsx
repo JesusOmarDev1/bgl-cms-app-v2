@@ -23,7 +23,7 @@ function TooltipTrigger({
       delay={delay}
       {...props}
     >
-      <Focusable>
+      <Focusable isDisabled={props.isDisabled}>
         {trigger as React.ComponentProps<typeof Focusable>["children"]}
       </Focusable>
       {tooltip}

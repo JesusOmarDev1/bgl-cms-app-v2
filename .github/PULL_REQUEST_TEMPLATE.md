@@ -1,44 +1,31 @@
-## Description
+## ¿Qué hace este PR?
 
-<!-- Clearly describe what this PR does and why. -->
+<!-- Una descripción corta: qué cambia y por qué. Enlazá la issue si existe. -->
 
-## Related Issue
+Closes #
 
-Closes #<!-- issue number -->
+## Tipo de cambio
 
-## Type of Change
+- [ ] 🐛 Bug fix
+- [ ] 🚀 Feature nueva
+- [ ] 💥 Breaking change
+- [ ] 📖 Documentación
+- [ ] 🔧 Refactor / chore (sin cambios funcionales)
 
-- [ ] 🐛 Bug fix (change that fixes an error without breaking existing functionality)
-- [ ] 🚀 New feature (change that adds functionality without breaking existing functionality)
-- [ ] 💥 Breaking change (fix or feature that would change existing functionality)
-- [ ] 📖 Documentation
-- [ ] 🔧 Refactor / chore (no functional changes)
+## Cómo se probó
 
-## Changes Made
+- [ ] `pnpm pre-deploy` corre sin errores
+- [ ] Probado manualmente con `pnpm dev`
 
-<!-- List the key changes in this PR. -->
+## Evidencia visual (si aplica)
 
--
--
-
-## How Was It Tested?
-
-<!-- Describe how you tested your changes. -->
-
-- [ ] Lint passes (`pnpm run lint`)
-- [ ] Type check passes (`pnpm run typecheck`)
-- [ ] Astro check passes (`pnpm run check`)
-- [ ] Tested manually locally
-
-## Screenshots (if applicable)
-
-<!-- Add screenshots or recordings for UI changes. -->
+<!-- Capturas o grabaciones para cambios de UI. Borrar esta sección si no aplica. -->
 
 ## Checklist
 
-- [ ] My code follows the project conventions (Prettier)
-- [ ] I performed a self-review of my code
-- [ ] I did not modify CMS contracts (collections, fields, webhooks) without approval
-- [ ] I did not add new dependencies without approval
-- [ ] I updated relevant documentation if necessary
-- [ ] My commits follow the [Conventional Commits](https://www.conventionalcommits.org/) format
+- [ ] Siguió las convenciones del proyecto (DESIGN.md, componentes de `components/ui`)
+- [ ] Prettier aplicado y commits en formato [Conventional Commits](https://www.conventionalcommits.org/)
+- [ ] Autorevisado el código
+- [ ] No tocó contratos del CMS (colecciones, campos, webhooks) sin aprobación
+- [ ] No agregó dependencias nuevas sin aprobación
+- [ ] Documentación actualizada si era necesario

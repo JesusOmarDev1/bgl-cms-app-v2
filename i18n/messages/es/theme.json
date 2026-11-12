@@ -3,6 +3,7 @@
     "toggle": "Cambiar tema",
     "light": "Claro",
     "dark": "Oscuro",
-    "system": "Sistema"
+    "system": "Sistema",
+    "scheme": "Esquema de color"
   }
 }

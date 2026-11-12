@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/combobox"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { DebugPagination } from "@/components/debug/DebugPagination"
-import { debugSearchParams } from "@/app/debug/search-params"
+import { debugSearchParams } from "@/app/(site)/debug/search-params"
 import {
   DEBUG_KINDS,
   getDebugResourcesByKind,

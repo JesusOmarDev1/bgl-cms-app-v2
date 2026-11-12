@@ -53,9 +53,12 @@ const subscribeNever = () => () => {}
 
 // Segmented font-size control: one row, equal thirds, subtle token selection
 // (no solid fill; the brand red stays reserved for the red button variant).
-const SEGMENT_LIST_CLASS = "grid w-full grid-cols-3 rounded-xl"
+// h-auto! cancels the list's group-data-horizontal h-8, which otherwise
+// clips the larger trigger labels out of the track.
+const SEGMENT_LIST_CLASS =
+  "grid h-auto! w-full grid-cols-1 gap-1 rounded-xl bg-muted/40 p-1 text-center sm:grid-cols-3"
 const SEGMENT_TRIGGER_CLASS =
-  "data-selected:bg-primary/10 data-selected:text-foreground dark:data-selected:bg-primary/15"
+  "group-data-vertical/tabs:justify-center text-center px-2 py-1.5 data-selected:bg-primary/10 data-selected:text-foreground! dark:data-selected:bg-primary/15"
 
 // shortcut: stored preferences are read after hydration, so there is a brief
 // flash of the default font size on load; upgrade by inlining a
@@ -106,7 +109,7 @@ export function AppearanceSettings() {
   }
 
   return (
-    <div className="flex max-w-sm flex-col gap-8">
+    <div className="flex w-full flex-col gap-8">
       <Tabs
         selectedKey={activeFontSize}
         onSelectionChange={selectFontSize}
@@ -116,14 +119,22 @@ export function AppearanceSettings() {
           aria-label={t("settings.fontSizeLabel")}
           className={SEGMENT_LIST_CLASS}
         >
-          <span className="sr-only">{t("settings.fontSizeLabel")}</span>
-          <TabsTrigger id="small" className={SEGMENT_TRIGGER_CLASS}>
+          <TabsTrigger
+            id="small"
+            className={`${SEGMENT_TRIGGER_CLASS} text-sm`}
+          >
             {t("settings.fontSizeSmall")}
           </TabsTrigger>
-          <TabsTrigger id="default" className={SEGMENT_TRIGGER_CLASS}>
+          <TabsTrigger
+            id="default"
+            className={`${SEGMENT_TRIGGER_CLASS} text-base`}
+          >
             {t("settings.fontSizeDefault")}
           </TabsTrigger>
-          <TabsTrigger id="large" className={SEGMENT_TRIGGER_CLASS}>
+          <TabsTrigger
+            id="large"
+            className={`${SEGMENT_TRIGGER_CLASS} text-lg`}
+          >
             {t("settings.fontSizeLarge")}
           </TabsTrigger>
         </TabsList>

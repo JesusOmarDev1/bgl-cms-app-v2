@@ -13,12 +13,19 @@ const hit = {
 
 describe("toSearchCommandItem", () => {
   it("rejects an executable search URL", () => {
-    for (const url of ["javascript:alert(1)", "//evil.example", "/\\evil.example"]) {
+    for (const url of [
+      "javascript:alert(1)",
+      "//evil.example",
+      "/\\evil.example",
+    ]) {
       expect(toSearchCommandItem({ ...hit, url })).toBeNull()
     }
   })
 
   it("keeps an internal search result navigable", () => {
-    expect(toSearchCommandItem(hit)).toMatchObject({ id: "pages:1", label: "Page" })
+    expect(toSearchCommandItem(hit)).toMatchObject({
+      id: "pages:1",
+      label: "Page",
+    })
   })
 })

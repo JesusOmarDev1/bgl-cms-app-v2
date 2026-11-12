@@ -6,7 +6,7 @@ export interface SessionIdentityTypes {
   title: string | null
   location: string | null
   description: string | null
-  tags: string[] | null
+  avatar: string | null
   // Audit
   last_access: string | null
 }

@@ -7,7 +7,7 @@ import { DebugPayload } from "@/components/debug/DebugPayload"
 import { DebugPayloadSkeleton } from "@/components/debug/DebugPayloadSkeleton"
 import { DebugToolbar } from "@/components/debug/DebugToolbar"
 import { DebugToolbarSkeleton } from "@/components/debug/DebugToolbarSkeleton"
-import { loadDebugSearchParams } from "@/app/debug/search-params"
+import { loadDebugSearchParams } from "@/app/(site)/debug/search-params"
 import { loadDebugCollectionCount } from "@/services/domain/db/debug/load-debug-resource"
 import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
 

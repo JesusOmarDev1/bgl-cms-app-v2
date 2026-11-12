@@ -46,9 +46,7 @@ export default function RootLayout({
               attribute="class"
               defaultTheme="dark"
               disableTransitionOnChange
-              forcedTheme="dark"
               storageKey="bgl-theme"
-              enableSystem={false}
             >
               <NuqsAdapter>{children}</NuqsAdapter>
               <Toaster

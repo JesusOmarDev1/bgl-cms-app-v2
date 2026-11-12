@@ -5,6 +5,8 @@ export const SESSION_IDENTITY_FIELDS = [
   "title",
   "location",
   "description",
-  "tags",
+  {
+    avatar: ["id", "type", "width", "height"],
+  },
   "last_access",
 ] as const

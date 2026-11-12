@@ -1,65 +1,45 @@
 name: 🐛 Reporte de Bug
-description: Reportá un bug reproducible o comportamiento inesperado
+description: Un bug reproducible o comportamiento inesperado
 labels: [bug]
 body:
   - type: markdown
     attributes:
       value: |
-        ¡Gracias por tomarte el tiempo de reportar un bug! Completá el formulario para que podamos reproducirlo y corregirlo.
+        Completá lo mínimo para poder reproducir el bug. Si podés, pegá también el error de consola o el stack trace.
 
   - type: textarea
     id: description
     attributes:
-      label: Descripción del Bug
-      description: Descripción clara y concisa del bug.
+      label: ¿Qué pasó?
+      description: Descripción breve del bug y qué esperabas que pasara en su lugar.
+      placeholder: "Ej: Al entrar a /blog el listado no carga y la consola tira un 500. Debería mostrar los posts."
     validations:
       required: true
 
   - type: textarea
     id: reproduction
     attributes:
-      label: Pasos para Reproducir
-      description: Instrucciones paso a paso para reproducir el comportamiento.
+      label: Cómo reproducirlo
+      description: Pasos mínimos, de uno en uno, desde `pnpm dev`.
       placeholder: |
-        1. Ejecutar `pnpm install`
-        2. Ejecutar `pnpm run dev`
-        3. Navegar a '...'
-        4. Ver el error
+        1. Ir a '...'
+        2. Hacer click en '...'
+        3. Ver el error
     validations:
       required: true
 
   - type: textarea
-    id: expected
+    id: evidence
     attributes:
-      label: Comportamiento Esperado
-      description: ¿Qué esperabas que pasara?
+      label: Evidencia
+      description: Capturas, grabaciones, mensajes de error o stack trace.
     validations:
-      required: true
+      required: false
 
-  - type: textarea
-    id: actual
-    attributes:
-      label: Comportamiento Actual
-      description: ¿Qué pasó realmente? Incluí mensajes de error o stack traces si los tenés.
-    validations:
-      required: true
-
-  - type: textarea
+  - type: input
     id: environment
     attributes:
-      label: Entorno
-      description: Indicá los detalles de tu entorno.
-      value: |
-        - OS:
-        - Node.js:
-        - pnpm:
-    validations:
-      required: true
-
-  - type: textarea
-    id: additional
-    attributes:
-      label: Contexto Adicional
-      description: Cualquier otro contexto, capturas de pantalla o fragmentos de código que ayuden.
+      label: Entorno (opcional)
+      description: 'Solo si pensás que afecta. Ej: Windows 11, Chrome.'
     validations:
       required: false

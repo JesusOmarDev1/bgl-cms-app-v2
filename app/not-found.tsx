@@ -27,7 +27,11 @@ export const metadata = createMetadata({
 
 export default function NotFound() {
   return (
-    <Fragment>
+    <div
+      data-theme-scope="dark"
+      className="min-h-dvh bg-background text-foreground"
+    >
+      <Fragment>
       <Box
         className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto h-dvh max-w-5xl lg:max-w-6xl xl:max-w-7xl"
         display="flex"
@@ -87,5 +91,6 @@ export default function NotFound() {
         </div>
       </Box>
     </Fragment>
+    </div>
   )
 }

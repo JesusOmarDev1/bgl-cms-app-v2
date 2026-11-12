@@ -1,57 +1,49 @@
 name: 🚀 Solicitud de Feature
-description: Sugerí una nueva funcionalidad o mejora
+description: Una funcionalidad nueva o una mejora a algo existente
 labels: [enhancement]
 body:
   - type: markdown
     attributes:
       value: |
-        ¡Gracias por sugerir una funcionalidad! Describí tu idea claramente para que podamos entenderla y discutirla.
+        Contanos el problema antes que la solución: ayuda a validar si vale la pena y de qué lado atacarlo.
 
   - type: textarea
     id: problem
     attributes:
-      label: Problema / Motivación
-      description: ¿Qué problema resuelve esta funcionalidad? ¿Cuál es la limitación o dolor actual?
-      placeholder: "Siempre me frustra cuando..."
+      label: Problema o necesidad
+      description: ¿Qué no podés hacer hoy o qué te complica? Sin proponer solución todavía.
+      placeholder: "Hoy para X hay que hacer Y manualmente, y eso..."
     validations:
       required: true
 
   - type: textarea
     id: solution
     attributes:
-      label: Solución Propuesta
-      description: Describí la funcionalidad que te gustaría ver. ¿Cómo debería funcionar?
+      label: Solución propuesta
+      description: Cómo la imaginás funcionando. Una descripción simple alcanza.
     validations:
       required: true
-
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternativas Consideradas
-      description: ¿Consideraste alguna solución alternativa o workaround?
-    validations:
-      required: false
 
   - type: dropdown
     id: area
     attributes:
       label: Área
-      description: ¿A qué parte del proyecto se relaciona?
       options:
         - Páginas / Rutas
         - Bloques CMS
+        - UI / Componentes
         - API / Servicios
         - SEO / Rendimiento
-        - UI / Componentes
-        - Infraestructura / Docker
+        - Storybook / Design System
+        - Infraestructura / CI
         - Otro
     validations:
       required: true
 
   - type: textarea
-    id: additional
+    id: context
     attributes:
-      label: Contexto Adicional
-      description: Cualquier otro contexto, mockups o ejemplos que ayuden a ilustrar la funcionalidad.
+      label: Contexto extra (opcional)
+      description: Referencias, mockups o ejemplos de otros sitios que hagan lo que buscás.
     validations:
       required: false

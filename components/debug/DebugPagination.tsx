@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 
-import { serializeDebugSearchParams } from "@/app/debug/search-params"
+import { serializeDebugSearchParams } from "@/app/(site)/debug/search-params"
 import {
   Pagination,
   PaginationContent,

@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: 📖 Documentación
-    url: https://github.com/JesusOmarDev1/bgl-cms-app/blob/main/README.md
-    about: Consultá el README para instrucciones de uso y referencia.
+    url: https://github.com/JesusOmarDev1/bgl-cms-app-v2/blob/main/README.md
+    about: Consultá el README y DESIGN.md antes de abrir una issue o PR.

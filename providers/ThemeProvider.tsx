@@ -12,9 +12,7 @@ function ThemeProvider({
       attribute="class"
       defaultTheme="dark"
       disableTransitionOnChange
-      forcedTheme="dark"
       storageKey="bgl-theme"
-      enableSystem={false}
       {...props}
     >
       <ThemeHotkey />

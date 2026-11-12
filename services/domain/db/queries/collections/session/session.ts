@@ -15,9 +15,27 @@ export async function getIdentityQuery(
   failedToFetchMessage: string
 ): Promise<SessionIdentityTypes | null> {
   try {
-    return await (
+    const me = await (
       await createSessionClient(accessToken)
-    ).request(readMe({ fields: [...SESSION_IDENTITY_FIELDS] }))
+    ).request(
+      readMe({
+        // The SDK types `directus_users.avatar` as `string | file`, so its
+        // query-fields union rejects nested relation objects even though the
+        // server expands them at runtime.
+        fields: [...SESSION_IDENTITY_FIELDS] as unknown as NonNullable<
+          Parameters<typeof readMe>[0]
+        >["fields"],
+      })
+    )
+    // The expanded relation yields the avatar object; only the asset id
+    // reaches the identity type (DirectusImage resolves the public URL).
+    const avatar =
+      typeof me.avatar === "object" && me.avatar !== null
+        ? me.avatar.id
+        : typeof me.avatar === "string"
+          ? me.avatar
+          : null
+    return { ...me, avatar }
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",

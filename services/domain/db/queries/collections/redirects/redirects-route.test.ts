@@ -12,7 +12,13 @@ import { GET } from "@/app/api/redirects/route"
 describe("GET /api/redirects", () => {
   beforeEach(() => getRedirectsQuery.mockReset())
 
-  it.each([null, "", "https://evil.example/path", "//evil.example/path", "/bad\\path"])(
+  it.each([
+    null,
+    "",
+    "https://evil.example/path",
+    "//evil.example/path",
+    "/bad\\path",
+  ])(
     "rejects missing or invalid origin %s without querying",
     async (origin) => {
       const url = new URL("https://example.com/api/redirects")
@@ -28,8 +34,15 @@ describe("GET /api/redirects", () => {
   it("uses the main query for an exact origin and includes redirects beyond row 200", async () => {
     const url = new URL("https://example.com/api/redirects?origin=%2Fold")
     const firstPage = Array.from({ length: 200 }, (_, id) => ({ id }))
-    const finalRow = { id: 201, origin: "/old", destiny: "/new", http_code: "301" }
-    getRedirectsQuery.mockResolvedValueOnce(firstPage).mockResolvedValueOnce([finalRow])
+    const finalRow = {
+      id: 201,
+      origin: "/old",
+      destiny: "/new",
+      http_code: "301",
+    }
+    getRedirectsQuery
+      .mockResolvedValueOnce(firstPage)
+      .mockResolvedValueOnce([finalRow])
 
     const response = await GET(new Request(url))
 
@@ -50,9 +63,13 @@ describe("GET /api/redirects", () => {
 
   it("does not return partial redirects when a later page fails", async () => {
     const firstPage = Array.from({ length: 200 }, (_, id) => ({ id }))
-    getRedirectsQuery.mockResolvedValueOnce(firstPage).mockRejectedValueOnce(new Error("CMS down"))
+    getRedirectsQuery
+      .mockResolvedValueOnce(firstPage)
+      .mockRejectedValueOnce(new Error("CMS down"))
 
-    const response = await GET(new Request("https://example.com/api/redirects?origin=%2Fold"))
+    const response = await GET(
+      new Request("https://example.com/api/redirects?origin=%2Fold")
+    )
 
     expect(response.status).toBe(503)
     expect(await response.json()).toEqual({ error: "Redirects unavailable." })

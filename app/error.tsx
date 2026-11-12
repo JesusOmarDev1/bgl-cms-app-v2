@@ -10,7 +10,10 @@ export default function Error({
   reset: () => void
 }) {
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-4">
+    <div
+      data-theme-scope="dark"
+      className="flex h-screen flex-col items-center justify-center gap-4 bg-background text-foreground"
+    >
       <h1 className="text-6xl font-bold">Algo salió mal</h1>
       <p className="text-2xl text-muted-foreground">
         Por favor, intenta de nuevo.

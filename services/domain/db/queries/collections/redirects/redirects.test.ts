@@ -42,7 +42,9 @@ describe("getRedirectsQuery", () => {
   it("returns an empty result when the main query fails", async () => {
     request.mockRejectedValueOnce(new Error("Directus unavailable"))
 
-    await expect(getRedirectsQuery({ origin: "/old" }, "failed")).resolves.toEqual([])
+    await expect(
+      getRedirectsQuery({ origin: "/old" }, "failed")
+    ).resolves.toEqual([])
     expect(request).toHaveBeenCalledTimes(1)
   })
 })

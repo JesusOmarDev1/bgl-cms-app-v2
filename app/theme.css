@@ -1,4 +1,4 @@
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, [data-theme-scope="dark"] *));
 
 @theme inline {
   --font-heading: var(--font-geist);
@@ -79,7 +79,12 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
+/* Theme: light tokens on :root, dark on .dark (next-themes manages the
+   class app-wide). Public routes opt out of the private theme choice by
+   declaring [data-theme-scope="dark"], which pins the dark tokens and
+   enables the dark: variant inside the scope. */
+.dark,
+[data-theme-scope="dark"] {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -160,7 +165,7 @@
   }
 }
 
-/* Private-area device preferences (set by /dashboard/configuracion). */
+/* Private-area device preferences (set from the settings dialog). */
 html[data-font-size="small"] {
   font-size: 14px;
 }

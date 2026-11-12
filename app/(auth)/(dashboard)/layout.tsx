@@ -2,10 +2,10 @@ import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { redirect } from "next/navigation"
 import {
-  PrivateSidebar,
+  AppSidebar,
   SidebarUserFallback,
   UserMenu,
-} from "@/components/blocks/layout/private-sidebar"
+} from "@/components/blocks/app/AppSidebar"
 import {
   SidebarInset,
   SidebarProvider,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar"
 import { readAuthSession } from "@/services/domain/server/auth/token"
 import { getIdentityRepository } from "@/services/domain/db/repositories/collections/session"
+import { ThemeToggle } from "@/components/shared/theme/ThemeToggle"
 import type { SessionIdentityTypes } from "@/types/collections/session"
 
 function initials(identity: SessionIdentityTypes) {
@@ -45,6 +46,8 @@ async function SidebarUser() {
       name={name}
       email={email}
       initials={identity ? initials(identity) : "?"}
+      avatar={identity?.avatar ?? null}
+      identity={identity}
     />
   )
 }
@@ -59,21 +62,22 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <a
-        href="#private-content"
+        href="#sidebar-content"
         className="sr-only focus:not-sr-only focus:absolute focus:start-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:shadow"
       >
         {t("skipToContent")}
       </a>
-      <PrivateSidebar
+      <AppSidebar
         user={
           <Suspense fallback={<SidebarUserFallback />}>
             <SidebarUser />
           </Suspense>
         }
       />
-      <SidebarInset id="private-content">
+      <SidebarInset id="sidebar-content">
         <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-4">
           <SidebarTrigger aria-label={t("toggleSidebar")} />
+          <ThemeToggle className="ms-auto" />
         </header>
         {children}
       </SidebarInset>

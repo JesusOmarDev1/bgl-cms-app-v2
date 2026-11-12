@@ -12,9 +12,12 @@ import { ServicesBtn } from "@/components/blocks/singletons/services-btn/Service
  * Health and debug pages keep the fixed header, so their groups render it too
  * (HeaderSpacer in those pages assumes it is present).
  */
-export function PublicChrome({ children }: { children: React.ReactNode }) {
+export function PublicSite({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div
+      data-theme-scope="dark"
+      className="min-h-svh bg-background text-foreground"
+    >
       <Suspense
         key="header-nav"
         name="header-nav"
@@ -33,6 +36,6 @@ export function PublicChrome({ children }: { children: React.ReactNode }) {
       >
         <FooterNav />
       </Suspense>
-    </>
+    </div>
   )
 }

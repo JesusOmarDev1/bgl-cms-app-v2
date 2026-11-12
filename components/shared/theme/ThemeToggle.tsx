@@ -1,49 +1,39 @@
 "use client"
 
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
+import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import { useTranslations } from "next-intl"
 
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
-export function ModeToggle() {
-  const { setTheme } = useTheme()
+/**
+ * Compact light/dark switch for the private navbar. The System option and
+ * the visual scheme picker live in the settings dialog (ThemeSchemePicker).
+ */
+export function ThemeToggle({
+  className,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { resolvedTheme, setTheme } = useTheme()
   const t = useTranslations("theme")
 
+  // resolvedTheme is undefined until mounted; the icon then defaults to dark,
+  // matching the app default, without a hydration mismatch.
+  const isDark = resolvedTheme === "dark"
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="icon">
-          <MaterialIcon
-            name="light_mode"
-            size={20}
-            className="scale-100 rotate-0 opacity-100 transition-[transform,opacity] dark:scale-95 dark:-rotate-90 dark:opacity-0"
-          />
-          <MaterialIcon
-            name="dark_mode"
-            size={20}
-            className="absolute scale-95 rotate-90 opacity-0 transition-[transform,opacity] dark:scale-100 dark:rotate-0 dark:opacity-100"
-          />
-          <span className="sr-only">{t("toggle")}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuGroup>
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          {t("light")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          {t("dark")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          {t("system")}
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label={t("toggle")}
+      onPress={() => setTheme(isDark ? "light" : "dark")}
+      className={className}
+      {...props}
+    >
+      <MaterialIcon
+        name={isDark ? "light_mode" : "dark_mode"}
+        size={20}
+        className="transition-[transform,opacity] duration-200 data-[switching=true]:scale-75"
+      />
+    </Button>
   )
 }
