@@ -8,7 +8,8 @@ import {
 } from "@/lib/env/constants"
 
 function isTurnstileSuccess(
-  value: unknown
+  value: unknown,
+  action: string
 ): value is TurnstileServerValidationResponse {
   return (
     typeof value === "object" &&
@@ -16,11 +17,14 @@ function isTurnstileSuccess(
     "success" in value &&
     value.success === true &&
     "action" in value &&
-    value.action === TURNSTILE_FORM_ACTION
+    value.action === action
   )
 }
 
-export async function verifyTurnstile(token: string): Promise<boolean> {
+export async function verifyTurnstile(
+  token: string,
+  action: string = TURNSTILE_FORM_ACTION
+): Promise<boolean> {
   const secret = TURNSTILE_SECRET_KEY
   const url = TURNSTILE_VERIFY_URL
   const responseToken = token.trim()
@@ -35,7 +39,7 @@ export async function verifyTurnstile(token: string): Promise<boolean> {
     })
     if (!response.ok) return false
     const payload: unknown = await response.json()
-    return isTurnstileSuccess(payload)
+    return isTurnstileSuccess(payload, action)
   } catch {
     return false
   }

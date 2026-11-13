@@ -14,6 +14,7 @@ export const TURNSTILE_SITE_KEY =
 export const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY ?? ""
 export const TURNSTILE_VERIFY_URL = process.env.NEXT_PUBLIC_SITEVERIFY_URL ?? ""
 export const TURNSTILE_FORM_ACTION = "submit_form"
+export const TURNSTILE_LOGIN_ACTION = "login"
 
 // GOOGLE ANALYTICS
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ""
