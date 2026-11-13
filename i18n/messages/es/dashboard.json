@@ -1,19 +1,19 @@
 {
   "dashboard": {
-    "brand": "BGL BASCULAS APP",
+    "brand": "BGL BASCULAS INDUSTRIALES",
     "nav": {
       "operation": "Operación",
       "catalogs": "Catálogos",
-      "dashboard": "Panel",
-      "orders": "Órdenes",
-      "movements": "Movimientos",
+      "dashboard": "Panel de control",
+      "orders": "Órdenes de servicio",
+      "movements": "Movimientos de inventario",
       "clients": "Clientes",
-      "scales": "Básculas",
+      "scales": "Básculas de clientes",
       "inventory": "Inventario",
       "brands": "Marcas",
       "models": "Modelos",
       "suppliers": "Proveedores",
-      "configuration": "Configuración"
+      "configuration": "Configuración del sistema"
     },
     "comingSoon": "Disponible próximamente",
     "openMenu": "Abrir menú de cuenta",
@@ -43,6 +43,7 @@
       "photoHint": "Arrastra y suelta una imagen o haz clic para buscarla.",
       "photoRecommended": "Imagen cuadrada, de al menos 400×400 px.",
       "photoTooLarge": "La foto supera el máximo de 2 MB.",
+      "photoTooSmall": "La imagen debe medir al menos 400×400 px.",
       "photoInvalidType": "Solo se permiten imágenes JPG, PNG o WebP.",
       "saveChanges": "Guardar cambios",
       "noChanges": "Sin cambios por guardar",

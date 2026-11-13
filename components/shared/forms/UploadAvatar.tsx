@@ -20,7 +20,8 @@ import { cn } from "cn"
 import Image from "next/image"
 
 const FRAME_SIZE = 208
-const OUTPUT_SIZE = 320
+// Exactly 400x400 out; sources smaller than that are rejected on load.
+const OUTPUT_SIZE = 400
 const BUTTON_CLASS = "h-8 rounded-lg px-3 cursor-pointer"
 const ENTRANCE_ANIMATION = "animate-in fade-in zoom-in-95 duration-300"
 
@@ -33,6 +34,9 @@ const loadImage = (src: string) =>
     img.onerror = reject
     img.src = src
   })
+
+const isTooSmall = (img: HTMLImageElement) =>
+  Math.min(img.naturalWidth, img.naturalHeight) < OUTPUT_SIZE
 
 const dataUrlToFile = (dataUrl: string) => {
   const [meta, base64] = dataUrl.split(",")
@@ -52,7 +56,7 @@ const UploadAvatar = () => {
   const [rotation, setRotation] = useState(0)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 })
-  const [uploadFailure, setUploadFailure] = useState<string | null>(null)
+  const [photoError, setPhotoError] = useState<string | null>(null)
 
   const dragState = useRef<{
     startX: number
@@ -72,10 +76,15 @@ const UploadAvatar = () => {
     if (!file || !file.type.startsWith("image/")) return
     const url = URL.createObjectURL(file)
     loadImage(url).then((img) => {
+      if (isTooSmall(img)) {
+        URL.revokeObjectURL(url)
+        setPhotoError("photoTooSmall")
+        return
+      }
       setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight })
       setImageUrl(url)
       setResultUrl(null)
-      setUploadFailure(null)
+      setPhotoError(null)
       resetEditor()
       setStage("editing")
     })
@@ -146,7 +155,7 @@ const UploadAvatar = () => {
   const avatarError =
     avatarAction.result.data?.ok === false
       ? avatarAction.result.data.message
-      : uploadFailure
+      : photoError
   const avatarErrorText = avatarError
     ? avatarError.startsWith("photo")
       ? t(`settings.${avatarError}`)
@@ -158,7 +167,7 @@ const UploadAvatar = () => {
     setStage("idle")
     setImageUrl(null)
     setResultUrl(null)
-    setUploadFailure(null)
+    setPhotoError(null)
     resetEditor()
   }
 
@@ -187,7 +196,7 @@ const UploadAvatar = () => {
 
       const croppedUrl = canvas.toDataURL("image/png")
       setResultUrl(croppedUrl)
-      setUploadFailure(null)
+      setPhotoError(null)
       avatarAction.execute({ photo: dataUrlToFile(croppedUrl) })
     })
   }
@@ -233,6 +242,12 @@ const UploadAvatar = () => {
                   {t("settings.photoChooseFile")}
                 </Button>
               </div>
+
+              {avatarErrorText ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {avatarErrorText}
+                </p>
+              ) : null}
             </div>
           )}
 

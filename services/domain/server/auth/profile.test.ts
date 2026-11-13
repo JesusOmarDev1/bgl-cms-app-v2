@@ -6,13 +6,8 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }))
 vi.mock("@directus/sdk", () => ({
-  isDirectusError: vi.fn(
-    (error: unknown) =>
-      typeof error === "object" &&
-      error !== null &&
-      Array.isArray((error as { errors?: unknown[] }).errors)
-  ),
   updateMe: vi.fn((data: unknown) => ({ __command: "updateMe", data })),
+  uploadFiles: vi.fn((data: FormData) => ({ __command: "uploadFiles", data })),
 }))
 vi.mock("@/config/directus-private", () => ({
   createPrivateDirectus: vi.fn(),
@@ -164,6 +159,65 @@ describe("update-profile server action", () => {
     expect((result.data as ProfileResult).message).toBe("accessDenied")
   })
 
+  function givenDirectusFailure(
+    code: string,
+    extensions: Record<string, unknown> = {}
+  ) {
+    requestMock.mockRejectedValue({
+      message: "redacted",
+      errors: [{ message: "redacted", extensions: { code, ...extensions } }],
+      response: { status: 400 },
+    })
+  }
+
+  it.each([
+    ["TOKEN_EXPIRED", "sessionExpired"],
+    ["INVALID_TOKEN", "sessionExpired"],
+    ["USER_SUSPENDED", "sessionExpired"],
+    ["INVALID_IP", "sessionExpired"],
+    ["FORBIDDEN", "accessDenied"],
+    ["FAILED_VALIDATION", "validationFailed"],
+    ["CONTENT_TOO_LARGE", "photoTooLarge"],
+    ["SERVICE_UNAVAILABLE", "unavailable"],
+    ["CODE_INVENTADO", "generic"],
+  ])("maps the official %s code to %s", async (code, expected) => {
+    givenSession()
+    givenDirectusFailure(code, { field: "title" })
+
+    const result = await updateProfile({ firstName: "Ana" })
+
+    expect((result.data as ProfileResult).message).toBe(expected)
+  })
+
+  it("reports a transport failure as unavailable, not as a Directus verdict", async () => {
+    givenSession()
+    requestMock.mockRejectedValue(new TypeError("fetch failed"))
+
+    const result = await updateProfile({ firstName: "Ana" })
+
+    expect((result.data as ProfileResult).message).toBe("unavailable")
+  })
+
+  it.each([
+    ["an error without a Directus code", new Error("boom")],
+    [
+      "the client timeout",
+      Object.assign(new Error("This operation was aborted"), {
+        name: "AbortError",
+      }),
+    ],
+  ])(
+    "reports %s as unavailable, not as a Directus verdict",
+    async (_label, error) => {
+      givenSession()
+      requestMock.mockRejectedValue(error)
+
+      const result = await updateProfile({ firstName: "Ana" })
+
+      expect((result.data as ProfileResult).message).toBe("unavailable")
+    }
+  )
+
   it("rejects names over 80 characters before touching Directus", async () => {
     givenSession()
 
@@ -179,12 +233,6 @@ describe("update-profile server action", () => {
 })
 
 describe("upload-avatar server action", () => {
-  function givenFetchUpload() {
-    const fetchMock = vi.fn()
-    vi.stubGlobal("fetch", fetchMock)
-    return fetchMock
-  }
-
   function givenFile(overrides: Partial<{ size: number; type: string }> = {}) {
     const file = new File(["x"], "photo.png", { type: "image/png" })
     if (overrides.size !== undefined) {
@@ -196,39 +244,73 @@ describe("upload-avatar server action", () => {
     return file
   }
 
-  it("uploads the file to Directus and patches the own user avatar", async () => {
+  function givenNoRawFetch() {
+    const fetchMock = vi.fn()
+    vi.stubGlobal("fetch", fetchMock)
+    return fetchMock
+  }
+
+  it("uploads the file with the SDK and patches the avatar with the id it returns", async () => {
     givenSession()
-    const fetchMock = givenFetchUpload()
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ data: { id: "file-9" } }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      })
-    )
-    requestMock.mockResolvedValue({})
+    const fetchMock = givenNoRawFetch()
+    requestMock
+      .mockResolvedValueOnce({ id: "file-9" })
+      .mockResolvedValueOnce({})
 
     await expect(uploadAvatar({ photo: givenFile() })).resolves.toEqual({
       data: { ok: true },
     })
 
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
-    expect(url).toContain("/files")
-    expect(new Headers(init.headers).get("Authorization")).toBe(
-      "Bearer access-1"
-    )
-    expect(init.body).toBeInstanceOf(FormData)
-    expect((init.body as FormData).get("file")).toBeInstanceOf(File)
-    expect(requestMock).toHaveBeenCalledTimes(1)
-    expect(requestMock.mock.calls[0][0]).toEqual({
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(createPrivateDirectus).toHaveBeenCalledTimes(1)
+    expect(createPrivateDirectus).toHaveBeenCalledWith("access-1")
+    expect(requestMock).toHaveBeenCalledTimes(2)
+    const upload = requestMock.mock.calls[0][0] as {
+      __command: string
+      data: FormData
+    }
+    expect(upload.__command).toBe("uploadFiles")
+    expect(upload.data).toBeInstanceOf(FormData)
+    expect(upload.data.get("file")).toBeInstanceOf(File)
+    expect(requestMock.mock.calls[1][0]).toEqual({
       __command: "updateMe",
       data: { avatar: "file-9" },
     })
   })
 
+  it.each(["image/jpeg", "image/png", "image/webp"])(
+    "accepts a %s photo",
+    async (type) => {
+      givenSession()
+      requestMock
+        .mockResolvedValueOnce({ id: "file-9" })
+        .mockResolvedValueOnce({})
+
+      await expect(
+        uploadAvatar({ photo: givenFile({ type }) })
+      ).resolves.toEqual({ data: { ok: true } })
+      expect(requestMock).toHaveBeenCalledTimes(2)
+    }
+  )
+
+  it.each(["image/gif", "application/pdf"])(
+    "rejects a %s photo with photoInvalidType and zero requests",
+    async (type) => {
+      givenSession()
+      const fetchMock = givenNoRawFetch()
+
+      const result = await uploadAvatar({ photo: givenFile({ type }) })
+
+      expect((result.data as ProfileResult).message).toBe("photoInvalidType")
+      expect(fetchMock).not.toHaveBeenCalled()
+      expect(createPrivateDirectus).not.toHaveBeenCalled()
+      expect(requestMock).not.toHaveBeenCalled()
+    }
+  )
+
   it("rejects a photo over 2 MB with photoTooLarge and zero requests", async () => {
     givenSession()
-    const fetchMock = givenFetchUpload()
+    const fetchMock = givenNoRawFetch()
 
     const result = await uploadAvatar({
       photo: givenFile({ size: 2 * 1024 * 1024 + 1 }),
@@ -240,23 +322,9 @@ describe("upload-avatar server action", () => {
     expect(requestMock).not.toHaveBeenCalled()
   })
 
-  it("rejects a non-image photo with photoInvalidType and zero requests", async () => {
-    givenSession()
-    const fetchMock = givenFetchUpload()
-
-    const result = await uploadAvatar({
-      photo: givenFile({ type: "application/pdf" }),
-    })
-
-    expect((result.data as ProfileResult).message).toBe("photoInvalidType")
-    expect(fetchMock).not.toHaveBeenCalled()
-    expect(createPrivateDirectus).not.toHaveBeenCalled()
-    expect(requestMock).not.toHaveBeenCalled()
-  })
-
   it("fails closed with sessionExpired and zero requests without a session", async () => {
     givenNoSession()
-    const fetchMock = givenFetchUpload()
+    const fetchMock = givenNoRawFetch()
 
     const result = await uploadAvatar({ photo: givenFile() })
 
@@ -268,14 +336,8 @@ describe("upload-avatar server action", () => {
 
   it("maps a Directus access denial on the avatar patch to accessDenied", async () => {
     givenSession()
-    const fetchMock = givenFetchUpload()
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ data: { id: "file-9" } }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      })
-    )
-    requestMock.mockRejectedValue({
+    givenNoRawFetch()
+    requestMock.mockResolvedValueOnce({ id: "file-9" }).mockRejectedValueOnce({
       response: { status: 403 },
       errors: [{ message: "redacted", extensions: { code: "FORBIDDEN" } }],
     })
@@ -283,5 +345,20 @@ describe("upload-avatar server action", () => {
     const result = await uploadAvatar({ photo: givenFile() })
 
     expect((result.data as ProfileResult).message).toBe("accessDenied")
+  })
+
+  it("reports unavailable when the SDK upload fails", async () => {
+    givenSession()
+    givenNoRawFetch()
+    requestMock.mockRejectedValue({
+      errors: [
+        { message: "redacted", extensions: { code: "SERVICE_UNAVAILABLE" } },
+      ],
+    })
+
+    const result = await uploadAvatar({ photo: givenFile() })
+
+    expect((result.data as ProfileResult).message).toBe("unavailable")
+    expect(requestMock).toHaveBeenCalledTimes(1)
   })
 })
