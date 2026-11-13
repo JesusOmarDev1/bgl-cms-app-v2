@@ -2,53 +2,31 @@ import "server-only"
 import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible"
 import redis from "@/config/redis"
 
-const searchLimiterMemory = new RateLimiterMemory({
-  keyPrefix: "search",
-  points: 60,
-  duration: 60,
-})
+const WINDOW_SECONDS = 60
 
-const formLimiterMemory = new RateLimiterMemory({
-  keyPrefix: "form-submit",
-  points: 5,
-  duration: 60,
-})
+// One limiter shape for every scope: `points` per minute, blocked for
+// `blockDuration` seconds after the points are consumed, memory fallback included.
+function makeLimiter(
+  keyPrefix: string,
+  points: number,
+  blockDuration = WINDOW_SECONDS
+) {
+  return new RateLimiterRedis({
+    storeClient: redis,
+    keyPrefix,
+    points,
+    duration: WINDOW_SECONDS,
+    blockDuration,
+    inMemoryBlockOnConsumed: points,
+    inMemoryBlockDuration: blockDuration,
+    insuranceLimiter: new RateLimiterMemory({
+      keyPrefix,
+      points,
+      duration: WINDOW_SECONDS,
+    }),
+  })
+}
 
-const loginLimiterMemory = new RateLimiterMemory({
-  keyPrefix: "auth-login",
-  points: 5,
-  duration: 60,
-})
-
-export const searchLimiter = new RateLimiterRedis({
-  storeClient: redis,
-  keyPrefix: "search",
-  points: 60,
-  duration: 60,
-  blockDuration: 60,
-  inMemoryBlockOnConsumed: 60,
-  inMemoryBlockDuration: 60,
-  insuranceLimiter: searchLimiterMemory,
-})
-
-export const formLimiter = new RateLimiterRedis({
-  storeClient: redis,
-  keyPrefix: "form-submit",
-  points: 5,
-  duration: 60,
-  blockDuration: 300,
-  inMemoryBlockOnConsumed: 5,
-  inMemoryBlockDuration: 300,
-  insuranceLimiter: formLimiterMemory,
-})
-
-export const loginLimiter = new RateLimiterRedis({
-  storeClient: redis,
-  keyPrefix: "auth-login",
-  points: 5,
-  duration: 60,
-  blockDuration: 300,
-  inMemoryBlockOnConsumed: 5,
-  inMemoryBlockDuration: 300,
-  insuranceLimiter: loginLimiterMemory,
-})
+export const searchLimiter = makeLimiter("search", 60)
+export const formLimiter = makeLimiter("form-submit", 5, 300)
+export const loginLimiter = makeLimiter("auth-login", 5, 300)

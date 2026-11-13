@@ -13,8 +13,10 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { RefreshSession } from "@/components/shared/auth/RefreshSession"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
+import { getInitials } from "@/lib/formatting/initials"
 import UploadAvatar from "@/components/shared/forms/UploadAvatar"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { updateProfile } from "@/services/domain/server/auth/profile"
@@ -36,10 +38,6 @@ interface ProfileFormProps {
     description: string
     avatar: string | null
   } | null
-}
-
-function initialsOf(firstName: string, lastName: string) {
-  return `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "?"
 }
 
 function serialize(values: ProfileValues) {
@@ -79,7 +77,7 @@ export function ProfileForm({ identity }: ProfileFormProps) {
   const router = useRouter()
 
   const initials = identity
-    ? initialsOf(identity.firstName, identity.lastName)
+    ? getInitials(identity.firstName, identity.lastName)
     : "?"
 
   const action = useAction(updateProfile, {
@@ -353,6 +351,11 @@ export function ProfileForm({ identity }: ProfileFormProps) {
           }}
         </form.Subscribe>
       </form>
+
+      {/* Silent session renewal: fires once on mount, cleans up cookies on
+          transient failure and shows a manual retry button. Renders null on
+          success — the user never sees it unless something goes wrong. */}
+      <RefreshSession />
     </div>
   )
 }

@@ -13,20 +13,9 @@ import {
 } from "@/components/ui/sidebar"
 import { readAuthSession } from "@/services/domain/server/auth/token"
 import { getIdentityRepository } from "@/services/domain/db/repositories/collections/session"
+import { getInitials } from "@/lib/formatting/initials"
 import { ThemeToggle } from "@/components/shared/theme/ThemeToggle"
 import type { SessionIdentityTypes } from "@/types/collections/session"
-
-function initials(identity: SessionIdentityTypes) {
-  const source =
-    `${identity.first_name ?? ""} ${identity.last_name ?? ""}`.trim()
-  return source
-    ? source
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? "")
-        .join("")
-    : (identity.email?.[0]?.toUpperCase() ?? "?")
-}
 
 async function SidebarUser() {
   const session = await readAuthSession()
@@ -45,7 +34,9 @@ async function SidebarUser() {
     <UserMenu
       name={name}
       email={email}
-      initials={identity ? initials(identity) : "?"}
+      initials={
+        identity ? getInitials(identity.first_name, identity.last_name) : "?"
+      }
       avatar={identity?.avatar ?? null}
       identity={identity}
     />

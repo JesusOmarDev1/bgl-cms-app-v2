@@ -56,7 +56,7 @@ describe("logout server action", () => {
     )
 
     await expect(logout({} as never)).resolves.toEqual({
-      data: { ok: true, remoteRevoked: true },
+      data: { ok: true },
     })
 
     expect(calls).toHaveLength(1)
@@ -70,7 +70,7 @@ describe("logout server action", () => {
     expect(store.set).not.toHaveBeenCalled()
   })
 
-  it("still clears cookies locally while refusing to confirm remote revocation", async () => {
+  it("still clears cookies locally when the remote revocation fails", async () => {
     givenCookies()
     vi.stubGlobal(
       "fetch",
@@ -80,7 +80,7 @@ describe("logout server action", () => {
     )
 
     await expect(logout({} as never)).resolves.toEqual({
-      data: { ok: true, remoteRevoked: false },
+      data: { ok: true },
     })
     expect(store.delete).toHaveBeenCalledWith(AUTH_ACCESS_COOKIE)
     expect(store.delete).toHaveBeenCalledWith(AUTH_REFRESH_COOKIE)

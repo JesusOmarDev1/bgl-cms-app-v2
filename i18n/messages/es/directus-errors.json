@@ -5,7 +5,6 @@
     "accessDenied": "No tenés permiso para realizar esta acción.",
     "rateLimited": "Hubo demasiados intentos. Esperá un momento antes de volver a intentar.",
     "unavailable": "El servicio no está disponible en este momento. Intentá más tarde.",
-    "resultUnknown": "No pudimos confirmar si se guardó la operación. Verificá su estado antes de intentarlo nuevamente.",
     "validationFailed": "Revisá los datos señalados e intentá de nuevo.",
     "generic": "No pudimos completar la operación. Intentá de nuevo."
   }

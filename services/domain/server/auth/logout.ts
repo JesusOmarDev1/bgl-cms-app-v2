@@ -9,18 +9,17 @@ import {
   readAuthSession,
 } from "@/services/domain/server/auth/token"
 
-type LogoutResult = { ok: true; remoteRevoked: boolean }
+type LogoutResult = { ok: true } | { ok: false; message: string }
 
 export const logout = actionClient
   .inputSchema(v.optional(v.object({})))
-  .action(async (): Promise<LogoutResult | { ok: false; message: string }> => {
+  .action(async (): Promise<LogoutResult> => {
     const session = await readAuthSession()
     if (!session) {
       await clearAuthCookies()
       return { ok: false, message: "sessionExpired" }
     }
 
-    let remoteRevoked = true
     try {
       const client = await createDirectusAuthClient()
       await client.request(
@@ -30,8 +29,8 @@ export const logout = actionClient
         })
       )
     } catch {
-      remoteRevoked = false
+      // Local logout stands even when Directus is unreachable.
     }
     await clearAuthCookies()
-    return { ok: true, remoteRevoked }
+    return { ok: true }
   })

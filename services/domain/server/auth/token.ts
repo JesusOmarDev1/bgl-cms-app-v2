@@ -1,7 +1,6 @@
 import "server-only"
 
 import { cookies } from "next/headers"
-import { createPrivateDirectus } from "@/config/directus-private"
 import type { AuthenticationData } from "@directus/sdk"
 
 export const AUTH_ACCESS_COOKIE = "bgl_auth_access"
@@ -10,7 +9,7 @@ export const AUTH_REFRESH_COOKIE = "bgl_auth_refresh"
 // shortcut: refresh cookie TTL must match Directus REFRESH_TOKEN_TTL in deployment; a shorter cookie only logs the user out earlier (fail-closed).
 export const AUTH_REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 
-export type AuthSession = {
+type AuthSession = {
   accessToken: string | null
   refreshToken: string
 }
@@ -22,11 +21,6 @@ export async function readAuthSession(): Promise<AuthSession | null> {
   const refreshToken = store.get(AUTH_REFRESH_COOKIE)?.value
   if (!refreshToken) return null
   return { accessToken: accessToken ?? null, refreshToken }
-}
-
-/** Builds the private Directus client for this request's identity only. */
-export function createSessionClient(accessToken: string) {
-  return createPrivateDirectus(accessToken)
 }
 
 /**

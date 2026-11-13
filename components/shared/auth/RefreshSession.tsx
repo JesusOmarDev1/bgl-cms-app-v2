@@ -22,10 +22,13 @@ export function RefreshSession() {
   })
 
   useEffect(() => {
+    // Fire-once guard: React 18 StrictMode double-invokes effects in dev.
     if (started.current) return
     started.current = true
     action.execute({})
-  }, [action.execute])
+    // action.execute from next-safe-action's useAction is stable across
+    // renders; the started ref avoids re-fires on hot-reload.
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!failed) return null
   return (

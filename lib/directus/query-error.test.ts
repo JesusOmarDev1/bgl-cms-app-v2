@@ -6,7 +6,8 @@ const { errorLog, warnLog } = vi.hoisted(() => ({
 }))
 
 vi.mock("server-only", () => ({}))
-vi.mock("@/lib/directus/logger", () => ({
+vi.mock("@/lib/directus/logger", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/directus/logger")>()),
   directusLogger: { error: errorLog, warn: warnLog },
 }))
 

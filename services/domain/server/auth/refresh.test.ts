@@ -144,6 +144,58 @@ describe("refresh server action", () => {
     expect(store.set).not.toHaveBeenCalled()
   })
 
+  it.each(["TOKEN_EXPIRED", "INVALID_TOKEN", "USER_SUSPENDED"])(
+    "clears the session when Directus answers %s",
+    async (code) => {
+      givenCookies()
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () =>
+          Response.json(
+            { errors: [{ message: "redacted", extensions: { code } }] },
+            { status: 401 }
+          )
+        )
+      )
+
+      const result = (await refresh({} as never)).data as {
+        ok: boolean
+        message: string
+      }
+
+      expect(result).toEqual({ ok: false, message: "sessionExpired" })
+      expect(store.delete).toHaveBeenCalledWith(AUTH_ACCESS_COOKIE)
+      expect(store.delete).toHaveBeenCalledWith(AUTH_REFRESH_COOKIE)
+      expect(store.set).not.toHaveBeenCalled()
+    }
+  )
+
+  it("keeps cookies on an unhandled Directus code and reports unavailability", async () => {
+    givenCookies()
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json(
+          {
+            errors: [
+              { message: "redacted", extensions: { code: "CODE_INVENTADO" } },
+            ],
+          },
+          { status: 500 }
+        )
+      )
+    )
+
+    const result = (await refresh({} as never)).data as {
+      ok: boolean
+      message: string
+    }
+
+    expect(result).toEqual({ ok: false, message: "unavailable" })
+    expect(store.delete).not.toHaveBeenCalled()
+    expect(store.set).not.toHaveBeenCalled()
+  })
+
   it("clears a missing session without touching Directus", async () => {
     store.get.mockImplementation(() => undefined)
     vi.mocked(cookies).mockResolvedValue(store as never)

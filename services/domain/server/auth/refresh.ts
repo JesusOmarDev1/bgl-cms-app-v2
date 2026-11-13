@@ -1,25 +1,24 @@
 "use server"
 
 import {
-  isDirectusError,
   refresh as refreshCommand,
   type AuthenticationData,
 } from "@directus/sdk"
 import * as v from "valibot"
 import { actionClient } from "@/lib/server/safe-action"
 import { createDirectusAuthClient } from "@/config/directus-private"
-import { classifyDirectusError } from "@/lib/directus/classify-error"
+import { getDirectusCode } from "@/lib/directus/directus-error"
 import {
   applyAuthCookies,
   clearAuthCookies,
   readAuthSession,
 } from "@/services/domain/server/auth/token"
 
-type SharedOutcome = Promise<AuthenticationData | "expired" | "unavailable">
+type Rotation = AuthenticationData | "expired" | "unavailable"
 // Single-flight refresh is deliberate process-local coordination: concurrent
 // callers wait on one upstream rotation instead of racing a single-use token.
 // eslint-disable-next-line react-doctor/server-no-mutable-module-state
-const pendingRefreshes = new Map<string, SharedOutcome>()
+const pendingRefreshes = new Map<string, Promise<Rotation>>()
 
 type RefreshResult = { ok: true } | { ok: false; message: string }
 
@@ -38,45 +37,37 @@ export const refresh = actionClient
     if (!shared) {
       shared = performRefresh(staleToken)
       pendingRefreshes.set(staleToken, shared)
-      void shared.finally(() => {
-        pendingRefreshes.delete(staleToken)
-      })
+      void shared.finally(() => pendingRefreshes.delete(staleToken))
     }
     // Every waiting request applies the rotated tokens in its own response:
     // the caller who ran the request alone must not be the only one keeping the session.
     const auth = await shared
     if (auth === "expired") return { ok: false, message: "sessionExpired" }
-    if (auth === "unavailable") {
-      return { ok: false, message: "unavailable" }
-    }
+    if (auth === "unavailable") return { ok: false, message: "unavailable" }
     await applyAuthCookies(auth)
     return { ok: true }
   })
 
-async function performRefresh(
-  refreshToken: string
-): Promise<AuthenticationData | "expired" | "unavailable"> {
+async function performRefresh(refreshToken: string): Promise<Rotation> {
   try {
     // Raw command: the auth() extension's refresh() reads its own storage and
     // ignores an explicit refresh_token; the endpoint requires the JSON body.
     const client = await createDirectusAuthClient()
-    const auth = await client.request(
+    return await client.request(
       refreshCommand({ mode: "json", refresh_token: refreshToken })
     )
-    return auth
   } catch (error) {
-    if (isDirectusError(error)) {
-      // Only a denied or dead session clears the cookies. A Directus outage
-      // (5xx, rate limit) is transient: keep the tokens so the browser retries.
-      const { category } = classifyDirectusError(error)
-      if (category === "sessionExpired" || category === "sessionInvalid") {
+    // Only a denied or dead session clears the cookies. A Directus outage
+    // (5xx, rate limit, transport) is transient: keep the tokens so the browser retries.
+    switch (getDirectusCode(error)) {
+      case "TOKEN_EXPIRED":
+      case "INVALID_TOKEN":
+      case "USER_SUSPENDED":
         // Racing callers end up here too; the deletion is idempotent.
         await clearAuthCookies()
         return "expired"
-      }
-      return "unavailable"
+      default:
+        return "unavailable"
     }
-    // Transient failures keep the refresh token: the browser retries later.
-    return "unavailable"
   }
 }

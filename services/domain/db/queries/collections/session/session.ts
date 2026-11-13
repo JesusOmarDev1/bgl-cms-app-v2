@@ -1,8 +1,8 @@
 import "server-only"
 
 import { readMe } from "@directus/sdk"
+import { createPrivateDirectus } from "@/config/directus-private"
 import { returnDirectusQueryError } from "@/lib/directus/query-error"
-import { createSessionClient } from "@/services/domain/server/auth/token"
 import { SESSION_IDENTITY_FIELDS } from "@/services/domain/db/queries/collections/session/session.fields"
 import type { SessionIdentityTypes } from "@/types/collections/session"
 
@@ -16,7 +16,7 @@ export async function getIdentityQuery(
 ): Promise<SessionIdentityTypes | null> {
   try {
     const me = await (
-      await createSessionClient(accessToken)
+      await createPrivateDirectus(accessToken)
     ).request(
       readMe({
         // The SDK types `directus_users.avatar` as `string | file`, so its

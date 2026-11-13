@@ -55,7 +55,8 @@ const TRUSTED_COLLECTIONS = new Set([
   "whatsapp_button",
 ])
 
-const TRUSTED_ERROR_CODES = new Set([
+/** Official codes the logger accepts as safe diagnostics; anything else is dropped. */
+export const TRUSTED_ERROR_CODES = new Set([
   "FORBIDDEN",
   "INTERNAL_SERVER_ERROR",
   "INVALID_CREDENTIALS",
