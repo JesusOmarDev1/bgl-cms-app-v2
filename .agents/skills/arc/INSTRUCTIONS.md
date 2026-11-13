@@ -1,11 +1,11 @@
 # Arc rules for coding agents
 
-Keep this file where your agent reads project rules: paste it into `AGENTS.md` or `CLAUDE.md`, or save it as `.cursor/rules/arc.mdc` with this header:
+Keep this file where your agent reads project rules: paste it into `AGENTS.md` or save it as `.agents/rules/arc.md` with this header:
 
 ```
 ---
 description: Arc UI rules for React components, pages, and CSS modules
-globs: ["**/*.tsx", "**/*.module.css"]
+globs: **/*.tsx,**/*.module.css
 alwaysApply: false
 ---
 ```

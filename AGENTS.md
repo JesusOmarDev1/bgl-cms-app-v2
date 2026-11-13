@@ -15,9 +15,15 @@ Before finishing a code change: `pnpm pre-deploy`.
 
 Read [DESIGN.md](DESIGN.md) before any UI change. The site is forced dark. Brand red (`#e7000b`) is the `red` button variant and text selection only. Use components in `components/ui`.
 
+## ui-sdk
+
+Before using ui-sdk, follow the ui-sdk skill if it's installed. Also read `node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component with ui-sdk, also search `node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` located next to it (same directory).
+
 # Rule dispatcher
 
-Before editing, read `.cursor/rules/*.mdc` and apply every rule with `alwaysApply: true`, plus every rule whose frontmatter `globs` matches any file you intend to change. If a Cursor rule conflicts with this file, `AGENTS.md` wins.
+Before editing, read `.agents/rules/*.md`. Apply every rule with `alwaysApply: true`, plus every rule whose frontmatter `globs` matches any file you intend to change. If a rule conflicts with this file, `AGENTS.md` wins.
+
+Project skills live in `.agents/skills/<name>/SKILL.md`; load the relevant skill and its relative references when it applies.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

@@ -11,3 +11,4 @@ Read `AGENTS.md` for setup and check commands.
 - No `any`. No `@ts-ignore`.
 - Commit or push only when asked.
 - Package manager: `pnpm` / `pnpx` only. No `npm`, `npx`, or `curl`.
+- Do not run `pnpm approve-builds`; set `allowBuilds` booleans in `pnpm-workspace.yaml` and run `pnpm i`.

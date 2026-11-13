@@ -32,65 +32,65 @@ export default function NotFound() {
       className="min-h-dvh bg-background text-foreground"
     >
       <Fragment>
-      <Box
-        className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto h-dvh max-w-5xl lg:max-w-6xl xl:max-w-7xl"
-        display="flex"
-        orientation="vertical"
-        padding={3}
-        gap={1.5}
-        align="center"
-        justify="center"
-      >
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-col items-center">
-              <StaticLogo className="aspect-auto h-32 w-auto" />
+        <Box
+          className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto h-dvh max-w-5xl lg:max-w-6xl xl:max-w-7xl"
+          display="flex"
+          orientation="vertical"
+          padding={3}
+          gap={1.5}
+          align="center"
+          justify="center"
+        >
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col items-center">
+                <StaticLogo className="aspect-auto h-32 w-auto" />
+              </div>
+              <h1 className="text-center font-mono text-7xl font-semibold text-muted-foreground">
+                404
+              </h1>
+              <h2 className="text-center text-3xl font-semibold md:text-6xl">
+                Página no encontrada
+              </h2>
             </div>
-            <h1 className="text-center font-mono text-7xl font-semibold text-muted-foreground">
-              404
-            </h1>
-            <h2 className="text-center text-3xl font-semibold md:text-6xl">
-              Página no encontrada
-            </h2>
-          </div>
-          <p className="text-center text-muted-foreground">
-            La página que buscas no existe o se ha movido. Revisa la URL o haz
-            clic en el botón de abajo para volver a la página de inicio o
-            cotizar un producto.
-          </p>
-          <div className="flex flex-col justify-center gap-4 md:flex-row">
-            <LinkButton href="/inicio">
-              <MaterialIcon
-                className="text-current"
-                name="arrow_back"
-                data-icon="inline-start"
-              />
-              Volver a la página de inicio
-            </LinkButton>
-            <LinkButton href="/cotizar" variant="red">
+            <p className="text-center text-muted-foreground">
+              La página que buscas no existe o se ha movido. Revisa la URL o haz
+              clic en el botón de abajo para volver a la página de inicio o
+              cotizar un producto.
+            </p>
+            <div className="flex flex-col justify-center gap-4 md:flex-row">
+              <LinkButton href="/inicio">
+                <MaterialIcon
+                  className="text-current"
+                  name="arrow_back"
+                  data-icon="inline-start"
+                />
+                Volver a la página de inicio
+              </LinkButton>
+              <LinkButton href="/cotizar" variant="red">
+                <MaterialIcon
+                  className="text-foreground"
+                  name="shopping_bag_speed"
+                  data-icon="inline-start"
+                />
+                Cotizar un producto
+              </LinkButton>
+            </div>
+            <p className="text-center text-muted-foreground">
+              Si tienes alguna pregunta, no dudes en contactar con nuestro
+              equipo de soporte técnico.
+            </p>
+            <LinkButton href="/soporte" variant="secondary">
               <MaterialIcon
                 className="text-foreground"
-                name="shopping_bag_speed"
+                name="support_agent"
                 data-icon="inline-start"
               />
-              Cotizar un producto
+              Contactar soporte tecnico
             </LinkButton>
           </div>
-          <p className="text-center text-muted-foreground">
-            Si tienes alguna pregunta, no dudes en contactar con nuestro equipo
-            de soporte técnico.
-          </p>
-          <LinkButton href="/soporte" variant="secondary">
-            <MaterialIcon
-              className="text-foreground"
-              name="support_agent"
-              data-icon="inline-start"
-            />
-            Contactar soporte tecnico
-          </LinkButton>
-        </div>
-      </Box>
-    </Fragment>
+        </Box>
+      </Fragment>
     </div>
   )
 }

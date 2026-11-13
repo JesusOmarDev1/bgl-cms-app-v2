@@ -12,7 +12,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,mjs,json}\"",
     "typecheck": "tsc --noEmit",
     "reset": "clean --lockfile",
-    "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm format && pnpm build",
+    "pre-deploy": "pnpm typegen && pnpm typecheck && pnpm lint && pnpm exec prettier --check \"**/*.{ts,tsx,mjs,json}\" && pnpm exec vitest run --project unit && pnpm build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

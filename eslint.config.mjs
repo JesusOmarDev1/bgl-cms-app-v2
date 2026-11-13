@@ -23,7 +23,6 @@ const eslintConfig = defineConfig([
     "storybook-static/**",
     "next-env.d.ts",
     ".codegraph/**",
-    ".cursor/**",
     ".vscode/**",
     ".github/**",
     ".ai/**",

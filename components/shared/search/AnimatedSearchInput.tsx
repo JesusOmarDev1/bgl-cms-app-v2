@@ -31,6 +31,11 @@ function readTextSwapDurationMs(): number {
   return Number.isFinite(parsed) ? parsed : 150
 }
 
+function scheduleTextSwap(callback: () => void, delay: number) {
+  const timeout = window.setTimeout(callback, delay)
+  return () => window.clearTimeout(timeout)
+}
+
 export type AnimatedSearchInputProps = {
   placeholders?: string[]
   interval?: number
@@ -68,12 +73,13 @@ export function AnimatedSearchInput({
     if (inputValue || reduce || placeholders.length < 2) return
 
     const swapEl = swapRef.current
-    let nestedTimeout: number | undefined
+    const pendingSwaps = new Set<() => void>()
     const timer = window.setInterval(() => {
       const el = swapRef.current
       if (!el) return
       el.classList.add("is-exit")
-      nestedTimeout = window.setTimeout(() => {
+      const cancel = scheduleTextSwap(() => {
+        pendingSwaps.delete(cancel)
         const nextIndex = (indexRef.current + 1) % placeholders.length
         indexRef.current = nextIndex
         el.textContent = placeholders[nextIndex] ?? "Buscar..."
@@ -83,11 +89,12 @@ export function AnimatedSearchInput({
         el.classList.remove("is-enter-start")
         setCurrentIndex(nextIndex)
       }, readTextSwapDurationMs())
+      pendingSwaps.add(cancel)
     }, interval)
 
     return () => {
       window.clearInterval(timer)
-      if (nestedTimeout !== undefined) window.clearTimeout(nestedTimeout)
+      for (const cancel of pendingSwaps) cancel()
       swapEl?.classList.remove("is-exit", "is-enter-start")
     }
   }, [placeholders, placeholders.length, interval, inputValue, reduce])

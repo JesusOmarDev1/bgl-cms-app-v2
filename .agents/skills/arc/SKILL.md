@@ -89,7 +89,7 @@ Read only the file the task needs. Each is one level from here.
 | [example-settings.md](example-settings.md) | Worked example: account settings page |
 | [example-pricing.md](example-pricing.md) | Worked example: pricing section with plans, comparison, and FAQ |
 | [example-dashboard.md](example-dashboard.md) | Worked example: analytics overview with KPIs, chart, and table |
-| [INSTRUCTIONS.md](INSTRUCTIONS.md) | Short always-on rules for AGENTS.md, CLAUDE.md, or Cursor rules |
+| [INSTRUCTIONS.md](INSTRUCTIONS.md) | Short always-on rules for AGENTS.md or `.agents/rules/` |
 
 Over MCP, `get_skill` returns any of these by file name without `.md` (`get_skill { "id": "checklist" }`). Raw copies: `https://uiarc.dev/r/skills/arc/<file>`.
 

@@ -22,11 +22,11 @@ Node version: [.nvmrc](.nvmrc).
 | `pnpm exec vitest run --project unit`  | Unit tests                                        |
 | `pnpm exec vitest run --project media` | Audio and video hook browser tests                |
 | `pnpm lint`                            | `eslint`                                          |
-| `pnpm format`                          | Prettier                                          |
+| `pnpm format`                          | Prettier (writes files)                           |
 | `pnpm build`                           | `next build`                                      |
 | `pnpm build-storybook`                 | Storybook build                                   |
 | `pnpm start`                           | `next start`                                      |
-| `pnpm pre-deploy`                      | `typegen`, `typecheck`, `lint`, `format`, `build` |
+| `pnpm pre-deploy`                      | Types, lint, format check, unit tests, build       |
 | `pnpm reset`                           | Clean install (`clean --lockfile`)                |
 
 ## Layout

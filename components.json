@@ -17,7 +17,13 @@
     "utils": "cn",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/hooks",
+    "stories": "@/stories",
+    "types": "@/types",
+    "queries": "@/services/domain/db/queries",
+    "repositories": "@/services/domain/db/repositories",
+    "actions": "@/services/domain/server",
+    "blocks": "@/components/blocks"
   },
   "menuColor": "default-translucent",
   "menuAccent": "subtle",
