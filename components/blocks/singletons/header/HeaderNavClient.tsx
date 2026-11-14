@@ -20,6 +20,7 @@ import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { MexicoCityIcon } from "@/assets/logos/cities/mexico"
 import { LinkButton } from "@/components/ui/button"
+import { isManualsUrl } from "@/lib/formatting/manuals-url"
 
 const HEADER_LEGAL_LINKS = [
   {
@@ -127,7 +128,12 @@ export function HeaderNavClient({
                   const url = item.url
 
                   if (item.type === "dropdown") {
-                    const subLinks = item.sub_links ?? []
+                    const subLinks = (item.sub_links ?? []).filter(
+                      (sub) =>
+                        sub.sub_links_id != null &&
+                        !isManualsUrl(sub.sub_links_id.url)
+                    )
+                    if (subLinks.length === 0) return null
 
                     return (
                       <NavigationMenuItem key={link.id}>
@@ -165,7 +171,8 @@ export function HeaderNavClient({
                     )
                   }
 
-                  if (url == null || url.length === 0) return null
+                  if (url == null || url.length === 0 || isManualsUrl(url))
+                    return null
 
                   return (
                     <NavigationMenuItem key={link.id}>
@@ -219,7 +226,7 @@ export function HeaderNavClient({
         <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           {search}
           <MexicoCityIcon className="hidden size-8 min-[1366px]:flex" />
-          {data?.primary_button ? (
+          {data?.primary_button && !isManualsUrl(data.primary_url) ? (
             <LinkButton
               href={data.primary_url ?? ""}
               variant="red"
@@ -234,7 +241,7 @@ export function HeaderNavClient({
               />
             </LinkButton>
           ) : null}
-          {data?.secondary_button ? (
+          {data?.secondary_button && !isManualsUrl(data.secondary_url) ? (
             <LinkButton
               href={data.secondary_url ?? ""}
               variant="outline"

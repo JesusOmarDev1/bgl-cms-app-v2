@@ -10,6 +10,7 @@ import { actionClient } from "@/lib/server/safe-action"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
 import { sanitizeHtmlFields } from "@/lib/formatting/sanitize"
 import { TEXT_REGEX } from "@/lib/validations/text"
+import { isManualsUrl } from "@/lib/formatting/manuals-url"
 
 const searchSchema = v.object({
   query: v.pipe(
@@ -49,7 +50,7 @@ export const searchAction = actionClient
         .index("global_search")
         .search<SearchHitTypes>(query, {
           offset: 0,
-          limit: 10,
+          limit: 20,
           attributesToHighlight: ["title", "excerpt"],
           attributesToRetrieve: [
             "id",
@@ -62,7 +63,10 @@ export const searchAction = actionClient
           ],
         })
 
-      return results.hits.map((hit) => sanitizeHtmlFields(hit))
+      return results.hits
+        .filter((hit) => hit.collection !== "manuals" && !isManualsUrl(hit.url))
+        .slice(0, 10)
+        .map((hit) => sanitizeHtmlFields(hit))
     } catch (error) {
       console.error(error)
       throw new Error(t("unknown_error"), { cause: error })

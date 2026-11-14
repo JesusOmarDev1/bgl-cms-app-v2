@@ -9,6 +9,7 @@ import type { BrandsTypes } from "@/types/collections/brands"
 import type { SuppliersTypes } from "@/types/collections/suppliers"
 import type { ModelsTypes } from "@/types/collections/models"
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
+import type { ProductTypesTypes } from "@/types/collections/product-types"
 import type { ProductsFilesJunction } from "@/types/collections/junctions/products-files"
 import type { ProductsProductAttributesJunction } from "@/types/collections/junctions/products-product-attributes"
 import type { ProductsProductsJunction } from "@/types/collections/junctions/products-products"
@@ -44,6 +45,7 @@ export interface ProductsTypes {
   image: string | DirectusFileTypes
   description: string | null
   product_category: string | ProductCategoriesTypes
+  product_type: string | ProductTypesTypes | null
   attributes: number[] | ProductsProductAttributesJunction[]
   images: number[] | ProductsFilesJunction[]
   related_products: number[] | ProductsProductsJunction[]

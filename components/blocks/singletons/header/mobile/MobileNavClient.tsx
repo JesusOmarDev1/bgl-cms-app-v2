@@ -19,6 +19,7 @@ import type { HeaderQueryResult } from "@/services/domain/db/queries/singletons/
 import Link from "next/link"
 import { Fragment, useState } from "react"
 import { SocialIcon } from "@/components/shared/content/SocialIcon"
+import { isManualsUrl } from "@/lib/formatting/manuals-url"
 
 const MOBILE_NAV_LINKS = [
   {
@@ -90,6 +91,13 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                 if (item == null) return null
 
                 if (item.type === "dropdown") {
+                  const subLinks = (item.sub_links ?? []).filter(
+                    (sub) =>
+                      sub.sub_links_id != null &&
+                      !isManualsUrl(sub.sub_links_id.url)
+                  )
+                  if (subLinks.length === 0) return null
+
                   return (
                     <AccordionItem key={link.id} id={String(link.id)}>
                       <AccordionTrigger className="flex items-center px-2.5 text-base hover:bg-muted hover:text-foreground hover:no-underline">
@@ -99,7 +107,7 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="ml-5 flex flex-col gap-1 ps-4">
-                        {item.sub_links?.map((sub) => {
+                        {subLinks.map((sub) => {
                           return (
                             <Link
                               key={sub.id}
@@ -121,7 +129,12 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                   )
                 }
 
-                if (item.url == null || item.url.length === 0) return null
+                if (
+                  item.url == null ||
+                  item.url.length === 0 ||
+                  isManualsUrl(item.url)
+                )
+                  return null
 
                 return (
                   <Link
@@ -165,7 +178,9 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
             </Accordion>
           </ScrollArea>
           <div className="mt-auto flex shrink-0 flex-col gap-4 border-t border-border p-4">
-            {data.primary_button && data.primary_url ? (
+            {data.primary_button &&
+            data.primary_url &&
+            !isManualsUrl(data.primary_url) ? (
               <LinkButton
                 href={data.primary_url}
                 onClick={close}
@@ -181,7 +196,9 @@ export function MobileNavClient({ data }: MobileNavClientProps) {
                 />
               </LinkButton>
             ) : null}
-            {data.secondary_button && data.secondary_url ? (
+            {data.secondary_button &&
+            data.secondary_url &&
+            !isManualsUrl(data.secondary_url) ? (
               <LinkButton
                 href={data.secondary_url}
                 onClick={close}

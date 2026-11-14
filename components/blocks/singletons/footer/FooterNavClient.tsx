@@ -23,6 +23,7 @@ import { splitEmail } from "@/lib/formatting/split-email"
 import { COOKIE_CONSENT_OPEN_EVENT } from "@/components/shared/utility/CookieConsent"
 import { FooterCopyright } from "./FooterCopyright"
 import { FooterCompanyLetters } from "./FooterCompanyLetters"
+import { isManualsUrl } from "@/lib/formatting/manuals-url"
 
 const FOOTER_LEGAL_LINKS = [
   {
@@ -117,7 +118,8 @@ function FooterDropdownColumn({
 }) {
   const rows = (dropdown.sub_links ?? []).flatMap((sub) => {
     const item = sub.sub_links_id
-    if (item == null || item.url.length === 0) return []
+    if (item == null || item.url.length === 0 || isManualsUrl(item.url))
+      return []
     return [{ key: sub.id, href: item.url, title: item.title, icon: item.icon }]
   })
   if (rows.length === 0) return null
@@ -407,7 +409,8 @@ export function FooterNavClient({
       dropdowns.push({ key: link.id, item })
       continue
     }
-    if (item.url == null || item.url.length === 0) continue
+    if (item.url == null || item.url.length === 0 || isManualsUrl(item.url))
+      continue
     links.push({
       key: link.id,
       href: item.url,

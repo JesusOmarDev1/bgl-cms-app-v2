@@ -1,6 +1,7 @@
 import type { Query } from "@directus/sdk"
 import { SEO_FIELDS } from "@/services/domain/db/queries/collections/seo/seo.fields"
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
+import type { ProductTypesTypes } from "@/types/collections/product-types"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { Schema } from "@/types/schema"
 
@@ -14,16 +15,29 @@ export const PRODUCT_CATALOG_FIELDS = [
   { image: ["id"] },
   { brand: ["title"] },
   { model: ["title"] },
-  { product_category: ["id", "title", "slug", "icon"] },
+  {
+    product_category: ["id", "title", "slug", "icon"],
+  },
+  { product_type: ["id", "slug"] },
 ] as const satisfies NonNullable<Query<Schema, ProductsTypes>["fields"]>
 
 export const PRODUCT_CATALOG_CATEGORY_FIELDS = [
   "id",
+  "title",
   "slug",
+  { image: ["id"] },
   { parent: ["id"] },
 ] as const satisfies NonNullable<
   Query<Schema, ProductCategoriesTypes>["fields"]
 >
+
+export const PRODUCT_CATALOG_TYPE_FIELDS = [
+  "id",
+  "slug",
+  "title",
+  { image: ["id"] },
+  { category: ["id"] },
+] as const satisfies NonNullable<Query<Schema, ProductTypesTypes>["fields"]>
 
 export const PRODUCTS_FIELDS = [
   "id",

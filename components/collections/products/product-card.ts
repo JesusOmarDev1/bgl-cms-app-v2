@@ -11,6 +11,9 @@ export type ProductCardData = {
   categoryTitle: string | null
   categorySlug: string | null
   categoryIcon: string | null
+  categoryId: string | null
+  productTypeId: string | null
+  productTypeSlug: string | null
   categoryAncestors?: readonly string[]
 }
 
@@ -25,10 +28,12 @@ export type ProductCardSource = {
   brand: { title: string } | null
   model: { title: string } | null
   product_category: {
+    id?: string
     title: string
     slug: string | null
     icon?: string | null
   } | null
+  product_type?: { id: string; slug: string } | null
 }
 
 function trimmed(value: string | null | undefined): string | null {
@@ -50,5 +55,8 @@ export function pickProductCard(product: ProductCardSource): ProductCardData {
     categoryTitle: trimmed(product.product_category?.title),
     categorySlug: trimmed(product.product_category?.slug),
     categoryIcon: trimmed(product.product_category?.icon),
+    categoryId: product.product_category?.id ?? null,
+    productTypeId: product.product_type?.id ?? null,
+    productTypeSlug: trimmed(product.product_type?.slug),
   }
 }

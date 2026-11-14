@@ -7,6 +7,7 @@ import { CatalogBodySkeleton } from "@/components/collections/catalog/CatalogBod
 import { CatalogToolBarSkeleton } from "@/components/collections/catalog/CatalogToolBarSkeleton"
 import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
 import { ProductCatalogClients } from "@/components/collections/products/ProductCatalogClients"
+import { buildCatalogHierarchy } from "@/components/collections/catalog/catalog-items"
 import { toProductCard } from "@/components/collections/products/to-product-card"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -18,18 +19,40 @@ import { getProductCatalogRepository } from "@/services/domain/db/repositories/c
 async function ProductCatalog({
   products,
   labels,
+  navigationLabels,
   emptyCatalog,
   noMatches,
   clearLabel,
 }: {
   products: ReturnType<typeof getProductCatalogRepository>
   labels: CatalogLabels
+  navigationLabels: { categories: string; untypedProducts: string }
   emptyCatalog: string
   noMatches: string
   clearLabel: string
 }) {
-  const { products: rows, categoryAncestors } = await products
+  const {
+    products: rows,
+    categories,
+    types,
+    categoryAncestors,
+  } = await products
   await connection()
+  const hierarchy = buildCatalogHierarchy(
+    categories.map((category) => ({
+      ...category,
+      image: category.image ?? null,
+    })),
+    types.map((type) => ({
+      ...type,
+      category: type.category.id,
+      image: type.image ?? null,
+    })),
+    rows.map((row) => ({
+      categoryId: row.product_category?.id ?? null,
+      typeId: row.product_type?.id ?? null,
+    }))
+  )
   const items = rows.map((row) => {
     const card = toProductCard(row)
     return {
@@ -44,8 +67,10 @@ async function ProductCatalog({
     <ProductCatalogClients
       clearLabel={clearLabel}
       emptyCatalog={emptyCatalog}
+      hierarchy={hierarchy}
       items={items}
       labels={labels}
+      navigationLabels={navigationLabels}
       noMatches={noMatches}
     />
   )
@@ -102,6 +127,10 @@ async function Catalog() {
             emptyCatalog={t("empty_catalog")}
             labels={labels}
             noMatches={t("no_matches")}
+            navigationLabels={{
+              categories: catalog("category_all"),
+              untypedProducts: catalog("untyped_products"),
+            }}
             products={products}
           />
         </Suspense>

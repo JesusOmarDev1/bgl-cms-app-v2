@@ -74,6 +74,7 @@ import type { PagesTypes } from "@/types/collections/pages"
 import type { PhoneTypes } from "@/types/collections/phones"
 import type { ProductAttributesTypes } from "@/types/collections/product-attributes"
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
+import type { ProductTypesTypes } from "@/types/collections/product-types"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { RedirectsTypes } from "@/types/collections/redirects"
 import type { SeoTypes } from "@/types/collections/seo"
@@ -102,6 +103,7 @@ export interface Schema {
   manual_categories: ManualCategoriesTypes[]
   products: ProductsTypes[]
   product_categories: ProductCategoriesTypes[]
+  product_types: ProductTypesTypes[]
   product_attributes: ProductAttributesTypes[]
   brands: BrandsTypes[]
   clients: ClientsTypes[]

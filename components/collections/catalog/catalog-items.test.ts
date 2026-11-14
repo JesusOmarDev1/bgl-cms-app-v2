@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
+  buildCatalogHierarchy,
+  getCatalogNavigationStage,
   filterCatalogProducts,
   getCatalogCategoryAncestors,
 } from "@/components/collections/catalog/catalog-items"
@@ -82,6 +84,81 @@ describe("filterCatalogProducts", () => {
     expect(filterCatalogProducts(products, "", "manuals", "newest")).toEqual([
       products[2],
       products[0],
+    ])
+  })
+})
+
+describe("getCatalogNavigationStage", () => {
+  it("resolves entry, category, and type stages from shareable slugs", () => {
+    expect(getCatalogNavigationStage("", "")).toBe("categories")
+    expect(getCatalogNavigationStage("scales", "")).toBe("types")
+    expect(getCatalogNavigationStage("scales", "industrial")).toBe("products")
+  })
+})
+
+describe("buildCatalogHierarchy", () => {
+  it("shows empty categories and scopes types and untyped products to their category", () => {
+    const hierarchy = buildCatalogHierarchy(
+      [
+        { id: "c1", slug: "scales", title: "Básculas", image: { id: "img1" } },
+        { id: "c2", slug: null, title: "Sin slug", image: null },
+        { id: "c3", slug: "empty", title: "Vacía", image: null },
+      ],
+      [
+        {
+          id: "t1",
+          slug: "industrial",
+          title: "Industriales",
+          category: "c1",
+          image: null,
+        },
+        {
+          id: "t2",
+          slug: "other",
+          title: "Otro",
+          category: "c2",
+          image: { id: "img2" },
+        },
+      ],
+      [
+        { categoryId: "c1", typeId: "t1" },
+        { categoryId: "c1", typeId: null },
+        { categoryId: "c2", typeId: "t1" },
+      ]
+    )
+
+    expect(hierarchy).toEqual([
+      {
+        id: "c1",
+        slug: "scales",
+        title: "Básculas",
+        imageId: "img1",
+        types: [
+          {
+            id: "t1",
+            slug: "industrial",
+            title: "Industriales",
+            imageId: null,
+          },
+        ],
+        untypedProductCount: 1,
+      },
+      {
+        id: "c2",
+        slug: null,
+        title: "Sin slug",
+        imageId: null,
+        types: [{ id: "t2", slug: "other", title: "Otro", imageId: "img2" }],
+        untypedProductCount: 0,
+      },
+      {
+        id: "c3",
+        slug: "empty",
+        title: "Vacía",
+        imageId: null,
+        types: [],
+        untypedProductCount: 0,
+      },
     ])
   })
 })

@@ -10,10 +10,12 @@ import { returnDirectusQueryError } from "@/lib/directus/query-error"
 import {
   PRODUCT_CATALOG_CATEGORY_FIELDS,
   PRODUCT_CATALOG_FIELDS,
+  PRODUCT_CATALOG_TYPE_FIELDS,
   PRODUCTS_FIELDS,
 } from "@/services/domain/db/queries/collections/products/products.fields"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { ProductCategoriesTypes } from "@/types/collections/product-categories"
+import type { ProductTypesTypes } from "@/types/collections/product-types"
 import type { StatusType } from "@/types/enums/status-type"
 import type { Schema } from "@/types/schema"
 import { cacheLife, cacheTag } from "next/cache"
@@ -35,14 +37,20 @@ type ProductCategoryCatalogRow = ApplyQueryFields<
   ProductCategoriesTypes,
   typeof PRODUCT_CATALOG_CATEGORY_FIELDS
 >
+type ProductTypeCatalogRow = ApplyQueryFields<
+  Schema,
+  ProductTypesTypes,
+  typeof PRODUCT_CATALOG_TYPE_FIELDS
+>
 
 async function fetchCatalogProducts() {
   "use cache"
-  cacheTag("products", "product_categories")
+  cacheTag("products", "product_categories", "product_types")
   cacheLife("minutes")
 
   const products: ProductCatalogRow[] = []
   const categoryRows: ProductCategoryCatalogRow[] = []
+  const typeRows: ProductTypeCatalogRow[] = []
   for (let page = 1; ; page += 1) {
     const batch = await publicDirectus.request(
       readItems("products", {
@@ -68,6 +76,19 @@ async function fetchCatalogProducts() {
     categoryRows.push(...batch)
     if (batch.length < CATALOG_BATCH_SIZE) break
   }
+  for (let page = 1; ; page += 1) {
+    const batch = await publicDirectus.request(
+      readItems("product_types", {
+        fields: PRODUCT_CATALOG_TYPE_FIELDS,
+        limit: CATALOG_BATCH_SIZE,
+        page,
+        sort: ["title"],
+        filter: { status: { _eq: "published" } },
+      } satisfies Query<Schema, ProductTypesTypes>)
+    )
+    typeRows.push(...batch)
+    if (batch.length < CATALOG_BATCH_SIZE) break
+  }
   const categoryAncestors = getCatalogCategoryAncestors(
     categoryRows.map((category) => ({
       id: category.id,
@@ -75,7 +96,12 @@ async function fetchCatalogProducts() {
       parentId: category.parent?.id ?? null,
     }))
   )
-  return { products, categoryAncestors }
+  return {
+    products,
+    categories: categoryRows,
+    types: typeRows,
+    categoryAncestors,
+  }
 }
 
 export async function getProductCatalogQuery(failedToFetchMessage: string) {

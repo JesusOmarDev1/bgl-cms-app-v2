@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next"
 import { WEBSITE_URL as BASE_URL } from "@/lib/env/constants"
 import { getBlogPostsRepository } from "@/services/domain/db/repositories/collections/blog-posts"
-import { getManualsRepository } from "@/services/domain/db/repositories/collections/manuals"
 import { getPagesRepository } from "@/services/domain/db/repositories/collections/pages"
 import { getProductsRepository } from "@/services/domain/db/repositories/collections/products"
 import { getServicesRepository } from "@/services/domain/db/repositories/collections/services"
@@ -101,13 +100,15 @@ export const sitemapRegistry = {
   },
   pages: {
     prefix: "pages",
-    entries: async () =>
-      collectionEntries(
-        await allRows((page) =>
-          getPagesRepository({ limit: SITEMAP_LIMIT, page })
-        ),
+    entries: async () => {
+      const rows = await allRows((page) =>
+        getPagesRepository({ limit: SITEMAP_LIMIT, page })
+      )
+      return collectionEntries(
+        rows.filter((row) => row.slug !== "manuales"),
         ""
-      ),
+      )
+    },
   },
   services: {
     prefix: "services",
@@ -137,16 +138,6 @@ export const sitemapRegistry = {
           getProductsRepository({ limit: SITEMAP_LIMIT, page })
         ),
         "/tienda/producto"
-      ),
-  },
-  manuals: {
-    prefix: "manuals",
-    entries: async () =>
-      collectionEntries(
-        await allRows((page) =>
-          getManualsRepository({ limit: SITEMAP_LIMIT, page })
-        ),
-        "/manuales"
       ),
   },
 } satisfies Record<string, SitemapSource>

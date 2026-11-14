@@ -10,6 +10,75 @@ export type CatalogCategoryPath = {
   parentId: string | null
 }
 
+export type CatalogHierarchy = {
+  id: string
+  slug: string | null
+  title: string
+  imageId: string | null
+  types: {
+    id: string
+    slug: string
+    title: string
+    imageId: string | null
+  }[]
+  untypedProductCount: number
+}
+
+type CatalogHierarchyCategory = Pick<
+  CatalogHierarchy,
+  "id" | "slug" | "title"
+> & {
+  image: { id: string } | null
+}
+type CatalogHierarchyType = Omit<
+  CatalogHierarchy["types"][number],
+  "imageId"
+> & {
+  category: string
+  image: { id: string } | null
+}
+type CatalogHierarchyProduct = {
+  categoryId: string | null
+  typeId: string | null
+}
+
+export function getCatalogNavigationStage(
+  categorySlug: string,
+  typeSlug: string
+): "categories" | "types" | "products" {
+  if (!categorySlug) return "categories"
+  return typeSlug ? "products" : "types"
+}
+
+export function buildCatalogHierarchy(
+  categories: readonly CatalogHierarchyCategory[],
+  types: readonly CatalogHierarchyType[],
+  products: readonly CatalogHierarchyProduct[]
+): CatalogHierarchy[] {
+  return categories.map((category) => {
+    const categoryTypes = types
+      .filter((type) => type.category === category.id)
+      .map(({ id, slug, title, image }) => ({
+        id,
+        slug,
+        title,
+        imageId: image?.id ?? null,
+      }))
+
+    return {
+      id: category.id,
+      slug: category.slug,
+      title: category.title,
+      imageId: category.image?.id ?? null,
+      types: categoryTypes,
+      untypedProductCount: products.filter(
+        (product) =>
+          product.categoryId === category.id && product.typeId === null
+      ).length,
+    }
+  })
+}
+
 export function getCatalogCategoryAncestors(
   categories: readonly CatalogCategoryPath[]
 ): Record<string, string[]> {
