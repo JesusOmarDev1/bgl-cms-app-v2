@@ -18,10 +18,6 @@ import {
 // (no solid fill; the brand red stays reserved for the red button variant).
 // h-auto! cancels the list's group-data-horizontal h-8, which otherwise
 // clips the larger trigger labels out of the track.
-const SEGMENT_LIST_CLASS =
-  "grid h-auto! w-full grid-cols-3 gap-1 rounded-xl bg-muted/40 p-1 text-center"
-const SEGMENT_TRIGGER_CLASS =
-  "group-data-vertical/tabs:justify-center text-center px-2 py-1.5 data-selected:bg-primary/10 data-selected:text-foreground! dark:data-selected:bg-primary/15"
 
 // shortcut: stored preferences are read after hydration, so there is a brief
 // flash of the default font size on load; upgrade by inlining a
@@ -71,13 +67,13 @@ export function AppearanceSettings() {
       >
         <TabsList
           aria-label={t("settings.fontSizeLabel")}
-          className={SEGMENT_LIST_CLASS}
+          className="grid h-auto! w-full grid-cols-3 gap-1 rounded-xl bg-muted/40 p-1 text-center"
         >
           {FONT_SIZES.map((key) => (
             <TabsTrigger
               key={key}
               id={key}
-              className={`${SEGMENT_TRIGGER_CLASS} text-${key === "small" ? "sm" : key === "large" ? "lg" : "base"}`}
+              className="text-center group-data-vertical/tabs:justify-center data-selected:bg-primary/10 data-selected:text-foreground! dark:data-selected:bg-primary/15"
             >
               {t(
                 `settings.fontSize${key === "small" ? "Small" : key === "large" ? "Large" : "Default"}`
