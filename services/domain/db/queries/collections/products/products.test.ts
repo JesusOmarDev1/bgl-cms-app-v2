@@ -38,6 +38,9 @@ describe("getProductCatalogQuery", () => {
       filter: { status: { _eq: "published" } },
     })
     expect(products.fields).toContainEqual({ product_type: ["id", "slug"] })
+    expect(products.fields).toContain("capacity")
+    expect(products.fields).toContain("division")
+    expect(products.fields).toContainEqual({ brand: ["title"] })
     expect(categories).toMatchObject({
       collection: "product_categories",
       filter: { status: { _eq: "published" } },

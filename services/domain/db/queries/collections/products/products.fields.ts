@@ -11,6 +11,8 @@ export const PRODUCT_CATALOG_FIELDS = [
   "title",
   "excerpt",
   "description",
+  "capacity",
+  "division",
   "date_created",
   { image: ["id"] },
   { brand: ["title"] },

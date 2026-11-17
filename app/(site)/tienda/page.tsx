@@ -57,6 +57,8 @@ async function ProductCatalog({
     const card = toProductCard(row)
     return {
       ...card,
+      capacity: row.capacity,
+      division: row.division,
       categoryAncestors: row.product_category
         ? (categoryAncestors[row.product_category.id] ?? [])
         : [],
@@ -96,6 +98,12 @@ async function Catalog() {
       oldest: catalog("sort_oldest"),
       az: catalog("sort_az"),
       za: catalog("sort_za"),
+    },
+    filters: {
+      brand: catalog("filter_brand"),
+      capacity: catalog("filter_capacity"),
+      division: catalog("filter_division"),
+      all: catalog("filter_all"),
     },
     clear: catalog("clear_filters"),
   }

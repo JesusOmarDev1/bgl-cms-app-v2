@@ -4,6 +4,7 @@ import {
   getCatalogNavigationStage,
   filterCatalogProducts,
   getCatalogCategoryAncestors,
+  normalizeCatalogFilterParams,
 } from "@/components/collections/catalog/catalog-items"
 
 describe("filterCatalogProducts", () => {
@@ -50,6 +51,63 @@ describe("filterCatalogProducts", () => {
     expect(
       filterCatalogProducts(products, "", "", "z-a").map((item) => item.id)
     ).toEqual(["newer-c", "older-b", "newer-a"])
+  })
+
+  it("handles facet URL values, invalid filters, and clearing", () => {
+    const product = (
+      id: string,
+      dateCreated: string,
+      brand: string | null,
+      capacity: number | null,
+      division: number | null
+    ) => ({
+      id,
+      title: id,
+      excerpt: null,
+      description: null,
+      dateCreated,
+      categorySlug: "scales",
+      brand,
+      capacity,
+      division,
+    })
+    const products = [
+      product("torrey", "2024-01-04", "Torrey", 30, 5),
+      product("all-brand", "2024-01-02", "all", 10, 1),
+      product("other-brand", "2024-01-03", "Other", 20, 2),
+      product("untyped", "2024-01-01", null, null, null),
+    ]
+    const ids = (url: string) =>
+      filterCatalogProducts(
+        products,
+        "",
+        "scales",
+        "newest",
+        new URLSearchParams(url)
+      ).map((product) => product.id)
+
+    expect(ids("brand=Torrey&capacity=30&division=5")).toEqual(["torrey"])
+    expect(ids("brand=all")).toEqual(["all-brand"])
+    expect(ids("capacity=null&division=null")).toEqual([
+      "torrey",
+      "other-brand",
+      "all-brand",
+      "untyped",
+    ])
+    expect(ids("cat=scales&type=industrial")).toEqual([
+      "torrey",
+      "other-brand",
+      "all-brand",
+      "untyped",
+    ])
+    expect(
+      normalizeCatalogFilterParams(
+        products,
+        new URLSearchParams(
+          "cat=scales&type=industrial&brand=missing&capacity=30&division=bad"
+        )
+      ).toString()
+    ).toBe("cat=scales&type=industrial&capacity=30")
   })
 
   it("filters by category and searches text before sorting", () => {

@@ -207,6 +207,8 @@ export function ProductCatalogClients({
             labels={labels}
             paginated
             shallow={false}
+            showCategoryFilter={false}
+            showProductFilters
           />
           <CatalogBodyClient
             clearLabel={clearLabel}
@@ -215,6 +217,7 @@ export function ProductCatalogClients({
             noMatches={noMatches}
             pageSize={24}
             paginated
+            productFilters
             renderItem={(item) => <ProductCard data={item} />}
             shallow={false}
           />
