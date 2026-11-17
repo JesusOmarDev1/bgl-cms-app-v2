@@ -42,6 +42,23 @@ type CatalogHierarchyProduct = {
   typeId: string | null
 }
 
+export function getCatalogCategoryParam(
+  category: Pick<CatalogHierarchy, "id" | "slug">
+): string {
+  return category.slug || `id:${category.id}`
+}
+
+export function findCatalogHierarchyCategory(
+  hierarchy: readonly CatalogHierarchy[],
+  categoryParam: string
+): CatalogHierarchy | undefined {
+  if (categoryParam.startsWith("id:")) {
+    const id = categoryParam.slice(3)
+    return hierarchy.find((category) => !category.slug && category.id === id)
+  }
+  return hierarchy.find((category) => category.slug === categoryParam)
+}
+
 export function getCatalogNavigationStage(
   categorySlug: string,
   typeSlug: string

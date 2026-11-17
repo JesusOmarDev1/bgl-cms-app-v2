@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest"
 import {
   buildCatalogHierarchy,
   getCatalogNavigationStage,
+  getCatalogCategoryParam,
+  findCatalogHierarchyCategory,
   filterCatalogProducts,
   getCatalogCategoryAncestors,
   normalizeCatalogFilterParams,
@@ -151,6 +153,38 @@ describe("getCatalogNavigationStage", () => {
     expect(getCatalogNavigationStage("", "")).toBe("categories")
     expect(getCatalogNavigationStage("scales", "")).toBe("types")
     expect(getCatalogNavigationStage("scales", "industrial")).toBe("products")
+  })
+})
+
+describe("catalog category references", () => {
+  it("uses slugs when available and a stable ID reference otherwise", () => {
+    const hierarchy = [
+      {
+        id: "category-without-slug",
+        slug: null,
+        title: "Published category",
+        imageId: null,
+        types: [],
+        untypedProductCount: 0,
+      },
+      {
+        id: "scales-id",
+        slug: "scales",
+        title: "Scales",
+        imageId: null,
+        types: [],
+        untypedProductCount: 0,
+      },
+    ]
+
+    expect(getCatalogCategoryParam(hierarchy[0])).toBe(
+      "id:category-without-slug"
+    )
+    expect(
+      findCatalogHierarchyCategory(hierarchy, "id:category-without-slug")
+    ).toBe(hierarchy[0])
+    expect(getCatalogCategoryParam(hierarchy[1])).toBe("scales")
+    expect(findCatalogHierarchyCategory(hierarchy, "scales")).toBe(hierarchy[1])
   })
 })
 

@@ -29,7 +29,11 @@ async function ProductCatalog({
 }: {
   products: ReturnType<typeof getProductCatalogRepository>
   labels: CatalogLabels
-  navigationLabels: { categories: string; untypedProducts: string }
+  navigationLabels: {
+    categories: string
+    untypedProducts: string
+    emptyCategory: string
+  }
   emptyCatalog: string
   noMatches: string
   clearLabel: string
@@ -143,6 +147,7 @@ async function Catalog({ searchParams }: PageProps) {
             navigationLabels={{
               categories: catalog("category_all"),
               untypedProducts: catalog("untyped_products"),
+              emptyCategory: catalog("empty_category"),
             }}
             products={products}
           />

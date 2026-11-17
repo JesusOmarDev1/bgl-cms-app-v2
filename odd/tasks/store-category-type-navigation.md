@@ -21,7 +21,8 @@ Implementation route: writer; commits pending.
 - T1 — S2, S9 — Add the Directus product-types schema and image support; route: writer; commit: pending.
 - T2 — S2–S8 — Implement storefront category → type → product navigation, photo-leading cards, reusable filtered toolbar, skeleton variants, tests, and docs; route: writer; commit: partial 5c86a30 (filters only; T2 remains incomplete).
 - T3 — S2, S10 — Remove the task-created frontend suppression of `/manuales`; leave backend blocking to the backend and preserve Directus data, with tests; route: writer; commit: 9612782.
-- T4 — S11 — Run `pnpm pre-deploy` and correct the errors that appear; final feature gate; route: writer; commit: pending.
+- T4 — S11 — Run `pnpm pre-deploy` and correct the errors that appear; final feature gate; route: writer; gate: passed; commit: pending.
+- T5 — S11 — Apply narrowly scoped LF checkout/working-tree maintenance after T4's repo-wide Prettier gate failed; T4 gate now passed and T2 remains incomplete; route: writer; commit: 92e1a88.
 
 ## Log
 
@@ -41,3 +42,7 @@ Implementation route: writer; commits pending.
 - L14: 2.- Tambien cuando ejecutes "pnpm pre-deploy" debes corregir los errores que aparezcan.
 - L15: T3 frontend manuals restoration is committed as 9612782. T2 filter-toolbar work is committed as 5c86a30 and is partial; T2 skeleton variants are a follow-on implementation and do not complete T2.
 - L16: This uncommitted T2 follow-on adds category, type, and product-stage skeleton fallbacks; focused rendered tests, typecheck, lint, Prettier, and diff checks pass. T2 remains incomplete and the live Directus schema remains unverified.
+- L17: This uncommitted T2 navigation/card unit keeps empty categories selectable with an empty state, scopes untyped products and types to their category, adds URL/breadcrumb navigation and icon fallbacks, and uses DirectusImage for available photos. Rendered server-markup tests plus focused catalog tests (4 files, 13 tests), typecheck, ESLint, Prettier, and diff checks pass. This covers S2/S3/S4/S8; T2 remains incomplete, and live Directus hierarchy/schema plus browser navigation are unverified.
+- L18: This uncommitted T2 follow-on gives published categories without slugs stable ID-backed URLs, ensures their product stage still scopes correctly, and renders invalid cross-category type URLs as the category stage rather than labeling them untyped. Rendered tests cover these URLs, category-scoped type ID mismatches, and global entry search with `q`; focused catalog tests (4 files, 18 tests), typecheck, ESLint, Prettier, and diff checks pass. T2 remains incomplete; live Directus schema/data and browser interaction are unverified.
+- L19: T5 is linked to S11 because the explicitly authorized maintenance follows the final feature gate failure. `pnpm pre-deploy` reached typegen/typecheck/lint (0 errors, 35 pre-existing warnings), then failed at repo-wide Prettier with 816 files flagged before Vitest/build. Focused task files were LF and passed Prettier. At that point T4 and T2 remained incomplete.
+- L20: Commit 92e1a88 enforces LF; a separate worker normalized 816 Prettier-flagged tracked files without extra Git content diff. Parent reran corrected `pnpm pre-deploy` once and it exited 0 through typegen, typecheck, ESLint (warnings only), global Prettier, Vitest unit suite, and Next build. T4's gate pass is recorded, but T1/T2 and the feature remain incomplete: Directus `product_types` and `products.product_type` are absent, and worker MCP/browser/live proof is unavailable.
