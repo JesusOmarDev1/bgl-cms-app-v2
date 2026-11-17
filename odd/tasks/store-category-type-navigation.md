@@ -19,8 +19,8 @@ Implementation route: writer; commits pending.
 ## Tasks
 
 - T1 — S2, S9 — Add the Directus product-types schema and image support; route: writer; commit: pending.
-- T2 — S2–S8 — Implement storefront category → type → product navigation, photo-leading cards, reusable filtered toolbar, skeleton variants, tests, and docs; route: writer; commit: pending.
-- T3 — S2, S10 — Remove the task-created frontend suppression of `/manuales`; leave backend blocking to the backend and preserve Directus data, with tests; route: writer; commit: pending.
+- T2 — S2–S8 — Implement storefront category → type → product navigation, photo-leading cards, reusable filtered toolbar, skeleton variants, tests, and docs; route: writer; commit: partial 5c86a30 (filters only; T2 remains incomplete).
+- T3 — S2, S10 — Remove the task-created frontend suppression of `/manuales`; leave backend blocking to the backend and preserve Directus data, with tests; route: writer; commit: 9612782.
 - T4 — S11 — Run `pnpm pre-deploy` and correct the errors that appear; final feature gate; route: writer; commit: pending.
 
 ## Log
@@ -39,3 +39,5 @@ Implementation route: writer; commits pending.
 - L12: La experiencia debe respetar el diseño oscuro actual y usar los componentes existentes.
 - L13: 1.- Cuando dije que no usariamos los manuales me refiero a que lo voy a bloquear en el backend no en el frontend, no la bloquees ni la ocultes no es necesario, elimina ese codigo.
 - L14: 2.- Tambien cuando ejecutes "pnpm pre-deploy" debes corregir los errores que aparezcan.
+- L15: T3 frontend manuals restoration is committed as 9612782. T2 filter-toolbar work is committed as 5c86a30 and is partial; T2 skeleton variants are a follow-on implementation and do not complete T2.
+- L16: This uncommitted T2 follow-on adds category, type, and product-stage skeleton fallbacks; focused rendered tests, typecheck, lint, Prettier, and diff checks pass. T2 remains incomplete and the live Directus schema remains unverified.

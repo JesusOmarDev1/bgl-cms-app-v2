@@ -3,11 +3,14 @@ import type { Metadata } from "next"
 import { connection } from "next/server"
 import { getTranslations } from "next-intl/server"
 import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
-import { CatalogBodySkeleton } from "@/components/collections/catalog/CatalogBodySkeleton"
-import { CatalogToolBarSkeleton } from "@/components/collections/catalog/CatalogToolBarSkeleton"
+import { ProductCatalogSkeleton } from "@/components/collections/products/ProductCatalogSkeleton"
+import type { ProductCatalogStage } from "@/components/collections/products/ProductCatalogSkeleton"
 import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
 import { ProductCatalogClients } from "@/components/collections/products/ProductCatalogClients"
-import { buildCatalogHierarchy } from "@/components/collections/catalog/catalog-items"
+import {
+  buildCatalogHierarchy,
+  getCatalogNavigationStage,
+} from "@/components/collections/catalog/catalog-items"
 import { toProductCard } from "@/components/collections/products/to-product-card"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -78,7 +81,16 @@ async function ProductCatalog({
   )
 }
 
-async function Catalog() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+async function Catalog({ searchParams }: PageProps) {
+  const { cat, type } = await searchParams
+  const stage: ProductCatalogStage = getCatalogNavigationStage(
+    Array.isArray(cat) ? (cat[0] ?? "") : (cat ?? ""),
+    Array.isArray(type) ? (type[0] ?? "") : (type ?? "")
+  )
   const products = getProductCatalogRepository()
   const t = await getTranslations("products")
   const catalog = await getTranslations("catalog")
@@ -122,14 +134,7 @@ async function Catalog() {
           {t("title")}
         </h1>
         <p className="max-w-prose text-muted-foreground">{t("intro")}</p>
-        <Suspense
-          fallback={
-            <>
-              <CatalogToolBarSkeleton />
-              <CatalogBodySkeleton />
-            </>
-          }
-        >
+        <Suspense fallback={<ProductCatalogSkeleton stage={stage} />}>
           <ProductCatalog
             clearLabel={labels.clear}
             emptyCatalog={t("empty_catalog")}
@@ -163,11 +168,13 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default function Page() {
+export default function Page({ searchParams }: PageProps) {
   return (
     <>
       <HeaderSpacer />
-      <Catalog />
+      <Suspense fallback={<ProductCatalogSkeleton stage="categories" />}>
+        <Catalog searchParams={searchParams} />
+      </Suspense>
     </>
   )
 }
