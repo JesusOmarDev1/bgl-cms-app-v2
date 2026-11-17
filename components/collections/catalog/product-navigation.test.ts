@@ -56,7 +56,13 @@ const hierarchy: CatalogHierarchy[] = [
     title: "Scales",
     imageId: "category-image",
     types: [
-      { id: "t1", slug: "industrial", title: "Industrial", imageId: null },
+      {
+        id: "t1",
+        slug: "industrial",
+        title: "Industrial",
+        icon: "monitor_weight",
+        imageId: null,
+      },
     ],
     untypedProductCount: 1,
   },
@@ -73,7 +79,9 @@ const hierarchy: CatalogHierarchy[] = [
     slug: "other",
     title: "Other category",
     imageId: null,
-    types: [{ id: "t2", slug: "bench", title: "Bench", imageId: null }],
+    types: [
+      { id: "t2", slug: "bench", title: "Bench", icon: null, imageId: null },
+    ],
     untypedProductCount: 1,
   },
   {
@@ -175,6 +183,7 @@ describe("store category/type navigation", () => {
     expect(entry).toContain('href="/tienda?cat=empty"')
     expect(entry).toContain('data-directus-src="category-image"')
     expect(entry).toContain("material-symbols-rounded")
+    expect(entry).not.toContain('href="/tienda/producto/')
 
     const emptyCategory = renderCatalog("?cat=empty")
     expect(emptyCategory).toContain(
@@ -196,11 +205,27 @@ describe("store category/type navigation", () => {
     expect(products).toContain('href="/tienda/producto/no-slug-untyped"')
   })
 
-  it("keeps entry search global when q is present", () => {
+  it("filters only category cards at the entry stage", () => {
     const html = renderCatalog("?q=Other")
     expect(html).toContain('value="Other"')
-    expect(html).toContain('href="/tienda/producto/other-untyped"')
-    expect(html).not.toContain('href="/tienda/producto/scale-untyped"')
+    expect(html).toContain('href="/tienda?cat=other"')
+    expect(html).not.toContain('href="/tienda?cat=scales"')
+    expect(html).not.toContain('href="/tienda/producto/')
+
+    const noMatches = renderCatalog("?q=zzzz")
+    expect(noMatches).toContain("No matches")
+    expect(noMatches).toContain("Clear")
+    expect(noMatches).not.toContain('href="/tienda/producto/')
+  })
+
+  it("renders the product type icon and keeps the category icon fallback", () => {
+    const types = renderCatalog("?cat=scales")
+    expect(types).toContain(">monitor_weight</span>")
+    expect(types).toContain(">category</span>")
+
+    const entry = renderCatalog("")
+    expect(entry).not.toContain(">monitor_weight</span>")
+    expect(entry).toContain(">category</span>")
   })
 
   it("does not show another category's types for the selected category", () => {

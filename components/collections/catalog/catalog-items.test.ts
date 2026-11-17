@@ -6,7 +6,6 @@ import {
   findCatalogHierarchyCategory,
   filterCatalogProducts,
   getCatalogCategoryAncestors,
-  normalizeCatalogFilterParams,
 } from "@/components/collections/catalog/catalog-items"
 
 describe("filterCatalogProducts", () => {
@@ -55,7 +54,7 @@ describe("filterCatalogProducts", () => {
     ).toEqual(["newer-c", "older-b", "newer-a"])
   })
 
-  it("handles facet URL values, invalid filters, and clearing", () => {
+  it("handles facet values, invalid filters, and clearing", () => {
     const product = (
       id: string,
       dateCreated: string,
@@ -79,37 +78,24 @@ describe("filterCatalogProducts", () => {
       product("other-brand", "2024-01-03", "Other", 20, 2),
       product("untyped", "2024-01-01", null, null, null),
     ]
-    const ids = (url: string) =>
-      filterCatalogProducts(
-        products,
-        "",
-        "scales",
-        "newest",
-        new URLSearchParams(url)
-      ).map((product) => product.id)
+    const ids = (filters: Parameters<typeof filterCatalogProducts>[4]) =>
+      filterCatalogProducts(products, "", "scales", "newest", filters).map(
+        (product) => product.id
+      )
 
-    expect(ids("brand=Torrey&capacity=30&division=5")).toEqual(["torrey"])
-    expect(ids("brand=all")).toEqual(["all-brand"])
-    expect(ids("capacity=null&division=null")).toEqual([
+    expect(ids({ brand: "Torrey", capacity: "30", division: "5" })).toEqual([
+      "torrey",
+    ])
+    expect(ids({ brand: "all" })).toEqual(["all-brand"])
+    expect(ids({ capacity: "null", division: "null" })).toEqual([
       "torrey",
       "other-brand",
       "all-brand",
       "untyped",
     ])
-    expect(ids("cat=scales&type=industrial")).toEqual([
+    expect(ids({ brand: "missing", capacity: "30", division: "bad" })).toEqual([
       "torrey",
-      "other-brand",
-      "all-brand",
-      "untyped",
     ])
-    expect(
-      normalizeCatalogFilterParams(
-        products,
-        new URLSearchParams(
-          "cat=scales&type=industrial&brand=missing&capacity=30&division=bad"
-        )
-      ).toString()
-    ).toBe("cat=scales&type=industrial&capacity=30")
   })
 
   it("filters by category and searches text before sorting", () => {
@@ -201,6 +187,7 @@ describe("buildCatalogHierarchy", () => {
           id: "t1",
           slug: "industrial",
           title: "Industriales",
+          icon: "scale",
           category: "c1",
           image: null,
         },
@@ -230,6 +217,7 @@ describe("buildCatalogHierarchy", () => {
             id: "t1",
             slug: "industrial",
             title: "Industriales",
+            icon: "scale",
             imageId: null,
           },
         ],
@@ -240,7 +228,15 @@ describe("buildCatalogHierarchy", () => {
         slug: null,
         title: "Sin slug",
         imageId: null,
-        types: [{ id: "t2", slug: "other", title: "Otro", imageId: "img2" }],
+        types: [
+          {
+            id: "t2",
+            slug: "other",
+            title: "Otro",
+            icon: null,
+            imageId: "img2",
+          },
+        ],
         untypedProductCount: 0,
       },
       {

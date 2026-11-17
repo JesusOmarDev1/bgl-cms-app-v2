@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
 import {
   parseAsInteger,
   parseAsString,
@@ -56,40 +55,11 @@ export function useCatalogParams(
       .withOptions(options)
   )
 
-  function updateQuery(value: string | null) {
+  // Any narrowing resets pagination so the current page never outruns the results.
+  function update<T>(setter: (value: T | null) => unknown, value: T | null) {
     if (paginated) void setPage(null)
-    return setQ(value)
+    void setter(value)
   }
-
-  function updateCategory(value: string | null) {
-    if (paginated) void setPage(null)
-    return setCat(value)
-  }
-
-  function updateSort(value: CatalogSort) {
-    if (paginated) void setPage(null)
-    return setSort(value)
-  }
-
-  const updateFilter = useCallback(
-    (setter: typeof setBrand, value: string | null) => {
-      if (paginated) void setPage(null)
-      return setter(value)
-    },
-    [paginated, setPage]
-  )
-  const updateBrand = useCallback(
-    (value: string | null) => updateFilter(setBrand, value),
-    [setBrand, updateFilter]
-  )
-  const updateCapacity = useCallback(
-    (value: string | null) => updateFilter(setCapacity, value),
-    [setCapacity, updateFilter]
-  )
-  const updateDivision = useCallback(
-    (value: string | null) => updateFilter(setDivision, value),
-    [setDivision, updateFilter]
-  )
 
   function clearFilters() {
     void setQ(null)
@@ -102,17 +72,17 @@ export function useCatalogParams(
 
   return {
     q,
-    setQ: updateQuery,
+    setQ: (value: string | null) => update(setQ, value),
     cat,
-    setCat: updateCategory,
+    setCat: (value: string | null) => update(setCat, value),
     brand,
-    setBrand: updateBrand,
+    setBrand: (value: string | null) => update(setBrand, value),
     capacity,
-    setCapacity: updateCapacity,
+    setCapacity: (value: string | null) => update(setCapacity, value),
     division,
-    setDivision: updateDivision,
+    setDivision: (value: string | null) => update(setDivision, value),
     sort,
-    setSort: updateSort,
+    setSort: (value: CatalogSort) => update(setSort, value),
     page,
     setPage,
     clearFilters,

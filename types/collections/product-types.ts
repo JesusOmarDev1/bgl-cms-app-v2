@@ -8,6 +8,7 @@ export interface ProductTypesTypes {
   status: StatusType
   title: string
   slug: string
+  icon: string | null
   image: string | DirectusFileTypes | null
   category: string | ProductCategoriesTypes
 }

@@ -19,6 +19,7 @@ export type CatalogHierarchy = {
     id: string
     slug: string
     title: string
+    icon: string | null
     imageId: string | null
   }[]
   untypedProductCount: number
@@ -30,10 +31,11 @@ type CatalogHierarchyCategory = Pick<
 > & {
   image: { id: string } | null
 }
-type CatalogHierarchyType = Omit<
-  CatalogHierarchy["types"][number],
-  "imageId"
-> & {
+type CatalogHierarchyType = {
+  id: string
+  slug: string
+  title: string
+  icon?: string | null
   category: string
   image: { id: string } | null
 }
@@ -72,28 +74,24 @@ export function buildCatalogHierarchy(
   types: readonly CatalogHierarchyType[],
   products: readonly CatalogHierarchyProduct[]
 ): CatalogHierarchy[] {
-  return categories.map((category) => {
-    const categoryTypes = types
+  return categories.map((category) => ({
+    id: category.id,
+    slug: category.slug,
+    title: category.title,
+    imageId: category.image?.id ?? null,
+    types: types
       .filter((type) => type.category === category.id)
-      .map(({ id, slug, title, image }) => ({
+      .map(({ id, slug, title, icon, image }) => ({
         id,
         slug,
         title,
+        icon: icon ?? null,
         imageId: image?.id ?? null,
-      }))
-
-    return {
-      id: category.id,
-      slug: category.slug,
-      title: category.title,
-      imageId: category.image?.id ?? null,
-      types: categoryTypes,
-      untypedProductCount: products.filter(
-        (product) =>
-          product.categoryId === category.id && product.typeId === null
-      ).length,
-    }
-  })
+      })),
+    untypedProductCount: products.filter(
+      (product) => product.categoryId === category.id && product.typeId === null
+    ).length,
+  }))
 }
 
 export function getCatalogCategoryAncestors(
@@ -145,7 +143,13 @@ type CatalogFields = Pick<
   | "division"
 >
 
-export function sortCatalogProducts<T extends CatalogFields>(
+const CATALOG_FILTER_KEYS = ["brand", "capacity", "division"] as const
+
+export type CatalogFilters = Partial<
+  Record<(typeof CATALOG_FILTER_KEYS)[number], string>
+>
+
+function sortCatalogProducts<T extends CatalogFields>(
   products: readonly T[],
   sort: CatalogSort
 ): T[] {
@@ -162,59 +166,21 @@ export function sortCatalogProducts<T extends CatalogFields>(
   return next
 }
 
-export type CatalogFilters = {
-  brand?: string
-  capacity?: string
-  division?: string
-}
-
 export function normalizeCatalogFilters<T extends CatalogFields>(
   products: readonly T[],
   filters: CatalogFilters
 ): CatalogFilters {
-  return {
-    brand:
-      filters.brand &&
-      products.some((product) => product.brand === filters.brand)
-        ? filters.brand
-        : "",
-    capacity:
-      filters.capacity &&
-      products.some(
-        (product) =>
-          typeof product.capacity === "number" &&
-          Number.isFinite(product.capacity) &&
-          String(product.capacity) === filters.capacity
-      )
-        ? filters.capacity
-        : "",
-    division:
-      filters.division &&
-      products.some(
-        (product) =>
-          typeof product.division === "number" &&
-          Number.isFinite(product.division) &&
-          String(product.division) === filters.division
-      )
-        ? filters.division
-        : "",
+  const active: CatalogFilters = {}
+  for (const key of CATALOG_FILTER_KEYS) {
+    const value = filters[key]
+    if (
+      value &&
+      products.some((product) => String(product[key] ?? "") === value)
+    ) {
+      active[key] = value
+    }
   }
-}
-
-export function normalizeCatalogFilterParams<T extends CatalogFields>(
-  products: readonly T[],
-  params: URLSearchParams
-): URLSearchParams {
-  const normalized = normalizeCatalogFilters(products, {
-    brand: params.get("brand") ?? "",
-    capacity: params.get("capacity") ?? "",
-    division: params.get("division") ?? "",
-  })
-  const result = new URLSearchParams(params)
-  for (const key of ["brand", "capacity", "division"] as const) {
-    if (result.has(key) && !normalized[key]) result.delete(key)
-  }
-  return result
+  return active
 }
 
 export function filterCatalogProducts<T extends CatalogFields>(
@@ -222,7 +188,7 @@ export function filterCatalogProducts<T extends CatalogFields>(
   query: string,
   category: string,
   sort: CatalogSort,
-  filters: CatalogFilters | URLSearchParams = {}
+  filters: CatalogFilters = {}
 ): T[] {
   const scoped = category
     ? products.filter(
@@ -231,25 +197,16 @@ export function filterCatalogProducts<T extends CatalogFields>(
           product.categoryAncestors?.includes(category)
       )
     : [...products]
-  const filterValues =
-    filters instanceof URLSearchParams
-      ? {
-          brand: filters.get("brand") ?? "",
-          capacity: filters.get("capacity") ?? "",
-          division: filters.get("division") ?? "",
-        }
-      : filters
-  const validFilters = normalizeCatalogFilters(scoped, filterValues)
-  const filtered = scoped.filter(
-    (product) =>
-      (!validFilters.brand || product.brand === validFilters.brand) &&
-      (!validFilters.capacity ||
-        String(product.capacity) === validFilters.capacity) &&
-      (!validFilters.division ||
-        String(product.division) === validFilters.division)
+  const active = normalizeCatalogFilters(scoped, filters)
+  const filtered = scoped.filter((product) =>
+    CATALOG_FILTER_KEYS.every(
+      (key) => !active[key] || String(product[key] ?? "") === active[key]
+    )
   )
-  const searched = fuzzySearch(filtered, query, {
-    keys: ["title", "excerpt", "description"],
-  })
-  return sortCatalogProducts(searched, sort)
+  return sortCatalogProducts(
+    fuzzySearch(filtered, query, {
+      keys: ["title", "excerpt", "description"],
+    }),
+    sort
+  )
 }

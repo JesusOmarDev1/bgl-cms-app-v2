@@ -37,6 +37,7 @@ export const PRODUCT_CATALOG_TYPE_FIELDS = [
   "id",
   "slug",
   "title",
+  "icon",
   { image: ["id"] },
   { category: ["id"] },
 ] as const satisfies NonNullable<Query<Schema, ProductTypesTypes>["fields"]>

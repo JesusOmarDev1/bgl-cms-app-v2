@@ -5,9 +5,7 @@ import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { useDebounceFn } from "@/hooks/useDebounceFn"
 import {
-  normalizeCatalogFilterParams,
   normalizeCatalogFilters,
-  type CatalogFilters,
   type CatalogItem,
 } from "@/components/collections/catalog/catalog-items"
 import { Button } from "@/components/ui/button"
@@ -107,60 +105,50 @@ export function CatalogToolBarClient({
   const selectedCategory = categories.some((category) => category.slug === cat)
     ? cat
     : null
-  const filters: CatalogFilters = { brand, capacity, division }
-  const activeFilters = normalizeCatalogFilters(items, filters)
-  const normalizedFilterParams = useMemo(
-    () =>
-      normalizeCatalogFilterParams(
-        items,
-        new URLSearchParams({ brand, capacity, division })
-      ),
-    [brand, capacity, division, items]
+  const activeFilters = useMemo(
+    () => normalizeCatalogFilters(items, { brand, capacity, division }),
+    [items, brand, capacity, division]
   )
   useEffect(() => {
     if (!showProductFilters) return
-    if (brand && !normalizedFilterParams.has("brand")) void setBrand(null)
-    if (capacity && !normalizedFilterParams.has("capacity"))
-      void setCapacity(null)
-    if (division && !normalizedFilterParams.has("division"))
-      void setDivision(null)
+    if (brand && !activeFilters.brand) void setBrand(null)
+    if (capacity && !activeFilters.capacity) void setCapacity(null)
+    if (division && !activeFilters.division) void setDivision(null)
   }, [
+    activeFilters,
     brand,
     capacity,
     division,
-    normalizedFilterParams,
     setBrand,
     setCapacity,
     setDivision,
     showProductFilters,
   ])
-  const facetOptions = useMemo(
-    () => ({
-      brand: [
-        ...new Set(items.flatMap((item) => (item.brand ? [item.brand] : []))),
-      ].sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" })),
-      capacity: [
-        ...new Set(
-          items.flatMap((item) =>
-            item.capacity == null ? [] : [String(item.capacity)]
-          )
-        ),
-      ].sort((a, b) => Number(a) - Number(b)),
-      division: [
-        ...new Set(
-          items.flatMap((item) =>
-            item.division == null ? [] : [String(item.division)]
-          )
-        ),
-      ].sort((a, b) => Number(a) - Number(b)),
-    }),
-    [items]
-  )
+  const facetOptions = useMemo(() => {
+    const unique = (values: (string | null)[]) => [
+      ...new Set(values.flatMap((value) => (value ? [value] : []))),
+    ]
+    const numeric = (a: string, b: string) => Number(a) - Number(b)
+    return {
+      brand: unique(items.flatMap((item) => [item.brand ?? null])).sort(
+        (a, b) => a.localeCompare(b, "es", { sensitivity: "base" })
+      ),
+      capacity: unique(
+        items.flatMap((item) => [
+          item.capacity == null ? null : String(item.capacity),
+        ])
+      ).sort(numeric),
+      division: unique(
+        items.flatMap((item) => [
+          item.division == null ? null : String(item.division),
+        ])
+      ).sort(numeric),
+    }
+  }, [items])
   const filtersActive =
     q.length > 0 ||
     (showCategoryFilter && cat.length > 0) ||
-    (showProductFilters &&
-      Object.values(activeFilters).some((value) => value.length > 0))
+    (showProductFilters && Object.values(activeFilters).some(Boolean))
 
   function renderFacet(
     label: string,

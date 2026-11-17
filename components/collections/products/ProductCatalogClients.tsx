@@ -11,10 +11,12 @@ import {
 } from "@/components/collections/catalog/catalog-items"
 import { CatalogToolBarClient } from "@/components/collections/catalog/CatalogToolBarClient"
 import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
+import { fuzzySearch } from "@/config/search"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { ProductCard } from "@/components/collections/products/ProductCard"
 import type { ProductCardData } from "@/components/collections/products/product-card"
+import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Empty, EmptyDescription } from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
@@ -29,10 +31,12 @@ import {
 function NavigationCard({
   title,
   imageId,
+  icon,
   href,
 }: {
   title: string
   imageId: string | null
+  icon?: string | null
   href: string | null
 }) {
   const card = (
@@ -52,7 +56,7 @@ function NavigationCard({
             aria-hidden="true"
             className="absolute inset-0 flex items-center justify-center bg-secondary/30"
           >
-            <MaterialIcon name="category" size={48} />
+            <MaterialIcon name={icon || "category"} size={48} />
           </div>
         )}
       </div>
@@ -93,9 +97,10 @@ function CategoryTypes({
       {category.types.map((row) => (
         <li key={row.id}>
           <NavigationCard
-            title={row.title}
-            imageId={row.imageId}
             href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=${encodeURIComponent(row.slug)}`}
+            icon={row.icon}
+            imageId={row.imageId}
+            title={row.title}
           />
         </li>
       ))}
@@ -177,6 +182,8 @@ export function ProductCatalogClients({
     : items
 
   if (stage === "categories" || !category) {
+    const matches = fuzzySearch(hierarchy, query, { keys: ["title"] })
+
     return (
       <div className="flex flex-col gap-6">
         <Input
@@ -186,29 +193,26 @@ export function ProductCatalogClients({
           type="search"
           value={query}
         />
-        {query ? (
-          <CatalogBodyClient
-            clearLabel={clearLabel}
-            emptyCatalog={emptyCatalog}
-            items={items}
-            noMatches={noMatches}
-            pageSize={24}
-            paginated
-            renderItem={(item) => <ProductCard data={item} />}
-            shallow={false}
-          />
-        ) : null}
-        <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {hierarchy.map((row) => (
-            <li key={row.id}>
-              <NavigationCard
-                title={row.title}
-                imageId={row.imageId}
-                href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
-              />
-            </li>
-          ))}
-        </ul>
+        {query && matches.length === 0 ? (
+          <Empty className="items-start border-0 p-0 text-left">
+            <EmptyDescription>{noMatches}</EmptyDescription>
+            <Button onPress={() => void setQuery(null)} variant="outline">
+              {clearLabel}
+            </Button>
+          </Empty>
+        ) : (
+          <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {matches.map((row) => (
+              <li key={row.id}>
+                <NavigationCard
+                  title={row.title}
+                  imageId={row.imageId}
+                  href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     )
   }
