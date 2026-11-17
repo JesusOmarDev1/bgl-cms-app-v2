@@ -107,6 +107,7 @@ function CategoryTypes({
       {category.untypedProductCount > 0 ? (
         <li>
           <NavigationCard
+            icon="inventory_2"
             title={labels.untypedProducts}
             imageId={null}
             href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=sin-tipo`}
@@ -133,6 +134,8 @@ export function ProductCatalogClients({
     categories: string
     untypedProducts: string
     emptyCategory: string
+    searchLabel: string
+    searchPlaceholder: string
   }
   emptyCatalog: string
   noMatches: string
@@ -187,9 +190,9 @@ export function ProductCatalogClients({
     return (
       <div className="flex flex-col gap-6">
         <Input
-          aria-label={labels.search.label}
+          aria-label={navigationLabels.searchLabel}
           onChange={(event) => void setQuery(event.target.value || null)}
-          placeholder={labels.search.placeholder}
+          placeholder={navigationLabels.searchPlaceholder}
           type="search"
           value={query}
         />

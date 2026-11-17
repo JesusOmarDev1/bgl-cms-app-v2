@@ -48,6 +48,8 @@ const navigationLabels = {
   categories: "All categories",
   untypedProducts: "Untyped products",
   emptyCategory: "This category has no types or products yet.",
+  searchLabel: "Search categories",
+  searchPlaceholder: "Search categories...",
 }
 const hierarchy: CatalogHierarchy[] = [
   {
@@ -179,7 +181,7 @@ function renderCatalog(searchParams: string) {
 describe("store category/type navigation", () => {
   it("keeps empty categories linked and renders their empty state", () => {
     const entry = renderCatalog("")
-    expect(entry).toContain('aria-label="Search products"')
+    expect(entry).toContain('aria-label="Search categories"')
     expect(entry).toContain('href="/tienda?cat=empty"')
     expect(entry).toContain('data-directus-src="category-image"')
     expect(entry).toContain("material-symbols-rounded")
@@ -208,6 +210,7 @@ describe("store category/type navigation", () => {
   it("filters only category cards at the entry stage", () => {
     const html = renderCatalog("?q=Other")
     expect(html).toContain('value="Other"')
+    expect(html).toContain('aria-label="Search categories"')
     expect(html).toContain('href="/tienda?cat=other"')
     expect(html).not.toContain('href="/tienda?cat=scales"')
     expect(html).not.toContain('href="/tienda/producto/')
@@ -221,7 +224,7 @@ describe("store category/type navigation", () => {
   it("renders the product type icon and keeps the category icon fallback", () => {
     const types = renderCatalog("?cat=scales")
     expect(types).toContain(">monitor_weight</span>")
-    expect(types).toContain(">category</span>")
+    expect(types).toContain(">inventory_2</span>")
 
     const entry = renderCatalog("")
     expect(entry).not.toContain(">monitor_weight</span>")

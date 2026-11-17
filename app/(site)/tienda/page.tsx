@@ -33,6 +33,8 @@ async function ProductCatalog({
     categories: string
     untypedProducts: string
     emptyCategory: string
+    searchLabel: string
+    searchPlaceholder: string
   }
   emptyCatalog: string
   noMatches: string
@@ -148,6 +150,8 @@ async function Catalog({ searchParams }: PageProps) {
               categories: catalog("category_all"),
               untypedProducts: catalog("untyped_products"),
               emptyCategory: catalog("empty_category"),
+              searchLabel: catalog("search_label"),
+              searchPlaceholder: catalog("search_placeholder"),
             }}
             products={products}
           />

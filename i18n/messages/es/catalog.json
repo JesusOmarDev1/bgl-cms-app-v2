@@ -5,6 +5,8 @@
     "category_all": "Todas las categorías",
     "untyped_products": "Productos sin tipo",
     "empty_category": "Esta categoría todavía no tiene tipos ni productos.",
+    "search_label": "Buscar categorías",
+    "search_placeholder": "Buscar categorías...",
     "filter_brand": "Marca",
     "filter_capacity": "Capacidad",
     "filter_division": "División",
