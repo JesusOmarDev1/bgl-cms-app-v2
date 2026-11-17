@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { RecordBlockPage } from "@/components/page/BlockPage"
 import { BlockPageSkeleton } from "@/components/page/BlockPageSkeleton"
 import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
+import { getManualBySlugRepository } from "@/services/domain/db/repositories/collections/manuals"
 import { metadata as createMetadata } from "@/lib/seo/metadata"
 
 type PageProps = {
@@ -14,7 +15,6 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  if (slug === "manuales") notFound()
   const pages = await getPageBySlugRepository({ slug })
   const page = pages[0]
   if (!page) notFound()
@@ -29,15 +29,10 @@ export async function generateMetadata({
   })
 }
 
-async function loadPublicPageBySlug({ slug }: { slug: string }) {
-  if (slug === "manuales") notFound()
-  return getPageBySlugRepository({ slug })
-}
-
 export default function Page({ params }: PageProps) {
   return (
     <Suspense fallback={<BlockPageSkeleton />}>
-      <RecordBlockPage params={params} load={loadPublicPageBySlug} />
+      <RecordBlockPage params={params} load={getPageBySlugRepository} />
     </Suspense>
   )
 }

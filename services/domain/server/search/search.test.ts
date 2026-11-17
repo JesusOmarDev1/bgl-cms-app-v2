@@ -6,6 +6,7 @@ const {
   consume,
   getPageBySlug,
   getPages,
+  getManuals,
   getServices,
   getBlogPosts,
   getProducts,
@@ -15,6 +16,7 @@ const {
   consume: vi.fn(),
   getPageBySlug: vi.fn(),
   getPages: vi.fn(),
+  getManuals: vi.fn(),
   getServices: vi.fn(),
   getBlogPosts: vi.fn(),
   getProducts: vi.fn(),
@@ -128,6 +130,9 @@ vi.mock("@/services/domain/db/repositories/collections/pages", () => ({
   getPageBySlugRepository: getPageBySlug,
   getPagesRepository: getPages,
 }))
+vi.mock("@/services/domain/db/repositories/collections/manuals", () => ({
+  getManualsRepository: getManuals,
+}))
 vi.mock("@/services/domain/db/repositories/collections/services", () => ({
   getServicesRepository: getServices,
 }))
@@ -144,6 +149,9 @@ vi.mock("@/components/page/BlockPageSkeleton", () => ({
 vi.mock("@/lib/seo/metadata", () => ({ metadata: (value: unknown) => value }))
 vi.mock("@/lib/env/constants", () => ({ WEBSITE_URL: "https://site.example" }))
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }))
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}))
 vi.mock("next-intl/server", () => ({
   getTranslations: async () => (key: string) => key,
 }))
@@ -169,6 +177,7 @@ import * as React from "react"
 import { createElement, type ReactElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { HeaderNavClient } from "@/components/blocks/singletons/header/HeaderNavClient"
+import { FooterNavClient } from "@/components/blocks/singletons/footer/FooterNavClient"
 import { MobileNavClient } from "@/components/blocks/singletons/header/mobile/MobileNavClient"
 
 describe("manuals public visibility", () => {
@@ -176,7 +185,7 @@ describe("manuals public visibility", () => {
     consume.mockResolvedValue(undefined)
   })
 
-  it("excludes manuals search results while retaining unrelated and external results", async () => {
+  it("keeps ordinary manuals collection and URL search results", async () => {
     const publicHit: SearchHitTypes = {
       id: "1",
       collection: "pages",
@@ -203,10 +212,10 @@ describe("manuals public visibility", () => {
     }) => Promise<SearchHitTypes[]>
     await expect(
       runAction({ parsedInput: { query: "balanza" } })
-    ).resolves.toEqual([publicHit, hits[3]])
+    ).resolves.toEqual(hits)
   })
 
-  it("can return public search hits ranked after ten manuals", async () => {
+  it("preserves the ordinary search provider limit", async () => {
     const publicHit: SearchHitTypes = {
       id: "public-after-manuals",
       collection: "pages",
@@ -217,15 +226,12 @@ describe("manuals public visibility", () => {
       image: null,
     }
     search.mockResolvedValue({
-      hits: [
-        ...Array.from({ length: 10 }, (_, index) => ({
-          ...publicHit,
-          id: `manual-${index}`,
-          collection: "manuals",
-          url: `/manuales/${index}`,
-        })),
-        publicHit,
-      ],
+      hits: Array.from({ length: 10 }, (_, index) => ({
+        ...publicHit,
+        id: `manual-${index}`,
+        collection: "manuals",
+        url: `/manuales/${index}`,
+      })),
     })
 
     const runAction = searchAction as unknown as (input: {
@@ -233,20 +239,37 @@ describe("manuals public visibility", () => {
     }) => Promise<SearchHitTypes[]>
     await expect(
       runAction({ parsedInput: { query: "balanza" } })
-    ).resolves.toEqual([publicHit])
+    ).resolves.toEqual(
+      Array.from({ length: 10 }, (_, index) => ({
+        ...publicHit,
+        id: `manual-${index}`,
+        collection: "manuals",
+        url: `/manuales/${index}`,
+      }))
+    )
     expect(search).toHaveBeenCalledWith(
       "balanza",
-      expect.objectContaining({ limit: 20 })
+      expect.objectContaining({ limit: 10 })
     )
   })
 
-  it("hides local manuals CTAs in desktop and mobile navigation", () => {
+  it("keeps local manuals CTAs in desktop and mobile navigation", () => {
     const data = {
       primary_button: "Manual primary",
       primary_url: "/manuales/guia",
       secondary_button: "Public secondary",
       secondary_url: "/cotizar",
-      url_links: [],
+      url_links: [
+        {
+          id: 7,
+          item: {
+            type: "link",
+            url: "/manuales",
+            title: "Manuales",
+            icon: null,
+          },
+        },
+      ],
     } as never
     const desktop = renderToStaticMarkup(
       createElement(HeaderNavClient, { data })
@@ -254,13 +277,60 @@ describe("manuals public visibility", () => {
     const mobile = renderToStaticMarkup(
       createElement(MobileNavClient, { data })
     )
-    expect(desktop).not.toContain("Manual primary")
-    expect(mobile).not.toContain("Manual primary")
+    expect(desktop).toContain('href="/manuales/guia"')
+    expect(mobile).toContain('href="/manuales/guia"')
+    const footer = renderToStaticMarkup(
+      createElement(FooterNavClient, { data, healthStatus: "unknown" })
+    )
+    expect(desktop).toContain("Manual primary")
+    expect(mobile).toContain("Manual primary")
+    expect(desktop).toContain('href="/manuales"')
+    expect(mobile).toContain('href="/manuales"')
+    expect(footer).toContain('href="/manuales"')
     expect(desktop).toContain('href="/cotizar"')
     expect(mobile).toContain('href="/cotizar"')
   })
 
-  it("preserves external CTAs with a manuals path while hiding local secondary CTAs", () => {
+  it("keeps manuals dropdown links visible in desktop, mobile, and footer navigation", () => {
+    const data = {
+      url_links: [
+        {
+          id: 8,
+          item: {
+            type: "dropdown",
+            title: "Manuales",
+            icon: null,
+            sub_links: [
+              {
+                id: 9,
+                sub_links_id: {
+                  url: "/manuales/guia",
+                  title: "Guía de usuario",
+                  icon: null,
+                },
+              },
+            ],
+          },
+        },
+      ],
+    } as never
+    const desktop = renderToStaticMarkup(
+      createElement(HeaderNavClient, { data })
+    )
+    const mobile = renderToStaticMarkup(
+      createElement(MobileNavClient, { data })
+    )
+    const footer = renderToStaticMarkup(
+      createElement(FooterNavClient, { data, healthStatus: "unknown" })
+    )
+
+    for (const markup of [desktop, mobile, footer]) {
+      expect(markup).toContain('href="/manuales/guia"')
+      expect(markup).toContain("Guía de usuario")
+    }
+  })
+
+  it("preserves external and local manuals CTAs", () => {
     const data = {
       primary_button: "External primary",
       primary_url: "https://other.example/manuales/guia",
@@ -276,16 +346,20 @@ describe("manuals public visibility", () => {
     )
     expect(desktop).toContain("External primary")
     expect(mobile).toContain("External primary")
-    expect(desktop).not.toContain("Manual secondary")
-    expect(mobile).not.toContain("Manual secondary")
+    expect(desktop).toContain("Manual secondary")
+    expect(mobile).toContain("Manual secondary")
   })
 
-  it("rejects the generic manuals slug before page lookup, including metadata", async () => {
+  it("keeps the ordinary CMS route for the manuals slug and metadata", async () => {
+    getPageBySlug.mockResolvedValue([
+      { title: "Manuales", excerpt: "Contenido CMS" },
+    ])
     await expect(
       generateMetadata({ params: Promise.resolve({ slug: "manuales" }) })
-    ).rejects.toThrow("NEXT_NOT_FOUND")
-    expect(getPageBySlug).not.toHaveBeenCalled()
+    ).resolves.toMatchObject({ title: "Manuales" })
+    expect(getPageBySlug).toHaveBeenCalledWith({ slug: "manuales" })
 
+    getPageBySlug.mockClear()
     const page = Page({
       params: Promise.resolve({ slug: "manuales" }),
     }) as ReactElement<{
@@ -295,11 +369,11 @@ describe("manuals public visibility", () => {
     }>
     await expect(
       page.props.children.props.load({ slug: "manuales" })
-    ).rejects.toThrow("NEXT_NOT_FOUND")
-    expect(getPageBySlug).not.toHaveBeenCalled()
+    ).resolves.toEqual([{ title: "Manuales", excerpt: "Contenido CMS" }])
+    expect(getPageBySlug).toHaveBeenCalledWith({ slug: "manuales" })
   })
 
-  it("does not publish a manuals sitemap source", async () => {
+  it("publishes manuals in the ordinary CMS pages sitemap", async () => {
     getPages.mockResolvedValue([
       { slug: "manuales" },
       { slug: "pagina-publica" },
@@ -307,12 +381,14 @@ describe("manuals public visibility", () => {
     getServices.mockResolvedValue([])
     getBlogPosts.mockResolvedValue([])
     getProducts.mockResolvedValue([])
+    getManuals.mockResolvedValue([{ slug: "guia" }])
 
-    expect(await generateSitemaps()).not.toContainEqual({ id: "manuals" })
-    await expect(sitemap({ id: Promise.resolve("manuals") })).resolves.toEqual(
-      []
-    )
+    expect(await generateSitemaps()).toContainEqual({ id: "manuals" })
+    await expect(sitemap({ id: Promise.resolve("manuals") })).resolves.toEqual([
+      { url: "https://site.example/manuales/guia" },
+    ])
     await expect(sitemap({ id: Promise.resolve("pages") })).resolves.toEqual([
+      { url: "https://site.example/manuales" },
       { url: "https://site.example/pagina-publica" },
     ])
   })
