@@ -1,4 +1,4 @@
-import "./globals.css"
+import "../globals.css"
 import { NextIntlClientProvider } from "next-intl"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ThemeProvider } from "@/providers/ThemeProvider"
@@ -44,15 +44,16 @@ export default function RootLayout({
           <QueryProvider>
             <ThemeProvider
               attribute="class"
-              defaultTheme="dark"
+              defaultTheme="light"
               disableTransitionOnChange
               storageKey="bgl-theme"
+              enableSystem
             >
               <NuqsAdapter>{children}</NuqsAdapter>
               <Toaster
                 closeButton
                 expand
-                theme="dark"
+                theme="system"
                 duration={1500}
                 position="bottom-right"
               />

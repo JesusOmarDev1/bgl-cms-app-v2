@@ -16,8 +16,12 @@ export default function Error({
     >
       <h1 className="text-6xl font-bold">Algo salió mal</h1>
       <p className="text-2xl text-muted-foreground">
-        Por favor, intenta de nuevo.
+        Por favor, intenta de nuevo mas tarde. Si el problema persiste, contacta
+        al soporte técnico.
       </p>
+      {process.env.NODE_ENV === "development" && (
+        <code className="text-sm text-muted-foreground">{error.message}</code>
+      )}
       <Button onClick={() => reset()}>Intentar de nuevo</Button>
     </div>
   )

@@ -6,6 +6,15 @@ import { assetsRemotePatterns } from "@/lib/directus/asset-pattern"
 const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
+  redirects() {
+    return [
+      {
+        source: "/manuales",
+        destination: "/inicio",
+        permanent: true,
+      },
+    ]
+  },
   cacheComponents: true,
   partialPrefetching: true,
   logging: {

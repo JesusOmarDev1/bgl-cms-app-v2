@@ -15,6 +15,7 @@ import { readAuthSession } from "@/services/domain/server/auth/token"
 import { getIdentityRepository } from "@/services/domain/db/repositories/collections/session"
 import { getInitials } from "@/lib/formatting/initials"
 import { ThemeToggle } from "@/components/shared/theme/ThemeToggle"
+import { PrivateSettingsApplier } from "@/components/shared/settings/PrivateSettingsApplier"
 import type { SessionIdentityTypes } from "@/types/collections/session"
 
 async function SidebarUser() {
@@ -52,6 +53,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
+      <PrivateSettingsApplier />
       <a
         href="#sidebar-content"
         className="sr-only focus:not-sr-only focus:absolute focus:start-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:shadow"
