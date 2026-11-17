@@ -110,7 +110,7 @@ export function AppSidebar({ user }: { user: ReactNode }) {
         <SidebarHeader>
           <div className="flex h-12 items-center gap-2.5 px-2 group-data-[collapsible=icon]:justify-center">
             <StaticLogo className="aspect-auto h-8 w-auto shrink-0" />
-            <span className="min-w-0 truncate font-heading text-sm font-medium group-data-[collapsible=icon]:hidden">
+            <span className="min-w-0 truncate font-heading text-xs font-medium group-data-[collapsible=icon]:hidden">
               {t("brand")}
             </span>
           </div>

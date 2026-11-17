@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { useAction } from "next-safe-action/hooks"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
 import { email, nonEmpty, object, pipe, string } from "valibot"
@@ -120,6 +120,9 @@ interface StepRailProps {
 }
 
 function StepRail({ activeIndex, titles, onSelect }: StepRailProps) {
+  // Two-factor is optional: the OTP step only exists once the server asks for it.
+  const steps = STEPS.slice(0, Math.max(activeIndex + 1, 2))
+
   return (
     <Stepper
       value={activeIndex + 1}
@@ -130,7 +133,7 @@ function StepRail({ activeIndex, titles, onSelect }: StepRailProps) {
       className="py-1"
     >
       <StepperNav className="items-center gap-1">
-        {STEPS.map((value, index) => (
+        {steps.map((value, index) => (
           <StepperItem
             key={value}
             step={index + 1}
@@ -141,12 +144,25 @@ function StepRail({ activeIndex, titles, onSelect }: StepRailProps) {
               <StepperIndicator>{index + 1}</StepperIndicator>
               <span className="sr-only">{titles[value]}</span>
             </StepperTrigger>
-            {index < STEPS.length - 1 ? <StepperSeparator /> : null}
+            {index < steps.length - 1 ? <StepperSeparator /> : null}
           </StepperItem>
         ))}
       </StepperNav>
     </Stepper>
   )
+}
+
+/** Mount and bfcache restore both hand back a live, half-filled login form. */
+function useResetOnEnter(reset: () => void) {
+  useEffect(() => {
+    reset()
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) reset()
+    }
+    window.addEventListener("pageshow", onPageShow)
+    return () => window.removeEventListener("pageshow", onPageShow)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only reset
+  }, [])
 }
 
 export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
@@ -220,8 +236,18 @@ export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
 
   function freshChallenge() {
     form.setFieldValue("captcha", "")
-    setCaptchaEpoch((epoch) => epoch + 1)
+    // The widget exists only outside the email step; the epoch keys its remount.
+    if (widgetMounted) setCaptchaEpoch((epoch) => epoch + 1)
   }
+
+  // Logout returns here through the router cache and bfcache restores the page
+  // as it was: a fresh login page never keeps the previous values, step, or a
+  // spent captcha token.
+  useResetOnEnter(() => {
+    form.reset()
+    setStep("email")
+    freshChallenge()
+  })
 
   // A manual step change drops the solved token: only the flow's own move
   // forward to the OTP step keeps it (the marker covers that one).
@@ -231,9 +257,16 @@ export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
     action.reset()
   }
 
-  async function continueToPassword() {
+  async function continueToPassword(event?: { preventDefault: () => void }) {
+    event?.preventDefault()
     const errors = await form.validateField("email", "submit")
     if (errors.length === 0) goToStep("password")
+  }
+
+  function submitCredentials(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+    void form.handleSubmit().catch(() => undefined)
   }
 
   return (
@@ -268,11 +301,7 @@ export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
           <form
             className="space-y-4"
             aria-labelledby="login-step-title"
-            onSubmit={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              void form.handleSubmit().catch(() => undefined)
-            }}
+            onSubmit={step === "email" ? continueToPassword : submitCredentials}
             noValidate
           >
             <h2 id="login-step-title" className="text-xl font-semibold">

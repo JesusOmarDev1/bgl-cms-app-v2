@@ -461,7 +461,7 @@ function restoreSignatureHistory(
   action: "undo" | "redo",
   history: History,
   live: { current: LiveStroke | null },
-  settleWipe: () => void,
+  cancelWipe: () => void,
   stopReplay: () => void,
   setHistory: (update: (current: History) => History) => void,
   setStatus: (status: string) => void
@@ -471,7 +471,8 @@ function restoreSignatureHistory(
     live.current
   )
     return
-  settleWipe()
+  // Cancelled, not completed: completing the wipe would commit the clear it undoes.
+  cancelWipe()
   stopReplay()
   setHistory((current) =>
     action === "undo"
@@ -1144,6 +1145,18 @@ export function SignaturePad({
   const settleWipe = useCallback(() => {
     wipeAnimation.current?.complete()
   }, [])
+  /**
+   * Undo and redo cancel the wipe instead of settling it: the pad keeps its
+   * strokes, the clip is lifted, and the pending clear never commits.
+   */
+  const cancelWipe = useCallback(() => {
+    const wipe = wipeAnimation.current
+    if (!wipe) return
+    wipe.stop()
+    wipeAnimation.current = null
+    if (inkRef.current) inkRef.current.style.clipPath = ""
+    setWiping(false)
+  }, [])
 
   function toPad(event: { clientX: number; clientY: number }) {
     const box = padRef.current!.getBoundingClientRect()
@@ -1204,7 +1217,7 @@ export function SignaturePad({
       "undo",
       history,
       live,
-      settleWipe,
+      cancelWipe,
       stopReplay,
       setHistory,
       setStatus
@@ -1215,7 +1228,7 @@ export function SignaturePad({
       "redo",
       history,
       live,
-      settleWipe,
+      cancelWipe,
       stopReplay,
       setHistory,
       setStatus
@@ -1250,13 +1263,17 @@ export function SignaturePad({
       { clipPath: ["inset(0% 0% 0% 0%)", "inset(0% 0% 0% 100%)"] },
       { duration: 0.56, ease: [...ease.inOut] }
     )
-    wipeAnimation.current = {
+    const wipe = {
       stop: () => controls.stop(),
       complete: () => {
         controls.complete()
       },
     }
-    controls.then(finish)
+    wipeAnimation.current = wipe
+    controls.then(() => {
+      // A cancelled wipe (undo or redo mid-sweep) must not commit the clear.
+      if (wipeAnimation.current === wipe) finish()
+    })
   }
 
   function toggleReplay() {

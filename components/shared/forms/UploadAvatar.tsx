@@ -38,13 +38,6 @@ const loadImage = (src: string) =>
 const isTooSmall = (img: HTMLImageElement) =>
   Math.min(img.naturalWidth, img.naturalHeight) < OUTPUT_SIZE
 
-const dataUrlToFile = (dataUrl: string) => {
-  const [meta, base64] = dataUrl.split(",")
-  const type = meta.match(/data:(.*?);/)?.[1] ?? "image/png"
-  const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
-  return new File([bytes], "avatar.png", { type })
-}
-
 const UploadAvatar = () => {
   const t = useTranslations("dashboard")
   const te = useTranslations("directusErrors")
@@ -75,19 +68,25 @@ const UploadAvatar = () => {
   const loadFile = useCallback((file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
     const url = URL.createObjectURL(file)
-    loadImage(url).then((img) => {
-      if (isTooSmall(img)) {
+    loadImage(url)
+      .then((img) => {
+        if (isTooSmall(img)) {
+          URL.revokeObjectURL(url)
+          setPhotoError("photoTooSmall")
+          return
+        }
+        setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight })
+        setImageUrl(url)
+        setResultUrl(null)
+        setPhotoError(null)
+        resetEditor()
+        setStage("editing")
+      })
+      // A blob the browser cannot decode never fires onload.
+      .catch(() => {
         URL.revokeObjectURL(url)
-        setPhotoError("photoTooSmall")
-        return
-      }
-      setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight })
-      setImageUrl(url)
-      setResultUrl(null)
-      setPhotoError(null)
-      resetEditor()
-      setStage("editing")
-    })
+        setPhotoError("photoInvalidType")
+      })
   }, [])
 
   const onDrop = useCallback(
@@ -150,6 +149,8 @@ const UploadAvatar = () => {
         setStage("done")
       }
     },
+    // A thrown action (network/server transport) never reaches onSuccess.
+    onError: () => setPhotoError("generic"),
   })
 
   const avatarError =
@@ -164,6 +165,8 @@ const UploadAvatar = () => {
 
   const startOver = () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl)
+    if (resultUrl) URL.revokeObjectURL(resultUrl)
+    avatarAction.reset()
     setStage("idle")
     setImageUrl(null)
     setResultUrl(null)
@@ -173,32 +176,52 @@ const UploadAvatar = () => {
 
   const confirmCrop = () => {
     if (!imageUrl) return
-    loadImage(imageUrl).then((img) => {
-      const canvas = document.createElement("canvas")
-      canvas.width = OUTPUT_SIZE
-      canvas.height = OUTPUT_SIZE
-      const ctx = canvas.getContext("2d")
-      if (!ctx) return
+    loadImage(imageUrl)
+      .then((img) => {
+        const canvas = document.createElement("canvas")
+        canvas.width = OUTPUT_SIZE
+        canvas.height = OUTPUT_SIZE
+        const ctx = canvas.getContext("2d")
+        if (!ctx) {
+          setPhotoError("generic")
+          return
+        }
 
-      const outputScale = OUTPUT_SIZE / FRAME_SIZE
-      ctx.save()
-      ctx.beginPath()
-      ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2)
-      ctx.clip()
+        const outputScale = OUTPUT_SIZE / FRAME_SIZE
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(
+          OUTPUT_SIZE / 2,
+          OUTPUT_SIZE / 2,
+          OUTPUT_SIZE / 2,
+          0,
+          Math.PI * 2
+        )
+        ctx.clip()
 
-      ctx.translate(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2)
-      ctx.rotate((rotation * Math.PI) / 180)
-      ctx.translate(offset.x * outputScale, offset.y * outputScale)
-      const scale = displayScale * zoom[0] * outputScale
-      ctx.scale(scale, scale)
-      ctx.drawImage(img, -naturalSize.width / 2, -naturalSize.height / 2)
-      ctx.restore()
+        ctx.translate(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2)
+        ctx.rotate((rotation * Math.PI) / 180)
+        ctx.translate(offset.x * outputScale, offset.y * outputScale)
+        const scale = displayScale * zoom[0] * outputScale
+        ctx.scale(scale, scale)
+        ctx.drawImage(img, -naturalSize.width / 2, -naturalSize.height / 2)
+        ctx.restore()
 
-      const croppedUrl = canvas.toDataURL("image/png")
-      setResultUrl(croppedUrl)
-      setPhotoError(null)
-      avatarAction.execute({ photo: dataUrlToFile(croppedUrl) })
-    })
+        // PNG encode straight from the canvas: no base64 round trip.
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            setPhotoError("generic")
+            return
+          }
+          const nextResultUrl = URL.createObjectURL(blob)
+          setResultUrl(nextResultUrl)
+          setPhotoError(null)
+          avatarAction.execute({
+            photo: new File([blob], "avatar.png", { type: "image/png" }),
+          })
+        }, "image/png")
+      })
+      .catch(() => setPhotoError("generic"))
   }
 
   return (
