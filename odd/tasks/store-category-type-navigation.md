@@ -18,11 +18,13 @@ Implementation route: writer; commits pending.
 
 ## Tasks
 
-- T1 — S2, S9 — Add the Directus product-types schema and image support; route: writer; commit: pending.
+- T1 — S2, S9 — Add the Directus product-types schema and image support; route: writer; commit: pending (uncommitted, verified).
 - T2 — S2–S8 — Implement storefront category → type → product navigation, photo-leading cards, reusable filtered toolbar, skeleton variants, tests, and docs; route: writer; commit: partial 5c86a30 (filters only; T2 remains incomplete).
 - T3 — S2, S10 — Remove the task-created frontend suppression of `/manuales`; leave backend blocking to the backend and preserve Directus data, with tests; route: writer; commit: 9612782.
-- T4 — S11 — Run `pnpm pre-deploy` and correct the errors that appear; final feature gate; route: writer; gate: passed; commit: pending.
+- T4 — S11 — Run `pnpm pre-deploy` and correct the errors that appear; final feature gate; route: writer; gate: passed; commit: pending (uncommitted, verified).
 - T5 — S11 — Apply narrowly scoped LF checkout/working-tree maintenance after T4's repo-wide Prettier gate failed; T4 gate now passed and T2 remains incomplete; route: writer; commit: 92e1a88.
+- T6 — S12, S13 — Directus data: create published product_types records matching existing products/categories with Material icons, and assign products.product_type accordingly (parent via MCP); route: parent; done in Directus 2026-11-17.
+- T7 — S14–S17 — Catalog code refactor: stage-1 search filters categories only, corrected store title/intro copy, type icons surfaced, minimal-code pass leaning on existing fuse.js wrapper; tests updated; route: writer; commit: pending (uncommitted, verified).
 
 ## Log
 
@@ -46,3 +48,16 @@ Implementation route: writer; commits pending.
 - L18: This uncommitted T2 follow-on gives published categories without slugs stable ID-backed URLs, ensures their product stage still scopes correctly, and renders invalid cross-category type URLs as the category stage rather than labeling them untyped. Rendered tests cover these URLs, category-scoped type ID mismatches, and global entry search with `q`; focused catalog tests (4 files, 18 tests), typecheck, ESLint, Prettier, and diff checks pass. T2 remains incomplete; live Directus schema/data and browser interaction are unverified.
 - L19: T5 is linked to S11 because the explicitly authorized maintenance follows the final feature gate failure. `pnpm pre-deploy` reached typegen/typecheck/lint (0 errors, 35 pre-existing warnings), then failed at repo-wide Prettier with 816 files flagged before Vitest/build. Focused task files were LF and passed Prettier. At that point T4 and T2 remained incomplete.
 - L20: Commit 92e1a88 enforces LF; a separate worker normalized 816 Prettier-flagged tracked files without extra Git content diff. Parent reran corrected `pnpm pre-deploy` once and it exited 0 through typegen, typecheck, ESLint (warnings only), global Prettier, Vitest unit suite, and Next build. T4's gate pass is recorded, but T1/T2 and the feature remain incomplete: Directus `product_types` and `products.product_type` are absent, and worker MCP/browser/live proof is unavailable.
+- L21: User merged the feature into main themselves (a2825d0 on origin) and continued working on main; local feature branch left stale. Live Directus readback then confirmed product_types existed (user-created) and parent added product_types.category (M2O required) and products.product_type (M2O optional, SET NULL) via MCP; 24/24 focused unit tests pass on the merged code in a worktree.
+- L22: Ya funciona pero no como lo esperado: (1) el buscador de /tienda también filtra los productos directamente en lugar de solamente las categorías; (2) el titulo y la descripcion no tienen nada que ver; (3) para los tipos vamos a agregar registros en el backend que tengan que ver con los productos actuales y categorias existentes y vamos a agregar iconos a cada uno tambien para representarlos de mejor forma; (4) vamos a refactorizar todo el codigo de catalogo para reducirlo al maximo, utilizar el codigo menos posible, evitar sobreingenieria y codigo basura y a su vez tener soluciones mas simples para que sea escalable con fuse.js.
+- L23: T6 done via MCP: created 4 published product_types (Básculas/basculas + scale icon in Comercial and Recibo, Indicadores de peso/indicadores-de-peso + monitor_weight in Indicadores, Indicadores etiquetadores/indicadores-etiquetadores + label in Etiquetadoras) and assigned all 10 published products by their equipment_type; readback confirms every product has its type.
+- L24: Polish pass (impeccable/polish skill) committed as aa2a58b on main: entry search labels moved to catalog.json as "Buscar categorías", the untyped-products card uses the inventory_2 icon, NavigationCard labels threaded through navigationLabels; updated assertions pinned the new copy/icon. 19/19 focused tests, tsc, Prettier pass. User WIP continues on main; a deleted config/ directory was restored from HEAD at the user's instruction (accidental deletion), and React Doctor --staged could not run because next.config.ts differs between index and worktree (user WIP).
+
+## Specs (T6/T7 additions)
+
+- S12: Product types records must match the current products and existing categories (derived from products.equipment_type per category), published, each with an icon representing it.
+- S13: products.product_type assignments are additive updates only; no category/product reassignment or deletion.
+- S14: The /tienda top-level search filters only the category cards; it must not list/filter products directly at the category stage.
+- S15: The /tienda page title and description must describe the store browsing experience (category → type → products), not generic product copy.
+- S16: Type cards render their Directus icon (product_types.icon, Material icon name) when no photo exists; query/TS contract include icon.
+- S17: Catalog code is reduced to the minimum: consolidate helpers, delete dead code, lean on the existing fuse.js wrapper (config/search), no new abstractions; tests pin the new behavior.
