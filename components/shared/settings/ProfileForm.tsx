@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useRef } from "react"
 import { useAction } from "next-safe-action/hooks"
 import { useTranslations } from "next-intl"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
@@ -20,6 +21,7 @@ import { getInitials } from "@/lib/formatting/initials"
 import UploadAvatar from "@/components/shared/forms/UploadAvatar"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { updateProfile } from "@/services/domain/server/auth/profile"
+import { refresh } from "@/services/domain/server/auth/refresh"
 
 interface ProfileValues {
   firstName: string
@@ -80,11 +82,20 @@ export function ProfileForm({ identity }: ProfileFormProps) {
     ? getInitials(identity.firstName, identity.lastName)
     : "?"
 
+  const lastSubmit = useRef<ProfileValues | null>(null)
+  const retried = useRef(false)
+
   const action = useAction(updateProfile, {
     onSuccess: ({ data }) => {
-      if (data?.ok) {
-        router.refresh()
-      }
+      if (data?.ok) return router.refresh()
+      const payload = lastSubmit.current
+      // A dead access token is recoverable once: rotate it, then replay the save.
+      if (!payload || retried.current || data?.message !== "sessionExpired")
+        return
+      retried.current = true
+      void refresh({}).then(({ data: rotated }) => {
+        if (rotated?.ok) action.execute(payload)
+      })
     },
   })
   const result = action.result.data
@@ -128,13 +139,9 @@ export function ProfileForm({ identity }: ProfileFormProps) {
       onSubmit: profileSchema as StandardSchemaV1<ProfileValues, unknown>,
     },
     onSubmit: ({ value }) => {
-      action.execute({
-        firstName: value.firstName,
-        lastName: value.lastName,
-        title: value.title,
-        location: value.location,
-        description: value.description,
-      })
+      lastSubmit.current = value
+      retried.current = false
+      action.execute(value)
     },
   })
 

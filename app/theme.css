@@ -165,17 +165,9 @@
   }
 }
 
-/* Private-area device preferences (set from the settings dialog). */
-html[data-font-size="small"] {
-  font-size: 14px;
-}
-
-html[data-font-size="large"] {
-  font-size: 18px;
-}
-
-/* Local choice wins over prefers-reduced-motion; without a choice the
-   media query alone applies, so no data-motion attribute is set. */
+/* Private-area motion preference (set from the settings dialog): a local
+   choice wins over prefers-reduced-motion; without one the media query alone
+   applies, so no data-motion attribute is set. */
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion="full"]) *,
   html[data-motion="reduce"] *,
@@ -186,4 +178,60 @@ html[data-font-size="large"] {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+@theme {
+  --animate-marquee: marquee var(--duration, 80s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 80s) linear
+    infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.52;
+    }
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(0.62em);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes focus {
+    from {
+      filter: blur(var(--reveal-blur, 4px));
+    }
+  }
+}
+
+@utility field-halo {
+  border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--foreground) 9%, transparent);
+}
+
+@utility field-halo-invalid {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive) 18%, transparent);
 }

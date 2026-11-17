@@ -2,32 +2,37 @@
 
 import { useSyncExternalStore } from "react"
 
-type FontSizeKey = "small" | "default" | "large"
 type MotionKey = "reduce" | "full"
 
 type StoredSettings = {
-  fontSize?: FontSizeKey
   motion?: MotionKey
 }
 
 const STORAGE_KEY = "private-settings"
-const FONT_SIZES: readonly FontSizeKey[] = ["small", "default", "large"]
 const MOTION_VALUES: readonly MotionKey[] = ["reduce", "full"]
 
-const subscribeNever = () => () => {}
+const listeners = new Set<() => void>()
+let revision = 0
 
-function readStoredSettings(): StoredSettings | null {
+function subscribe(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+
+/**
+ * Reads the stored JSON: an unknown or invalid key is dropped instead of
+ * breaking the rest, so a payload written before a preference was removed
+ * (the old fontSize) still applies.
+ */
+export function parsePrivateSettings(
+  raw: string | null
+): StoredSettings | null {
+  if (!raw) return null
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
     const parsed = JSON.parse(raw) as Record<string, unknown>
     const settings: StoredSettings = {}
-    if (
-      typeof parsed.fontSize === "string" &&
-      (FONT_SIZES as readonly string[]).includes(parsed.fontSize)
-    ) {
-      settings.fontSize = parsed.fontSize as FontSizeKey
-    }
     if (
       typeof parsed.motion === "string" &&
       (MOTION_VALUES as readonly string[]).includes(parsed.motion)
@@ -40,28 +45,32 @@ function readStoredSettings(): StoredSettings | null {
   }
 }
 
-function persist(settings: StoredSettings) {
+/** Writes the whole preference set and wakes every mounted consumer. */
+export function persistPrivateSettings(settings: StoredSettings) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+    revision += 1
+    for (const listener of listeners) listener()
   } catch {
     // Private mode or full storage: preference stays for this page load only.
   }
 }
 
+function readStoredSettings(): StoredSettings | null {
+  try {
+    return parsePrivateSettings(window.localStorage.getItem(STORAGE_KEY))
+  } catch {
+    return null
+  }
+}
+
 /** Mounted flag so localStorage is only read after hydration. */
-export function useIsMounted(): boolean {
+function useIsMounted(): boolean {
   return useSyncExternalStore(
-    subscribeNever,
+    subscribe,
     () => true,
     () => false
   )
-}
-
-export type PrivateSettings = Required<StoredSettings>
-
-const DEFAULT_SETTINGS: PrivateSettings = {
-  fontSize: "default",
-  motion: "full",
 }
 
 /**
@@ -75,15 +84,19 @@ export function usePrivateSettings(): {
   mounted: boolean
 } {
   const mounted = useIsMounted()
-  // Pure function of localStorage; read once in the post-hydration render.
+  // Re-read on every persist so each mounted consumer sees the new value.
+  useSyncExternalStore(
+    subscribe,
+    () => revision,
+    () => 0
+  )
   const settings = mounted ? readStoredSettings() : null
 
   return {
     settings,
-    setSettings: persist,
+    setSettings: persistPrivateSettings,
     mounted,
   }
 }
 
-export { DEFAULT_SETTINGS, FONT_SIZES, MOTION_VALUES }
-export type { FontSizeKey, MotionKey }
+export type { MotionKey, StoredSettings }
