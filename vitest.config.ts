@@ -25,6 +25,7 @@ export default defineConfig({
             "lib/**/*.test.ts",
             "services/**/*.test.ts",
             "components/collections/catalog/**/*.test.ts",
+            "components/shared/settings/**/*.test.ts",
           ],
         },
       },

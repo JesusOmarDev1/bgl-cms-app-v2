@@ -1,9 +1,9 @@
 "use server"
 
-import { headers } from "next/headers"
 import { getTranslations } from "next-intl/server"
 import * as v from "valibot"
 import { actionClient } from "@/lib/server/safe-action"
+import { getClientIpTrusted } from "@/lib/server/client-ip"
 import { verifyTurnstile } from "@/lib/security/turnstile"
 import {
   buildFormValuesSchema,
@@ -51,12 +51,8 @@ export const submitForm = actionClient
   .action(async ({ parsedInput }): Promise<SubmitFormData> => {
     const { formId, captchaToken, values } = parsedInput
     const t = await getTranslations("db.form_responses")
-    const forwarded = (await headers()).get("x-forwarded-for")
-    const clientIp = forwarded
-      ?.trim()
-      .toLowerCase()
-      .replace(/^::ffff:/, "")
-    if (!clientIp || clientIp.includes(",")) {
+    const clientIp = await getClientIpTrusted()
+    if (!clientIp) {
       console.warn("[form] rate limited")
       return { ok: false, message: t("rate_limited") }
     }

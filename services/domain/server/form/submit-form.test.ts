@@ -55,6 +55,18 @@ describe("submitForm rate limit", () => {
     expect(getPublishedFormBlockRepository).toHaveBeenCalledWith(formId)
   })
 
+  it("uses the last hop of a multi-hop header instead of blocking the lead", async () => {
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ "x-forwarded-for": "203.0.113.4, 10.0.0.1" })
+    )
+
+    await expect(submitForm({ formId, values: {} })).resolves.toEqual({
+      data: { ok: false, message: "not_found" },
+    })
+    expect(formLimiter.consume).toHaveBeenCalledWith("10.0.0.1")
+    expect(getPublishedFormBlockRepository).toHaveBeenCalledWith(formId)
+  })
+
   it("fails closed when the trusted IP header is missing", async () => {
     vi.mocked(headers).mockResolvedValue(new Headers())
 

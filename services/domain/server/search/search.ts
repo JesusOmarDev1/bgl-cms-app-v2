@@ -1,11 +1,11 @@
 "use server"
 
-import { headers } from "next/headers"
 import { getTranslations } from "next-intl/server"
 import { returnServerError } from "next-safe-action"
 import * as v from "valibot"
 import meilisearch from "@/config/meilisearch"
 import { searchLimiter } from "@/config/rate-limiter"
+import { getClientIpTrusted } from "@/lib/server/client-ip"
 import { actionClient } from "@/lib/server/safe-action"
 import type { SearchHitTypes } from "@/types/shared/search/search-hits"
 import { sanitizeHtmlFields } from "@/lib/formatting/sanitize"
@@ -29,14 +29,7 @@ export const searchAction = actionClient
   .action(async ({ parsedInput: { query } }) => {
     const t = await getTranslations("search")
 
-    const forwarded = (await headers()).get("x-forwarded-for")
-    const ip =
-      forwarded
-        ?.split(",")
-        .at(-1)
-        ?.trim()
-        .toLowerCase()
-        .replace(/^::ffff:/, "") || "missing"
+    const ip = (await getClientIpTrusted()) ?? "missing"
     try {
       await searchLimiter.consume(ip)
     } catch {

@@ -1,9 +1,10 @@
 "use server"
 
-import { cookies, headers } from "next/headers"
+import { cookies } from "next/headers"
 import * as v from "valibot"
 import { readMe } from "@directus/sdk"
 import { actionClient } from "@/lib/server/safe-action"
+import { getClientIp } from "@/lib/server/client-ip"
 import { verifyTurnstile } from "@/lib/security/turnstile"
 import {
   TURNSTILE_LOGIN_ACTION,
@@ -37,12 +38,8 @@ export const login = actionClient
   .action(async ({ parsedInput }): Promise<LoginResult> => {
     const { email, password, otp, captcha } = parsedInput
 
-    const forwarded = (await headers()).get("x-forwarded-for")
-    const clientIp = forwarded
-      ?.trim()
-      .toLowerCase()
-      .replace(/^::ffff:/, "")
-    if (!clientIp || clientIp.includes(",")) {
+    const clientIp = await getClientIp()
+    if (!clientIp) {
       return { ok: false, message: "unavailable" }
     }
     // One challenge per login attempt: a submission without a fresh token passes

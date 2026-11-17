@@ -12,12 +12,14 @@ export async function getPublishedFormBlockQuery(
   failedToFetchMessage: string
 ) {
   try {
-    return await publicDirectus.request(
+    const form = await publicDirectus.request(
       readItem("form_block", id, {
         fields: FORM_BLOCK_FIELDS,
         filter: { status: { _eq: "published" } },
       } satisfies Query<Schema, FormBlock>)
     )
+    // readItem may ignore the filter: a draft block must never accept submissions.
+    return form?.status === "published" ? form : null
   } catch (error) {
     returnDirectusQueryError(error, failedToFetchMessage, {
       component: "db.queries",
