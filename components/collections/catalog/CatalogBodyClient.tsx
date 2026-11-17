@@ -99,6 +99,7 @@ export function CatalogBodyClient<T extends CatalogItem>({
   shallow = true,
   pageSize,
   paginated = false,
+  productFilters = false,
 }: {
   items: readonly T[]
   renderItem: (item: T) => ReactNode
@@ -108,11 +109,19 @@ export function CatalogBodyClient<T extends CatalogItem>({
   shallow?: boolean
   pageSize?: number
   paginated?: boolean
+  productFilters?: boolean
 }) {
-  const { q, cat, sort, page, setPage, clearFilters } = useCatalogParams(
-    shallow,
-    paginated
-  )
+  const {
+    q,
+    cat,
+    brand,
+    capacity,
+    division,
+    sort,
+    page,
+    setPage,
+    clearFilters,
+  } = useCatalogParams(shallow, paginated, productFilters)
   const columns = useColumnCount()
 
   if (items.length === 0) {
@@ -123,7 +132,13 @@ export function CatalogBodyClient<T extends CatalogItem>({
     )
   }
 
-  const matches = filterCatalogProducts(items, q, cat, sort)
+  const matches = filterCatalogProducts(
+    items,
+    q,
+    cat,
+    sort,
+    productFilters ? { brand, capacity, division } : {}
+  )
   if (matches.length === 0) {
     return (
       <Empty className="items-start border-0 p-0 text-left">
@@ -140,7 +155,7 @@ export function CatalogBodyClient<T extends CatalogItem>({
       <InfiniteCatalogGrid
         columns={columns}
         items={matches}
-        key={`${q}\0${cat}\0${sort}`}
+        key={`${q}\0${cat}\0${brand}\0${capacity}\0${division}\0${sort}`}
         renderItem={renderItem}
       />
     )

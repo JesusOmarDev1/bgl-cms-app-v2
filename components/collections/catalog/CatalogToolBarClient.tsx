@@ -4,7 +4,12 @@ import { useEffect, useMemo, useRef } from "react"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { useDebounceFn } from "@/hooks/useDebounceFn"
-import type { CatalogItem } from "@/components/collections/catalog/catalog-items"
+import {
+  normalizeCatalogFilterParams,
+  normalizeCatalogFilters,
+  type CatalogFilters,
+  type CatalogItem,
+} from "@/components/collections/catalog/catalog-items"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -32,6 +37,12 @@ export type CatalogLabels = {
     az: string
     za: string
   }
+  filters?: {
+    brand: string
+    capacity: string
+    division: string
+    all: string
+  }
   clear: string
 }
 
@@ -40,14 +51,31 @@ export function CatalogToolBarClient({
   labels,
   shallow = true,
   paginated = false,
+  showCategoryFilter = true,
+  showProductFilters = false,
 }: {
   items: readonly CatalogItem[]
   labels: CatalogLabels
   shallow?: boolean
   paginated?: boolean
+  showCategoryFilter?: boolean
+  showProductFilters?: boolean
 }) {
-  const { q, setQ, cat, setCat, sort, setSort, clearFilters } =
-    useCatalogParams(shallow, paginated)
+  const {
+    q,
+    setQ,
+    cat,
+    setCat,
+    brand,
+    setBrand,
+    capacity,
+    setCapacity,
+    division,
+    setDivision,
+    sort,
+    setSort,
+    clearFilters,
+  } = useCatalogParams(shallow, paginated, !showCategoryFilter)
   const searchInputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     if (searchInputRef.current && searchInputRef.current.value !== q) {
@@ -79,11 +107,102 @@ export function CatalogToolBarClient({
   const selectedCategory = categories.some((category) => category.slug === cat)
     ? cat
     : null
-  const filtersActive = q.length > 0 || cat.length > 0
+  const filters: CatalogFilters = { brand, capacity, division }
+  const activeFilters = normalizeCatalogFilters(items, filters)
+  const normalizedFilterParams = useMemo(
+    () =>
+      normalizeCatalogFilterParams(
+        items,
+        new URLSearchParams({ brand, capacity, division })
+      ),
+    [brand, capacity, division, items]
+  )
+  useEffect(() => {
+    if (!showProductFilters) return
+    if (brand && !normalizedFilterParams.has("brand")) void setBrand(null)
+    if (capacity && !normalizedFilterParams.has("capacity"))
+      void setCapacity(null)
+    if (division && !normalizedFilterParams.has("division"))
+      void setDivision(null)
+  }, [
+    brand,
+    capacity,
+    division,
+    normalizedFilterParams,
+    setBrand,
+    setCapacity,
+    setDivision,
+    showProductFilters,
+  ])
+  const facetOptions = useMemo(
+    () => ({
+      brand: [
+        ...new Set(items.flatMap((item) => (item.brand ? [item.brand] : []))),
+      ].sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" })),
+      capacity: [
+        ...new Set(
+          items.flatMap((item) =>
+            item.capacity == null ? [] : [String(item.capacity)]
+          )
+        ),
+      ].sort((a, b) => Number(a) - Number(b)),
+      division: [
+        ...new Set(
+          items.flatMap((item) =>
+            item.division == null ? [] : [String(item.division)]
+          )
+        ),
+      ].sort((a, b) => Number(a) - Number(b)),
+    }),
+    [items]
+  )
+  const filtersActive =
+    q.length > 0 ||
+    (showCategoryFilter && cat.length > 0) ||
+    (showProductFilters &&
+      Object.values(activeFilters).some((value) => value.length > 0))
+
+  function renderFacet(
+    label: string,
+    value: string,
+    setValue: (value: string | null) => void,
+    options: string[]
+  ) {
+    return (
+      <Select
+        aria-label={label}
+        className="w-full lg:w-48"
+        onSelectionChange={(selected) =>
+          setValue(
+            selected == null || selected === "__reset__"
+              ? null
+              : String(selected).slice("value:".length)
+          )
+        }
+        placeholder={label}
+        selectedKey={options.includes(value) ? `value:${value}` : null}
+      >
+        <SelectTrigger aria-label={label} className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem id="__reset__" textValue={labels.filters?.all ?? label}>
+            {labels.filters?.all ?? label}
+          </SelectItem>
+          {options.map((option) => (
+            <SelectItem id={`value:${option}`} key={option} textValue={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
       <Select
+        hidden={!showCategoryFilter}
         aria-label={labels.category.label}
         className="w-full lg:w-64"
         onSelectionChange={(key) => {
@@ -151,6 +270,28 @@ export function CatalogToolBarClient({
           defaultValue={q}
         />
       </div>
+      {showProductFilters && labels.filters ? (
+        <>
+          {renderFacet(
+            labels.filters.brand,
+            brand,
+            setBrand,
+            facetOptions.brand
+          )}
+          {renderFacet(
+            labels.filters.capacity,
+            capacity,
+            setCapacity,
+            facetOptions.capacity
+          )}
+          {renderFacet(
+            labels.filters.division,
+            division,
+            setDivision,
+            facetOptions.division
+          )}
+        </>
+      ) : null}
       <Select
         aria-label={labels.sort.label}
         className="w-full lg:w-48"

@@ -4,8 +4,8 @@ import { notFound } from "next/navigation"
 import { RecordBlockPage } from "@/components/page/BlockPage"
 import { BlockPageSkeleton } from "@/components/page/BlockPageSkeleton"
 import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
-import { metadata as createMetadata } from "@/lib/seo/metadata"
 import { getManualBySlugRepository } from "@/services/domain/db/repositories/collections/manuals"
+import { metadata as createMetadata } from "@/lib/seo/metadata"
 
 type PageProps = {
   params: Promise<{ slug: string }>

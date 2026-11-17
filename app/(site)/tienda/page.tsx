@@ -3,10 +3,14 @@ import type { Metadata } from "next"
 import { connection } from "next/server"
 import { getTranslations } from "next-intl/server"
 import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
-import { CatalogBodySkeleton } from "@/components/collections/catalog/CatalogBodySkeleton"
-import { CatalogToolBarSkeleton } from "@/components/collections/catalog/CatalogToolBarSkeleton"
+import { ProductCatalogSkeleton } from "@/components/collections/products/ProductCatalogSkeleton"
+import type { ProductCatalogStage } from "@/components/collections/products/ProductCatalogSkeleton"
 import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
 import { ProductCatalogClients } from "@/components/collections/products/ProductCatalogClients"
+import {
+  buildCatalogHierarchy,
+  getCatalogNavigationStage,
+} from "@/components/collections/catalog/catalog-items"
 import { toProductCard } from "@/components/collections/products/to-product-card"
 import { Box } from "@/components/shared/content/Box"
 import { BoxContainer } from "@/components/shared/content/BoxLayout"
@@ -18,22 +22,50 @@ import { getProductCatalogRepository } from "@/services/domain/db/repositories/c
 async function ProductCatalog({
   products,
   labels,
+  navigationLabels,
   emptyCatalog,
   noMatches,
   clearLabel,
 }: {
   products: ReturnType<typeof getProductCatalogRepository>
   labels: CatalogLabels
+  navigationLabels: {
+    categories: string
+    untypedProducts: string
+    emptyCategory: string
+  }
   emptyCatalog: string
   noMatches: string
   clearLabel: string
 }) {
-  const { products: rows, categoryAncestors } = await products
+  const {
+    products: rows,
+    categories,
+    types,
+    categoryAncestors,
+  } = await products
   await connection()
+  const hierarchy = buildCatalogHierarchy(
+    categories.map((category) => ({
+      ...category,
+      image: category.image ?? null,
+    })),
+    types.map((type) => ({
+      ...type,
+      category: type.category.id,
+      image: type.image ?? null,
+    })),
+    rows.map((row) => ({
+      categoryId: row.product_category?.id ?? null,
+      typeId: row.product_type?.id ?? null,
+    }))
+  )
   const items = rows.map((row) => {
     const card = toProductCard(row)
     return {
       ...card,
+      capacity: row.capacity,
+      division: row.division,
       categoryAncestors: row.product_category
         ? (categoryAncestors[row.product_category.id] ?? [])
         : [],
@@ -44,14 +76,25 @@ async function ProductCatalog({
     <ProductCatalogClients
       clearLabel={clearLabel}
       emptyCatalog={emptyCatalog}
+      hierarchy={hierarchy}
       items={items}
       labels={labels}
+      navigationLabels={navigationLabels}
       noMatches={noMatches}
     />
   )
 }
 
-async function Catalog() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+async function Catalog({ searchParams }: PageProps) {
+  const { cat, type } = await searchParams
+  const stage: ProductCatalogStage = getCatalogNavigationStage(
+    Array.isArray(cat) ? (cat[0] ?? "") : (cat ?? ""),
+    Array.isArray(type) ? (type[0] ?? "") : (type ?? "")
+  )
   const products = getProductCatalogRepository()
   const t = await getTranslations("products")
   const catalog = await getTranslations("catalog")
@@ -72,6 +115,12 @@ async function Catalog() {
       az: catalog("sort_az"),
       za: catalog("sort_za"),
     },
+    filters: {
+      brand: catalog("filter_brand"),
+      capacity: catalog("filter_capacity"),
+      division: catalog("filter_division"),
+      all: catalog("filter_all"),
+    },
     clear: catalog("clear_filters"),
   }
 
@@ -89,19 +138,17 @@ async function Catalog() {
           {t("title")}
         </h1>
         <p className="max-w-prose text-muted-foreground">{t("intro")}</p>
-        <Suspense
-          fallback={
-            <>
-              <CatalogToolBarSkeleton />
-              <CatalogBodySkeleton />
-            </>
-          }
-        >
+        <Suspense fallback={<ProductCatalogSkeleton stage={stage} />}>
           <ProductCatalog
             clearLabel={labels.clear}
             emptyCatalog={t("empty_catalog")}
             labels={labels}
             noMatches={t("no_matches")}
+            navigationLabels={{
+              categories: catalog("category_all"),
+              untypedProducts: catalog("untyped_products"),
+              emptyCategory: catalog("empty_category"),
+            }}
             products={products}
           />
         </Suspense>
@@ -126,11 +173,13 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default function Page() {
+export default function Page({ searchParams }: PageProps) {
   return (
     <>
       <HeaderSpacer />
-      <Catalog />
+      <Suspense fallback={<ProductCatalogSkeleton stage="categories" />}>
+        <Catalog searchParams={searchParams} />
+      </Suspense>
     </>
   )
 }

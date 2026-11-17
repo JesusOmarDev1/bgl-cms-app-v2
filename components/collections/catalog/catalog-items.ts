@@ -10,6 +10,92 @@ export type CatalogCategoryPath = {
   parentId: string | null
 }
 
+export type CatalogHierarchy = {
+  id: string
+  slug: string | null
+  title: string
+  imageId: string | null
+  types: {
+    id: string
+    slug: string
+    title: string
+    imageId: string | null
+  }[]
+  untypedProductCount: number
+}
+
+type CatalogHierarchyCategory = Pick<
+  CatalogHierarchy,
+  "id" | "slug" | "title"
+> & {
+  image: { id: string } | null
+}
+type CatalogHierarchyType = Omit<
+  CatalogHierarchy["types"][number],
+  "imageId"
+> & {
+  category: string
+  image: { id: string } | null
+}
+type CatalogHierarchyProduct = {
+  categoryId: string | null
+  typeId: string | null
+}
+
+export function getCatalogCategoryParam(
+  category: Pick<CatalogHierarchy, "id" | "slug">
+): string {
+  return category.slug || `id:${category.id}`
+}
+
+export function findCatalogHierarchyCategory(
+  hierarchy: readonly CatalogHierarchy[],
+  categoryParam: string
+): CatalogHierarchy | undefined {
+  if (categoryParam.startsWith("id:")) {
+    const id = categoryParam.slice(3)
+    return hierarchy.find((category) => !category.slug && category.id === id)
+  }
+  return hierarchy.find((category) => category.slug === categoryParam)
+}
+
+export function getCatalogNavigationStage(
+  categorySlug: string,
+  typeSlug: string
+): "categories" | "types" | "products" {
+  if (!categorySlug) return "categories"
+  return typeSlug ? "products" : "types"
+}
+
+export function buildCatalogHierarchy(
+  categories: readonly CatalogHierarchyCategory[],
+  types: readonly CatalogHierarchyType[],
+  products: readonly CatalogHierarchyProduct[]
+): CatalogHierarchy[] {
+  return categories.map((category) => {
+    const categoryTypes = types
+      .filter((type) => type.category === category.id)
+      .map(({ id, slug, title, image }) => ({
+        id,
+        slug,
+        title,
+        imageId: image?.id ?? null,
+      }))
+
+    return {
+      id: category.id,
+      slug: category.slug,
+      title: category.title,
+      imageId: category.image?.id ?? null,
+      types: categoryTypes,
+      untypedProductCount: products.filter(
+        (product) =>
+          product.categoryId === category.id && product.typeId === null
+      ).length,
+    }
+  })
+}
+
 export function getCatalogCategoryAncestors(
   categories: readonly CatalogCategoryPath[]
 ): Record<string, string[]> {
@@ -41,6 +127,9 @@ export type CatalogItem = {
   categoryTitle: string | null
   categoryIcon?: string | null
   categoryAncestors?: readonly string[]
+  brand?: string | null
+  capacity?: number | null
+  division?: number | null
 }
 
 type CatalogFields = Pick<
@@ -51,6 +140,9 @@ type CatalogFields = Pick<
   | "dateCreated"
   | "categorySlug"
   | "categoryAncestors"
+  | "brand"
+  | "capacity"
+  | "division"
 >
 
 export function sortCatalogProducts<T extends CatalogFields>(
@@ -70,11 +162,67 @@ export function sortCatalogProducts<T extends CatalogFields>(
   return next
 }
 
+export type CatalogFilters = {
+  brand?: string
+  capacity?: string
+  division?: string
+}
+
+export function normalizeCatalogFilters<T extends CatalogFields>(
+  products: readonly T[],
+  filters: CatalogFilters
+): CatalogFilters {
+  return {
+    brand:
+      filters.brand &&
+      products.some((product) => product.brand === filters.brand)
+        ? filters.brand
+        : "",
+    capacity:
+      filters.capacity &&
+      products.some(
+        (product) =>
+          typeof product.capacity === "number" &&
+          Number.isFinite(product.capacity) &&
+          String(product.capacity) === filters.capacity
+      )
+        ? filters.capacity
+        : "",
+    division:
+      filters.division &&
+      products.some(
+        (product) =>
+          typeof product.division === "number" &&
+          Number.isFinite(product.division) &&
+          String(product.division) === filters.division
+      )
+        ? filters.division
+        : "",
+  }
+}
+
+export function normalizeCatalogFilterParams<T extends CatalogFields>(
+  products: readonly T[],
+  params: URLSearchParams
+): URLSearchParams {
+  const normalized = normalizeCatalogFilters(products, {
+    brand: params.get("brand") ?? "",
+    capacity: params.get("capacity") ?? "",
+    division: params.get("division") ?? "",
+  })
+  const result = new URLSearchParams(params)
+  for (const key of ["brand", "capacity", "division"] as const) {
+    if (result.has(key) && !normalized[key]) result.delete(key)
+  }
+  return result
+}
+
 export function filterCatalogProducts<T extends CatalogFields>(
   products: readonly T[],
   query: string,
   category: string,
-  sort: CatalogSort
+  sort: CatalogSort,
+  filters: CatalogFilters | URLSearchParams = {}
 ): T[] {
   const scoped = category
     ? products.filter(
@@ -83,7 +231,24 @@ export function filterCatalogProducts<T extends CatalogFields>(
           product.categoryAncestors?.includes(category)
       )
     : [...products]
-  const searched = fuzzySearch(scoped, query, {
+  const filterValues =
+    filters instanceof URLSearchParams
+      ? {
+          brand: filters.get("brand") ?? "",
+          capacity: filters.get("capacity") ?? "",
+          division: filters.get("division") ?? "",
+        }
+      : filters
+  const validFilters = normalizeCatalogFilters(scoped, filterValues)
+  const filtered = scoped.filter(
+    (product) =>
+      (!validFilters.brand || product.brand === validFilters.brand) &&
+      (!validFilters.capacity ||
+        String(product.capacity) === validFilters.capacity) &&
+      (!validFilters.division ||
+        String(product.division) === validFilters.division)
+  )
+  const searched = fuzzySearch(filtered, query, {
     keys: ["title", "excerpt", "description"],
   })
   return sortCatalogProducts(searched, sort)

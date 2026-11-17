@@ -39,7 +39,18 @@ export function ProductCard({ data }: { data: ProductCardData }) {
             style={{ height: "100%", objectFit: "contain", width: "100%" }}
             variant="original"
           />
-        ) : null}
+        ) : (
+          <div
+            aria-hidden="true"
+            className="flex aspect-[4/3] w-full items-center justify-center bg-background"
+          >
+            <MaterialIcon
+              className="text-muted-foreground"
+              name={data.categoryIcon || "inventory_2"}
+              size={48}
+            />
+          </div>
+        )}
         <CardHeader>
           {data.title ? (
             <CardTitle className="text-2xl md:text-3xl">{data.title}</CardTitle>
