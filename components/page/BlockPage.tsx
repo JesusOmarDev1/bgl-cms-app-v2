@@ -2,7 +2,6 @@ import { connection } from "next/server"
 import { notFound } from "next/navigation"
 import { RenderBlocks, type BlockBody } from "@/components/blocks/RenderBlocks"
 import { HeaderSpacer } from "@/components/blocks/singletons/header/HeaderSpacer"
-import { getPageBySlugRepository } from "@/services/domain/db/repositories/collections/pages"
 
 type BlockPageProps = {
   slug?: string

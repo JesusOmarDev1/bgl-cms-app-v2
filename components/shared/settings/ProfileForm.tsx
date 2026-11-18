@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAction } from "next-safe-action/hooks"
 import { useTranslations } from "next-intl"
 import { useForm, type StandardSchemaV1 } from "@tanstack/react-form"
@@ -42,13 +42,13 @@ interface ProfileFormProps {
   } | null
 }
 
-function serialize(values: ProfileValues) {
+function serialize(values: Partial<ProfileValues>) {
   return JSON.stringify({
-    firstName: values.firstName.trim(),
-    lastName: values.lastName.trim(),
-    title: values.title.trim(),
-    location: values.location.trim(),
-    description: values.description.trim(),
+    firstName: values.firstName?.trim() ?? "",
+    lastName: values.lastName?.trim() ?? "",
+    title: values.title?.trim() ?? "",
+    location: values.location?.trim() ?? "",
+    description: values.description?.trim() ?? "",
   })
 }
 
@@ -83,24 +83,71 @@ export function ProfileForm({ identity }: ProfileFormProps) {
     : "?"
 
   const lastSubmit = useRef<ProfileValues | null>(null)
+  const lastSuccessfulSubmit = useRef<string | undefined>(undefined)
   const retried = useRef(false)
+  const refreshing = useRef(false)
+  const mounted = useRef(false)
+  const [refreshError, setRefreshError] = useState<string | undefined>(
+    undefined
+  )
+
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   const action = useAction(updateProfile, {
-    onSuccess: ({ data }) => {
-      if (data?.ok) return router.refresh()
+    onSuccess: ({ data, input }) => {
+      if (!mounted.current) return
+      const isLatestSubmit =
+        lastSubmit.current !== null &&
+        serialize(input) === serialize(lastSubmit.current)
+      if (data?.ok) {
+        if (!isLatestSubmit) return
+        lastSuccessfulSubmit.current = serialize(input)
+        setRefreshError(undefined)
+        return router.refresh()
+      }
       const payload = lastSubmit.current
       // A dead access token is recoverable once: rotate it, then replay the save.
-      if (!payload || retried.current || data?.message !== "sessionExpired")
+      if (
+        !payload ||
+        !isLatestSubmit ||
+        retried.current ||
+        data?.message !== "sessionExpired"
+      )
         return
       retried.current = true
-      void refresh({}).then(({ data: rotated }) => {
-        if (rotated?.ok) action.execute(payload)
-      })
+      refreshing.current = true
+      setRefreshError(undefined)
+      void refresh({})
+        .then(({ data: rotated }) => {
+          refreshing.current = false
+          if (!mounted.current) return
+          const latest = lastSubmit.current
+          if (!latest || lastSuccessfulSubmit.current === serialize(latest))
+            return
+          if (rotated?.ok) action.execute(latest)
+          else setRefreshError(rotated?.message ?? "unavailable")
+        })
+        .catch(() => {
+          refreshing.current = false
+          if (
+            mounted.current &&
+            lastSubmit.current &&
+            lastSuccessfulSubmit.current !== serialize(lastSubmit.current)
+          ) {
+            setRefreshError("unavailable")
+          }
+        })
     },
   })
   const result = action.result.data
   const submitting = action.isPending
-  const error = result?.ok === false ? result.message : undefined
+  const error =
+    refreshError ?? (result?.ok === false ? result.message : undefined)
   const saved = result?.ok === true
 
   const profileSchema = pipe(
@@ -140,7 +187,11 @@ export function ProfileForm({ identity }: ProfileFormProps) {
     },
     onSubmit: ({ value }) => {
       lastSubmit.current = value
-      retried.current = false
+      lastSuccessfulSubmit.current = undefined
+      if (!refreshing.current) {
+        retried.current = false
+        setRefreshError(undefined)
+      }
       action.execute(value)
     },
   })

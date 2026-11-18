@@ -1,6 +1,6 @@
 {
   "dashboard": {
-    "brand": "BGL BASCULAS INDUSTRIALES",
+    "brand": "BGL BASCULAS APP",
     "nav": {
       "operation": "Operación",
       "catalogs": "Catálogos",
@@ -31,7 +31,7 @@
       "profileTitle": "Título o Cargo",
       "profileTitlePlaceholder": "Ej. Ingeniero de Soporte",
       "profileLocation": "Empresa / Ubicación",
-      "profileDescription": "Descripción del puesto",
+      "profileDescription": "Descripción breve",
       "locationPlaceholder": "Tecnico, Gerente, etc.",
       "descriptionPlaceholder": "Describe brevemente tu función...",
       "profileReadonly": "El correo electrónico y el avatar son de solo lectura.",

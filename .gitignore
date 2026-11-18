@@ -45,3 +45,6 @@ storybook-static
 .atl/
 odd/
 *.jsonl
+/design
+# pi session dumps
+pi-session-*.html

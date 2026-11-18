@@ -29,6 +29,7 @@ export default getRequestConfig(async () => {
       ...(await import(`./messages/${locale}/auth.json`)).default,
       ...(await import(`./messages/${locale}/app.json`)).default,
       ...(await import(`./messages/${locale}/dashboard.json`)).default,
+      ...(await import(`./messages/${locale}/metrology.json`)).default,
       ...(await import(`./messages/${locale}/storybook.json`)).default,
     },
   }

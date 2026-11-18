@@ -3,7 +3,8 @@ import { injectHeadingIds } from "@/lib/directus/anchor-injector"
 import { sanitizeHtml } from "@/lib/formatting/sanitize"
 import { cn } from "cn"
 
-type TypesetPreset = "article" | "compact"
+type TypesetPreset = "article" | "compact" | "docs" | "display" | "chat"
+type TypesetFont = "sans" | "mono"
 
 type SafeHtmlProps = {
   content?: string | null
@@ -15,6 +16,7 @@ type SafeHtmlProps = {
   preset?: TypesetPreset
   /** Skip Typeset classes; sanitized HTML only. */
   unstyled?: boolean
+  font?: TypesetFont
 } & Omit<
   HTMLAttributes<HTMLElement>,
   "children" | "className" | "dangerouslySetInnerHTML"
@@ -27,6 +29,7 @@ export function SafeHtml({
   className,
   preset = "article",
   unstyled = false,
+  font = "sans",
   ...props
 }: SafeHtmlProps) {
   if (!content) {
@@ -44,6 +47,7 @@ export function SafeHtml({
     <Component
       className={cn(
         !unstyled && ["typeset", `typeset-${preset}`],
+        `font-${font}`,
         "min-w-0 wrap-anywhere",
         className
       )}

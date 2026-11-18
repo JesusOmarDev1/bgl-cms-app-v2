@@ -17,7 +17,7 @@ async function DashboardGuard() {
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-[calc(100svh-3rem)] flex-1">
+    <main className="min-h-[calc(100svh-3.5rem)] flex-1">
       <Suspense fallback={null}>
         <DashboardGuard />
       </Suspense>

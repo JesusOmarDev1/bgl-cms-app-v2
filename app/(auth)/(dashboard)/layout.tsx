@@ -68,7 +68,7 @@ export default async function DashboardLayout({
         }
       />
       <SidebarInset id="sidebar-content">
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-4">
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b px-6">
           <SidebarTrigger aria-label={t("toggleSidebar")} />
           <ThemeToggle className="ms-auto" />
         </header>

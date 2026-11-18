@@ -15,7 +15,7 @@ import {
 } from "@/lib/animation/forms/calendar/calendar-utils"
 
 const DEFAULT_LOCALE = "es-ES"
-const TIME_ZONE = "America/Mexico_City"
+const CIVIL_DATE_TIME_ZONE = "UTC"
 
 type DateRangeSelection = { mode: "range"; start: Date; end: Date | null }
 type SpecificDaysSelection = { mode: "days"; days: Date[] }
@@ -177,7 +177,7 @@ function DateRangePicker({
     () =>
       new Intl.DateTimeFormat(locale, {
         dateStyle: "medium",
-        timeZone: TIME_ZONE,
+        timeZone: CIVIL_DATE_TIME_ZONE,
       }),
     [locale]
   )
@@ -185,7 +185,7 @@ function DateRangePicker({
     () =>
       new Intl.DateTimeFormat(locale, {
         dateStyle: "full",
-        timeZone: TIME_ZONE,
+        timeZone: CIVIL_DATE_TIME_ZONE,
       }),
     [locale]
   )
@@ -197,7 +197,7 @@ function DateRangePicker({
     () =>
       new Intl.DateTimeFormat(locale, {
         weekday: "short",
-        timeZone: TIME_ZONE,
+        timeZone: CIVIL_DATE_TIME_ZONE,
       }),
     [locale]
   )
@@ -211,7 +211,7 @@ function DateRangePicker({
       new Intl.DateTimeFormat(locale, {
         month: "long",
         year: "numeric",
-        timeZone: TIME_ZONE,
+        timeZone: CIVIL_DATE_TIME_ZONE,
       }),
     [locale]
   )
@@ -237,12 +237,14 @@ function DateRangePicker({
         aria-expanded={open}
         data-slot="date-range-picker-trigger"
         onPress={() => setOpen((previous) => !previous)}
-        className="h-9 w-full justify-start gap-2 px-3 text-start text-sm font-normal tabular-nums"
+        className="h-10 w-full justify-between gap-2 px-3 text-start text-sm font-normal tabular-nums"
       >
-        <MaterialIcon name="calendar_today" size={14} className="shrink-0" />
-        <span className={cn("truncate", !value && "text-muted-foreground")}>
+        <span
+          className={cn("min-w-0 flex-1 truncate", !value && "text-muted-foreground")}
+        >
           {label}
         </span>
+        <MaterialIcon name="expand_more" size={16} className="shrink-0" />
       </Button>
       <Popover
         triggerRef={triggerRef}
@@ -251,7 +253,7 @@ function DateRangePicker({
         className="w-auto"
         data-slot="date-range-picker-popover"
       >
-        <div className="w-64 p-3">
+        <div className="w-80 max-w-[calc(100vw-1.75rem)] p-3">
           <div
             className="mb-3 grid grid-cols-2 gap-1"
             role="group"
@@ -303,7 +305,7 @@ function DateRangePicker({
             >
               <MaterialIcon name="chevron_left" size={14} />
             </Button>
-            <span className="text-[11px] tracking-[0.08em] text-muted-foreground uppercase">
+            <span className="text-sm font-medium text-muted-foreground">
               {monthCaption}
             </span>
             <Button
@@ -334,7 +336,7 @@ function DateRangePicker({
                 <span
                   key={weekday}
                   role="columnheader"
-                  className="flex h-7 items-center justify-center text-[10px] text-muted-foreground uppercase"
+                  className="flex h-7 items-center justify-center text-[11px] text-muted-foreground"
                 >
                   {weekday}
                 </span>
@@ -360,7 +362,7 @@ function DateRangePicker({
                       onClick={() => selectDate(day)}
                       onKeyDown={(event) => handleDayKeyDown(event, day)}
                       className={cn(
-                        "relative size-8 rounded-sm text-xs tabular-nums transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30",
+                        "relative size-9 rounded-full text-xs tabular-nums transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30",
                         selected(day) &&
                           "bg-primary text-primary-foreground hover:bg-primary",
                         rangeEndpoint(day) && "rounded-full"
@@ -372,7 +374,7 @@ function DateRangePicker({
                     <span
                       key={`blank-${weekIndex}-${dayIndex}`}
                       aria-hidden="true"
-                      className="size-8"
+                      className="size-9"
                     />
                   )
                 )}

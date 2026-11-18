@@ -25,7 +25,7 @@ export default function Page() {
     <Fragment>
       <HeaderSpacer />
       <Box
-        className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto max-w-5xl lg:max-w-6xl xl:max-w-7xl"
+        className="3xl:max-w-8xl 2xl:max-w-8xl mx-auto max-w-5xl font-mono lg:max-w-6xl xl:max-w-7xl"
         padding={2}
         paddingInline={{ base: 1, sm: 1.5 }}
       >
@@ -40,7 +40,7 @@ export default function Page() {
             Última actualización: Septiembre 2026
           </p>
         </div>
-        <div className="typeset typeset-docs flex flex-col gap-4">
+        <div className="typeset typeset-docs flex flex-col gap-4 font-mono">
           <div>
             <h2>1. Introducción</h2>
             <p>

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { useAction } from "next-safe-action/hooks"
@@ -25,14 +26,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import {
-  Stepper,
-  StepperIndicator,
-  StepperItem,
-  StepperNav,
-  StepperSeparator,
-  StepperTrigger,
-} from "@/components/ui/stepper"
 
 /** Login flow order: one Turnstile challenge outside the steps, one submission per step. */
 const STEPS = ["email", "password", "otp"] as const
@@ -94,61 +87,55 @@ interface AuthPageProps {
   captchaEnabled?: boolean
 }
 
+/** Staggered entrance; the curve is `motionTokens.ease.enter`. */
+const RISE =
+  "motion-safe:animate-[auth-rise_.55s_cubic-bezier(.16,1,.3,1)_both]"
+
 function AuthAside() {
   const t = useTranslations("auth")
   return (
     <div className="relative hidden h-full flex-col border-e bg-secondary p-10 lg:flex dark:bg-secondary/20">
       <StaticLogo className="absolute top-8 left-8 size-20" />
+      <FloatingPaths position={1} />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background" />
-      <div className="z-10 mt-auto">
-        <blockquote className="space-y-2 text-lg text-foreground/80">
-          {t("brandNarrative")}
+      <div className="relative z-10 mt-auto max-w-lg">
+        <blockquote
+          className={`${RISE} text-2xl leading-relaxed font-medium text-balance text-foreground/85`}
+          style={{ animationDelay: "120ms" }}
+        >
+          “{t("asideQuote")}”
         </blockquote>
-      </div>
-      <div className="absolute inset-0">
-        <FloatingPaths position={1} />
-        <FloatingPaths position={-1} />
+        <cite
+          className={`${RISE} mt-4 block font-mono text-xs tracking-wide text-muted-foreground not-italic`}
+          style={{ animationDelay: "200ms" }}
+        >
+          {t("asideAttribution")}
+        </cite>
       </div>
     </div>
   )
 }
 
-interface StepRailProps {
-  activeIndex: number
-  titles: Record<Step, string>
-  onSelect: (index: number) => void
+interface StepProgressProps {
+  current: number
+  total: number
+  title: string
+  email: string
 }
 
-function StepRail({ activeIndex, titles, onSelect }: StepRailProps) {
-  // Two-factor is optional: the OTP step only exists once the server asks for it.
-  const steps = STEPS.slice(0, Math.max(activeIndex + 1, 2))
-
+/** The stepper without its dot circles: one mono line from the password step on. */
+function StepProgress({ current, total, title, email }: StepProgressProps) {
+  const t = useTranslations("auth")
   return (
-    <Stepper
-      value={activeIndex + 1}
-      onValueChange={(index) => {
-        // The rail only walks back; forward progress belongs to the flow.
-        if (index <= activeIndex) onSelect(index)
-      }}
-      className="py-1"
-    >
-      <StepperNav className="items-center gap-1">
-        {steps.map((value, index) => (
-          <StepperItem
-            key={value}
-            step={index + 1}
-            disabled={index > activeIndex}
-            className="flex-1 justify-start"
-          >
-            <StepperTrigger>
-              <StepperIndicator>{index + 1}</StepperIndicator>
-              <span className="sr-only">{titles[value]}</span>
-            </StepperTrigger>
-            {index < steps.length - 1 ? <StepperSeparator /> : null}
-          </StepperItem>
-        ))}
-      </StepperNav>
-    </Stepper>
+    <p className="flex items-center gap-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
+      <span className="shrink-0">
+        {t("stepProgress", { current, total, title })}
+      </span>
+      <span aria-hidden className="h-px flex-1 bg-border" />
+      <span className="max-w-56 truncate text-xs tracking-normal text-foreground/75 normal-case">
+        {email}
+      </span>
+    </p>
   )
 }
 
@@ -271,70 +258,167 @@ export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
 
   return (
     <main className="relative md:h-screen md:overflow-hidden lg:grid lg:grid-cols-2">
+      <style href="auth-rise-keyframes" precedence="default">
+        {
+          "@keyframes auth-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}"
+        }
+      </style>
       <AuthAside />
-      <div className="relative flex min-h-screen flex-col justify-center px-8">
+      <div className="relative flex min-h-screen flex-col px-8 py-10">
         <Shaders />
-        <div className="mx-auto w-full max-w-sm space-y-4 sm:w-sm">
-          {/* One identity per zone: the aside owns the brand from lg up. */}
-          <div className="flex">
-            <LinkButton variant="ghost" href="/">
-              <MaterialIcon name="chevron_left" data-icon="inline-start" />
-              {t("backHome")}
-            </LinkButton>
-          </div>
+        {/* One identity per zone: the aside owns the brand from lg up. */}
+        <div className="relative flex">
+          <LinkButton
+            variant="ghost"
+            href="/"
+            className="text-muted-foreground"
+          >
+            <MaterialIcon name="chevron_left" data-icon="inline-start" />
+            {t("backHome")}
+          </LinkButton>
+        </div>
+        <div className="mx-auto my-auto w-full max-w-[420px] space-y-6">
           <StaticLogo className="size-24 lg:hidden" />
-          <div className="flex flex-col space-y-1">
-            <h1 className="text-4xl font-bold tracking-wide">
-              {t("signInTitle")}
-            </h1>
+          <div
+            className={`${RISE} space-y-1.5`}
+            style={{ animationDelay: "40ms" }}
+          >
+            <div className="flex items-center gap-2.5">
+              <MaterialIcon name="lock" size={28} />
+              <h1 className="text-3xl font-bold tracking-tight">
+                {t("signInTitle")}
+              </h1>
+            </div>
             <p className="text-base text-muted-foreground">
               {t("signInSubtitle")}
             </p>
           </div>
 
-          <StepRail
-            activeIndex={stepIndex}
-            titles={stepTitles}
-            onSelect={(index) => goToStep(STEPS[index - 1])}
-          />
-
-          <form
-            className="space-y-4"
-            aria-labelledby="login-step-title"
-            onSubmit={step === "email" ? continueToPassword : submitCredentials}
-            noValidate
+          <div
+            className={`${RISE} space-y-5`}
+            style={{ animationDelay: "120ms" }}
           >
-            <h2 id="login-step-title" className="text-xl font-semibold">
-              {stepTitles[step]}
-            </h2>
+            {step !== "email" ? (
+              <form.Subscribe selector={(state) => state.values.email}>
+                {(email) => (
+                  <StepProgress
+                    current={stepIndex + 1}
+                    // Two-factor is optional: it only counts once the server asks.
+                    total={step === "otp" ? 3 : 2}
+                    title={stepTitles[step]}
+                    email={email}
+                  />
+                )}
+              </form.Subscribe>
+            ) : null}
 
-            {step === "email" ? (
-              <>
-                <form.Field
-                  name="email"
-                  validators={{ onBlur: emailSchema, onSubmit: emailSchema }}
-                >
+            <form
+              className="space-y-5"
+              aria-labelledby="login-step-title"
+              onSubmit={
+                step === "email" ? continueToPassword : submitCredentials
+              }
+              noValidate
+            >
+              <h2 id="login-step-title" className="sr-only">
+                {stepTitles[step]}
+              </h2>
+
+              {step === "email" ? (
+                <>
+                  <form.Field
+                    name="email"
+                    validators={{ onBlur: emailSchema, onSubmit: emailSchema }}
+                  >
+                    {(field) => (
+                      <label className="block space-y-2">
+                        <span className="block text-sm font-medium text-muted-foreground">
+                          {t("emailLabel")}
+                        </span>
+                        <InputGroup className="h-11 dark:bg-foreground/5 dark:hover:bg-foreground/[0.07]">
+                          <InputGroupInput
+                            type="email"
+                            autoComplete="email"
+                            required
+                            autoFocus
+                            disabled={submitting}
+                            placeholder={t("emailPlaceholder")}
+                            value={field.state.value}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            onBlur={field.handleBlur}
+                          />
+                          <InputGroupAddon align="inline-start">
+                            <MaterialIcon name="email" />
+                          </InputGroupAddon>
+                        </InputGroup>
+                        {field.state.meta.errors.length > 0 ? (
+                          <FieldError
+                            errors={toFieldErrors(field.state.meta.errors)}
+                          />
+                        ) : null}
+                      </label>
+                    )}
+                  </form.Field>
+                  <Button
+                    className="h-11 w-full"
+                    type="button"
+                    variant="red"
+                    onClick={() => void continueToPassword()}
+                  >
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span>{t("continue")}</span>
+                      <MaterialIcon
+                        name="arrow_forward"
+                        data-icon="inline-end"
+                        className="text-white"
+                      />
+                    </div>
+                  </Button>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    {t.rich("termsNote", {
+                      terms: (chunks) => (
+                        <Link
+                          className="underline underline-offset-4 hover:text-foreground"
+                          href="/legal/terminos-de-uso-y-datos"
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                      privacy: (chunks) => (
+                        <Link
+                          className="underline underline-offset-4 hover:text-foreground"
+                          href="/legal/politicas-de-privacidad"
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </p>
+                </>
+              ) : null}
+
+              {step === "password" ? (
+                <form.Field name="password">
                   {(field) => (
-                    <label className="block space-y-3">
-                      <span className="sr-only">{t("emailLabel")}</span>
-                      <InputGroup>
-                        <InputGroupInput
-                          type="email"
-                          autoComplete="email"
-                          required
-                          autoFocus
-                          disabled={submitting}
-                          placeholder={t("emailPlaceholder")}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          onBlur={field.handleBlur}
-                        />
-                        <InputGroupAddon align="inline-start">
-                          <MaterialIcon name="email" />
-                        </InputGroupAddon>
-                      </InputGroup>
+                    <label className="block space-y-2">
+                      <span className="block text-sm font-medium text-muted-foreground">
+                        {t("passwordLabel")}
+                      </span>
+                      <PasswordInput
+                        className="h-11 dark:bg-foreground/5 dark:hover:bg-foreground/[0.07]"
+                        autoComplete="current-password"
+                        placeholder={t("passwordPlaceholder")}
+                        required
+                        autoFocus
+                        disabled={submitting}
+                        value={field.state.value}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        onBlur={field.handleBlur}
+                      />
                       {field.state.meta.errors.length > 0 ? (
                         <FieldError
                           errors={toFieldErrors(field.state.meta.errors)}
@@ -343,121 +427,89 @@ export function AuthPage({ captchaEnabled = false }: AuthPageProps) {
                     </label>
                   )}
                 </form.Field>
-                <Button
-                  className="w-full"
-                  type="button"
-                  onClick={() => void continueToPassword()}
-                >
-                  <div className="flex items-center justify-center gap-1.5">
-                    <span>{t("continue")}</span>
-                    <MaterialIcon name="arrow_forward" data-icon="inline-end" />
-                  </div>
-                </Button>
-              </>
-            ) : null}
+              ) : null}
 
-            {step === "password" ? (
-              <form.Field name="password">
-                {(field) => (
-                  <label className="block space-y-3">
-                    <span className="sr-only">{t("passwordLabel")}</span>
-                    <PasswordInput
-                      autoComplete="current-password"
-                      placeholder={t("passwordPlaceholder")}
-                      required
-                      autoFocus
-                      disabled={submitting}
+              {step === "otp" ? (
+                <form.Field name="otp">
+                  {(field) => (
+                    <OtpField
                       value={field.state.value}
-                      onChange={(event) =>
-                        field.handleChange(event.target.value)
-                      }
-                      onBlur={field.handleBlur}
+                      onChange={(value) => field.handleChange(value)}
+                      submitting={submitting}
                     />
-                    {field.state.meta.errors.length > 0 ? (
-                      <FieldError
-                        errors={toFieldErrors(field.state.meta.errors)}
-                      />
-                    ) : null}
-                  </label>
-                )}
-              </form.Field>
-            ) : null}
-
-            {step === "otp" ? (
-              <form.Field name="otp">
-                {(field) => (
-                  <OtpField
-                    value={field.state.value}
-                    onChange={(value) => field.handleChange(value)}
-                    submitting={submitting}
-                  />
-                )}
-              </form.Field>
-            ) : null}
-
-            {error ? <ErrorAlert error={error} /> : null}
-
-            {step !== "email" && widgetMounted ? (
-              <div className="min-h-[65px] w-full">
-                <Turnstile
-                  key={captchaEpoch}
-                  className="w-full"
-                  siteKey={turnstileSiteKey}
-                  options={{
-                    theme: "dark",
-                    language: "es",
-                    action: TURNSTILE_LOGIN_ACTION,
-                    size: "flexible",
-                  }}
-                  onSuccess={(token) => form.setFieldValue("captcha", token)}
-                  onExpire={() => form.setFieldValue("captcha", "")}
-                  onError={() => form.setFieldValue("captcha", "")}
-                />
-              </div>
-            ) : null}
-
-            {step !== "email" ? (
-              <div className="space-y-2">
-                <form.Subscribe selector={(state) => state.values.captcha}>
-                  {(captcha) => (
-                    <Button
-                      className="w-full"
-                      type="submit"
-                      isDisabled={
-                        submitting ||
-                        (widgetMounted && step === "password" && !captcha)
-                      }
-                    >
-                      {submitting ? (
-                        t("signingIn")
-                      ) : (
-                        <div className="flex items-center justify-center gap-1.5">
-                          <MaterialIcon
-                            name="login"
-                            data-icon="inline-start"
-                            className="text-accent"
-                          />
-                          <span>{t("signIn")}</span>
-                        </div>
-                      )}
-                    </Button>
                   )}
-                </form.Subscribe>
-                <Button
-                  className="w-full"
-                  type="button"
-                  variant="ghost"
-                  isDisabled={submitting}
-                  onClick={() =>
-                    goToStep(step === "otp" ? "password" : "email")
-                  }
-                >
-                  <MaterialIcon name="arrow_back" data-icon="inline-start" />
-                  {t("back")}
-                </Button>
-              </div>
-            ) : null}
-          </form>
+                </form.Field>
+              ) : null}
+
+              {error ? <ErrorAlert error={error} /> : null}
+
+              {step !== "email" && widgetMounted ? (
+                <div className="min-h-[65px] w-full">
+                  <Turnstile
+                    key={captchaEpoch}
+                    className="w-full"
+                    siteKey={turnstileSiteKey}
+                    options={{
+                      theme: "dark",
+                      language: "es",
+                      action: TURNSTILE_LOGIN_ACTION,
+                      size: "flexible",
+                    }}
+                    onSuccess={(token) => form.setFieldValue("captcha", token)}
+                    onExpire={() => form.setFieldValue("captcha", "")}
+                    onError={() => form.setFieldValue("captcha", "")}
+                  />
+                </div>
+              ) : null}
+
+              {step !== "email" ? (
+                <div className="space-y-2">
+                  <form.Subscribe selector={(state) => state.values.captcha}>
+                    {(captcha) => (
+                      <Button
+                        className="h-11 w-full"
+                        type="submit"
+                        variant="red"
+                        isDisabled={
+                          submitting ||
+                          (widgetMounted && step === "password" && !captcha)
+                        }
+                      >
+                        {submitting ? (
+                          t("signingIn")
+                        ) : (
+                          <div className="flex items-center justify-center gap-1.5">
+                            <MaterialIcon
+                              name="login"
+                              data-icon="inline-start"
+                              className="text-white"
+                            />
+                            <span>{t("signIn")}</span>
+                          </div>
+                        )}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                  <Button
+                    className="w-full"
+                    type="button"
+                    variant="outline"
+                    isDisabled={submitting}
+                    onClick={() =>
+                      goToStep(step === "otp" ? "password" : "email")
+                    }
+                  >
+                    <MaterialIcon
+                      name="arrow_back"
+                      data-icon="inline-start"
+                      className="text-foreground"
+                    />
+                    {t("back")}
+                  </Button>
+                </div>
+              ) : null}
+            </form>
+          </div>
         </div>
       </div>
     </main>

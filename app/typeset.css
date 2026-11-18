@@ -11,6 +11,11 @@
     --typeset-size: 1.25em;
     --typeset-leading: 1.6;
     --typeset-flow: 1.25em;
+    --typeset-h1: 2.25;
+    --typeset-h2: 1.625;
+    --typeset-h3: 1.25;
+    --typeset-h4: 1;
+    --typeset-heading-weight: 600;
   }
 
   .typeset-article {
@@ -19,7 +24,7 @@
     --typeset-font-mono: var(--font-mono);
     --typeset-size: 1.0625rem;
     --typeset-leading: 1.75;
-    --typeset-flow: 1.25em;
+    --typeset-flow: 1.5em;
   }
 
   .typeset-compact {
@@ -35,6 +40,31 @@
     --typeset-size: 1.25rem;
     --typeset-leading: 1.6;
     --typeset-flow: 1.25em;
+    --typeset-h1: 1.875;
+    --typeset-h2: 1.5;
+    --typeset-h3: 1.25;
+  }
+
+  /* Hero and marketing blocks: oversized headings, bold weight. */
+  .typeset-display {
+    --typeset-size: 1.125rem;
+    --typeset-leading: 1.55;
+    --typeset-flow: 1.25em;
+    --typeset-h1: 3;
+    --typeset-h2: 2.25;
+    --typeset-h3: 1.5;
+    --typeset-h4: 1.125;
+    --typeset-heading-weight: 700;
+  }
+
+  /* Chat bubbles and streaming replies: tight rhythm, small headings. */
+  .typeset-chat {
+    --typeset-size: 0.9375rem;
+    --typeset-leading: 1.6;
+    --typeset-flow: 0.875em;
+    --typeset-h1: 1.5;
+    --typeset-h2: 1.25;
+    --typeset-h3: 1.0625;
   }
 
   .typeset :where(.typeset-lead) {
@@ -85,28 +115,30 @@
     &:where(h1, h2, h3, h4, h5, h6) {
       color: var(--color-foreground, currentColor);
       font-family: var(--typeset-font-heading);
-      font-weight: 600;
+      font-weight: var(--typeset-heading-weight);
       margin-block-end: 0;
     }
     &:where(h1) {
-      font-size: 1.75em;
-      line-height: 1.3;
-      margin-block-start: var(--typeset-flow);
+      font-size: calc(var(--typeset-h1) * 1em);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h1));
     }
     &:where(h2) {
-      font-size: 1.25em;
-      line-height: 1.4;
-      margin-block-start: calc(var(--typeset-flow) * 1.4);
+      font-size: calc(var(--typeset-h2) * 1em);
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h2));
     }
     &:where(h3) {
-      font-size: 1.125em;
-      line-height: 1.45;
-      margin-block-start: var(--typeset-flow);
+      font-size: calc(var(--typeset-h3) * 1em);
+      line-height: 1.35;
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h3));
     }
     &:where(h4) {
-      font-size: 1em;
-      line-height: 1.5;
-      margin-block-start: var(--typeset-flow);
+      font-size: calc(var(--typeset-h4) * 1em);
+      line-height: 1.4;
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h4));
     }
     &:where(h5) {
       font-size: 0.875em;
@@ -351,8 +383,17 @@
       margin-block-start: calc(var(--typeset-flow) * 2.4);
       margin-block-end: 0;
     }
-    &:where(hr + h1, hr + h2, hr + h3, hr + h4) {
-      margin-block-start: var(--typeset-flow);
+    &:where(hr + h1) {
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h1));
+    }
+    &:where(hr + h2) {
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h2));
+    }
+    &:where(hr + h3) {
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h3));
+    }
+    &:where(hr + h4) {
+      margin-block-start: calc(var(--typeset-flow) / var(--typeset-h4));
     }
 
     /* GFM footnotes. */

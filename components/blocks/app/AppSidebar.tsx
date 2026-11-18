@@ -44,12 +44,17 @@ type NavGroup = {
   items: NavItem[]
 }
 
+// Inset-block spacing: taller items with a hairline ring so the active row
+// reads in both light and dark tokens.
+const NAV_ITEM_CLASS =
+  "h-9 gap-2.5 data-active:ring-1 data-active:ring-sidebar-border"
+
 const NAV_GROUPS: NavGroup[] = [
   {
     label: "operation",
     items: [
       { label: "dashboard", href: "/dashboard", icon: "space_dashboard" },
-      { label: "orders", icon: "receipt_long" },
+      { label: "orders", href: "/dashboard/ordenes", icon: "receipt_long" },
       { label: "movements", icon: "compare_arrows" },
     ],
   },
@@ -75,6 +80,7 @@ function NavLink({ item }: { item: NavItem }) {
     return (
       <SidebarMenuItem>
         <SidebarMenuButton
+          className={NAV_ITEM_CLASS}
           isDisabled
           tooltip={`${t(`nav.${item.label}`)} · ${t("comingSoon")}`}
         >
@@ -89,6 +95,7 @@ function NavLink({ item }: { item: NavItem }) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
+        className={NAV_ITEM_CLASS}
         isActive={active}
         tooltip={t(`nav.${item.label}`)}
         href={item.href}
@@ -106,11 +113,11 @@ export function AppSidebar({ user }: { user: ReactNode }) {
 
   return (
     <RouterProvider navigate={(href) => router.push(href)}>
-      <Sidebar collapsible="icon">
+      <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
           <div className="flex h-12 items-center gap-2.5 px-2 group-data-[collapsible=icon]:justify-center">
-            <StaticLogo className="aspect-auto h-8 w-auto shrink-0" />
-            <span className="min-w-0 truncate font-heading text-xs font-medium group-data-[collapsible=icon]:hidden">
+            <StaticLogo className="aspect-auto h-12 w-auto shrink-0" />
+            <span className="min-w-0 truncate font-heading text-sm font-medium group-data-[collapsible=icon]:hidden">
               {t("brand")}
             </span>
           </div>
@@ -118,9 +125,11 @@ export function AppSidebar({ user }: { user: ReactNode }) {
         <SidebarContent>
           {NAV_GROUPS.map((group) => (
             <SidebarGroup key={group.label}>
-              <SidebarGroupLabel>{t(`nav.${group.label}`)}</SidebarGroupLabel>
+              <SidebarGroupLabel className="tracking-wide text-muted-foreground">
+                {t(`nav.${group.label}`)}
+              </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="gap-1">
                   {group.items.map((item) => (
                     <NavLink key={item.label} item={item} />
                   ))}

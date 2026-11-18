@@ -218,22 +218,37 @@ export async function ProductDetail({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Box align="start" cols={{ base: 1, lg: 2 }} display="grid" gap={2}>
-          <ProductGallery images={galleryImages(product)} />
+        <Box
+          align="start"
+          className="lg:grid-cols-[minmax(0,520px)_minmax(0,1fr)] lg:gap-12"
+          cols={{ base: 1 }}
+          display="grid"
+          gap={2}
+        >
+          <Box className="lg:sticky lg:top-24 lg:self-start">
+            <ProductGallery images={galleryImages(product)} />
+          </Box>
           <Box display="flex" gap={1} orientation="vertical">
-            {kicker.length > 0 ? (
-              <p className="text-lg font-medium tracking-wide text-muted-foreground uppercase">
-                {kicker.join(" | ")}
-              </p>
-            ) : null}
-            <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              {product.title}
-            </h1>
+            <Box display="flex" gap={0.75} orientation="vertical">
+              {kicker.length > 0 ? (
+                <p className="font-mono text-sm font-medium tracking-widest text-muted-foreground uppercase">
+                  {kicker.join(" | ")}
+                </p>
+              ) : null}
+              <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+                {product.title}
+              </h1>
+            </Box>
             {card.excerpt ? (
-              <SafeHtml content={card.excerpt} preset="compact" />
+              <SafeHtml
+                className="text-muted-foreground"
+                content={card.excerpt}
+                preset="compact"
+              />
             ) : null}
             <Share
-              className="w-full"
+              className="self-start"
+              size="lg"
               text={product.title}
               title={product.title}
               url={shareUrl}
@@ -242,11 +257,22 @@ export async function ProductDetail({
           </Box>
         </Box>
         {card.description ? (
-          <SafeHtml content={card.description} preset="article" />
+          <SafeHtml
+            className="max-w-[65ch]"
+            content={card.description}
+            preset="article"
+          />
         ) : null}
+        <p className="text-sm text-muted-foreground">{t("quote_note")}</p>
         <ProductAttributes groups={groups} />
         {related.length > 0 ? (
-          <Box display="flex" gap={1} orientation="vertical">
+          <Box
+            className="border-t border-border"
+            display="flex"
+            gap={1}
+            orientation="vertical"
+            paddingTop={2}
+          >
             <h2 className="font-heading text-2xl font-semibold">
               {t("related")}
             </h2>

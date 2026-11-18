@@ -56,7 +56,7 @@ export function SettingsDialog({
     <Dialog
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="max-h-[85dvh] w-[calc(100%-2rem)] overflow-y-auto sm:max-w-3xl"
+      className="max-h-[85dvh] w-[calc(100%-3rem)] overflow-y-auto sm:max-w-3xl"
     >
       <DialogHeader className="px-1">
         <DialogTitle>{t("settings.title")}</DialogTitle>

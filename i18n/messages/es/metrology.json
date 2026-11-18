@@ -1,0 +1,77 @@
+{
+  "metrology": {
+    "orders": {
+      "title": "Órdenes de servicio",
+      "tabs": {
+        "label": "Filtrar órdenes por estado",
+        "all": "Todas",
+        "drafts": "Borradores",
+        "paid": "Pagadas",
+        "cancelled": "Canceladas"
+      },
+      "search": {
+        "label": "Buscar por folio o cliente",
+        "placeholder": "Escribe un folio o nombre de cliente"
+      },
+      "date": {
+        "label": "Fecha de creación",
+        "placeholder": "Selecciona fechas",
+        "limit": "Selecciona hasta 31 días específicos."
+      },
+      "view": {
+        "label": "Vista de órdenes",
+        "table": "Tabla",
+        "list": "Lista"
+      },
+      "results": "{count, plural, one {# orden en esta página} other {# órdenes en esta página}}",
+      "empty": {
+        "title": "Todavía no hay órdenes",
+        "description": "Las órdenes disponibles aparecerán aquí.",
+        "filteredTitle": "No hay órdenes con estos filtros",
+        "filteredDescription": "Cambia la búsqueda, el estado o el período para ver otras órdenes."
+      },
+      "fields": {
+        "folio": "Folio",
+        "date": "Fecha",
+        "client": "Cliente",
+        "scales": "Básculas",
+        "technician": "Técnico",
+        "status": "Estado"
+      },
+      "status": {
+        "draft": "Borrador",
+        "paid": "Pagada",
+        "cancelled": "Cancelada"
+      },
+      "missingValue": "Sin dato",
+      "table": { "label": "Órdenes en tabla" },
+      "list": { "label": "Órdenes en lista" },
+      "pagination": {
+        "label": "Paginación de órdenes",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "page": "Página {page}"
+      },
+      "state": {
+        "denied": {
+          "title": "No tienes permiso para consultar estas órdenes",
+          "description": "Solicita acceso a una persona administradora de tu organización."
+        },
+        "error": {
+          "title": "No se pudieron cargar las órdenes",
+          "description": "Inténtalo de nuevo más tarde. La información no se reemplazó por una lista vacía."
+        },
+        "invalid": {
+          "title": "No se pudieron aplicar estos filtros",
+          "description": "Revisa los valores de búsqueda, fecha y página e inténtalo de nuevo."
+        },
+        "unexpected": {
+          "title": "No se pudo mostrar la lista de órdenes",
+          "description": "Inténtalo de nuevo. Si el problema continúa, contacta a soporte."
+        }
+      },
+      "loading": "Cargando órdenes…",
+      "retry": "Volver a intentar"
+    }
+  }
+}

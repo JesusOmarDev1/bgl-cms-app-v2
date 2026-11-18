@@ -33,6 +33,63 @@ describe("DateRangePicker", () => {
     vi.unstubAllGlobals()
   })
 
+  it("uses the dense outlined trigger and compact popover layout", async () => {
+    await act(async () =>
+      root.render(
+        createElement(DateRangePicker, {
+          defaultMonth: new Date(2024, 0, 1),
+        })
+      )
+    )
+    const trigger = container.querySelector<HTMLButtonElement>(
+      "[data-slot='date-range-picker-trigger']"
+    )
+    expect(trigger?.classList.contains("h-10")).toBe(true)
+    expect(trigger?.classList.contains("justify-between")).toBe(true)
+    expect(
+      trigger?.querySelector(".material-symbols-rounded")?.textContent
+    ).toBe("expand_more")
+
+    await act(async () => trigger?.click())
+    expect(
+      document.body.querySelector(
+        "[data-slot='date-range-picker-popover'] .w-80"
+      )
+    ).not.toBeNull()
+  })
+
+  it("formats civil dates without shifting across the UTC month boundary", async () => {
+    await act(async () =>
+      root.render(
+        createElement(DateRangePicker, {
+          defaultMonth: new Date(2024, 0, 1),
+          locale: "es-MX",
+          value: {
+            mode: "range",
+            start: new Date(2024, 0, 10),
+            end: null,
+          },
+        })
+      )
+    )
+    const trigger = container.querySelector<HTMLButtonElement>(
+      "[data-slot='date-range-picker-trigger']"
+    )
+    expect(trigger?.querySelector("span")?.textContent).toBe("10 ene 2024")
+
+    await act(async () => trigger?.click())
+    expect(
+      document.body.querySelector("[role='grid']")?.getAttribute("aria-label")
+    ).toBe("enero de 2024")
+    expect(
+      Array.from(
+        document.body.querySelectorAll<HTMLElement>("[role='columnheader']")
+      )
+        .slice(0, 2)
+        .map((weekday) => weekday.textContent)
+    ).toEqual(["lun", "mar"])
+  })
+
   it("selects an inclusive range and clears it", async () => {
     const onValueChange = vi.fn()
     await act(async () =>

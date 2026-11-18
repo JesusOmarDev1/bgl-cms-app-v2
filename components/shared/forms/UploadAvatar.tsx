@@ -293,6 +293,8 @@ const UploadAvatar = () => {
                   <Image
                     src={imageUrl}
                     alt={t("settings.photoLabel")}
+                    width={naturalSize.width}
+                    height={naturalSize.height}
                     draggable={false}
                     // blob:/data: URLs bypass the next/image optimizer (it rejects those schemes)
                     unoptimized
@@ -381,6 +383,8 @@ const UploadAvatar = () => {
                 <Image
                   src={resultUrl}
                   alt={t("settings.photoLabel")}
+                  width={OUTPUT_SIZE}
+                  height={OUTPUT_SIZE}
                   unoptimized
                   className="size-32 rounded-full border"
                   style={{ width: FRAME_SIZE * 0.7, height: FRAME_SIZE * 0.7 }}

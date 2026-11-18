@@ -47,7 +47,14 @@ export function ContentColumnClient({ data }: { data: ContentColumnQuery }) {
       paddingTop={contentPaddingToBox(data.padding_top)}
       style={background ? { backgroundColor: background } : undefined}
     >
-      {data.content ? <SafeHtml content={data.content} /> : null}
+      {data.content ? (
+        <SafeHtml
+          preset="article"
+          font="mono"
+          richAnchors
+          content={data.content}
+        />
+      ) : null}
     </Box>
   )
 }
