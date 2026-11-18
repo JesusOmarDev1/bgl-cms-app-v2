@@ -6,9 +6,12 @@ import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { useDebounceFn } from "@/hooks/useDebounceFn"
 import {
+  filterCatalogProducts,
   normalizeCatalogFilters,
   type CatalogItem,
 } from "@/components/collections/catalog/catalog-items"
+import { CatalogFilterSheet } from "@/components/collections/catalog/CatalogFilterSheet"
+import type { CatalogFilterFacet } from "@/components/collections/catalog/CatalogFilterSheet"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -193,6 +196,21 @@ export function CatalogToolBarClient({
     "a-z": labels.sort.az,
     "z-a": labels.sort.za,
   }
+  const facetOptionsList: CatalogFilterFacet[] = facetLabels
+    ? [
+        { key: "brand", label: facetLabels.brand, options: facetOptions.brand },
+        {
+          key: "capacity",
+          label: facetLabels.capacity,
+          options: facetOptions.capacity,
+        },
+        {
+          key: "division",
+          label: facetLabels.division,
+          options: facetOptions.division,
+        },
+      ]
+    : []
 
   function renderFacet(
     label: string,
@@ -305,24 +323,43 @@ export function CatalogToolBarClient({
         </div>
         {showProductFilters && labels.filters ? (
           <>
-            {renderFacet(
-              labels.filters.brand,
-              brand,
-              setBrand,
-              facetOptions.brand
-            )}
-            {renderFacet(
-              labels.filters.capacity,
-              capacity,
-              setCapacity,
-              facetOptions.capacity
-            )}
-            {renderFacet(
-              labels.filters.division,
-              division,
-              setDivision,
-              facetOptions.division
-            )}
+            <CatalogFilterSheet
+              activeCount={chips.length}
+              countFor={(filters) =>
+                filterCatalogProducts(items, q, cat, sort, filters).length
+              }
+              facets={facetOptionsList}
+              onApply={(next) => {
+                void setBrand(next.brand || null)
+                void setCapacity(next.capacity || null)
+                void setDivision(next.division || null)
+              }}
+              onClear={() => {
+                queryDebounce.cancel()
+                clearFilters()
+              }}
+              value={activeFilters}
+            />
+            <div className="hidden items-center gap-3 lg:flex">
+              {renderFacet(
+                labels.filters.brand,
+                brand,
+                setBrand,
+                facetOptions.brand
+              )}
+              {renderFacet(
+                labels.filters.capacity,
+                capacity,
+                setCapacity,
+                facetOptions.capacity
+              )}
+              {renderFacet(
+                labels.filters.division,
+                division,
+                setDivision,
+                facetOptions.division
+              )}
+            </div>
           </>
         ) : null}
         <Select

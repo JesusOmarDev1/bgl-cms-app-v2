@@ -5,8 +5,15 @@ import { describe, expect, it, vi } from "vitest"
 import { ProductCatalogClients } from "@/components/collections/products/ProductCatalogClients"
 import { ProductCard } from "@/components/collections/products/ProductCard"
 import type { ProductCardData } from "@/components/collections/products/product-card"
-import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
-import type { CatalogHierarchy } from "@/components/collections/catalog/catalog-items"
+import {
+  CatalogToolBarClient,
+  type CatalogLabels,
+} from "@/components/collections/catalog/CatalogToolBarClient"
+import { CatalogFilterOptions } from "@/components/collections/catalog/CatalogFilterSheet"
+import type {
+  CatalogFilters,
+  CatalogHierarchy,
+} from "@/components/collections/catalog/catalog-items"
 
 vi.mock("next/link", async () => {
   const { createElement } = await import("react")
@@ -227,6 +234,100 @@ describe("faceted product results", () => {
     const az = renderCatalog("?cat=comercial&type=basculas&sort=a-z")
     expect(az).toContain("Ordenar:")
     expect(az).toContain("A-Z")
+  })
+
+  it("offers the facet selectors inline for wide screens", () => {
+    const html = renderCatalog("?cat=comercial&type=basculas")
+    expect(html).toContain('aria-label="Marca"')
+    expect(html).toContain('aria-label="Capacidad"')
+    expect(html).toContain('aria-label="División"')
+  })
+
+  it("labels the compact filter button with the active filter count", () => {
+    expect(renderCatalog("?cat=comercial&type=basculas")).toContain(
+      'aria-label="Filtros (0)"'
+    )
+    expect(
+      renderCatalog("?cat=comercial&type=basculas&brand=Torrey")
+    ).toContain('aria-label="Filtros (1)"')
+  })
+
+  it("keeps the filter button count in parity with the active filter chips", () => {
+    const html = renderCatalog(
+      "?cat=comercial&type=basculas&brand=Torrey&capacity=40&q=acero"
+    )
+    const chips = html.match(/aria-label="Quitar filtro /g) ?? []
+    expect(chips).toHaveLength(3)
+    expect(html).toContain('aria-label="Filtros (3)"')
+
+    const stale = renderCatalog("?cat=comercial&type=basculas&brand=Nope")
+    expect(stale).toContain('aria-label="Filtros (0)"')
+  })
+
+  it("announces the filtered product count in the filter sheet apply action", () => {
+    const countFor = (filters: CatalogFilters) =>
+      items.filter((entry) =>
+        Object.entries(filters).every(
+          ([key, value]) =>
+            !value ||
+            String((entry as unknown as Record<string, unknown>)[key] ?? "") ===
+              value
+        )
+      ).length
+    const facets = [
+      {
+        key: "brand" as const,
+        label: "Marca",
+        options: ["Metrology", "Torrey"],
+      },
+      { key: "capacity" as const, label: "Capacidad", options: ["30", "40"] },
+      { key: "division" as const, label: "División", options: ["5", "10"] },
+    ]
+    const sheet = (value: CatalogFilters) =>
+      renderToStaticMarkup(
+        createElement(CatalogFilterOptions, {
+          facets,
+          value,
+          countFor,
+          onApply: () => {},
+          onClear: () => {},
+        })
+      )
+
+    const all = sheet({})
+    expect(all).toContain(">Filtros<")
+    expect(all).toContain("Marca: ")
+    expect(all).toContain('aria-label="Marca: Torrey"')
+    expect(all).toContain("Ver 3 productos")
+    expect(all).toContain("Limpiar filtros")
+
+    const applied = sheet({ brand: "Torrey" })
+    expect(applied).toContain("Ver 1 producto")
+    expect(applied).not.toContain("Ver 1 productos")
+  })
+
+  it("renders a compact horizontal product card below the wide breakpoint", () => {
+    const html = renderToStaticMarkup(
+      createElement(ProductCard, { data: items[0] })
+    )
+    expect(html).toContain("flex-row")
+    expect(html).toContain("sm:flex-col")
+    expect(html).toContain("w-24")
+    expect(html).toContain("sm:w-full")
+  })
+
+  it("keeps the shared toolbar unchanged where product filters are off", () => {
+    const html = renderToStaticMarkup(
+      createElement(
+        TestingAdapter,
+        { searchParams: "" },
+        createElement(CatalogToolBarClient, { items, labels })
+      )
+    )
+    expect(html).toContain('aria-label="Categoría"')
+    expect(html).toContain('aria-label="Buscar productos"')
+    expect(html).toContain('aria-label="Ordenar"')
+    expect(html).not.toContain("Filtros")
   })
 
   it("shows brand, capacity and division facets on each product card", () => {

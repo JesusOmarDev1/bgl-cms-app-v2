@@ -41,11 +41,11 @@ export function ProductCard({ data }: { data: ProductCardData }) {
       className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       href={`/tienda/producto/${data.slug}`}
     >
-      <Card className="h-full pt-0 transition-colors hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40">
+      <Card className="h-full flex-row pt-0 transition-colors hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40 sm:flex-col">
         {data.imageId ? (
           <DirectusImage
             alt={data.title}
-            className="aspect-[4/3] w-full bg-background"
+            className="w-24 shrink-0 bg-background sm:aspect-[4/3] sm:w-full"
             imgClassName="h-full w-full"
             sizing="contained"
             src={data.imageId}
@@ -55,7 +55,7 @@ export function ProductCard({ data }: { data: ProductCardData }) {
         ) : (
           <div
             aria-hidden="true"
-            className="flex aspect-[4/3] w-full items-center justify-center bg-background"
+            className="flex w-24 shrink-0 items-center justify-center bg-background sm:aspect-[4/3] sm:w-full"
           >
             <MaterialIcon
               className="text-muted-foreground"
@@ -64,56 +64,63 @@ export function ProductCard({ data }: { data: ProductCardData }) {
             />
           </div>
         )}
-        <CardHeader>
-          {data.title ? (
-            <CardTitle className="text-2xl md:text-3xl">{data.title}</CardTitle>
-          ) : null}
-          {facets ? (
-            <p className="text-sm text-muted-foreground">{facets}</p>
-          ) : null}
-          {data.model ? (
-            <p className="text-sm text-muted-foreground">
-              {t("model", { model: data.model })}
-            </p>
-          ) : null}
-          {data.excerpt ? (
-            <CardDescription>
-              <SafeHtml
-                className="line-clamp-2"
-                content={data.excerpt}
-                preset="compact"
-              />
-            </CardDescription>
-          ) : null}
-        </CardHeader>
-        <div className="mt-auto flex items-end justify-between gap-3 px-8">
-          <div className="flex min-w-0 flex-col gap-2">
-            {data.brand ? (
-              <Badge variant="secondary">
-                {t("brand", { brand: data.brand })}
-              </Badge>
+        <div className="flex min-w-0 flex-1 flex-col gap-(--card-spacing) sm:contents">
+          <CardHeader className="px-4 sm:px-8">
+            {data.title ? (
+              <CardTitle className="text-base leading-snug sm:text-2xl md:text-3xl">
+                {data.title}
+              </CardTitle>
             ) : null}
-            {data.categoryTitle ? (
-              <Badge variant="secondary">{data.categoryTitle}</Badge>
+            {facets ? (
+              <p className="text-sm text-muted-foreground">{facets}</p>
             ) : null}
-            {data.dateCreated ? (
-              <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <MaterialIcon name="calendar_today" size={14} />
-                <time dateTime={data.dateCreated}>
-                  {formatDateShort(data.dateCreated)}
-                </time>
+            {data.model ? (
+              <p className="text-sm text-muted-foreground">
+                {t("model", { model: data.model })}
               </p>
             ) : null}
+            {data.excerpt ? (
+              <CardDescription>
+                <SafeHtml
+                  className="line-clamp-2"
+                  content={data.excerpt}
+                  preset="compact"
+                />
+              </CardDescription>
+            ) : null}
+          </CardHeader>
+          <div className="mt-auto flex items-end justify-between gap-3 px-4 sm:px-8">
+            <div className="flex min-w-0 flex-col gap-2">
+              {data.brand ? (
+                <Badge variant="secondary">
+                  {t("brand", { brand: data.brand })}
+                </Badge>
+              ) : null}
+              {data.categoryTitle ? (
+                <Badge variant="secondary">{data.categoryTitle}</Badge>
+              ) : null}
+              {data.dateCreated ? (
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MaterialIcon name="calendar_today" size={14} />
+                  <time dateTime={data.dateCreated}>
+                    {formatDateShort(data.dateCreated)}
+                  </time>
+                </p>
+              ) : null}
+            </div>
+            {data.slug ? (
+              <Button
+                variant="secondary"
+                size="icon-sm"
+                aria-label="Ver producto"
+              >
+                <MaterialIcon
+                  name="arrow_outward"
+                  className="text-foreground"
+                />
+              </Button>
+            ) : null}
           </div>
-          {data.slug ? (
-            <Button
-              variant="secondary"
-              size="icon-sm"
-              aria-label="Ver producto"
-            >
-              <MaterialIcon name="arrow_outward" className="text-foreground" />
-            </Button>
-          ) : null}
         </div>
       </Card>
     </Link>
