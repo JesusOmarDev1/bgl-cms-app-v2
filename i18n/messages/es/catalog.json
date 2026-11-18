@@ -16,6 +16,13 @@
     "sort_oldest": "Más antiguos",
     "sort_az": "A-Z",
     "sort_za": "Z-A",
-    "clear_filters": "Limpiar filtros"
+    "clear_filters": "Limpiar filtros",
+    "clear_all": "Limpiar todo",
+    "active_filters": "Filtros activos",
+    "filter_search": "Búsqueda",
+    "remove_filter": "Quitar filtro {filter}",
+    "results_count": "{count, plural, one {producto} other {productos}} en {type} · {category}",
+    "card_capacity": "Capacidad {value} kg",
+    "card_division": "División {value} g"
   }
 }

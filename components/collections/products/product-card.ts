@@ -8,6 +8,8 @@ export type ProductCardData = {
   imageId: string | null
   brand: string | null
   model: string | null
+  capacity: number | null
+  division: number | null
   categoryTitle: string | null
   categorySlug: string | null
   categoryIcon: string | null
@@ -27,6 +29,8 @@ export type ProductCardSource = {
   image: { id: string } | null
   brand: { title: string } | null
   model: { title: string } | null
+  capacity: number | null
+  division: number | null
   product_category: {
     id?: string
     title: string
@@ -52,6 +56,8 @@ export function pickProductCard(product: ProductCardSource): ProductCardData {
     imageId: product.image?.id ?? null,
     brand: trimmed(product.brand?.title),
     model: trimmed(product.model?.title),
+    capacity: product.capacity ?? null,
+    division: product.division ?? null,
     categoryTitle: trimmed(product.product_category?.title),
     categorySlug: trimmed(product.product_category?.slug),
     categoryIcon: trimmed(product.product_category?.icon),

@@ -18,10 +18,23 @@ import { Button } from "@/components/ui/button"
 
 export function ProductCard({ data }: { data: ProductCardData }) {
   const t = useTranslations("products")
+  const catalog = useTranslations("catalog")
 
   if (!data.id) {
     return null
   }
+
+  // shortcut: capacity and division render in kg/g, upgrade when products expose their own units.
+  const facets = [
+    data.capacity == null
+      ? ""
+      : catalog("card_capacity", { value: data.capacity }),
+    data.division == null
+      ? ""
+      : catalog("card_division", { value: data.division }),
+  ]
+    .filter(Boolean)
+    .join(" · ")
 
   return (
     <Link
@@ -55,15 +68,10 @@ export function ProductCard({ data }: { data: ProductCardData }) {
           {data.title ? (
             <CardTitle className="text-2xl md:text-3xl">{data.title}</CardTitle>
           ) : null}
-          {data.brand && data.model ? (
-            <p className="text-sm text-muted-foreground">
-              {t("brand_model", { brand: data.brand, model: data.model })}
-            </p>
-          ) : data.brand ? (
-            <p className="text-sm text-muted-foreground">
-              {t("brand", { brand: data.brand })}
-            </p>
-          ) : data.model ? (
+          {facets ? (
+            <p className="text-sm text-muted-foreground">{facets}</p>
+          ) : null}
+          {data.model ? (
             <p className="text-sm text-muted-foreground">
               {t("model", { model: data.model })}
             </p>
@@ -80,6 +88,11 @@ export function ProductCard({ data }: { data: ProductCardData }) {
         </CardHeader>
         <div className="mt-auto flex items-end justify-between gap-3 px-8">
           <div className="flex min-w-0 flex-col gap-2">
+            {data.brand ? (
+              <Badge variant="secondary">
+                {t("brand", { brand: data.brand })}
+              </Badge>
+            ) : null}
             {data.categoryTitle ? (
               <Badge variant="secondary">{data.categoryTitle}</Badge>
             ) : null}

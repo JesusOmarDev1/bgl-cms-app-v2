@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef } from "react"
+import { useTranslations } from "next-intl"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { useDebounceFn } from "@/hooks/useDebounceFn"
@@ -9,6 +10,7 @@ import {
   type CatalogItem,
 } from "@/components/collections/catalog/catalog-items"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -75,6 +77,7 @@ export function CatalogToolBarClient({
     clearFilters,
   } = useCatalogParams(shallow, paginated, !showCategoryFilter)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const catalog = useTranslations("catalog")
   useEffect(() => {
     if (searchInputRef.current && searchInputRef.current.value !== q) {
       searchInputRef.current.value = q
@@ -149,6 +152,47 @@ export function CatalogToolBarClient({
     q.length > 0 ||
     (showCategoryFilter && cat.length > 0) ||
     (showProductFilters && Object.values(activeFilters).some(Boolean))
+  const facetLabels = showProductFilters ? labels.filters : undefined
+  const chips = [
+    q
+      ? {
+          key: "q",
+          label: catalog("filter_search"),
+          value: q,
+          remove: () => {
+            queryDebounce.cancel()
+            void setQ(null)
+          },
+        }
+      : null,
+    ...(
+      [
+        ["brand", facetLabels?.brand, activeFilters.brand, setBrand],
+        [
+          "capacity",
+          facetLabels?.capacity,
+          activeFilters.capacity,
+          setCapacity,
+        ],
+        [
+          "division",
+          facetLabels?.division,
+          activeFilters.division,
+          setDivision,
+        ],
+      ] as const
+    ).map(([key, label, value, setValue]) =>
+      label && value
+        ? { key, label, value, remove: () => void setValue(null) }
+        : null
+    ),
+  ].filter((chip) => chip !== null)
+  const sortLabels: Record<typeof sort, string> = {
+    newest: labels.sort.newest,
+    oldest: labels.sort.oldest,
+    "a-z": labels.sort.az,
+    "z-a": labels.sort.za,
+  }
 
   function renderFacet(
     label: string,
@@ -188,146 +232,179 @@ export function CatalogToolBarClient({
   }
 
   return (
-    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-      <Select
-        hidden={!showCategoryFilter}
-        aria-label={labels.category.label}
-        className="w-full lg:w-64"
-        onSelectionChange={(key) => {
-          if (key == null || key === "all") {
-            void setCat(null)
-            return
-          }
-          void setCat(String(key))
-        }}
-        placeholder={labels.category.placeholder}
-        selectedKey={selectedCategory}
-      >
-        <SelectTrigger aria-label={labels.category.label} className="w-full">
-          <MaterialIcon
-            className="text-muted-foreground"
-            name="category"
-            size={16}
-          />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem id="all" textValue={labels.category.all}>
-            <span className="flex items-center gap-2">
-              <MaterialIcon aria-hidden name="category" size={16} />
-              {labels.category.all}
-            </span>
-          </SelectItem>
-          {categories.map((category) => (
-            <SelectItem
-              id={category.slug}
-              key={category.slug}
-              textValue={category.title}
-            >
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <Select
+          hidden={!showCategoryFilter}
+          aria-label={labels.category.label}
+          className="w-full lg:w-64"
+          onSelectionChange={(key) => {
+            if (key == null || key === "all") {
+              void setCat(null)
+              return
+            }
+            void setCat(String(key))
+          }}
+          placeholder={labels.category.placeholder}
+          selectedKey={selectedCategory}
+        >
+          <SelectTrigger aria-label={labels.category.label} className="w-full">
+            <MaterialIcon
+              className="text-muted-foreground"
+              name="category"
+              size={16}
+            />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem id="all" textValue={labels.category.all}>
               <span className="flex items-center gap-2">
-                <MaterialIcon
-                  aria-hidden
-                  name={category.icon || "category"}
-                  size={16}
-                />
-                {category.title}
+                <MaterialIcon aria-hidden name="category" size={16} />
+                {labels.category.all}
               </span>
             </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div className="relative w-full min-w-0 flex-1">
-        <MaterialIcon
-          className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-          name="search"
-          size={16}
-        />
-        <Input
-          aria-label={labels.search.label}
-          className="ps-8"
-          onChange={(event) => {
-            const value = event?.target.value ?? ""
-            if (!value) {
-              queryDebounce.cancel()
-              void setQ(null)
-            } else queryDebounce.run(value)
-          }}
-          placeholder={labels.search.placeholder}
-          ref={searchInputRef}
-          type="search"
-          defaultValue={q}
-        />
-      </div>
-      {showProductFilters && labels.filters ? (
-        <>
-          {renderFacet(
-            labels.filters.brand,
-            brand,
-            setBrand,
-            facetOptions.brand
-          )}
-          {renderFacet(
-            labels.filters.capacity,
-            capacity,
-            setCapacity,
-            facetOptions.capacity
-          )}
-          {renderFacet(
-            labels.filters.division,
-            division,
-            setDivision,
-            facetOptions.division
-          )}
-        </>
-      ) : null}
-      <Select
-        aria-label={labels.sort.label}
-        className="w-full lg:w-48"
-        onSelectionChange={(key) => {
-          if (
-            key === "newest" ||
-            key === "oldest" ||
-            key === "a-z" ||
-            key === "z-a"
-          ) {
-            void setSort(key)
-          }
-        }}
-        selectedKey={sort}
-      >
-        <SelectTrigger aria-label={labels.sort.label} className="w-full">
+            {categories.map((category) => (
+              <SelectItem
+                id={category.slug}
+                key={category.slug}
+                textValue={category.title}
+              >
+                <span className="flex items-center gap-2">
+                  <MaterialIcon
+                    aria-hidden
+                    name={category.icon || "category"}
+                    size={16}
+                  />
+                  {category.title}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="relative w-full min-w-0 flex-1">
           <MaterialIcon
-            className="text-muted-foreground"
-            name="swap_vert"
+            className="pointer-events-none absolute start-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            name="search"
             size={16}
           />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem id="newest" textValue={labels.sort.newest}>
-            {labels.sort.newest}
-          </SelectItem>
-          <SelectItem id="oldest" textValue={labels.sort.oldest}>
-            {labels.sort.oldest}
-          </SelectItem>
-          <SelectItem id="a-z" textValue={labels.sort.az}>
-            {labels.sort.az}
-          </SelectItem>
-          <SelectItem id="z-a" textValue={labels.sort.za}>
-            {labels.sort.za}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-      {filtersActive ? (
-        <Button
-          onPress={() => {
-            queryDebounce.cancel()
-            clearFilters()
+          <Input
+            aria-label={labels.search.label}
+            className="ps-8"
+            onChange={(event) => {
+              const value = event?.target.value ?? ""
+              if (!value) {
+                queryDebounce.cancel()
+                void setQ(null)
+              } else queryDebounce.run(value)
+            }}
+            placeholder={labels.search.placeholder}
+            ref={searchInputRef}
+            type="search"
+            defaultValue={q}
+          />
+        </div>
+        {showProductFilters && labels.filters ? (
+          <>
+            {renderFacet(
+              labels.filters.brand,
+              brand,
+              setBrand,
+              facetOptions.brand
+            )}
+            {renderFacet(
+              labels.filters.capacity,
+              capacity,
+              setCapacity,
+              facetOptions.capacity
+            )}
+            {renderFacet(
+              labels.filters.division,
+              division,
+              setDivision,
+              facetOptions.division
+            )}
+          </>
+        ) : null}
+        <Select
+          aria-label={labels.sort.label}
+          className="w-full lg:w-48"
+          onSelectionChange={(key) => {
+            if (
+              key === "newest" ||
+              key === "oldest" ||
+              key === "a-z" ||
+              key === "z-a"
+            ) {
+              void setSort(key)
+            }
           }}
-          variant="ghost"
+          selectedKey={sort}
         >
-          {labels.clear}
-        </Button>
+          <SelectTrigger aria-label={labels.sort.label} className="w-full">
+            <MaterialIcon
+              className="text-muted-foreground"
+              name="swap_vert"
+              size={16}
+            />
+            <span className="text-muted-foreground">{labels.sort.label}:</span>
+            <span className="truncate">{sortLabels[sort]}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem id="newest" textValue={labels.sort.newest}>
+              {labels.sort.newest}
+            </SelectItem>
+            <SelectItem id="oldest" textValue={labels.sort.oldest}>
+              {labels.sort.oldest}
+            </SelectItem>
+            <SelectItem id="a-z" textValue={labels.sort.az}>
+              {labels.sort.az}
+            </SelectItem>
+            <SelectItem id="z-a" textValue={labels.sort.za}>
+              {labels.sort.za}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {filtersActive ? (
+        <ul
+          aria-label={catalog("active_filters")}
+          className="flex flex-wrap items-center gap-2"
+        >
+          {chips.map((chip) => (
+            <li key={chip.key}>
+              <Badge
+                className="h-6 gap-1 ps-2.5 pe-0.5 text-xs font-normal"
+                variant="secondary"
+              >
+                <span className="text-muted-foreground">{chip.label}:</span>
+                {chip.value}
+                <Button
+                  aria-label={catalog("remove_filter", {
+                    filter: chip.label,
+                  })}
+                  className="size-5 text-muted-foreground hover:text-foreground"
+                  onPress={chip.remove}
+                  size="icon-xs"
+                  variant="ghost"
+                >
+                  <MaterialIcon name="close" size={14} />
+                </Button>
+              </Badge>
+            </li>
+          ))}
+          <li>
+            <Button
+              onPress={() => {
+                queryDebounce.cancel()
+                clearFilters()
+              }}
+              size="xs"
+              variant="ghost"
+            >
+              {catalog("clear_all")}
+            </Button>
+          </li>
+        </ul>
       ) : null}
     </div>
   )

@@ -106,6 +106,8 @@ const item = (
   imageId: null,
   brand: null,
   model: null,
+  capacity: null,
+  division: null,
   categoryTitle: null,
   categorySlug: null,
   categoryIcon: null,

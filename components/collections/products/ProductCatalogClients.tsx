@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useQueryState, parseAsString } from "nuqs"
 import { CatalogBodyClient } from "@/components/collections/catalog/CatalogBodyClient"
 import {
+  filterCatalogProducts,
   findCatalogHierarchyCategory,
   getCatalogCategoryParam,
   getCatalogNavigationStage,
@@ -11,6 +13,7 @@ import {
 } from "@/components/collections/catalog/catalog-items"
 import { CatalogToolBarClient } from "@/components/collections/catalog/CatalogToolBarClient"
 import type { CatalogLabels } from "@/components/collections/catalog/CatalogToolBarClient"
+import { useCatalogParams } from "@/components/collections/catalog/useCatalogParams"
 import { fuzzySearch } from "@/config/search"
 import { DirectusImage } from "@/components/shared/assets/img/DirectusImage"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
@@ -159,6 +162,8 @@ export function ProductCatalogClients({
   const category = findCatalogHierarchyCategory(hierarchy, categorySlug)
   const productType = category?.types.find((row) => row.slug === typeSlug)
   const stage = getCatalogNavigationStage(categorySlug, typeSlug)
+  const filters = useCatalogParams()
+  const catalog = useTranslations("catalog")
   const validProductsStage =
     stage === "products" && category && (productType || typeSlug === "sin-tipo")
   const isCategoryStage = stage === "types" || !validProductsStage
@@ -220,6 +225,20 @@ export function ProductCatalogClients({
     )
   }
 
+  const catalogMatches = isCategoryStage
+    ? []
+    : filterCatalogProducts(
+        scopedItems,
+        filters.q,
+        categorySlug,
+        filters.sort,
+        {
+          brand: filters.brand,
+          capacity: filters.capacity,
+          division: filters.division,
+        }
+      )
+
   return (
     <div className="flex flex-col gap-6">
       <Breadcrumb>
@@ -255,14 +274,26 @@ export function ProductCatalogClients({
         <CategoryTypes category={category} labels={navigationLabels} />
       ) : (
         <>
-          <CatalogToolBarClient
-            items={scopedItems}
-            labels={labels}
-            paginated
-            shallow={false}
-            showCategoryFilter={false}
-            showProductFilters
-          />
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-muted-foreground">
+              <strong className="font-semibold text-foreground">
+                {catalogMatches.length}
+              </strong>{" "}
+              {catalog("results_count", {
+                count: catalogMatches.length,
+                type: productType?.title ?? navigationLabels.untypedProducts,
+                category: category.title,
+              })}
+            </p>
+            <CatalogToolBarClient
+              items={scopedItems}
+              labels={labels}
+              paginated
+              shallow={false}
+              showCategoryFilter={false}
+              showProductFilters
+            />
+          </div>
           <CatalogBodyClient
             clearLabel={clearLabel}
             emptyCatalog={emptyCatalog}
