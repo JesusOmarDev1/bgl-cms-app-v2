@@ -27,6 +27,7 @@ export const PRODUCT_CATALOG_CATEGORY_FIELDS = [
   "id",
   "title",
   "slug",
+  "icon",
   { image: ["id"] },
   { parent: ["id"] },
 ] as const satisfies NonNullable<

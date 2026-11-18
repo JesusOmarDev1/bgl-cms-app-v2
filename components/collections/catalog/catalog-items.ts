@@ -14,6 +14,7 @@ export type CatalogHierarchy = {
   id: string
   slug: string | null
   title: string
+  icon: string | null
   imageId: string | null
   types: {
     id: string
@@ -22,6 +23,7 @@ export type CatalogHierarchy = {
     icon: string | null
     imageId: string | null
   }[]
+  productCount: number
   untypedProductCount: number
 }
 
@@ -29,6 +31,7 @@ type CatalogHierarchyCategory = Pick<
   CatalogHierarchy,
   "id" | "slug" | "title"
 > & {
+  icon?: string | null
   image: { id: string } | null
 }
 type CatalogHierarchyType = {
@@ -78,6 +81,7 @@ export function buildCatalogHierarchy(
     id: category.id,
     slug: category.slug,
     title: category.title,
+    icon: category.icon ?? null,
     imageId: category.image?.id ?? null,
     types: types
       .filter((type) => type.category === category.id)
@@ -88,6 +92,9 @@ export function buildCatalogHierarchy(
         icon: icon ?? null,
         imageId: image?.id ?? null,
       })),
+    productCount: products.filter(
+      (product) => product.categoryId === category.id
+    ).length,
     untypedProductCount: products.filter(
       (product) => product.categoryId === category.id && product.typeId === null
     ).length,

@@ -101,6 +101,7 @@ const hierarchy: CatalogHierarchy[] = [
     id: "c1",
     slug: "comercial",
     title: "Comercial",
+    icon: null,
     imageId: null,
     types: [
       {
@@ -111,6 +112,7 @@ const hierarchy: CatalogHierarchy[] = [
         imageId: null,
       },
     ],
+    productCount: 3,
     untypedProductCount: 1,
   },
 ]

@@ -149,16 +149,20 @@ describe("catalog category references", () => {
         id: "category-without-slug",
         slug: null,
         title: "Published category",
+        icon: null,
         imageId: null,
         types: [],
+        productCount: 0,
         untypedProductCount: 0,
       },
       {
         id: "scales-id",
         slug: "scales",
         title: "Scales",
+        icon: null,
         imageId: null,
         types: [],
+        productCount: 0,
         untypedProductCount: 0,
       },
     ]
@@ -178,7 +182,13 @@ describe("buildCatalogHierarchy", () => {
   it("shows empty categories and scopes types and untyped products to their category", () => {
     const hierarchy = buildCatalogHierarchy(
       [
-        { id: "c1", slug: "scales", title: "Básculas", image: { id: "img1" } },
+        {
+          id: "c1",
+          slug: "scales",
+          title: "Básculas",
+          icon: "scale",
+          image: { id: "img1" },
+        },
         { id: "c2", slug: null, title: "Sin slug", image: null },
         { id: "c3", slug: "empty", title: "Vacía", image: null },
       ],
@@ -211,6 +221,7 @@ describe("buildCatalogHierarchy", () => {
         id: "c1",
         slug: "scales",
         title: "Básculas",
+        icon: "scale",
         imageId: "img1",
         types: [
           {
@@ -221,12 +232,14 @@ describe("buildCatalogHierarchy", () => {
             imageId: null,
           },
         ],
+        productCount: 2,
         untypedProductCount: 1,
       },
       {
         id: "c2",
         slug: null,
         title: "Sin slug",
+        icon: null,
         imageId: null,
         types: [
           {
@@ -237,14 +250,17 @@ describe("buildCatalogHierarchy", () => {
             imageId: "img2",
           },
         ],
+        productCount: 1,
         untypedProductCount: 0,
       },
       {
         id: "c3",
         slug: "empty",
         title: "Vacía",
+        icon: null,
         imageId: null,
         types: [],
+        productCount: 0,
         untypedProductCount: 0,
       },
     ])

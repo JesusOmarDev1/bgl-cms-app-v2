@@ -56,6 +56,7 @@ const hierarchy: CatalogHierarchy[] = [
     id: "c1",
     slug: "scales",
     title: "Scales",
+    icon: null,
     imageId: "category-image",
     types: [
       {
@@ -66,32 +67,39 @@ const hierarchy: CatalogHierarchy[] = [
         imageId: null,
       },
     ],
+    productCount: 2,
     untypedProductCount: 1,
   },
   {
     id: "c2",
     slug: "empty",
     title: "Empty category",
+    icon: null,
     imageId: null,
     types: [],
+    productCount: 0,
     untypedProductCount: 0,
   },
   {
     id: "c3",
     slug: "other",
     title: "Other category",
+    icon: null,
     imageId: null,
     types: [
       { id: "t2", slug: "bench", title: "Bench", icon: null, imageId: null },
     ],
+    productCount: 2,
     untypedProductCount: 1,
   },
   {
     id: "c4",
     slug: null,
     title: "No-slug category",
+    icon: null,
     imageId: null,
     types: [],
+    productCount: 1,
     untypedProductCount: 1,
   },
 ]

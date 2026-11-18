@@ -20,6 +20,7 @@ import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 import { ProductCard } from "@/components/collections/products/ProductCard"
 import type { ProductCardData } from "@/components/collections/products/product-card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Empty, EmptyDescription } from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
@@ -36,14 +37,26 @@ function NavigationCard({
   imageId,
   icon,
   href,
+  badge,
+  chips,
 }: {
   title: string
   imageId: string | null
   icon?: string | null
   href: string | null
+  badge?: string
+  chips?: string[]
 }) {
   const card = (
-    <Card className="h-full overflow-hidden p-0 transition-colors hover:bg-secondary/40">
+    <Card className="relative h-full overflow-hidden p-0 transition-colors hover:bg-secondary/40">
+      {badge ? (
+        <Badge
+          className="absolute top-3 right-3 z-10 bg-background/80"
+          variant="outline"
+        >
+          {badge}
+        </Badge>
+      ) : null}
       <div className="relative aspect-[16/10] bg-background">
         {imageId ? (
           <DirectusImage
@@ -65,6 +78,15 @@ function NavigationCard({
       </div>
       <CardHeader className="p-5">
         <CardTitle className="text-xl">{title}</CardTitle>
+        {chips && chips.length > 0 ? (
+          <ul className="flex flex-wrap gap-1.5" data-slot="type-chips">
+            {chips.map((chip) => (
+              <li key={chip}>
+                <Badge variant="secondary">{chip}</Badge>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </CardHeader>
     </Card>
   )
@@ -191,6 +213,16 @@ export function ProductCatalogClients({
 
   if (stage === "categories" || !category) {
     const matches = fuzzySearch(hierarchy, query, { keys: ["title"] })
+    const groups = [
+      {
+        heading: catalog("categories_with_products"),
+        rows: matches.filter((row) => row.productCount > 0),
+      },
+      {
+        heading: catalog("more_categories"),
+        rows: matches.filter((row) => row.productCount === 0),
+      },
+    ].filter((group) => group.rows.length > 0)
 
     return (
       <div className="flex flex-col gap-6">
@@ -209,17 +241,37 @@ export function ProductCatalogClients({
             </Button>
           </Empty>
         ) : (
-          <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {matches.map((row) => (
-              <li key={row.id}>
-                <NavigationCard
-                  title={row.title}
-                  imageId={row.imageId}
-                  href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
-                />
-              </li>
-            ))}
-          </ul>
+          groups.map((group) => (
+            <section className="flex flex-col gap-3" key={group.heading}>
+              <h2 className="text-base font-semibold text-muted-foreground">
+                {group.heading}
+              </h2>
+              <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {group.rows.map((row) => (
+                  <li key={row.id}>
+                    <NavigationCard
+                      badge={
+                        row.productCount > 0
+                          ? catalog("product_count", {
+                              count: row.productCount,
+                            })
+                          : catalog("empty_category_badge")
+                      }
+                      chips={
+                        row.productCount > 0
+                          ? row.types.map((type) => type.title)
+                          : undefined
+                      }
+                      href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
+                      icon={row.icon}
+                      imageId={row.imageId}
+                      title={row.title}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
         )}
       </div>
     )
