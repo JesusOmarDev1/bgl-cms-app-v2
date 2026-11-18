@@ -41,7 +41,7 @@ export function ProductCard({ data }: { data: ProductCardData }) {
       className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       href={`/tienda/producto/${data.slug}`}
     >
-      <Card className="h-full flex-row pt-0 transition-colors hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40 sm:flex-col">
+      <Card className="h-full flex-row pt-0 transition-[transform,box-shadow,background-color] hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg motion-reduce:transition-none sm:flex-col">
         {data.imageId ? (
           <DirectusImage
             alt={data.title}
@@ -67,12 +67,14 @@ export function ProductCard({ data }: { data: ProductCardData }) {
         <div className="flex min-w-0 flex-1 flex-col gap-(--card-spacing) sm:contents">
           <CardHeader className="px-4 sm:px-8">
             {data.title ? (
-              <CardTitle className="text-base leading-snug sm:text-2xl md:text-3xl">
+              <CardTitle className="text-base leading-snug text-balance sm:text-2xl md:text-3xl">
                 {data.title}
               </CardTitle>
             ) : null}
             {facets ? (
-              <p className="text-sm text-muted-foreground">{facets}</p>
+              <p className="text-sm text-muted-foreground tabular-nums">
+                {facets}
+              </p>
             ) : null}
             {data.model ? (
               <p className="text-sm text-muted-foreground">

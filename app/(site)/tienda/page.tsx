@@ -136,7 +136,7 @@ async function Catalog({ searchParams }: PageProps) {
         paddingTop={2}
       >
         <GoBackBtn href="/">{t("back_home")}</GoBackBtn>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance md:text-4xl">
           {t("title")}
         </h1>
         <p className="max-w-prose text-muted-foreground">{t("intro")}</p>

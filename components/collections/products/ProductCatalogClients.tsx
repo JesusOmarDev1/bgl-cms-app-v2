@@ -48,10 +48,10 @@ function NavigationCard({
   chips?: string[]
 }) {
   const card = (
-    <Card className="relative h-full overflow-hidden p-0 transition-colors hover:bg-secondary/40">
+    <Card className="relative h-full overflow-hidden p-0 transition-[transform,box-shadow,background-color] hover:bg-secondary/40 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg motion-reduce:transition-none">
       {badge ? (
         <Badge
-          className="absolute top-3 right-3 z-10 bg-background/80"
+          className="absolute top-3 right-3 z-10 bg-background/80 tabular-nums"
           variant="outline"
         >
           {badge}
@@ -77,7 +77,7 @@ function NavigationCard({
         )}
       </div>
       <CardHeader className="p-5">
-        <CardTitle className="text-xl">{title}</CardTitle>
+        <CardTitle className="text-xl text-balance">{title}</CardTitle>
         {chips && chips.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5" data-slot="type-chips">
             {chips.map((chip) => (
@@ -327,8 +327,8 @@ export function ProductCatalogClients({
       ) : (
         <>
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">
-              <strong className="font-semibold text-foreground">
+            <p aria-live="polite" className="text-sm text-muted-foreground">
+              <strong className="font-semibold text-foreground tabular-nums">
                 {catalogMatches.length}
               </strong>{" "}
               {catalog("results_count", {

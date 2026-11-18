@@ -110,7 +110,9 @@ export function CatalogFilterSheet({
         <MaterialIcon name="filter_list" size={16} />
         {catalog("filters_title")}
         {activeCount > 0 ? (
-          <Badge variant="secondary">{activeCount}</Badge>
+          <Badge className="tabular-nums" variant="secondary">
+            {activeCount}
+          </Badge>
         ) : null}
       </Button>
       <Sheet side="bottom">

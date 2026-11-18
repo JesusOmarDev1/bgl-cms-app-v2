@@ -410,7 +410,7 @@ export function CatalogToolBarClient({
           {chips.map((chip) => (
             <li key={chip.key}>
               <Badge
-                className="h-6 gap-1 ps-2.5 pe-0.5 text-xs font-normal"
+                className="h-7 gap-1 ps-2.5 pe-0.5 text-xs font-normal tabular-nums"
                 variant="secondary"
               >
                 <span className="text-muted-foreground">{chip.label}:</span>
@@ -419,7 +419,7 @@ export function CatalogToolBarClient({
                   aria-label={catalog("remove_filter", {
                     filter: chip.label,
                   })}
-                  className="size-5 text-muted-foreground hover:text-foreground"
+                  className="size-6 text-muted-foreground hover:text-foreground"
                   onPress={chip.remove}
                   size="icon-xs"
                   variant="ghost"

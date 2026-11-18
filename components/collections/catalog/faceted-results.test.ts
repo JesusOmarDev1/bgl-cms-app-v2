@@ -332,6 +332,64 @@ describe("faceted product results", () => {
     expect(html).not.toContain("Filtros")
   })
 
+  it("politely announces the result count and sets counts in tabular figures", () => {
+    const html = renderCatalog("?cat=comercial&type=basculas")
+    expect(html).toContain('aria-live="polite"')
+    expect(html).toMatch(
+      /<strong class="[^"]*\btabular-nums\b[^"]*">2<\/strong>/
+    )
+
+    const categories = renderCatalog("")
+    expect(categories).toMatch(
+      /data-slot="badge"[^>]*class="[^"]*\btabular-nums\b[^"]*"[^>]*>3 productos<\/span>/
+    )
+
+    const filtered = renderCatalog("?cat=comercial&type=basculas&brand=Torrey")
+    expect(filtered).toMatch(
+      /data-slot="badge"[^>]*class="[^"]*\btabular-nums\b[^"]*"[^>]*>1<\/span>/
+    )
+    expect(filtered).toMatch(
+      /<p class="[^"]*\btabular-nums\b[^"]*">Capacidad 40 kg · División 5 g<\/p>/
+    )
+  })
+
+  it("balances card titles", () => {
+    const card = renderToStaticMarkup(
+      createElement(ProductCard, { data: items[0] })
+    )
+    expect(card).toMatch(
+      /data-slot="card-title"[^>]*class="[^"]*\btext-balance\b/
+    )
+
+    const categories = renderCatalog("")
+    expect(categories).toMatch(
+      /data-slot="card-title"[^>]*class="[^"]*\btext-balance\b/
+    )
+  })
+
+  it("lifts cards on hover only when motion is allowed", () => {
+    const card = renderToStaticMarkup(
+      createElement(ProductCard, { data: items[0] })
+    )
+    for (const html of [card, renderCatalog("")]) {
+      expect(html).toContain("motion-safe:hover:-translate-y-0.5")
+      expect(html).toContain("motion-safe:hover:shadow-lg")
+      expect(html).toContain("motion-reduce:transition-none")
+      expect(html).toContain(
+        "transition-[transform,box-shadow,background-color]"
+      )
+    }
+  })
+
+  it("gives chip remove buttons a comfortable hit target and a focus ring", () => {
+    const html = renderCatalog("?cat=comercial&type=basculas&brand=Torrey")
+    const tag =
+      html.match(/<button[^>]*aria-label="Quitar filtro Marca"[^>]*>/)?.[0] ??
+      ""
+    expect(tag).toContain("size-6")
+    expect(tag).toContain("focus-visible:ring")
+  })
+
   it("shows brand, capacity and division facets on each product card", () => {
     const html = renderToStaticMarkup(
       createElement(ProductCard, { data: items[0] })
