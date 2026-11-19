@@ -6,7 +6,10 @@ const { request, createPrivateDirectus } = vi.hoisted(() => ({
 }))
 vi.mock("server-only", () => ({}))
 vi.mock("@directus/sdk", () => ({
-  readItems: vi.fn((collection: string, query: object) => ({ collection, ...query })),
+  readItems: vi.fn((collection: string, query: object) => ({
+    collection,
+    ...query,
+  })),
 }))
 vi.mock("@/config/directus-private", () => ({ createPrivateDirectus }))
 
@@ -19,11 +22,21 @@ describe("private scale repository", () => {
   })
 
   it("filters by the assigned client on the server and excludes unassigned scales", async () => {
-    const scales = [{ id: "scale-1", title: "Báscula", serial_number: "S-1", client: "client-a" }]
+    const scales = [
+      {
+        id: "scale-1",
+        title: "Báscula",
+        serial_number: "S-1",
+        client: "client-a",
+      },
+    ]
     request.mockResolvedValue(scales)
 
     await expect(
-      getPrivateScalesRepository({ accessToken: "employee-a", clientId: "client-a" })
+      getPrivateScalesRepository({
+        accessToken: "employee-a",
+        clientId: "client-a",
+      })
     ).resolves.toEqual({ items: scales, hasNextPage: false })
 
     expect(createPrivateDirectus).toHaveBeenCalledWith("employee-a")
@@ -103,7 +116,13 @@ describe("private scale repository", () => {
     })
   })
 
-  it.each([{ limit: 0 }, { limit: -1 }, { limit: 1.5 }, { page: 0 }, { page: 1.5 }])(
+  it.each([
+    { limit: 0 },
+    { limit: -1 },
+    { limit: 1.5 },
+    { page: 0 },
+    { page: 1.5 },
+  ])(
     "rejects invalid pagination before creating a private client: %o",
     async (query) => {
       await expect(

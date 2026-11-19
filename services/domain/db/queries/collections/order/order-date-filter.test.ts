@@ -4,7 +4,9 @@ import { buildOrderDateFilter } from "@/services/domain/db/queries/collections/o
 
 describe("order date filters", () => {
   it("converts one Mexico City calendar day to half-open UTC bounds", () => {
-    expect(buildOrderDateFilter({ mode: "period", startDate: "2026-01-02" })).toEqual({
+    expect(
+      buildOrderDateFilter({ mode: "period", startDate: "2026-01-02" })
+    ).toEqual({
       date_created: {
         _gte: "2026-01-02T06:00:00.000Z",
         _lt: "2026-01-03T06:00:00.000Z",

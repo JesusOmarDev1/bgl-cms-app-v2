@@ -1,6 +1,6 @@
 import { BarsRotateDots } from "@/assets/loaders/BarsRotateDots"
+import { StaticLogo } from "@/assets/logos/static-logo"
 import { Box } from "@/components/shared/content/Box"
-import Image from "next/image"
 
 export default function Loading() {
   return (
@@ -12,7 +12,7 @@ export default function Loading() {
       padding={4}
     >
       <div className="flex flex-col items-center gap-4">
-        <Image src="/favicon.svg" alt="Logo" width={100} height={100} />
+        <StaticLogo className="size-28" />
         <BarsRotateDots />
       </div>
     </Box>

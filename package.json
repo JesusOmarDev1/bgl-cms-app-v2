@@ -17,7 +17,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@audio-ui/react": "^0.1.2",
+    "@audio-ui/react": "0.2.0",
     "@base-ui/react": "^1.7.0",
     "@directus/sdk": "^24.0.0",
     "@directus/visual-editing": "^2.1.0",
@@ -35,6 +35,7 @@
     "@shadcn/react": "^0.3.0",
     "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-query": "^5.102.1",
+    "@tanstack/react-table": "9.3.1",
     "@tanstack/react-virtual": "^3.14.10",
     "border-beam": "^1.3.0",
     "class-variance-authority": "^0.7.1",

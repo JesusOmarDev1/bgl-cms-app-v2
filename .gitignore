@@ -46,5 +46,5 @@ storybook-static
 odd/
 *.jsonl
 /design
-# pi session dumps
 pi-session-*.html
+

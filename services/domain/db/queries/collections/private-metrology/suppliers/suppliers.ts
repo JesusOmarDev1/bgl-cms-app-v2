@@ -18,8 +18,11 @@ export interface PrivateSuppliersQuery {
 
 function validatePagination(limit: number, page: number): void {
   if (
-    !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_LIMIT ||
-    !Number.isSafeInteger(page) || page < 1 ||
+    !Number.isSafeInteger(limit) ||
+    limit < 1 ||
+    limit > MAX_LIMIT ||
+    !Number.isSafeInteger(page) ||
+    page < 1 ||
     page > Math.floor(Number.MAX_SAFE_INTEGER / limit)
   ) {
     throw new RangeError("Invalid pagination")
@@ -38,7 +41,9 @@ export async function getPrivateSuppliersQuery({
   const rows = await directus.request(
     readItems("suppliers", {
       fields: PRIVATE_SUPPLIERS_FIELDS,
-      ...(normalizedSearch ? { filter: { name: { _icontains: normalizedSearch } } } : {}),
+      ...(normalizedSearch
+        ? { filter: { name: { _icontains: normalizedSearch } } }
+        : {}),
       limit: limit + 1,
       offset: (page - 1) * limit,
       sort: ["name", "id"],
@@ -47,4 +52,6 @@ export async function getPrivateSuppliersQuery({
   return { items: rows.slice(0, limit), hasNextPage: rows.length > limit }
 }
 
-export type PrivateSuppliersQueryResult = Awaited<ReturnType<typeof getPrivateSuppliersQuery>>
+export type PrivateSuppliersQueryResult = Awaited<
+  ReturnType<typeof getPrivateSuppliersQuery>
+>

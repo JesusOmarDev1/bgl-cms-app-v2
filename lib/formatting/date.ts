@@ -72,3 +72,13 @@ export const formatDateLong = new Intl.DateTimeFormat("es-MX", {
   year: "numeric",
   timeZone: "America/Mexico_City",
 })
+
+/**
+ * Parse a date string to a Date object.
+ * Accepts "yyyy-MM-dd" or "yyyy-MM-dd'T'HH:mm" formats.
+ * @param value - The date string to parse
+ * @returns Date object or undefined if invalid
+ */
+function dateToString(date: Date) {
+  return `${date.getFullYear().toString().padStart(4, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
+}

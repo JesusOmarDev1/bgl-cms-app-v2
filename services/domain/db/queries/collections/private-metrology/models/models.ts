@@ -18,8 +18,11 @@ export interface PrivateModelsQuery {
 
 function validatePagination(limit: number, page: number): void {
   if (
-    !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_LIMIT ||
-    !Number.isSafeInteger(page) || page < 1 ||
+    !Number.isSafeInteger(limit) ||
+    limit < 1 ||
+    limit > MAX_LIMIT ||
+    !Number.isSafeInteger(page) ||
+    page < 1 ||
     page > Math.floor(Number.MAX_SAFE_INTEGER / limit)
   ) {
     throw new RangeError("Invalid pagination")
@@ -38,7 +41,9 @@ export async function getPrivateModelsQuery({
   const rows = await directus.request(
     readItems("models", {
       fields: PRIVATE_MODELS_FIELDS,
-      ...(normalizedSearch ? { filter: { title: { _icontains: normalizedSearch } } } : {}),
+      ...(normalizedSearch
+        ? { filter: { title: { _icontains: normalizedSearch } } }
+        : {}),
       limit: limit + 1,
       offset: (page - 1) * limit,
       sort: ["title", "id"],
@@ -47,4 +52,6 @@ export async function getPrivateModelsQuery({
   return { items: rows.slice(0, limit), hasNextPage: rows.length > limit }
 }
 
-export type PrivateModelsQueryResult = Awaited<ReturnType<typeof getPrivateModelsQuery>>
+export type PrivateModelsQueryResult = Awaited<
+  ReturnType<typeof getPrivateModelsQuery>
+>

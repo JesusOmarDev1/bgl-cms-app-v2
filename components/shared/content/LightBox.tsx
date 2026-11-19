@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
+import type { BaseUIEvent } from "@base-ui/react/types"
 import { MaterialIcon } from "@/components/shared/assets/icons/MaterialIcon"
 
 import { cn } from "cn"
@@ -187,13 +188,13 @@ function LightboxPortal(
 function LightboxOverlay({
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+}: React.ComponentProps<typeof DialogPrimitive.Backdrop>) {
   return (
-    <DialogPrimitive.Overlay
+    <DialogPrimitive.Backdrop
       data-slot="lightbox-overlay"
       className={cn(
         "fixed inset-0 z-50 bg-black/90 backdrop-blur-sm",
-        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         "duration-200 ease-out motion-reduce:animate-none",
         className
       )}
@@ -214,7 +215,7 @@ function LightboxContent({
   children,
   onKeyDown,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: React.ComponentProps<typeof DialogPrimitive.Popup>) {
   const {
     items,
     index,
@@ -246,7 +247,9 @@ function LightboxContent({
     return () => cancelAnimationFrame(frame)
   }, [index, zoomed])
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function handleKeyDown(
+    event: BaseUIEvent<React.KeyboardEvent<HTMLDivElement>>
+  ) {
     onKeyDown?.(event)
     if (event.defaultPrevented) return
     const rtl = isRtl(event.currentTarget)
@@ -334,13 +337,13 @@ function LightboxContent({
   return (
     <LightboxPortal>
       <LightboxOverlay />
-      <DialogPrimitive.Content
+      <DialogPrimitive.Popup
         data-slot="lightbox-content"
         aria-describedby={undefined}
         onKeyDown={handleKeyDown}
         className={cn(
           "fixed inset-0 z-50 flex flex-col outline-none",
-          "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+          "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0",
           "duration-200 ease-out motion-reduce:animate-none",
           className
         )}
@@ -450,7 +453,7 @@ function LightboxContent({
             />
           </button>
         ) : null}
-      </DialogPrimitive.Content>
+      </DialogPrimitive.Popup>
     </LightboxPortal>
   )
 }

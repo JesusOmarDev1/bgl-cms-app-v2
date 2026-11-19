@@ -7,10 +7,15 @@ const { request, publicRequest, createPrivateDirectus } = vi.hoisted(() => ({
 }))
 vi.mock("server-only", () => ({}))
 vi.mock("@directus/sdk", () => ({
-  readItems: vi.fn((collection: string, query: object) => ({ collection, ...query })),
+  readItems: vi.fn((collection: string, query: object) => ({
+    collection,
+    ...query,
+  })),
 }))
 vi.mock("@/config/directus-private", () => ({ createPrivateDirectus }))
-vi.mock("@/config/directus-public", () => ({ publicDirectus: { request: publicRequest } }))
+vi.mock("@/config/directus-public", () => ({
+  publicDirectus: { request: publicRequest },
+}))
 vi.mock("next/cache", () => ({ cacheLife: vi.fn(), cacheTag: vi.fn() }))
 
 import { getPrivateClientsRepository } from "@/services/domain/db/repositories/collections/private-clients"
@@ -31,7 +36,11 @@ describe("private client repository", () => {
     request.mockResolvedValue(clients)
 
     await expect(
-      getPrivateClientsRepository({ accessToken: "employee-a", search: "uno", page: 2 })
+      getPrivateClientsRepository({
+        accessToken: "employee-a",
+        search: "uno",
+        page: 2,
+      })
     ).resolves.toEqual({ items: clients.slice(0, 10), hasNextPage: true })
 
     expect(createPrivateDirectus).toHaveBeenCalledWith("employee-a")
@@ -45,7 +54,13 @@ describe("private client repository", () => {
     })
   })
 
-  it.each([{ limit: 0 }, { limit: -1 }, { limit: 1.5 }, { page: 0 }, { page: 1.5 }])(
+  it.each([
+    { limit: 0 },
+    { limit: -1 },
+    { limit: 1.5 },
+    { page: 0 },
+    { page: 1.5 },
+  ])(
     "rejects invalid pagination before creating a private client: %o",
     async (query) => {
       await expect(
@@ -60,9 +75,7 @@ describe("private client repository", () => {
     const publicClients = [{ id: "public-1", name: "Cliente público" }]
     publicRequest.mockResolvedValue(publicClients)
 
-    await expect(
-      getClientsQuery({}, "failed")
-    ).resolves.toEqual(publicClients)
+    await expect(getClientsQuery({}, "failed")).resolves.toEqual(publicClients)
 
     expect(publicRequest.mock.calls[0][0]).toMatchObject({
       collection: "clients",
@@ -75,7 +88,8 @@ describe("private client repository", () => {
   })
 
   it("propagates authorization and transport failures instead of returning empty data", async () => {
-    request.mockRejectedValueOnce(new Error("FORBIDDEN"))
+    request
+      .mockRejectedValueOnce(new Error("FORBIDDEN"))
       .mockRejectedValueOnce(new Error("SERVICE_UNAVAILABLE"))
 
     await expect(

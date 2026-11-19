@@ -240,7 +240,10 @@ function DateRangePicker({
         className="h-10 w-full justify-between gap-2 px-3 text-start text-sm font-normal tabular-nums"
       >
         <span
-          className={cn("min-w-0 flex-1 truncate", !value && "text-muted-foreground")}
+          className={cn(
+            "min-w-0 flex-1 truncate",
+            !value && "text-muted-foreground"
+          )}
         >
           {label}
         </span>
