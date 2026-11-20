@@ -24,6 +24,7 @@ export default defineConfig({
           include: [
             "lib/**/*.test.ts",
             "services/**/*.test.ts",
+            "app/(auth)/(dashboard)/dashboard/ordenes/page.test.ts",
             "components/collections/catalog/**/*.test.ts",
             "components/shared/settings/**/*.test.ts",
           ],
@@ -35,12 +36,15 @@ export default defineConfig({
         test: {
           name: "media",
           include: [
+            "components/shared/assets/audio/Transport.test.tsx",
+            "components/shared/assets/audio/Fader.test.tsx",
             "hooks/useAudioProvider.test.tsx",
             "hooks/useVideoPlayback.test.tsx",
             "components/shared/utility/CookieConsentAnalytics.test.tsx",
             "components/shared/forms/DateRangePicker.test.tsx",
             "components/shared/settings/ProfileForm.test.tsx",
             "components/blocks/metrology/orders/OrdersClient.test.tsx",
+            "components/blocks/metrology/orders/OrdersTableView.test.tsx",
           ],
           browser: {
             enabled: true,

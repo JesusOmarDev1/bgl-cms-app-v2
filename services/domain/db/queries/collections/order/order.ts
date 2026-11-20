@@ -20,6 +20,8 @@ function isOrderStatus(status: unknown): status is OrderStatus {
 }
 
 export type OrderStatusFilter = "all" | OrderStatus
+export type OrderSortField = "date_created" | "folio"
+export type OrderSortDirection = "asc" | "desc"
 
 export interface OrdersQuery {
   limit?: number
@@ -27,6 +29,8 @@ export interface OrdersQuery {
   status?: OrderStatusFilter
   search?: string
   dateFilter?: OrderDateFilterInput
+  sortBy?: OrderSortField
+  sortDirection?: OrderSortDirection
 }
 
 const DEFAULT_ORDER_LIMIT = 10
@@ -42,27 +46,41 @@ export async function getOrdersQuery(
     status = "all",
     search,
     dateFilter,
+    sortBy = "date_created",
+    sortDirection = "desc",
   }: OrdersQuery = {}
 ) {
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > MAX_ORDER_LIMIT) {
-    throw new RangeError(`limit must be an integer between 1 and ${MAX_ORDER_LIMIT}`)
+    throw new RangeError(
+      `limit must be an integer between 1 and ${MAX_ORDER_LIMIT}`
+    )
   }
   if (
     !Number.isSafeInteger(page) ||
     page < 1 ||
     page > Math.floor(Number.MAX_SAFE_INTEGER / limit)
   ) {
-    throw new RangeError("page must be a positive safe integer within the result bound")
+    throw new RangeError(
+      "page must be a positive safe integer within the result bound"
+    )
   }
 
   if (!ORDER_STATUSES.includes(status as OrderStatus) && status !== "all") {
     throw new RangeError("status must be all, draft, paid, or cancelled")
   }
+  if (sortBy !== "date_created" && sortBy !== "folio") {
+    throw new RangeError("sortBy must be date_created or folio")
+  }
+  if (sortDirection !== "asc" && sortDirection !== "desc") {
+    throw new RangeError("sortDirection must be asc or desc")
+  }
   if (search !== undefined && typeof search !== "string") {
     throw new RangeError("search must be a string")
   }
   if (search && search.length > MAX_ORDER_SEARCH_LENGTH) {
-    throw new RangeError(`search must not exceed ${MAX_ORDER_SEARCH_LENGTH} characters`)
+    throw new RangeError(
+      `search must not exceed ${MAX_ORDER_SEARCH_LENGTH} characters`
+    )
   }
   if (
     dateFilter?.mode === "specific" &&
@@ -95,15 +113,24 @@ export async function getOrdersQuery(
         : { _and: filters }
 
   const directus = await createPrivateDirectus(accessToken)
+  const sortField = (
+    {
+      date_created: { asc: "date_created", desc: "-date_created" },
+      folio: { asc: "folio", desc: "-folio" },
+    } as const
+  )[sortBy][sortDirection]
   return directus.request(
     readItems("order", {
       // directus_users stays out of Schema; the technician relation is locally verified but not SDK-typed.
-      fields: ORDER_LIST_FIELDS as unknown as Query<Schema, OrderTypes>["fields"],
+      fields: ORDER_LIST_FIELDS as unknown as Query<
+        Schema,
+        OrderTypes
+      >["fields"],
       deep: { scales: { _sort: ["sort"] } },
       ...(filter ? { filter } : {}),
       limit,
       page,
-      sort: ["-date_created", "id"],
+      sort: [sortField, "id"],
     } satisfies Query<Schema, OrderTypes>)
   )
 }
@@ -113,7 +140,10 @@ export async function getOrderQuery(accessToken: string, id: string) {
   const order = await directus.request(
     readItem("order", id, {
       // Keep the user relation expansion narrow without adding directus_users to Schema.
-      fields: ORDER_DETAIL_FIELDS as unknown as Query<Schema, OrderTypes>["fields"],
+      fields: ORDER_DETAIL_FIELDS as unknown as Query<
+        Schema,
+        OrderTypes
+      >["fields"],
       deep: { scales: { _sort: ["sort"] } },
     } satisfies Query<Schema, OrderTypes>)
   )

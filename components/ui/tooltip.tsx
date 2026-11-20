@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  Focusable,
   OverlayArrow,
   Tooltip as TooltipPrimitive,
   TooltipTrigger as TooltipTriggerPrimitive,
@@ -23,9 +22,10 @@ function TooltipTrigger({
       delay={delay}
       {...props}
     >
-      <Focusable isDisabled={props.isDisabled}>
-        {trigger as React.ComponentProps<typeof Focusable>["children"]}
-      </Focusable>
+      {/* RAC trigger children consume the FocusableProvider context
+          themselves; an extra <Focusable> clone breaks inside RAC
+          collection pre-rendering (e.g. Tabs) by detaching the ref. */}
+      {trigger as React.ReactNode}
       {tooltip}
     </TooltipTriggerPrimitive>
   )

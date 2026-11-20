@@ -22,6 +22,7 @@ import {
   getOrderRepository,
   getOrdersRepository,
 } from "@/services/domain/db/repositories/collections/order"
+import { readOrderSort } from "@/app/(auth)/(dashboard)/dashboard/ordenes/page"
 
 const listOrder = {
   id: "order-1",
@@ -53,6 +54,24 @@ const order = {
 }
 
 describe("private order repositories", () => {
+  it("parses only supported sort URL values and leaves filters outside this parser", () => {
+    expect(
+      readOrderSort({
+        sortBy: "folio",
+        sortDirection: "asc",
+        page: "4",
+        status: "paid",
+        q: "báscula",
+      })
+    ).toEqual({ sortBy: "folio", sortDirection: "asc" })
+    expect(readOrderSort({ sortBy: "folio,id", sortDirection: "asc" })).toEqual(
+      { sortBy: "date_created", sortDirection: "asc" }
+    )
+    expect(
+      readOrderSort({ sortBy: "folio", sortDirection: ["desc", "asc"] })
+    ).toEqual({ sortBy: "folio", sortDirection: "desc" })
+  })
+
   beforeEach(() => {
     request.mockReset()
     createPrivateDirectus.mockClear()
@@ -83,6 +102,64 @@ describe("private order repositories", () => {
       sort: ["-date_created", "id"],
     })
   })
+
+  it.each([
+    {
+      sortBy: "date_created" as const,
+      sortDirection: "asc" as const,
+      expected: ["date_created", "id"],
+    },
+    {
+      sortBy: "date_created" as const,
+      sortDirection: "desc" as const,
+      expected: ["-date_created", "id"],
+    },
+    {
+      sortBy: "folio" as const,
+      sortDirection: "asc" as const,
+      expected: ["folio", "id"],
+    },
+    {
+      sortBy: "folio" as const,
+      sortDirection: "desc" as const,
+      expected: ["-folio", "id"],
+    },
+  ])(
+    "uses a whitelisted global sort %#",
+    async ({ sortBy, sortDirection, expected }) => {
+      request.mockResolvedValue([listOrder])
+
+      await getOrdersRepository({
+        accessToken: "employee-token",
+        sortBy,
+        sortDirection,
+        page: 2,
+        limit: 5,
+      })
+
+      expect(request.mock.calls[0][0]).toMatchObject({
+        sort: expected,
+        limit: 5,
+        page: 2,
+      })
+    }
+  )
+
+  it.each([
+    { sortBy: "status" as never },
+    { sortBy: "folio,id" as never },
+    { sortDirection: "random" as never },
+  ])(
+    "rejects invalid sort query %# before creating a Directus client",
+    async (query) => {
+      await expect(
+        getOrdersRepository({ accessToken: "employee-token", ...query })
+      ).rejects.toThrow()
+
+      expect(createPrivateDirectus).not.toHaveBeenCalled()
+      expect(request).not.toHaveBeenCalled()
+    }
+  )
 
   it("applies status, folio-or-authorized-client-name search, and date filters before pagination", async () => {
     request.mockResolvedValue([listOrder])
@@ -172,7 +249,10 @@ describe("private order repositories", () => {
     {
       dateFilter: {
         mode: "specific" as const,
-        dates: Array.from({ length: 32 }, (_, index) => `2026-01-${String(index + 1).padStart(2, "0")}`),
+        dates: Array.from(
+          { length: 32 },
+          (_, index) => `2026-01-${String(index + 1).padStart(2, "0")}`
+        ),
       },
     },
     { dateFilter: { mode: "period", startDate: "2026-02-30" } as never },

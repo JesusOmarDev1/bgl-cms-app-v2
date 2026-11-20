@@ -30,6 +30,12 @@
         "filteredTitle": "No hay órdenes con estos filtros",
         "filteredDescription": "Cambia la búsqueda, el estado o el período para ver otras órdenes."
       },
+      "sorting": {
+        "label": "Ordenar órdenes",
+        "byField": "Ordenar por {field}. Orden actual: {direction}",
+        "ascending": "ascendente",
+        "descending": "descendente"
+      },
       "fields": {
         "folio": "Folio",
         "date": "Fecha",

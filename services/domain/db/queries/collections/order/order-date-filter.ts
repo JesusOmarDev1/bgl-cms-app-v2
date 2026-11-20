@@ -54,7 +54,9 @@ function mexicoCityMidnightUtc(value: string): string {
   let timestamp = localMidnightAsUtc
   for (let attempt = 0; attempt < 3; attempt++) {
     const parts = Object.fromEntries(
-      formatter.formatToParts(timestamp).map(({ type, value: part }) => [type, part])
+      formatter
+        .formatToParts(timestamp)
+        .map(({ type, value: part }) => [type, part])
     )
     const formattedAsUtc = Date.UTC(
       Number(parts.year),
@@ -70,7 +72,10 @@ function mexicoCityMidnightUtc(value: string): string {
   return new Date(timestamp).toISOString()
 }
 
-function dateRange(startDate: string, endExclusiveDate: string): DateRangeFilter {
+function dateRange(
+  startDate: string,
+  endExclusiveDate: string
+): DateRangeFilter {
   return {
     date_created: {
       _gte: mexicoCityMidnightUtc(startDate),

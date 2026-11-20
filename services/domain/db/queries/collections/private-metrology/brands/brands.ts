@@ -18,8 +18,11 @@ export interface PrivateBrandsQuery {
 
 function validatePagination(limit: number, page: number): void {
   if (
-    !Number.isSafeInteger(limit) || limit < 1 || limit > MAX_LIMIT ||
-    !Number.isSafeInteger(page) || page < 1 ||
+    !Number.isSafeInteger(limit) ||
+    limit < 1 ||
+    limit > MAX_LIMIT ||
+    !Number.isSafeInteger(page) ||
+    page < 1 ||
     page > Math.floor(Number.MAX_SAFE_INTEGER / limit)
   ) {
     throw new RangeError("Invalid pagination")
@@ -38,7 +41,9 @@ export async function getPrivateBrandsQuery({
   const rows = await directus.request(
     readItems("brands", {
       fields: PRIVATE_BRANDS_FIELDS,
-      ...(normalizedSearch ? { filter: { title: { _icontains: normalizedSearch } } } : {}),
+      ...(normalizedSearch
+        ? { filter: { title: { _icontains: normalizedSearch } } }
+        : {}),
       limit: limit + 1,
       offset: (page - 1) * limit,
       sort: ["title", "id"],
@@ -47,4 +52,6 @@ export async function getPrivateBrandsQuery({
   return { items: rows.slice(0, limit), hasNextPage: rows.length > limit }
 }
 
-export type PrivateBrandsQueryResult = Awaited<ReturnType<typeof getPrivateBrandsQuery>>
+export type PrivateBrandsQueryResult = Awaited<
+  ReturnType<typeof getPrivateBrandsQuery>
+>

@@ -7,6 +7,10 @@ import { getDirectusCode } from "@/lib/directus/directus-error"
 import { getOrdersRepository } from "@/services/domain/db/repositories/collections/order"
 import { readAuthSession } from "@/services/domain/server/auth/token"
 import type { OrderDateFilterInput } from "@/services/domain/db/queries/collections/order/order-date-filter"
+import type {
+  OrderSortDirection,
+  OrderSortField,
+} from "@/services/domain/db/queries/collections/order/order"
 
 export const metadata: Metadata = {
   title: "Órdenes de servicio",
@@ -19,7 +23,27 @@ function getString(value: string | string[] | undefined) {
   return typeof value === "string" ? value : undefined
 }
 
-function readDateFilter(params: SearchParams): OrderDateFilterInput | undefined {
+export function readOrderSort(params: SearchParams): {
+  sortBy: OrderSortField
+  sortDirection: OrderSortDirection
+} {
+  const sortBy = getString(params.sortBy)
+  const sortDirection = getString(params.sortDirection)
+  return {
+    sortBy:
+      sortBy === "date_created" || sortBy === "folio"
+        ? sortBy
+        : "date_created",
+    sortDirection:
+      sortDirection === "asc" || sortDirection === "desc"
+        ? sortDirection
+        : "desc",
+  }
+}
+
+function readDateFilter(
+  params: SearchParams
+): OrderDateFilterInput | undefined {
   const mode = getString(params.dateMode)
   if (!mode) return undefined
   if (mode === "range") {
@@ -48,7 +72,11 @@ function queryErrorKind(error: unknown): "denied" | "error" | "invalid" {
   return "error"
 }
 
-async function OrdersPageContent({ searchParams }: { searchParams: Promise<SearchParams> }) {
+async function OrdersPageContent({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
   await connection()
   const session = await readAuthSession()
   if (!session?.accessToken) redirect("/login")
@@ -57,8 +85,12 @@ async function OrdersPageContent({ searchParams }: { searchParams: Promise<Searc
   const rawPage = getString(params.page)
   const page = rawPage && /^\d+$/.test(rawPage) ? Number(rawPage) : 1
   const rawStatus = getString(params.status)
-  const status = rawStatus === "draft" || rawStatus === "paid" || rawStatus === "cancelled" ? rawStatus : "all"
+  const status =
+    rawStatus === "draft" || rawStatus === "paid" || rawStatus === "cancelled"
+      ? rawStatus
+      : "all"
   const search = getString(params.q) ?? ""
+  const orderSort = readOrderSort(params)
   const t = await getTranslations("metrology.orders")
 
   let orders: Awaited<ReturnType<typeof getOrdersRepository>> | null = null
@@ -71,6 +103,7 @@ async function OrdersPageContent({ searchParams }: { searchParams: Promise<Searc
       status,
       search,
       dateFilter: readDateFilter(params),
+      ...orderSort,
     })
   } catch (error) {
     errorKind = queryErrorKind(error)
@@ -78,16 +111,25 @@ async function OrdersPageContent({ searchParams }: { searchParams: Promise<Searc
 
   if (errorKind) {
     return (
-      <section className="rounded-xl border border-border bg-card/30 p-6" role="alert">
+      <section
+        className="rounded-xl border border-border bg-card/30 p-6"
+        role="alert"
+      >
         <h2 className="text-lg font-medium">{t(`state.${errorKind}.title`)}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t(`state.${errorKind}.description`)}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t(`state.${errorKind}.description`)}
+        </p>
       </section>
     )
   }
   return <OrdersClient orders={orders ?? []} />
 }
 
-export default async function OrdersPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
   const t = await getTranslations("metrology.orders")
   return (
     <main className="min-h-[calc(100svh-3rem)] flex-1 p-4 md:p-6">

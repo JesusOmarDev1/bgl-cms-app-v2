@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@audio-ui/react':
-        specifier: ^0.1.2
-        version: 0.1.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.2.0
+        version: 0.2.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@base-ui/react':
         specifier: ^1.7.0
         version: 1.9.0(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -66,6 +66,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.102.1
         version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
+      '@tanstack/react-table':
+        specifier: 9.3.1
+        version: 9.3.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@tanstack/react-virtual':
         specifier: ^3.14.10
         version: 3.14.26(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -280,19 +283,18 @@ packages:
   '@astrojs/compiler@4.0.0':
     resolution: {integrity: sha512-eouss7G8ygdZqHuke033VMcVw5HTZUu+PXd/h06DGDUg/jt5btPYPqh66ENWw/mU78rBrf/oeC4oqoBwMtDMNA==}
 
-  '@audio-ui/react@0.1.2':
-    resolution: {integrity: sha512-nhcGj7cU0krwn8ZDZllvPceo2DtyCzmK16IlzJY+2G8CT51oflO224fudzCbQ76jErWV9L1zYAvSPya7nUwcdA==}
+  '@audio-ui/core@0.1.2':
+    resolution: {integrity: sha512-ONeStZSlKOjkiki9dx2hOTDA+z9D2jjGB3lZ2tazACx/yfRIUkjzZBNtpZ6V0nu6QJrM/GtmW+KegPunCyKFDw==}
+
+  '@audio-ui/react@0.2.0':
+    resolution: {integrity: sha512-WLt9J5zj5tTtgeIgP9lofNd13TmjtW/ODB1ir3v3KB5stv+sP+BsG2zGshgStPYcQNH4KgtLN5pFziARWTAmVw==}
     peerDependencies:
-      '@types/react': 19.3.0
+      '@types/react': ^18 || ^19
       react: ^19.2.7
       react-dom: ^19.2.7
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  '@audio-ui/utils@0.0.5':
-    resolution: {integrity: sha512-D+yJLWahXlhN/po8vXXjCRaNCKVkVsb2kozjh+gJrjH2oiH1Kh89IGtzTGQMAskbal84Gj2CZ7aut4I9PBIVPw==}
-    deprecated: 'No longer maintained: its helpers are bundled in @audio-ui/core and @audio-ui/react.'
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -2629,6 +2631,12 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  '@tanstack/react-table@9.3.1':
+    resolution: {integrity: sha512-E6Ya5TnY6EaGyZYIUqig/29Lr/gJSAubQkLJFqiWkUl5nRCr0Xr9hvJot+NiRTtG+TzGxHTiqUW3bnLtQxlHug==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=18'
+
   '@tanstack/react-virtual@3.14.26':
     resolution: {integrity: sha512-HUDlfsrYH6ko5xH56L62Mcl/uzT+AGVNMHFuDNqDJMdZWc1AQa2oeVKNUvZ/RWBZQ4TYtyQerFrNvLnp39h65A==}
     peerDependencies:
@@ -2637,6 +2645,10 @@ packages:
 
   '@tanstack/store@0.11.2':
     resolution: {integrity: sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q==}
+
+  '@tanstack/table-core@9.3.1':
+    resolution: {integrity: sha512-zQvlxSNi2qGM3L4jh85Z6hqMfdIR5qOfD9KHOU32nuKFJGN0RlJ7UvV1lsPb1fPVhpFYI0VP3jJGxLdLDpTKjQ==}
+    engines: {node: '>=20'}
 
   '@tanstack/virtual-core@3.19.11':
     resolution: {integrity: sha512-/5iHb0RHBvj8Di59FDs4ESNm45jls33aZAi4zccVXZjc/6ZvwQP6nzEYeT6weXjTf9E6/vrp2JhYWRyO+ZP13A==}
@@ -6009,15 +6021,15 @@ snapshots:
 
   '@astrojs/compiler@4.0.0': {}
 
-  '@audio-ui/react@0.1.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@audio-ui/react@0.2.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@audio-ui/utils': 0.0.5
+      '@audio-ui/core': 0.1.2
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
       '@types/react': 19.3.0
 
-  '@audio-ui/utils@0.0.5': {}
+  '@audio-ui/core@0.1.2': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -7869,6 +7881,14 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
       use-sync-external-store: 1.7.0(react@19.3.1)
 
+  '@tanstack/react-table@9.3.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@tanstack/react-store': 0.11.2(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@tanstack/table-core': 9.3.1
+      react: 19.3.1
+    transitivePeerDependencies:
+      - react-dom
+
   '@tanstack/react-virtual@3.14.26(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@tanstack/virtual-core': 3.19.11
@@ -7876,6 +7896,10 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
 
   '@tanstack/store@0.11.2': {}
+
+  '@tanstack/table-core@9.3.1':
+    dependencies:
+      '@tanstack/store': 0.11.2
 
   '@tanstack/virtual-core@3.19.11': {}
 
