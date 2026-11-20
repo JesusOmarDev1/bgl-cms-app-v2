@@ -192,43 +192,45 @@ describe("store category/type navigation", () => {
   it("keeps empty categories linked and renders their empty state", () => {
     const entry = renderCatalog("")
     expect(entry).toContain('aria-label="Search categories"')
-    expect(entry).toContain('href="/tienda?cat=empty"')
+    expect(entry).toContain('href="/productos?cat=empty"')
     expect(entry).toContain('data-directus-src="category-image"')
     expect(entry).toContain("material-symbols-rounded")
-    expect(entry).not.toContain('href="/tienda/producto/')
+    expect(entry).not.toContain('href="/productos/')
 
     const emptyCategory = renderCatalog("?cat=empty")
     expect(emptyCategory).toContain(
       "This category has no types or products yet."
     )
-    expect(emptyCategory).toContain('href="/tienda"')
-    expect(emptyCategory).not.toContain('href="/tienda?cat=empty&type=')
+    expect(emptyCategory).toContain('href="/productos"')
+    expect(emptyCategory).not.toContain('href="/productos?cat=empty&type=')
   })
 
   it("keeps categories without slugs selectable through a stable ID URL", () => {
     const entry = renderCatalog("")
-    expect(entry).toContain('href="/tienda?cat=id%3Ac4"')
+    expect(entry).toContain('href="/productos?cat=id%3Ac4"')
 
     const category = renderCatalog("?cat=id%3Ac4")
     expect(category).toContain("No-slug category")
-    expect(category).toContain('href="/tienda?cat=id%3Ac4&amp;type=sin-tipo"')
+    expect(category).toContain(
+      'href="/productos?cat=id%3Ac4&amp;type=sin-tipo"'
+    )
 
     const products = renderCatalog("?cat=id%3Ac4&type=sin-tipo")
-    expect(products).toContain('href="/tienda/producto/no-slug-untyped"')
+    expect(products).toContain('href="/productos/no-slug-untyped"')
   })
 
   it("filters only category cards at the entry stage", () => {
     const html = renderCatalog("?q=Other")
     expect(html).toContain('value="Other"')
     expect(html).toContain('aria-label="Search categories"')
-    expect(html).toContain('href="/tienda?cat=other"')
-    expect(html).not.toContain('href="/tienda?cat=scales"')
-    expect(html).not.toContain('href="/tienda/producto/')
+    expect(html).toContain('href="/productos?cat=other"')
+    expect(html).not.toContain('href="/productos?cat=scales"')
+    expect(html).not.toContain('href="/productos/')
 
     const noMatches = renderCatalog("?q=zzzz")
     expect(noMatches).toContain("No matches")
     expect(noMatches).toContain("Clear")
-    expect(noMatches).not.toContain('href="/tienda/producto/')
+    expect(noMatches).not.toContain('href="/productos/')
   })
 
   it("renders the product type icon and keeps the category icon fallback", () => {
@@ -243,10 +245,10 @@ describe("store category/type navigation", () => {
 
   it("does not show another category's types for the selected category", () => {
     const html = renderCatalog("?cat=scales")
-    expect(html).toContain('href="/tienda?cat=scales&amp;type=industrial"')
-    expect(html).toContain('href="/tienda?cat=scales&amp;type=sin-tipo"')
+    expect(html).toContain('href="/productos?cat=scales&amp;type=industrial"')
+    expect(html).toContain('href="/productos?cat=scales&amp;type=sin-tipo"')
     expect(html).not.toContain("Bench")
-    expect(html).toContain('href="/tienda"')
+    expect(html).toContain('href="/productos"')
   })
 
   it("treats a cross-category type URL as the category stage, not untyped products", () => {
@@ -255,22 +257,22 @@ describe("store category/type navigation", () => {
     expect(html).not.toMatch(
       /data-slot="breadcrumb-page"[^>]*>Untyped products<\/span>/
     )
-    expect(html).toContain('href="/tienda?cat=scales&amp;type=industrial"')
-    expect(html).not.toContain('href="/tienda/producto/')
+    expect(html).toContain('href="/productos?cat=scales&amp;type=industrial"')
+    expect(html).not.toContain('href="/productos/')
   })
 
   it("keeps selected products scoped even when another category reuses a type ID", () => {
     const html = renderCatalog("?cat=scales&type=industrial")
-    expect(html).toContain('href="/tienda/producto/industrial-scale"')
+    expect(html).toContain('href="/productos/industrial-scale"')
     expect(html).not.toContain("other-cross-type")
     expect(html).not.toContain("other-untyped")
   })
 
   it("keeps untyped products scoped and provides a breadcrumb back to category", () => {
     const html = renderCatalog("?cat=scales&type=sin-tipo")
-    expect(html).toContain('href="/tienda?cat=scales"')
+    expect(html).toContain('href="/productos?cat=scales"')
     expect(html).toContain("Untyped products")
-    expect(html).toContain('href="/tienda/producto/scale-untyped"')
+    expect(html).toContain('href="/productos/scale-untyped"')
     expect(html).not.toContain("other-untyped")
   })
 

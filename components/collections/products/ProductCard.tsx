@@ -39,7 +39,7 @@ export function ProductCard({ data }: { data: ProductCardData }) {
   return (
     <Link
       className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      href={`/tienda/producto/${data.slug}`}
+      href={`/productos/${data.slug}`}
     >
       <Card className="h-full flex-row pt-0 transition-[transform,box-shadow,background-color] hover:bg-secondary/40 has-[a:focus-visible]:bg-secondary/40 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg motion-reduce:transition-none sm:flex-col">
         {data.imageId ? (

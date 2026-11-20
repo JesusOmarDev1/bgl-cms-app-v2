@@ -29,4 +29,3 @@ function makeLimiter(
 
 export const searchLimiter = makeLimiter("search", 60)
 export const formLimiter = makeLimiter("form-submit", 5, 300)
-export const loginLimiter = makeLimiter("auth-login", 5, 300)

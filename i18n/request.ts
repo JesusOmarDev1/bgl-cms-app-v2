@@ -18,7 +18,6 @@ export default getRequestConfig(async () => {
       ...(await import(`./messages/${locale}/manuals.json`)).default,
       ...(await import(`./messages/${locale}/ai.json`)).default,
       ...(await import(`./messages/${locale}/copy-to-clipboard.json`)).default,
-      ...(await import(`./messages/${locale}/theme.json`)).default,
       ...(await import(`./messages/${locale}/health.json`)).default,
       ...(await import(`./messages/${locale}/network.json`)).default,
       ...(await import(`./messages/${locale}/maintenance.json`)).default,
@@ -26,10 +25,6 @@ export default getRequestConfig(async () => {
       ...(await import(`./messages/${locale}/server-error.json`)).default,
       ...(await import(`./messages/${locale}/debug.json`)).default,
       ...(await import(`./messages/${locale}/cookies.json`)).default,
-      ...(await import(`./messages/${locale}/auth.json`)).default,
-      ...(await import(`./messages/${locale}/app.json`)).default,
-      ...(await import(`./messages/${locale}/dashboard.json`)).default,
-      ...(await import(`./messages/${locale}/metrology.json`)).default,
       ...(await import(`./messages/${locale}/storybook.json`)).default,
     },
   }

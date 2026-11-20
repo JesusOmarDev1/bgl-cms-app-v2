@@ -19,9 +19,21 @@ const transportTrackVariants = cva(
   {
     variants: { size: { sm: "", default: "", lg: "" } },
     compoundVariants: [
-      { size: "sm", class: "data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5" },
-      { size: "default", class: "data-[orientation=horizontal]:h-2 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2" },
-      { size: "lg", class: "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2.5" },
+      {
+        size: "sm",
+        class:
+          "data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+      },
+      {
+        size: "default",
+        class:
+          "data-[orientation=horizontal]:h-2 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2",
+      },
+      {
+        size: "lg",
+        class:
+          "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2.5",
+      },
     ],
     defaultVariants: { size: "default" },
   }
@@ -32,9 +44,21 @@ const transportThumbVariants = cva(
   {
     variants: { size: { sm: "", default: "", lg: "" } },
     compoundVariants: [
-      { size: "sm", class: "data-[orientation=horizontal]:h-3.5 data-[orientation=horizontal]:w-5 data-[orientation=vertical]:h-5 data-[orientation=vertical]:w-3.5" },
-      { size: "default", class: "data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-6 data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-4" },
-      { size: "lg", class: "data-[orientation=horizontal]:h-5 data-[orientation=horizontal]:w-7 data-[orientation=vertical]:h-7 data-[orientation=vertical]:w-5" },
+      {
+        size: "sm",
+        class:
+          "data-[orientation=horizontal]:h-3.5 data-[orientation=horizontal]:w-5 data-[orientation=vertical]:h-5 data-[orientation=vertical]:w-3.5",
+      },
+      {
+        size: "default",
+        class:
+          "data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-6 data-[orientation=vertical]:h-6 data-[orientation=vertical]:w-4",
+      },
+      {
+        size: "lg",
+        class:
+          "data-[orientation=horizontal]:h-5 data-[orientation=horizontal]:w-7 data-[orientation=vertical]:h-7 data-[orientation=vertical]:w-5",
+      },
     ],
     defaultVariants: { size: "default" },
   }
@@ -43,16 +67,35 @@ const transportThumbVariants = cva(
 const transportThumbMarkVariants = cva("bg-primary opacity-50", {
   variants: { size: { sm: "", default: "", lg: "" } },
   compoundVariants: [
-    { size: "sm", class: "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-2.5" },
-    { size: "default", class: "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-2.5" },
-    { size: "lg", class: "data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-3" },
+    {
+      size: "sm",
+      class:
+        "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-2.5",
+    },
+    {
+      size: "default",
+      class:
+        "data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-2.5",
+    },
+    {
+      size: "lg",
+      class:
+        "data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-px data-[orientation=vertical]:h-px data-[orientation=vertical]:w-3",
+    },
   ],
   defaultVariants: { size: "default" },
 })
 
 type TransportProps = Omit<
   SliderProps<number>,
-  "className" | "defaultValue" | "maxValue" | "minValue" | "onChange" | "onChangeEnd" | "onChangeStart" | "value"
+  | "className"
+  | "defaultValue"
+  | "maxValue"
+  | "minValue"
+  | "onChange"
+  | "onChangeEnd"
+  | "onChangeStart"
+  | "value"
 > & {
   value: number
   bufferedValue?: number
@@ -84,8 +127,13 @@ function Transport({
   const [isDragging, setIsDragging] = useState(false)
   const [frozenBufferedValue, setFrozenBufferedValue] = useState(bufferedValue)
   const displayedBufferedValue =
-    freezeValuesWhileDragging && isDragging ? frozenBufferedValue : bufferedValue
-  const buffer = Math.max(0, Math.min(100, ((displayedBufferedValue - min) / (max - min || 1)) * 100))
+    freezeValuesWhileDragging && isDragging
+      ? frozenBufferedValue
+      : bufferedValue
+  const buffer = Math.max(
+    0,
+    Math.min(100, ((displayedBufferedValue - min) / (max - min || 1)) * 100)
+  )
   return (
     <SliderPrimitive
       className={cn(
@@ -112,7 +160,7 @@ function Transport({
     >
       <div
         className={cn(
-          "relative flex w-full touch-none items-center select-none data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col data-[orientation=horizontal]:min-w-32",
+          "relative flex w-full touch-none items-center select-none data-[orientation=horizontal]:min-w-32 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-40 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
           "data-[disabled]:opacity-50"
         )}
         data-orientation={orientation}
@@ -158,21 +206,15 @@ function Transport({
                 ? "flex-row px-1.5 py-1"
                 : "flex-col px-1 py-1.5",
               size === "sm" &&
-                (orientation === "horizontal"
-                  ? "px-1 py-0.5"
-                  : "px-0.5 py-1"),
+                (orientation === "horizontal" ? "px-1 py-0.5" : "px-0.5 py-1"),
               size === "lg" &&
-                (orientation === "horizontal"
-                  ? "px-2 py-1"
-                  : "px-1 py-2")
+                (orientation === "horizontal" ? "px-2 py-1" : "px-1 py-2")
             )}
           >
             <span
               className={cn(
                 transportThumbMarkVariants({ size }),
-                orientation === "horizontal"
-                  ? "h-2.5 w-px"
-                  : "h-px w-2.5"
+                orientation === "horizontal" ? "h-2.5 w-px" : "h-px w-2.5"
               )}
             />
           </span>

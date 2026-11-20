@@ -183,8 +183,10 @@ describe("store navigation depth", () => {
 
   it("keeps empty categories linked and labeled instead of hiding them", () => {
     const html = renderCatalog("")
-    expect(html).toContain('href="/tienda?cat=laboratorio"')
-    const labTile = html.slice(html.indexOf('href="/tienda?cat=laboratorio"'))
+    expect(html).toContain('href="/productos?cat=laboratorio"')
+    const labTile = html.slice(
+      html.indexOf('href="/productos?cat=laboratorio"')
+    )
     expect(labTile).toContain("Sin productos aún")
     expect(labTile).not.toContain('data-slot="type-chips"')
   })

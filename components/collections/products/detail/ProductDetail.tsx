@@ -178,7 +178,7 @@ export async function ProductDetail({
   const kicker = [card.brand, card.model].filter((part): part is string =>
     Boolean(part)
   )
-  const shareUrl = `${WEBSITE_URL}/tienda/producto/${slug}`
+  const shareUrl = `${WEBSITE_URL}/productos/${slug}`
 
   return (
     <BoxContainer>
@@ -189,11 +189,11 @@ export async function ProductDetail({
         paddingBottom={3}
         paddingTop={2}
       >
-        <GoBackBtn href="/tienda">{t("back_to_store")}</GoBackBtn>
+        <GoBackBtn href="/productos">{t("back_to_store")}</GoBackBtn>
         <Breadcrumb>
           <BreadcrumbList className="min-w-0 flex-nowrap text-base">
             <BreadcrumbItem className="shrink-0">
-              <BreadcrumbLink href="/tienda">{t("title")}</BreadcrumbLink>
+              <BreadcrumbLink href="/productos">{t("title")}</BreadcrumbLink>
             </BreadcrumbItem>
             {product.equipment_type ? (
               <BreadcrumbItem className="shrink-0">
