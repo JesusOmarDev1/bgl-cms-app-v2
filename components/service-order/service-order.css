@@ -1,0 +1,529 @@
+/*
+ * Service order sheet — US Letter (612 × 792 pt).
+ * Vertical budget: 18pt top padding + 86pt header + 92pt fields + 143pt
+ * description + 108pt equipment + 128pt parts + 111pt signatures/totals +
+ * 30pt logos + 76pt footer = 792pt. The 12pt taken off 600 × 804pt comes from
+ * blocks whose content is shorter than their minimum, so no row, signature,
+ * logo or type size shrinks.
+ */
+.so-sheet-canvas {
+  align-items: flex-start;
+  background: #101010;
+  color-scheme: light;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.so-page-sheet {
+  background: #fff;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-width: 816px;
+  min-height: 1056px;
+  padding: 18px 32px 0;
+  width: 100%;
+}
+/* Multipage variant: explicit letter sheets, one per page, stacked on screen. */
+.so-multipage-stack {
+  align-items: center;
+  flex-direction: column;
+  gap: 24px;
+}
+/* A single over-long value wraps instead of leaving the sheet horizontally. */
+.so-description-block,
+.so-equipment-list dd,
+.so-parts-table td {
+  overflow-wrap: break-word;
+}
+.so-header-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.so-header-top-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+.so-document-title {
+  color: #d3393b;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+}
+.so-header-brand-logo {
+  height: 60px;
+  object-fit: contain;
+  width: 60px;
+}
+.so-header-folio {
+  font-weight: 700;
+  margin: 0;
+}
+.so-header-date-row {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+.so-header-date-value {
+  background: #ebebeb;
+  border-radius: 3px;
+  font-size: 11px;
+  min-height: 18px;
+  min-width: 40px;
+  padding: 2px 6px;
+}
+.so-field-row dt {
+  flex: 0 0 76px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.so-field-row dd {
+  background: #ebebeb;
+  border-radius: 3px;
+  flex: 1 1 auto;
+  font-size: 11px;
+  margin: 0;
+  min-height: 18px;
+  padding: 2px 6px;
+}
+.so-sheet-section {
+  margin-top: 14px;
+}
+.so-section-bar {
+  background: #d3393b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin: 0 -32px 8px;
+  padding: 4px 32px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.so-fields-grid {
+  display: grid;
+  gap: 6px 16px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+}
+.so-fields-grid .so-field-row {
+  display: flex;
+  gap: 6px;
+}
+.so-fields-grid .so-field-row:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+.so-fields-grid .so-field-row:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+}
+.so-fields-grid .so-field-row:nth-child(3) dd {
+  min-height: 42px;
+}
+.so-fields-grid .so-field-row:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+.so-fields-grid .so-field-row:nth-child(5) {
+  grid-column: 2;
+  grid-row: 3;
+}
+.so-description-block {
+  background: #ebebeb;
+  border-radius: 3px;
+  margin: 0;
+  min-height: 136px;
+  padding: 8px;
+  white-space: pre-wrap;
+}
+.so-equipment-list {
+  display: grid;
+  gap: 8px 12px;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.so-equipment-item-box {
+  break-inside: avoid;
+}
+.so-equipment-item-box:nth-child(1) {
+  grid-column: 1;
+}
+.so-equipment-item-box:nth-child(2) {
+  grid-column: 2;
+}
+.so-equipment-list dl {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+}
+.so-equipment-list dt {
+  font-size: 9px;
+  font-weight: 700;
+}
+.so-equipment-list dd {
+  background: #ebebeb;
+  border-radius: 3px;
+  font-size: 10px;
+  margin: 0;
+  min-height: 84px;
+  padding: 4px;
+}
+.so-parts-table {
+  border-collapse: separate;
+  border-spacing: 0 3px;
+  width: 100%;
+}
+.so-parts-table th {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 4px;
+  text-align: left;
+}
+.so-parts-table td {
+  background: #ebebeb;
+  border-radius: 3px;
+  font-size: 10px;
+  padding: 12px 4px;
+  vertical-align: top;
+}
+.so-amount-cell {
+  text-align: right;
+}
+.so-parts-table th.so-amount-cell,
+.so-parts-table td.so-amount-cell {
+  text-align: right;
+}
+.so-visually-hidden {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.so-signatures-totals-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+.so-signature-group {
+  display: flex;
+  flex: 1 1 420px;
+  gap: 12px;
+}
+.so-signature-block {
+  break-inside: avoid;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.so-signature-title {
+  color: #d3393b;
+  font-size: 10px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.so-signature-block dl {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.so-signature-block .so-field-row {
+  display: flex;
+  gap: 6px;
+}
+.so-signature-label {
+  font-size: 9px;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+.so-signature-box {
+  align-items: center;
+  background: #ebebeb;
+  border-radius: 3px;
+  display: flex;
+  font-size: 10px;
+  margin-top: 4px;
+  min-height: 46px;
+  padding: 4px;
+}
+.so-signature-box img {
+  max-height: 42px;
+  object-fit: contain;
+}
+.so-totals-list {
+  break-inside: avoid;
+  display: grid;
+  flex: 0 0 200px;
+  gap: 3px;
+  margin: 0;
+}
+.so-total-row {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+.so-total-row dt {
+  flex: 1 1 auto;
+  font-size: 9px;
+  font-weight: 700;
+}
+.so-total-row dd {
+  background: #ebebeb;
+  border-radius: 3px;
+  flex: 0 0 78px;
+  font-size: 9px;
+  margin: 0;
+  min-height: 16px;
+  padding: 2px 4px;
+  text-align: right;
+}
+.so-total-row-strong dt {
+  color: #d3393b;
+}
+.so-total-row-strong dd {
+  font-weight: 700;
+}
+.so-partner-logos {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin: 14px 0;
+}
+.so-partner-logos img {
+  height: 32px;
+  max-width: 84px;
+  object-fit: contain;
+}
+.so-footer-block {
+  background: #d3393b;
+  color: #fff;
+  display: flex;
+  gap: 10px;
+  margin: auto -32px 0;
+  padding: 12px 32px;
+}
+.so-footer-brand {
+  align-self: center;
+  height: 60px;
+  object-fit: contain;
+  width: 60px;
+}
+.so-footer-block p {
+  flex: 1 1 0;
+  font-size: 9px;
+  line-height: 1.45;
+  margin: 0;
+  white-space: pre-line;
+}
+@page {
+  size: 612pt 792pt;
+  margin: 0;
+}
+@media print {
+  .so-sheet-canvas {
+    background: #fff;
+    display: block;
+    padding: 0;
+  }
+  .so-page-sheet {
+    box-shadow: none;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    min-height: 792pt;
+    padding: 18pt 24pt 0;
+    width: 612pt;
+  }
+  .so-header-block,
+  .so-fields-grid,
+  .so-description-block,
+  .so-equipment-item-box,
+  .so-parts-table tr,
+  .so-signature-block,
+  .so-totals-list,
+  .so-partner-logos,
+  .so-footer-block {
+    break-inside: avoid;
+  }
+  .so-parts-table thead {
+    display: table-header-group;
+  }
+  /* Each multipage sheet is one printed page; continuation sheets only carry
+     the content they were measured for, so their blocks hug their content. */
+  .so-multipage-stack .so-page-sheet + .so-page-sheet {
+    break-before: page;
+  }
+  .so-multipage-stack
+    .so-page-sheet
+    + .so-page-sheet
+    .so-sheet-section:has(.so-description-block),
+  .so-multipage-stack
+    .so-page-sheet
+    + .so-page-sheet
+    .so-sheet-section:has(.so-equipment-list),
+  .so-multipage-stack
+    .so-page-sheet
+    + .so-page-sheet
+    .so-sheet-section:has(.so-parts-table) {
+    min-height: 0;
+  }
+  .so-header-block {
+    height: 86pt;
+    position: relative;
+  }
+  .so-document-title {
+    font-size: 22pt;
+  }
+  .so-header-folio {
+    position: absolute;
+    top: 35pt;
+    left: 0;
+    font-size: 10pt;
+  }
+  .so-header-date-row {
+    display: flex;
+    justify-content: flex-start;
+    position: absolute;
+    top: 62pt;
+    left: 124pt;
+    width: 440pt;
+    font-size: 9pt;
+  }
+  .so-header-date-value {
+    box-sizing: border-box;
+    font-size: 9pt;
+  }
+  .so-header-date-value:first-of-type {
+    width: 125pt;
+  }
+  .so-header-date-value:last-of-type {
+    width: 196pt;
+  }
+  .so-sheet-section {
+    margin-top: 0;
+  }
+  .so-sheet-section:has(.so-fields-grid) {
+    min-height: 92pt;
+  }
+  .so-sheet-section:has(.so-fields-grid) .so-fields-grid {
+    padding-top: 6pt;
+  }
+  .so-sheet-section:has(.so-description-block) {
+    min-height: 143pt;
+    display: flex;
+    flex-direction: column;
+  }
+  .so-sheet-section:has(.so-equipment-list) {
+    min-height: 108pt;
+  }
+  .so-sheet-section:has(.so-parts-table) {
+    min-height: 128pt;
+  }
+  .so-description-block {
+    flex: 1;
+    min-height: 0;
+    font-size: 9pt;
+  }
+  .so-equipment-list dd {
+    min-height: 51pt;
+  }
+  .so-page-sheet-filled .so-equipment-list {
+    grid-template-columns: 330pt 1fr;
+  }
+  .so-section-bar {
+    font-size: 11pt;
+    margin-left: -24pt;
+    margin-right: -24pt;
+    padding-left: 24pt;
+    padding-right: 24pt;
+  }
+  .so-field-row dt,
+  .so-equipment-list dt,
+  .so-parts-table th {
+    font-size: 8pt;
+  }
+  .so-parts-table td {
+    height: 17pt;
+    padding: 3pt 4pt;
+  }
+  .so-signatures-totals-row {
+    min-height: 111pt;
+    margin: 0;
+    flex-wrap: nowrap;
+    gap: 10pt;
+  }
+  .so-signature-group {
+    flex: 0 0 380pt;
+    gap: 5pt;
+  }
+  .so-signature-mark {
+    align-items: center;
+    display: flex;
+    gap: 4pt;
+  }
+  .so-signature-label {
+    flex: 0 0 26pt;
+    margin: 0;
+    font-size: 8pt;
+  }
+  .so-signature-box {
+    flex: 1;
+    min-height: 42pt;
+    margin: 0;
+  }
+  .so-totals-list {
+    flex: 0 0 174pt;
+  }
+  .so-footer-block {
+    height: 76pt;
+    box-sizing: border-box;
+    gap: 8pt;
+    margin-top: auto;
+    margin-left: -24pt;
+    margin-right: -24pt;
+    padding: 15pt 20pt 0 36pt;
+    break-inside: avoid;
+  }
+  .so-footer-block p {
+    font-size: 7.5pt;
+  }
+  .so-footer-block p:first-of-type {
+    flex: 0 0 180pt;
+  }
+  .so-footer-block p:nth-of-type(2) {
+    flex: 0 0 110pt;
+  }
+  .so-footer-block p:nth-of-type(3) {
+    flex: 0 0 163pt;
+  }
+  .so-partner-logos {
+    height: 30pt;
+    margin: 0;
+  }
+  .so-partner-logos img {
+    height: 22pt;
+    max-width: 84pt;
+  }
+}

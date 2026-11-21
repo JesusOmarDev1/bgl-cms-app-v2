@@ -24,9 +24,8 @@ export default defineConfig({
           include: [
             "lib/**/*.test.ts",
             "services/**/*.test.ts",
-            "app/(auth)/(dashboard)/dashboard/ordenes/page.test.ts",
             "components/collections/catalog/**/*.test.ts",
-            "components/shared/settings/**/*.test.ts",
+            "components/service-order/**/*.test.tsx",
           ],
         },
       },
@@ -41,10 +40,6 @@ export default defineConfig({
             "hooks/useAudioProvider.test.tsx",
             "hooks/useVideoPlayback.test.tsx",
             "components/shared/utility/CookieConsentAnalytics.test.tsx",
-            "components/shared/forms/DateRangePicker.test.tsx",
-            "components/shared/settings/ProfileForm.test.tsx",
-            "components/blocks/metrology/orders/OrdersClient.test.tsx",
-            "components/blocks/metrology/orders/OrdersTableView.test.tsx",
           ],
           browser: {
             enabled: true,

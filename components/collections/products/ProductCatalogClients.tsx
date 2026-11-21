@@ -122,7 +122,7 @@ function CategoryTypes({
       {category.types.map((row) => (
         <li key={row.id}>
           <NavigationCard
-            href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=${encodeURIComponent(row.slug)}`}
+            href={`/productos?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=${encodeURIComponent(row.slug)}`}
             icon={row.icon}
             imageId={row.imageId}
             title={row.title}
@@ -135,7 +135,7 @@ function CategoryTypes({
             icon="inventory_2"
             title={labels.untypedProducts}
             imageId={null}
-            href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=sin-tipo`}
+            href={`/productos?cat=${encodeURIComponent(getCatalogCategoryParam(category))}&type=sin-tipo`}
           />
         </li>
       ) : null}
@@ -262,7 +262,7 @@ export function ProductCatalogClients({
                           ? row.types.map((type) => type.title)
                           : undefined
                       }
-                      href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
+                      href={`/productos?cat=${encodeURIComponent(getCatalogCategoryParam(row))}`}
                       icon={row.icon}
                       imageId={row.imageId}
                       title={row.title}
@@ -296,7 +296,7 @@ export function ProductCatalogClients({
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/tienda">
+            <BreadcrumbLink href="/productos">
               {navigationLabels.categories}
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -308,7 +308,7 @@ export function ProductCatalogClients({
             <>
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  href={`/tienda?cat=${encodeURIComponent(getCatalogCategoryParam(category))}`}
+                  href={`/productos?cat=${encodeURIComponent(getCatalogCategoryParam(category))}`}
                 >
                   {category.title}
                 </BreadcrumbLink>

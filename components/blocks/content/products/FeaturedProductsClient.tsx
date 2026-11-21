@@ -94,7 +94,7 @@ export function FeaturedProductsClient({
                   {product.slug ? (
                     <Link
                       className="block h-full rounded-xl focus-visible:ring-3 focus-visible:ring-ring/50"
-                      href={`/tienda/producto/${product.slug}`}
+                      href={`/productos/${product.slug}`}
                     >
                       {card}
                     </Link>

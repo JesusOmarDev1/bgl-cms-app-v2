@@ -1,0 +1,15 @@
+/*
+ * Print groundwork shared by printed formats. Each format stylesheet owns its
+ * own page size and layout; this file only keeps the screen theme off paper.
+ */
+@media print {
+  :root,
+  body {
+    background: #fff !important;
+    color-scheme: light;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

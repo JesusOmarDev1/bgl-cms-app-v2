@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   experimental: {
-    // Avatar uploads are 2 MB-capped PNGs; the 1 MB default rejects them.
     serverActions: { bodySizeLimit: "3mb" },
     agentFeedback: true,
     agentUpgrade: "security",

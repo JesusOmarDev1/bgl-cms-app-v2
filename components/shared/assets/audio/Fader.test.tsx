@@ -37,16 +37,22 @@ describe("Fader", () => {
       )
     )
 
-    const slider = container.querySelector<HTMLInputElement>("input[type='range']")
+    const slider = container.querySelector<HTMLInputElement>(
+      "input[type='range']"
+    )
     expect(slider?.getAttribute("aria-label")).toBe("Volume")
     expect(slider?.min).toBe("0")
     expect(slider?.max).toBe("100")
     expect(slider?.value).toBe("50")
     expect(slider?.getAttribute("aria-orientation")).toBe("horizontal")
-    expect(container.querySelectorAll("[data-slot='fader-mark']")).toHaveLength(3)
+    expect(container.querySelectorAll("[data-slot='fader-mark']")).toHaveLength(
+      3
+    )
 
     await act(async () =>
-      slider?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }))
+      slider?.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+      )
     )
     expect(onValueChange).toHaveBeenCalledWith(51)
   })
@@ -62,12 +68,18 @@ describe("Fader", () => {
         })
       )
     )
-    const slider = container.querySelector<HTMLInputElement>("input[type='range']")
+    const slider = container.querySelector<HTMLInputElement>(
+      "input[type='range']"
+    )
     expect(slider?.getAttribute("aria-orientation")).toBe("vertical")
     expect(
-      container.querySelector("[data-slot='fader-thumb'] > span")?.getAttribute("data-orientation")
+      container
+        .querySelector("[data-slot='fader-thumb'] > span")
+        ?.getAttribute("data-orientation")
     ).toBe("vertical")
-    expect(container.querySelectorAll("[data-slot='fader-mark']")).toHaveLength(0)
+    expect(container.querySelectorAll("[data-slot='fader-mark']")).toHaveLength(
+      0
+    )
   })
 
   it("defaults the thumb and marks to horizontal orientation", async () => {
@@ -76,15 +88,19 @@ describe("Fader", () => {
     )
 
     expect(
-      container.querySelector<HTMLInputElement>("input[type='range']")?.getAttribute("aria-orientation")
+      container
+        .querySelector<HTMLInputElement>("input[type='range']")
+        ?.getAttribute("aria-orientation")
     ).toBe("horizontal")
     expect(
-      container.querySelector("[data-slot='fader-thumb'] > span")?.getAttribute("data-orientation")
+      container
+        .querySelector("[data-slot='fader-thumb'] > span")
+        ?.getAttribute("data-orientation")
     ).toBe("horizontal")
     expect(
-      Array.from(container.querySelectorAll<HTMLElement>("[data-slot='fader-mark']")).map(
-        (mark) => mark.getAttribute("data-orientation")
-      )
+      Array.from(
+        container.querySelectorAll<HTMLElement>("[data-slot='fader-mark']")
+      ).map((mark) => mark.getAttribute("data-orientation"))
     ).toEqual(["horizontal", "horizontal", "horizontal"])
   })
 })

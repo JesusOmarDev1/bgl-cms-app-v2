@@ -70,11 +70,6 @@ import type { UrlLinksSubLinksJunction } from "@/types/collections/junctions/url
 import type { ManualCategoriesTypes } from "@/types/collections/manual-categories"
 import type { ManualsTypes } from "@/types/collections/manuals"
 import type { ModelsTypes } from "@/types/collections/models"
-import type {
-  OrderScaleTypes,
-  OrderScalesJunctionTypes,
-  OrderTypes,
-} from "@/types/collections/order"
 import type { PagesTypes } from "@/types/collections/pages"
 import type { PhoneTypes } from "@/types/collections/phones"
 import type { ProductAttributesTypes } from "@/types/collections/product-attributes"
@@ -83,7 +78,6 @@ import type { ProductTypesTypes } from "@/types/collections/product-types"
 import type { ProductsTypes } from "@/types/collections/products"
 import type { RedirectsTypes } from "@/types/collections/redirects"
 import type { SeoTypes } from "@/types/collections/seo"
-import type { ScalesTypes } from "@/types/collections/scales"
 import type { ServicesCategoriesTypes } from "@/types/collections/services-categories"
 import type { ServicesTypes } from "@/types/collections/services"
 import type { SocialLinksTypes } from "@/types/collections/social-links"
@@ -115,9 +109,6 @@ export interface Schema {
   clients: ClientsTypes[]
   suppliers: SuppliersTypes[]
   models: ModelsTypes[]
-  order: OrderTypes[]
-  order_scales: OrderScalesJunctionTypes[]
-  scales: ScalesTypes[]
   emails: EmailTypes[]
   form_responses: FormResponsesTypes[]
   phones: PhoneTypes[]

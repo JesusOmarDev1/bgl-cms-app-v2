@@ -1,9 +1,9 @@
 {
   "products": {
-    "title": "Tienda",
+    "title": "Catálogo",
     "intro": "Navega por categoría y tipo de equipo hasta el producto que necesitas. Encuentra la solución de pesaje ideal para tu negocio.",
     "back_home": "Regresar a inicio",
-    "back_to_store": "Regresar a tienda",
+    "back_to_store": "Regresar al catálogo",
     "search_label": "Buscar productos",
     "search_placeholder": "Buscar por nombre o descripción...",
     "empty_catalog": "Todavía no hay productos publicados.",

@@ -136,7 +136,7 @@ export const sitemapRegistry = {
         await allRows((page) =>
           getProductsRepository({ limit: SITEMAP_LIMIT, page })
         ),
-        "/tienda/producto"
+        "/productos"
       ),
   },
   manuals: {
